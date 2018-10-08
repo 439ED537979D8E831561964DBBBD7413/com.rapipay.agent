@@ -13,6 +13,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.rapipay.android.rapipay.R;
 import com.rapipay.android.rapipay.main_directory.Database.RapipayDB;
 import com.rapipay.android.rapipay.main_directory.Model.RapiPayPozo;
@@ -25,7 +26,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public class BaseCompactActivity extends AppCompatActivity {
-
+    protected FirebaseAnalytics mFirebaseAnalytics;
     protected SimpleDateFormat format;
     protected static String balance = null;
     protected Date date;
@@ -40,6 +41,7 @@ public class BaseCompactActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 //        align_text_center();
         format = new SimpleDateFormat("ddMMyyyyHHmmss");
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         date = new Date();
         localStorage = LocalStorage.getInstance(this);
         hideKeyboard(this);
