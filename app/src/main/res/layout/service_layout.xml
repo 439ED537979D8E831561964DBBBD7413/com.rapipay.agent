@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_margin="3sp"
+        android:weightSum="800">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="230"
+            android:inputType="text"
+            android:text="@string/p_sendnames"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/btn_sendname"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="570"
+            android:onClick="onClick"
+            android:text="@string/p_names"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_margin="3sp"
+        android:weightSum="800">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="230"
+            android:inputType="text"
+            android:text="@string/p_payeenames"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/btn_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="570"
+            android:onClick="onClick"
+            android:text="@string/p_names"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="12sp" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_margin="3sp"
+        android:weightSum="800">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="230"
+            android:inputType="text"
+            android:text="@string/p_payeebank"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/btn_bank"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="570"
+            android:onClick="onClick"
+            android:text="@string/p_bank"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_margin="3sp"
+        android:weightSum="800">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="230"
+            android:inputType="text"
+            android:text="@string/p_payeeaccountno"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/btn_account"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="570"
+            android:onClick="onClick"
+            android:text="@string/p_accountno"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_margin="3sp"
+        android:weightSum="800">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="230"
+            android:inputType="text"
+            android:text="@string/p_ServiceFee"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/btn_servicefee"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="570"
+            android:onClick="onClick"
+            android:text="@string/p_names"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_margin="3sp"
+        android:weightSum="800">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="230"
+            android:inputType="text"
+            android:text="@string/cgst"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/btn_cgst"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="570"
+            android:onClick="onClick"
+            android:text="@string/p_accountno"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_margin="3sp"
+        android:weightSum="800">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="230"
+            android:inputType="text"
+            android:text="@string/igst"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/btn_igst"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="570"
+            android:onClick="onClick"
+            android:text="@string/p_bank"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="12sp" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_margin="3sp"
+        android:weightSum="800">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="230"
+            android:inputType="text"
+            android:text="@string/sgst"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/btn_sgst"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="570"
+            android:onClick="onClick"
+            android:text="@string/p_bank"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="12sp" />
+    </LinearLayout>
+</LinearLayout>

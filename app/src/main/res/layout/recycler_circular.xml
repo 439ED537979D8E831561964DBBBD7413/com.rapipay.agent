@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="80dp"
+    android:layout_height="80dp"
+    android:orientation="vertical"
+    android:id="@+id/layout_item">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/recycler_image"
+        android:layout_width="wrap_content"
+        android:layout_height="60dp"
+        android:src="@drawable/mastercard"
+        android:layout_gravity="center"/>
+
+    <TextView
+        android:id="@+id/recycler_text"
+        android:layout_marginTop="5dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:textSize="8dp"
+        android:textColor="@color/colorPrimaryDark"
+        android:layout_below="@+id/recycler_image"
+        android:text="Recycler"/>
+
+</LinearLayout>

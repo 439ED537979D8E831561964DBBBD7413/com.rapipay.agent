@@ -1,0 +1,130 @@
+<resources>
+    <string name="app_name">RapiPay</string>
+    <string name="permission_read_phone_state_rationale">permission_read_phone_state_rationale</string>
+    <string name="permissions_not_granted_read_phone_state">Cannot Proceed without allowing permissions!</string>
+
+
+    <string name="dialog_button_ok">OK</string>
+    <string name="dialog_button_cancel">Cancel</string>
+    <string name="prompt_Internet">Internet is not Running</string>
+
+    <string name="msg_manual_otp">OTP on SMS Sent, Please Enter the Code</string>
+    <string name="lbl_enter_otp">Enter OTP</string>
+    <string name="lbl_submit">Enter</string>
+    <string name="msg_resent_otp">Click here to re-sent OPT request  </string>
+
+
+    <string name="p_powerdby">Powered by</string>
+    <string name="p_cname">Virgosoft IT Service PVT. LTD.</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="error_field_required">This field is required</string>
+
+    <string name="title_home">Home</string>
+    <string name="title_account">Account</string>
+    <string name="title_notification">Notification</string>
+
+    <string name="btnsubmit">Submit</string>
+    <string name="btnupdate">Generate Request</string>
+    <string name="btnhist">Details</string>
+    <string name="btnsearch">Search</string>
+    <string name="btnsender">Add Sender</string>
+    <string name="btnfund">Fund Transfer</string>
+    <string name="btnben">Add Beneficiary</string>
+    <string name="btnverify">Verify Account</string>
+    <string name="p_accounttr">Account Transfer</string>
+    <string name="p_benaadd">Add New Beneficiary</string>
+
+    <string name="p_bentrans">Beneficiary Transfer Details</string>
+    <string name="p_lasttrans">Last Transaction Details</string>
+    <string name="p_nethead">Network Transfer - Tap to Transfer</string>
+    <string name="p_currenttrans">Current Transaction Details</string>
+    <string name="p_pendingtrans">Pending Transaction Details</string>
+    <string name="p_refundtrans">Refund Transaction Details</string>
+
+
+    <string name="p_userid">Enter Mobile No.</string>
+    <string name="p_mobile">Mobile No.</string>
+    <string name="p_contactid">Enter Number</string>
+    <string name="p_email">Enter Email</string>
+    <string name="p_psw">Password</string>
+    <string name="p_pin">PIN</string>
+    <string name="p_chnagepsw">Change Password</string>
+    <string name="p_registeredUser">Register User</string>
+    <string name="p_feesetup">Fee Setup</string>
+    <string name="p_fundTransfer">Fund Transfer</string>
+    <string name="p_passbook">Pass Book</string>
+    <string name="p_moneytransfer">Money Transfer</string>
+    <string name="p_walletdetail">Wallet Details</string>
+    <string name="p_addPayee">Add Payee</string>
+    <string name="p_deletepayee">Delete Payee</string>
+    <string name="p_walledpasswbook">Wallet Passbook</string>
+    <string name="p_UtilityService">Utility Service</string>
+    <string name="p_prepaidMobile">Prepaid Mobile</string>
+    <string name="p_postpaidMobile">Postpaid Mobile</string>
+    <string name="p_DTH">DTH</string>
+    <string name="p_electricty">Electricity</string>
+    <string name="p_telephone">Telephone</string>
+    <string name="p_recharge">Recharge and Bill Payment</string>
+    <string name="p_travel">Travel and Insurance</string>
+
+    <string name="p_name">Enter Sender Name</string>
+    <string name="p_benname">Enter Beneficiary Name</string>
+    <string name="p_otp">Enter OTP</string>
+    <string name="p_account">Enter Sender Account No.</string>
+    <string name="p_amm_trans">Amount to Transfer</string>
+    <string name="p_benaccount">Enter Beneficiary Account No.</string>
+    <string name="p_ifsc">Enter Sender IFSC</string>
+    <string name="p_amount">Enter Amount</string>
+    <string name="p_tramount">Enter Transfer Amount</string>
+    <string name="p_transtionid">Enter Valid Bank Transaction Id</string>
+    <string name="p_address">Enter Address</string>
+    <string name="p_remark">Enter Remarks</string>
+    <string name="p_remarks">Remarks</string>
+    <string name="p_submit">Travel and Insurance</string>
+    <string name="user_details">User Details</string>
+    <string name="p_category">Agent Category</string>
+    <string name="p_branchname">Enter Branch Name</string>
+    <string name="p_branchcode">Enter Branch Code</string>
+
+    <string name="p_names">Name</string>
+    <string name="p_payeenames">Payee Name</string>
+    <string name="p_ServiceFee">ServiceFee</string>
+    <string name="p_sendnames">Sender No.</string>
+    <string name="p_date1">To Date</string>
+    <string name="p_date2">From Date</string>
+
+    <string name="p_comnames">Company Name</string>
+    <string name="p_requestid">Request ID</string>
+    <string name="p_txnamount">TXN Amount</string>
+    <string name="p_status">Status</string>
+    <string name="p_creditreq">Generate Credit Request</string>
+    <string name="p_chhist">Channel History</string>
+    <string name="p_req">Register User</string>
+    <string name="agentName">Agent Name</string>
+    <string name="agentBalance">Agent Balance</string>
+    <string name="p_accountno">Account</string>
+    <string name="p_payeeaccountno">Payee Account</string>
+    <string name="cgst">CGST</string>
+    <string name="igst">IGST</string>
+    <string name="sgst">SGST</string>
+    <string name="p_ifsccode">IFSC</string>
+    <string name="p_bank">Bank</string>
+    <string name="p_payeebank">Payee Bank</string>
+    <string name="p_rrn">RRN</string>
+    <string name="p_amounts">Amount</string>
+    <string name="p_transid">Trans ID</string>
+
+    <string name="sertype">Service type</string>
+    <string name="txndate">TXN Date</string>
+    <string name="txniddate">TXN ID/Date</string>
+    <string name="txncrdrAmount">TXN/CRDR Amount</string>
+
+    <string name="openingclosingBalance">Opening/Closing Balance</string>
+    <string name="txnsettlestatus">TXN/Settle Status</string>
+
+
+
+    <string name="prompt_getadteerror">Error in geting data,try again...</string>
+
+</resources>

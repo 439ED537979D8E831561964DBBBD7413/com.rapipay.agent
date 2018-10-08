@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:autofit="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="login"
+            type="com.rapipay.android.rapipay.main_directory.Model.Login" />
+
+    </data>
+
+    <android.support.design.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        android:fitsSystemWindows="true">
+
+        <android.support.design.widget.AppBarLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:theme="@style/AppTheme.AppBarOverlay">
+
+            <include layout="@layout/toolbar" />
+        </android.support.design.widget.AppBarLayout>
+
+        <android.support.v4.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/white"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">>
+
+            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:autofit="http://schemas.android.com/apk/res-auto"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/header"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/colorPrimaryDark"
+                    android:gravity="center"
+                    android:padding="8dp"
+                    android:text="@string/user_details"
+                    android:textColor="@color/white"
+                    android:textSize="14dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="5dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="3sp"
+                        android:orientation="horizontal"
+                        android:weightSum="800">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="300"
+                            android:inputType="text"
+                            android:text="@string/p_comnames"
+                            android:textSize="12sp" />
+
+                        <me.grantland.widget.AutofitTextView
+                            android:id="@+id/btn_name"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="500"
+                            android:maxLines="1"
+                            android:singleLine="true"
+                            android:text="@string/p_accountno"
+                            android:textColor="@color/colorPrimaryDark"
+                            android:textSize="12sp"
+                            autofit:minTextSize="8sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="3sp"
+                        android:orientation="horizontal"
+                        android:weightSum="800">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="300"
+                            android:inputType="text"
+                            android:text="@string/p_userid"
+                            android:textSize="12sp" />
+
+                        <me.grantland.widget.AutofitTextView
+                            android:id="@+id/btn_p_amounts"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="500"
+                            android:maxLines="1"
+                            android:singleLine="true"
+                            android:text="@string/p_amounts"
+                            android:textColor="@color/colorPrimaryDark"
+                            android:textSize="12sp"
+                            autofit:minTextSize="8sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="3sp"
+                        android:orientation="horizontal"
+                        android:weightSum="800">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="300"
+                            android:inputType="text"
+                            android:text="@string/agentName"
+                            android:textSize="12sp" />
+
+                        <me.grantland.widget.AutofitTextView
+                            android:id="@+id/btn_p_transid"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="500"
+                            android:maxLines="1"
+                            android:singleLine="true"
+                            android:text="@string/p_transid"
+                            android:textColor="@color/colorPrimaryDark"
+                            android:textSize="12sp"
+                            autofit:minTextSize="8sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="3sp"
+                        android:orientation="horizontal"
+                        android:weightSum="800">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="300"
+                            android:inputType="text"
+                            android:text="@string/p_amounts"
+                            android:textSize="12sp" />
+
+                        <me.grantland.widget.AutofitTextView
+                            android:id="@+id/btn_p_bank"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="500"
+                            android:maxLines="1"
+                            android:singleLine="true"
+                            android:text="@string/agentBalance"
+                            android:textColor="@color/colorPrimaryDark"
+                            android:textSize="12sp"
+                            autofit:minTextSize="8sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="3sp"
+                        android:orientation="horizontal"
+                        android:weightSum="800">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="300"
+                            android:inputType="text"
+                            android:text="@string/p_category"
+                            android:textSize="12sp" />
+
+                        <me.grantland.widget.AutofitTextView
+                            android:id="@+id/agent_category"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="500"
+                            android:maxLines="1"
+                            android:singleLine="true"
+                            android:text="@string/agentBalance"
+                            android:textColor="@color/colorPrimaryDark"
+                            android:textSize="12sp"
+                            autofit:minTextSize="8sp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+
+            </LinearLayout>
+        </android.support.v4.widget.NestedScrollView>
+    </android.support.design.widget.CoordinatorLayout>
+</layout>
