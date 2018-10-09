@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="5dp"
+    android:elevation="10dp"
+    app:cardBackgroundColor="@color/white">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/dialog_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:background="@color/colorPrimaryDark"
+            android:gravity="left"
+            android:padding="15dp"
+            android:text="@string/app_name"
+            android:textColor="@color/white"
+            android:textSize="18dp" />
+        <TextView
+            android:id="@+id/bank_select"
+            style="@style/Widget.AppCompat.Spinner.Underlined"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:padding="10dp"
+            android:layout_marginTop="5dp"
+            android:spinnerMode="dropdown"
+            android:text="Select Transfer Type" />
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:padding="10dp"
+            android:layout_height="wrap_content">
+
+            <EditText
+                android:id="@+id/input_amount_ben"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/p_amount"
+                android:inputType="numberDecimal"
+                android:maxLength="13"
+                android:textSize="16dp" />
+        </android.support.design.widget.TextInputLayout>
+
+
+        <EditText
+            android:id="@+id/input_ifsc"
+            android:padding="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/p_ifsccode"
+            android:inputType="text"
+            android:textSize="16dp"
+            android:visibility="gone" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:gravity="end"
+            android:orientation="horizontal"
+            android:weightSum="800">
+
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/btn_cancel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:background="@drawable/border_button"
+                android:onClick="onClick"
+                android:padding="5dp"
+                android:text="@string/cancel"
+                android:textColor="@color/white"
+                android:textSize="16dp" />
+
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/btn_ok"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:background="@drawable/border_button"
+                android:onClick="onClick"
+                android:padding="5dp"
+                android:text="@string/ok"
+                android:textColor="@color/white"
+                android:textSize="16dp" />
+        </LinearLayout>
+    </LinearLayout>
+
+</android.support.v7.widget.CardView>

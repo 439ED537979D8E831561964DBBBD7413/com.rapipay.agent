@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical"
+    android:theme="@style/AppTheme">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="10dp"
+        android:weightSum="800">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="200"
+            android:text="Enter Old Pin"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="16dp" />
+
+        <com.rapipay.android.agent.view.PinEntryEditText
+            android:id="@+id/otppinView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="600"
+            android:cursorVisible="false"
+            android:digits="1234567890"
+            android:hint="Enter OTP"
+            android:inputType="number"
+            android:maxLength="6"
+            android:padding="5dp"
+            android:textColor="@color/colorPrimaryDark"
+            android:textIsSelectable="false"
+            android:textSize="20sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="10dp"
+        android:weightSum="800">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="200"
+            android:text="Enter New Pin"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="16dp" />
+
+        <com.rapipay.android.agent.view.PinEntryEditText
+            android:id="@+id/pinView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="600"
+            android:cursorVisible="false"
+            android:digits="1234567890"
+            android:hint="Enter OTP"
+            android:inputType="number"
+            android:maxLength="6"
+            android:padding="5dp"
+            android:textColor="@color/colorPrimaryDark"
+            android:textIsSelectable="false"
+            android:textSize="20sp" />
+    </LinearLayout>
+
+    <android.support.v7.widget.AppCompatButton
+        android:id="@+id/btn_login"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="70dp"
+        android:background="@drawable/border_button"
+        android:onClick="onClick"
+        android:text="Submit"
+        android:textColor="@color/white" />
+
+</LinearLayout>

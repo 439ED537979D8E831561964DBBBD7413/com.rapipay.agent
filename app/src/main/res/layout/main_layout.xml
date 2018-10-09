@@ -1,0 +1,39 @@
+<android.support.v7.widget.Toolbar
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/toolbar"
+    android:layout_width="match_parent"
+    android:layout_height="?attr/actionBarSize"
+    android:background="@color/white"
+    app:popupTheme="@style/AppTheme.PopupOverlay"
+    app:contentInsetEnd="0dp"
+    app:contentInsetStart="0dp">
+
+    <ImageView android:id="@+id/back_click"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="left"
+        android:layout_marginLeft="10dp"
+        android:scaleType="fitStart"
+        android:src="@drawable/rapipay"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:textSize="16dp"
+        android:gravity="left"
+        android:layout_marginLeft="5dp"
+        android:text="@string/app_name"
+        android:textColor="@color/colorPrimaryDark"
+        android:id="@+id/toolbar_title"
+        android:visibility="gone"/>
+    <ImageView android:id="@+id/reset"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="right|center"
+        android:scaleType="fitStart"
+        android:layout_marginRight="5dp"
+        android:onClick="onClick"
+        android:src="@drawable/reset"
+        android:visibility="gone"/>
+</android.support.v7.widget.Toolbar>

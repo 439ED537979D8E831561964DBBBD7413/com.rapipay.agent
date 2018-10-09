@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:autofit="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="5dp"
+    android:weightSum="800">
+
+    <LinearLayout
+        android:id="@+id/fromdate"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="400"
+        android:background="@drawable/border_view"
+        android:orientation="horizontal"
+        android:weightSum="300">
+        <ImageView
+            android:id="@+id/fromimage"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="80"
+            android:clickable="true"
+            android:src="@drawable/calender"
+            android:textColor="@color/white" />
+        <me.grantland.widget.AutofitTextView
+            android:id="@+id/date2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="0dp"
+            android:layout_marginTop="8dp"
+            android:layout_weight="220"
+            android:hint="@string/p_date2for"
+            android:maxLines="1"
+            android:padding="1dp"
+            android:singleLine="true"
+            android:textSize="10sp"
+            autofit:minTextSize="7sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/todate"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="4dp"
+        android:layout_weight="400"
+        android:background="@drawable/border_view"
+        android:orientation="horizontal"
+        android:weightSum="300">
+        <ImageView
+            android:id="@+id/toimage"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="80"
+            android:clickable="true"
+            android:src="@drawable/calender"
+            android:textColor="@color/white" />
+        <me.grantland.widget.AutofitTextView
+            android:id="@+id/date1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="0dp"
+            android:layout_marginTop="8dp"
+            android:layout_weight="220"
+            android:hint="@string/p_date1for"
+            android:maxLines="1"
+            android:padding="1dp"
+            android:singleLine="true"
+            android:textSize="10sp"
+            autofit:minTextSize="7sp" />
+
+    </LinearLayout>
+
+</LinearLayout>

@@ -9,7 +9,7 @@
     app:cardBackgroundColor="@color/white">
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="5dp">
@@ -24,7 +24,7 @@
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="300"
+                android:layout_weight="400"
                 android:inputType="text"
                 android:text="@string/p_accountno"
                 android:textSize="12sp" />
@@ -33,7 +33,7 @@
                 android:id="@+id/btn_name"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="500"
+                android:layout_weight="400"
                 android:onClick="onClick"
                 android:text="@string/p_accountno"
                 android:textColor="@color/colorPrimaryDark"
@@ -53,7 +53,7 @@
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="300"
+                android:layout_weight="400"
                 android:inputType="text"
                 android:text="@string/p_amounts"
                 android:textSize="12sp" />
@@ -62,7 +62,7 @@
                 android:id="@+id/btn_p_amounts"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="500"
+                android:layout_weight="400"
                 android:onClick="onClick"
                 android:text="@string/p_amounts"
                 android:textColor="@color/colorPrimaryDark"
@@ -82,7 +82,7 @@
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="300"
+                android:layout_weight="400"
                 android:inputType="text"
                 android:text="@string/p_transid"
                 android:textSize="12sp" />
@@ -91,7 +91,7 @@
                 android:id="@+id/btn_p_transid"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="500"
+                android:layout_weight="400"
                 android:onClick="onClick"
                 android:text="@string/p_transid"
                 android:textColor="@color/colorPrimaryDark"
@@ -111,7 +111,7 @@
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="300"
+                android:layout_weight="400"
                 android:inputType="text"
                 android:text="@string/p_bank"
                 android:textSize="12sp" />
@@ -120,7 +120,7 @@
                 android:id="@+id/btn_p_bank"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="500"
+                android:layout_weight="400"
                 android:onClick="onClick"
                 android:text="@string/p_bank"
                 android:textColor="@color/colorPrimaryDark"
@@ -139,7 +139,7 @@
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="300"
+                android:layout_weight="400"
                 android:inputType="text"
                 android:text="@string/p_rrn"
                 android:textSize="12sp" />
@@ -148,7 +148,7 @@
                 android:id="@+id/btn_rrn"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="500"
+                android:layout_weight="400"
                 android:onClick="onClick"
                 android:text="@string/p_bank"
                 android:textColor="@color/colorPrimaryDark"

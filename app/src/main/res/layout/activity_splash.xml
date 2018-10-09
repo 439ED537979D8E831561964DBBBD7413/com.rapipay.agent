@@ -5,8 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    android:orientation="vertical"
-    tools:context="com.rapipay.android.rapipay.main_directory.main_directory.SpashScreenActivity">
+    android:orientation="vertical">
 
 
     <TextView
@@ -45,7 +44,7 @@
         android:layout_below="@id/textview1"
         android:layout_marginTop="10dp"
         android:gravity="center"
-        android:text="Virgosoft IT Services PVT. LTD."
+        android:text="RapiPay Fintech PVT. LTD."
         android:textColor="@color/colorPrimaryDark"
         android:textSize="16dp"
         android:textStyle="italic" />

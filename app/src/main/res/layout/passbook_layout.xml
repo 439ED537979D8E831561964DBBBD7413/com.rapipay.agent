@@ -1,16 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:autofit="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-
-    <data>
-
-        <variable
-            name="login"
-            type="com.rapipay.android.rapipay.main_directory.Model.Login" />
-    </data>
 
     <android.support.design.widget.CoordinatorLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:autofit="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/white"
@@ -25,10 +18,10 @@
         </android.support.design.widget.AppBarLayout>
 
         <android.support.v4.widget.NestedScrollView
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/white">
+            android:background="@color/white"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
             <LinearLayout
                 android:id="@+id/fundlayout"
@@ -37,69 +30,49 @@
                 android:orientation="vertical"
                 android:visibility="visible">
 
-                <TextView
-                    android:id="@+id/heading"
+                <Spinner
+                    android:id="@+id/select_state"
+                    style="@style/Widget.AppCompat.Spinner.Underlined"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@color/colorPrimaryDark"
-                    android:gravity="center"
-                    android:padding="5dp"
-                    android:text="@string/p_chhist"
-                    android:textColor="@color/white" />
+                    android:layout_marginTop="5dp"
+                    android:spinnerMode="dropdown"
+                    android:visibility="gone"/>
+
+                <!--<TextView-->
+                <!--android:id="@+id/heading"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:background="@color/colorPrimaryDark"-->
+                <!--android:gravity="center"-->
+                <!--android:padding="5dp"-->
+                <!--android:text="@string/p_chhist"-->
+                <!--android:textColor="@color/white" />-->
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="800"
                     android:orientation="horizontal"
-                    android:padding="5dp">
+                    android:padding="5dp"
+                    android:weightSum="800">
 
-                    <me.grantland.widget.AutofitTextView
-                        android:id="@+id/date2"
+                    <include
+                        layout="@layout/calender_lay"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_margin="5dp"
-                        android:layout_marginTop="8dp"
-                        android:layout_weight="300"
-                        android:background="@drawable/border_view"
-                        android:clickable="true"
-                        android:gravity="center"
-                        android:hint="@string/p_date2"
-                        android:maxLines="1"
-                        android:onClick="onClick"
-                        android:padding="5dp"
-                        android:singleLine="true"
-                        android:textSize="16dp"
-                        autofit:minTextSize="8sp" />
+                        android:layout_weight="700" />
 
-                    <me.grantland.widget.AutofitTextView
-                        android:id="@+id/date1"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="5dp"
-                        android:layout_marginTop="8dp"
-                        android:layout_weight="300"
-                        android:background="@drawable/border_view"
-                        android:clickable="true"
-                        android:gravity="center"
-                        android:hint="@string/p_date1"
-                        android:maxLines="1"
-                        android:onClick="onClick"
-                        android:padding="5dp"
-                        android:singleLine="true"
-                        android:textSize="16dp"
-                        autofit:minTextSize="8sp" />
-
-                    <android.support.v7.widget.AppCompatButton
+                    <ImageView
                         android:id="@+id/btn_fund"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:layout_weight="200"
-                        android:background="@drawable/border_button"
+                        android:layout_marginLeft="10dp"
+                        android:layout_weight="100"
                         android:clickable="true"
                         android:gravity="center"
                         android:onClick="onClick"
+                        android:src="@drawable/searchicon"
                         android:text="@string/btnhist"
                         android:textColor="@color/white"
                         android:textSize="14dp" />
@@ -117,4 +90,3 @@
             <!--</android.support.v7.widget.CardView>-->
         </android.support.v4.widget.NestedScrollView>
     </android.support.design.widget.CoordinatorLayout>
-</layout>

@@ -1,16 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:autofit="http://schemas.android.com/tools">
 
-    <data>
-        <variable
-            name="login"
-            type="com.rapipay.android.rapipay.main_directory.Model.Login" />
-
-    </data>
 
     <android.support.design.widget.CoordinatorLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:autofit="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/white"
@@ -24,82 +18,106 @@
             <include layout="@layout/toolbar" />
         </android.support.design.widget.AppBarLayout>
 
-        <android.support.v4.widget.NestedScrollView
+        <!--<android.support.v4.widget.NestedScrollView-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:background="@color/white"-->
+        <!--app:layout_behavior="@string/appbar_scrolling_view_behavior">-->
+
+        <LinearLayout
+            android:id="@+id/fundlayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/white"
+            android:orientation="vertical"
+            android:theme="@style/AppTheme"
+            android:visibility="visible"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
+            <TextView
+                android:id="@+id/heading"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorPrimaryDark"
+                android:gravity="center"
+                android:padding="5dp"
+                android:text="@string/pchist"
+                android:textColor="@color/white"
+                android:visibility="gone" />
+
             <LinearLayout
-                android:id="@+id/fundlayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="5dp"
+                android:weightSum="800"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+                <!--<LinearLayout-->
+                <!--android:id="@+id/todate"-->
+                <!--android:layout_width="0dp"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_weight="700"-->
+                <!--android:background="@drawable/border_view"-->
+                <!--android:orientation="horizontal"-->
+                <!--android:padding="5dp"-->
+                <!--android:weightSum="300">-->
+                <!--<ImageView-->
+                <!--android:id="@+id/toimage"-->
+                <!--android:layout_width="0dp"-->
+                <!--android:layout_height="40dp"-->
+                <!--android:layout_weight="50"-->
+                <!--android:clickable="true"-->
+                <!--android:src="@drawable/calender"-->
+                <!--android:textColor="@color/white" />-->
+                <!--<me.grantland.widget.AutofitTextView-->
+                <!--android:id="@+id/date"-->
+                <!--android:layout_width="0dp"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_gravity="center"-->
+                <!--android:layout_margin="0dp"-->
+                <!--android:gravity="center"-->
+                <!--android:layout_marginTop="8dp"-->
+                <!--android:layout_weight="250"-->
+                <!--android:hint="@string/p_date2for"-->
+                <!--android:maxLines="1"-->
+                <!--android:padding="1dp"-->
+                <!--android:singleLine="true"-->
+                <!--android:textSize="12sp"-->
+                <!--autofit:minTextSize="8sp" />-->
+                <!--</LinearLayout>-->
+
+                <include
+                    layout="@layout/calender_lay"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="700" />
+
+
+                <ImageView
+                    android:id="@+id/btn_fund"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="10dp"
+                    android:layout_weight="100"
+                    android:clickable="true"
+                    android:gravity="center"
+                    android:onClick="onClick"
+                    android:src="@drawable/searchicon"
+                    android:text="@string/btnhist"
+                    android:textColor="@color/white"
+                    android:textSize="14dp" />
+            </LinearLayout>
+
+            <ListView
+                android:id="@+id/trans_details"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:theme="@style/AppTheme"
-                android:visibility="visible">
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="5dp"
+                android:gravity="center_horizontal" />
 
-                <TextView
-                    android:id="@+id/heading"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@color/colorPrimaryDark"
-                    android:gravity="center"
-                    android:padding="5dp"
-                    android:text="@string/p_chhist"
-                    android:textColor="@color/white" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="5dp"
-                    android:weightSum="800"
-                    app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-                    <me.grantland.widget.AutofitTextView
-                        android:id="@+id/date"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="5dp"
-                        android:layout_marginTop="8dp"
-                        android:layout_weight="600"
-                        android:background="@drawable/border_view"
-                        android:clickable="true"
-                        android:gravity="center"
-                        android:hint="Select Date"
-                        android:maxLines="1"
-                        android:onClick="onClick"
-                        android:padding="5dp"
-                        android:singleLine="true"
-                        android:textSize="16dp"
-                        autofit:minTextSize="10sp" />
-
-                    <android.support.v7.widget.AppCompatButton
-                        android:id="@+id/btn_fund"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_weight="200"
-                        android:background="@drawable/border_button"
-                        android:clickable="true"
-                        android:gravity="center"
-                        android:onClick="onClick"
-                        android:text="@string/btnhist"
-                        android:textColor="@color/white"
-                        android:textSize="14dp" />
-                </LinearLayout>
-
-                <android.support.v7.widget.RecyclerView
-                    android:id="@+id/trans_details"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginTop="5dp"
-                    android:gravity="center_horizontal" />
-
-            </LinearLayout>
-        </android.support.v4.widget.NestedScrollView>
+        </LinearLayout>
+        <!--</android.support.v4.widget.NestedScrollView>-->
     </android.support.design.widget.CoordinatorLayout>
     <!--</android.support.v7.widget.CardView>-->
-
-</layout>

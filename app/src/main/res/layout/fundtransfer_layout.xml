@@ -1,14 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <data>
-        <variable
-            name="login"
-            type="com.rapipay.android.rapipay.main_directory.Model.Login" />
-    </data>
 
     <android.support.design.widget.CoordinatorLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/white">
@@ -39,8 +34,9 @@
                     android:background="@color/colorPrimaryDark"
                     android:gravity="center"
                     android:padding="5dp"
-                    android:text="@string/p_chhist"
-                    android:textColor="@color/white" />
+                    android:text="@string/pchist"
+                    android:textColor="@color/white"
+                    android:visibility="gone"/>
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -53,28 +49,28 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
                         android:layout_marginTop="8dp"
-                        android:layout_weight="600">
+                        android:layout_weight="700">
 
                         <EditText
                             android:id="@+id/input_mobile"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="@string/p_userid"
+                            android:hint="@string/p_cususerid"
                             android:inputType="number"
                             android:maxLength="10"
                             android:textSize="16dp" />
                     </android.support.design.widget.TextInputLayout>
 
-                    <android.support.v7.widget.AppCompatButton
+                    <ImageView
                         android:id="@+id/btn_search"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="50dp"
                         android:layout_margin="5dp"
                         android:layout_marginBottom="8dp"
                         android:layout_marginTop="8dp"
-                        android:layout_weight="200"
-                        android:background="@color/colorPrimary"
+                        android:layout_weight="100"
                         android:onClick="onClick"
+                        android:src="@drawable/contactsicon"
                         android:text="@string/btnsearch"
                         android:textColor="@color/white"
                         android:textSize="10dp" />
@@ -94,7 +90,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
                         android:layout_marginTop="8dp"
-                        android:layout_weight="600">
+                        android:layout_weight="700">
 
                         <EditText
                             android:id="@+id/input_name"
@@ -105,15 +101,15 @@
                             android:textSize="16dp" />
                     </android.support.design.widget.TextInputLayout>
 
-                    <android.support.v7.widget.AppCompatButton
+                    <ImageView
                         android:id="@+id/btn_sender"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_margin="5dp"
                         android:layout_marginBottom="8dp"
                         android:layout_marginTop="8dp"
-                        android:layout_weight="200"
-                        android:background="@color/colorPrimary"
+                        android:layout_weight="100"
+                        android:src="@drawable/sender"
                         android:onClick="onClick"
                         android:text="@string/btnsender"
                         android:textColor="@color/white"
@@ -133,14 +129,14 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
                         android:layout_marginTop="8dp"
-                        android:layout_weight="600">
+                        android:layout_weight="700">
 
                         <EditText
                             android:id="@+id/input_otp"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:hint="@string/p_otp"
-                            android:inputType="number"
+                            android:inputType="numberPassword"
                             android:maxLength="6"
                             android:textSize="16dp" />
                     </android.support.design.widget.TextInputLayout>
@@ -148,16 +144,16 @@
                     <android.support.v7.widget.AppCompatButton
                         android:id="@+id/btn_otpsubmit"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="5dp"
-                        android:layout_marginBottom="8dp"
-                        android:layout_marginTop="8dp"
-                        android:layout_weight="200"
-                        android:background="@color/colorPrimary"
+                        android:layout_height="40dp"
+                        android:layout_margin="10dp"
+                        android:layout_weight="100"
+                        android:layout_gravity="center"
+                        android:background="@drawable/otpborder"
                         android:onClick="onClick"
-                        android:text="@string/btnsubmit"
-                        android:textColor="@color/white"
-                        android:textSize="10dp" />
+                        android:text="@string/btotp"
+                        android:textStyle="bold"
+                        android:textColor="@color/colorPrimaryDark"
+                        android:textSize="14dp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -178,13 +174,14 @@
                         android:textColor="@color/white"
                         android:textSize="14dp" />
 
-                    <com.toptoche.searchablespinnerlibrary.SearchableSpinner
+                    <TextView
                         android:id="@+id/bank_select"
                         style="@style/Widget.AppCompat.Spinner.Underlined"
                         android:layout_width="match_parent"
+                        android:background="@drawable/border_view"
+                        android:padding="10dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="5dp"
-                        android:layout_marginTop="5dp"
+                        android:layout_margin="5dp"
                         android:spinnerMode="dropdown"
                         android:text="Select Bank" />
 
@@ -215,7 +212,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:hint="@string/p_amount"
-                            android:inputType="number"
+                            android:maxLength="10"
+                            android:inputType="numberDecimal"
                             android:textSize="16dp" />
                     </android.support.design.widget.TextInputLayout>
 
@@ -231,7 +229,7 @@
                             android:layout_height="wrap_content"
                             android:layout_margin="10dp"
                             android:layout_weight="400"
-                            android:background="@color/colorPrimary"
+                            android:background="@drawable/border_button"
                             android:onClick="onClick"
                             android:text="@string/btnfund"
                             android:textColor="@color/white"
@@ -243,12 +241,39 @@
                             android:layout_height="wrap_content"
                             android:layout_margin="10dp"
                             android:layout_weight="400"
-                            android:background="@color/colorPrimary"
+                            android:background="@drawable/border_button"
                             android:onClick="onClick"
                             android:text="@string/btnverify"
                             android:textColor="@color/white"
                             android:textSize="10dp" />
                     </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/beneficiary_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/colorPrimaryDark"
+                        android:gravity="center"
+                        android:padding="5dp"
+                        android:text="@string/p_bentrans"
+                        android:textColor="@color/white"
+                        android:textSize="14dp" />
+
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/beneficiary_details"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="5dp"
+                        android:gravity="center_horizontal" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -278,37 +303,7 @@
                         android:gravity="center_horizontal" />
                 </LinearLayout>
 
-
-                <LinearLayout
-                    android:id="@+id/beneficiary_layout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:orientation="vertical"
-                    android:visibility="gone">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@color/colorPrimaryDark"
-                        android:gravity="center"
-                        android:padding="5dp"
-                        android:text="@string/p_bentrans"
-                        android:textColor="@color/white"
-                        android:textSize="14dp" />
-
-                    <android.support.v7.widget.RecyclerView
-                        android:id="@+id/beneficiary_details"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:layout_marginTop="5dp"
-                        android:gravity="center_horizontal" />
-                </LinearLayout>
-
             </LinearLayout>
         </android.support.v4.widget.NestedScrollView>
     </android.support.design.widget.CoordinatorLayout>
     <!--</android.support.v7.widget.CardView>-->
-
-</layout>
