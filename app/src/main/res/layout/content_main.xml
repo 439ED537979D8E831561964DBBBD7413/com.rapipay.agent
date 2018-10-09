@@ -8,7 +8,7 @@
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:showIn="@layout/app_bar_main"
-    tools:context="com.rapipay.android.rapipay.main_directory.main_directory.MainActivity">
+    tools:context="com.rapipay.android.agent.main_directory.MainActivity">
 
     <FrameLayout
         android:id="@+id/frame_container"

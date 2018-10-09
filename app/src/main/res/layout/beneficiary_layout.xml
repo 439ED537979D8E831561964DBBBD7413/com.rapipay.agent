@@ -8,7 +8,7 @@
     app:cardBackgroundColor="@color/white">
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="5dp">
@@ -23,7 +23,7 @@
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="230"
+                android:layout_weight="400"
                 android:inputType="text"
                 android:text="@string/p_names"
                 android:textSize="12sp" />
@@ -32,9 +32,10 @@
                 android:id="@+id/btn_name"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="570"
+                android:layout_weight="400"
                 android:onClick="onClick"
                 android:text="@string/p_names"
+                android:inputType="textMultiLine"
                 android:textColor="@color/colorPrimaryDark"
                 android:textSize="12sp" />
         </LinearLayout>
@@ -49,7 +50,7 @@
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="230"
+                android:layout_weight="400"
                 android:inputType="text"
                 android:text="@string/p_accountno"
                 android:textSize="12sp" />
@@ -57,8 +58,9 @@
             <TextView
                 android:id="@+id/btn_account"
                 android:layout_width="0dp"
+                android:inputType="textMultiLine"
                 android:layout_height="wrap_content"
-                android:layout_weight="570"
+                android:layout_weight="400"
                 android:onClick="onClick"
                 android:text="@string/p_accountno"
                 android:textColor="@color/colorPrimaryDark"
@@ -75,7 +77,7 @@
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="230"
+                android:layout_weight="400"
                 android:inputType="text"
                 android:text="@string/p_bank"
                 android:textSize="12sp" />
@@ -83,8 +85,9 @@
             <TextView
                 android:id="@+id/btn_bank"
                 android:layout_width="0dp"
+                android:inputType="textMultiLine"
                 android:layout_height="wrap_content"
-                android:layout_weight="570"
+                android:layout_weight="400"
                 android:onClick="onClick"
                 android:text="@string/p_bank"
                 android:textColor="@color/colorPrimaryDark"

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:weightSum="800">
+
+    <TextView
+        android:id="@+id/headervalue"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="200"
+        android:inputType="textMultiLine"
+        android:padding="10dp"
+        android:text="Header"
+        android:textSize="14dp" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="540">
+
+        <TextView
+            android:id="@+id/headerdata"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="540"
+            android:inputType="textMultiLine"
+            android:padding="10dp"
+            android:text="Header"
+            android:textSize="14dp"
+            android:textStyle="bold"
+            android:visibility="visible"/>
+
+        <EditText
+            android:id="@+id/headerdataedit"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="540"
+            android:inputType="textMultiLine"
+            android:padding="10dp"
+            android:text="Header"
+            android:textSize="14dp"
+            android:textStyle="bold"
+            android:visibility="gone"/>
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/headeredit"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="60"
+        android:inputType="textMultiLine"
+        android:src="@drawable/edit"
+        android:text="Header"
+        android:textSize="14dp"
+        android:visibility="gone"/>
+
+</LinearLayout>

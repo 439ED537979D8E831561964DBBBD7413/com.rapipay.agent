@@ -1,17 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:autofit="http://schemas.android.com/tools">
 
-    <data>
-
-        <variable
-            name="login"
-            type="com.rapipay.android.rapipay.main_directory.Model.Login" />
-
-    </data>
 
     <android.support.design.widget.CoordinatorLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:autofit="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/white"
@@ -44,9 +37,12 @@
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
                     android:clickable="true"
-                    app:tabBackground="?attr/selectableItemBackground"
+                    app:tabIndicatorHeight="3dp"
+                    app:tabIndicatorColor="@color/tab_color"
+                    app:tabBackground="@color/colorPrimaryDark"
                     app:tabMode="fixed"
-                    app:tabSelectedTextColor="@android:color/black" />
+                    app:tabTextColor="@color/white"
+                    app:tabSelectedTextColor="@color/white"/>
                 <!--</android.support.design.widget.AppBarLayout>-->
                 <FrameLayout
                     android:id="@+id/frame_container"
@@ -55,4 +51,3 @@
             </LinearLayout>
         </android.support.v4.widget.NestedScrollView>
     </android.support.design.widget.CoordinatorLayout>
-</layout>

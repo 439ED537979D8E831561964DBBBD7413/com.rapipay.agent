@@ -5,39 +5,37 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    android:fitsSystemWindows="true"
-    tools:context="com.rapipay.android.rapipay.main_directory.main_directory.MainActivity">
+    android:fitsSystemWindows="true">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:theme="@style/AppTheme.AppBarOverlay">
 
-        <include layout="@layout/toolbar" />
+        <include layout="@layout/main_layout" />
     </android.support.design.widget.AppBarLayout>
 
     <include layout="@layout/content_main"
         android:layout_marginTop="?attr/actionBarSize"
-        android:layout_marginBottom="?attr/actionBarSize"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
-    <android.support.design.widget.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:background="@android:color/white"
-        android:elevation="80dp">
+    <!--<android.support.design.widget.AppBarLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_gravity="bottom"-->
+        <!--android:background="@android:color/white"-->
+        <!--android:elevation="80dp">-->
 
-        <android.support.design.widget.TabLayout
-            android:id="@+id/bottomNavigation"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:clickable="true"
-            app:tabBackground="?attr/selectableItemBackground"
-            app:tabGravity="fill"
-            app:tabMode="fixed"
-            app:tabSelectedTextColor="@android:color/black" />
-    </android.support.design.widget.AppBarLayout>
+        <!--<android.support.design.widget.TabLayout-->
+            <!--android:id="@+id/bottomNavigation"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="56dp"-->
+            <!--android:clickable="true"-->
+            <!--app:tabBackground="?attr/selectableItemBackground"-->
+            <!--app:tabGravity="fill"-->
+            <!--app:tabMode="fixed"-->
+            <!--app:tabSelectedTextColor="@android:color/black" />-->
+    <!--</android.support.design.widget.AppBarLayout>-->
 
 
 </android.support.design.widget.CoordinatorLayout>

@@ -1,0 +1,602 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:autofit="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="5dp"
+    android:elevation="10dp"
+    app:cardBackgroundColor="@color/white">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/dialog_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:background="@color/colorPrimaryDark"
+                android:gravity="left"
+                android:padding="15dp"
+                android:text="@string/app_name"
+                android:textColor="@color/white"
+                android:textSize="18dp" />
+
+            <TextView
+                android:id="@+id/dialog_cancel"
+                android:layout_alignParentRight="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:gravity="left"
+                android:padding="10dp"
+                android:text="X"
+                android:visibility="gone"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:textSize="24dp"/>
+        </RelativeLayout>
+
+
+        <TextView
+            android:id="@+id/dialog_msg"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:layout_marginTop="10dp"
+            android:gravity="left"
+            android:padding="5dp"
+            android:text="@string/app_name"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="18dp"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:id="@+id/otp_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/input_otp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/lbl_enter_otp"
+                    android:inputType="number"
+                    android:maxLength="4"
+                    android:textSize="16dp" />
+            </android.support.design.widget.TextInputLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ben_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="5dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="3sp"
+                    android:orientation="horizontal"
+                    android:weightSum="800">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="230"
+                        android:inputType="text"
+                        android:text="@string/p_accountno"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/btn_account"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="570"
+                        android:onClick="onClick"
+                        android:text="@string/p_accountno"
+                        android:textColor="@color/colorPrimaryDark"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="3sp"
+                    android:orientation="horizontal"
+                    android:weightSum="800">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="230"
+                        android:inputType="text"
+                        android:text="@string/p_names"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/btn_name"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="570"
+                        android:onClick="onClick"
+                        android:text="@string/p_names"
+                        android:textColor="@color/colorPrimaryDark"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="3sp"
+                    android:orientation="horizontal"
+                    android:weightSum="800">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="230"
+                        android:inputType="text"
+                        android:text="@string/p_bank"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/btn_bank"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="570"
+                        android:onClick="onClick"
+                        android:text="@string/p_bank"
+                        android:textColor="@color/colorPrimaryDark"
+                        android:textSize="12sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/input_amount_ben"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/p_tramount"
+                    android:inputType="number"
+                    android:maxLength="10"
+                    android:textSize="16dp" />
+            </android.support.design.widget.TextInputLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/fundtransfer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="10dp"
+            android:visibility="gone">
+
+            <Spinner
+                android:id="@+id/bank_selectss"
+                style="@style/Widget.AppCompat.Spinner.Underlined"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:layout_marginTop="5dp"
+                android:spinnerMode="dropdown"
+                android:text="Select Bank" />
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/input_amountss"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/p_amount"
+                    android:inputType="number"
+                    android:maxLength="10"
+                    android:textSize="16dp" />
+            </android.support.design.widget.TextInputLayout>
+
+
+            <EditText
+                android:id="@+id/input_ifscss"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/p_ifsccode"
+                android:inputType="text"
+                android:textSize="16dp"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/custom_popup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="5dp"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="3sp"
+                android:orientation="horizontal"
+                android:weightSum="800">
+
+                <me.grantland.widget.AutofitTextView
+                    android:id="@+id/btn_p_transid"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:text="@string/p_transid"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="12sp"
+                    autofit:minTextSize="8sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="3sp"
+                android:orientation="horizontal"
+                android:weightSum="800">
+
+                <me.grantland.widget.AutofitTextView
+                    android:id="@+id/btn_name_popup"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:text="@string/p_accountno"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="12sp"
+                    autofit:minTextSize="8sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="3sp"
+                android:orientation="horizontal"
+                android:weightSum="800">
+
+                <me.grantland.widget.AutofitTextView
+                    android:id="@+id/btn_p_bank"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:text="@string/agentBalance"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="12sp"
+                    autofit:minTextSize="8sp" />
+            </LinearLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/input_amount_popup"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/p_amount"
+                    android:inputType="numberDecimal"
+                    android:maxLength="13"
+                    android:textSize="16dp" />
+            </android.support.design.widget.TextInputLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/custom_service"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="3sp"
+                android:orientation="horizontal"
+                android:weightSum="800">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="230"
+                    android:inputType="text"
+                    android:text="@string/p_sendnames"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/btn_sendname"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="570"
+                    android:onClick="onClick"
+                    android:text="@string/p_names"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="3sp"
+                android:orientation="horizontal"
+                android:weightSum="800">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="230"
+                    android:inputType="text"
+                    android:text="@string/p_payeenames"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/btn_name_service"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="570"
+                    android:onClick="onClick"
+                    android:text="@string/p_names"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="3sp"
+                android:orientation="horizontal"
+                android:weightSum="800">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="230"
+                    android:inputType="text"
+                    android:text="@string/p_payeebank"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/btn_bank_service"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="570"
+                    android:onClick="onClick"
+                    android:text="@string/p_bank"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="3sp"
+                android:orientation="horizontal"
+                android:weightSum="800">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="230"
+                    android:inputType="text"
+                    android:text="@string/p_payeeaccountno"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/btn_account_service"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="570"
+                    android:onClick="onClick"
+                    android:text="@string/p_accountno"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="3sp"
+                android:orientation="horizontal"
+                android:weightSum="800">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="230"
+                    android:inputType="text"
+                    android:text="@string/p_amounts"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/btn_amount_servide"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="570"
+                    android:onClick="onClick"
+                    android:text="@string/p_bank"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="3sp"
+                android:orientation="horizontal"
+                android:weightSum="800">
+
+                <TextView
+                    android:id="@+id/change"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="230"
+                    android:inputType="text"
+                    android:text="@string/p_ServiceFee"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/btn_servicefee"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="570"
+                    android:onClick="onClick"
+                    android:text="@string/p_names"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="3sp"
+                android:orientation="horizontal"
+                android:weightSum="800">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="230"
+                    android:inputType="text"
+                    android:text="@string/cgst"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/btn_cgst"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="570"
+                    android:onClick="onClick"
+                    android:text="@string/p_accountno"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="3sp"
+                android:orientation="horizontal"
+                android:weightSum="800">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="230"
+                    android:inputType="text"
+                    android:text="@string/igst"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/btn_igst"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="570"
+                    android:onClick="onClick"
+                    android:text="@string/p_bank"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="3sp"
+                android:orientation="horizontal"
+                android:weightSum="800">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="230"
+                    android:inputType="text"
+                    android:text="@string/sgst"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/btn_sgst"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="570"
+                    android:onClick="onClick"
+                    android:text="@string/p_bank"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="12sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <include
+            android:id="@+id/verifytransferlayout"
+            layout="@layout/verify_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:gravity="end"
+            android:orientation="horizontal"
+            android:weightSum="800">
+
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/btn_cancel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:background="@drawable/border_button"
+                android:onClick="onClick"
+                android:padding="5dp"
+                android:text="@string/cancel"
+                android:textColor="@color/white"
+                android:textSize="16dp" />
+
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/btn_ok"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:background="@drawable/border_button"
+                android:onClick="onClick"
+                android:padding="5dp"
+                android:text="@string/ok"
+                android:textColor="@color/white"
+                android:textSize="16dp" />
+        </LinearLayout>
+    </LinearLayout>
+
+</android.support.v7.widget.CardView>

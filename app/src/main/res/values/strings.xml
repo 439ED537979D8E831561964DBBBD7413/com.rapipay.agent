@@ -1,7 +1,9 @@
 <resources>
-    <string name="app_name">RapiPay</string>
+    <string name="app_name">RapiPay Agent App</string>
     <string name="permission_read_phone_state_rationale">permission_read_phone_state_rationale</string>
     <string name="permissions_not_granted_read_phone_state">Cannot Proceed without allowing permissions!</string>
+
+    <string name="notification_error_ssl_cert_invalid">SSL Certificate Error</string>
 
 
     <string name="dialog_button_ok">OK</string>
@@ -12,6 +14,7 @@
     <string name="lbl_enter_otp">Enter OTP</string>
     <string name="lbl_submit">Enter</string>
     <string name="msg_resent_otp">Click here to re-sent OPT request  </string>
+    <string name="Alert">Alert</string>
 
 
     <string name="p_powerdby">Powered by</string>
@@ -22,10 +25,13 @@
 
     <string name="title_home">Home</string>
     <string name="title_account">Account</string>
+    <string name="title_accountname">Account Name</string>
+    <string name="title_accountno">Bank Account No.</string>
     <string name="title_notification">Notification</string>
 
     <string name="btnsubmit">Submit</string>
-    <string name="btnupdate">Generate Request</string>
+    <string name="btotp">*****</string>
+    <string name="btnupdate">Request for Credit</string>
     <string name="btnhist">Details</string>
     <string name="btnsearch">Search</string>
     <string name="btnsender">Add Sender</string>
@@ -34,17 +40,20 @@
     <string name="btnverify">Verify Account</string>
     <string name="p_accounttr">Account Transfer</string>
     <string name="p_benaadd">Add New Beneficiary</string>
+    <string name="p_bendd">Add Beneficiary</string>
 
-    <string name="p_bentrans">Beneficiary Transfer Details</string>
+    <string name="p_bentrans">Beneficiary Details</string>
     <string name="p_lasttrans">Last Transaction Details</string>
     <string name="p_nethead">Network Transfer - Tap to Transfer</string>
-    <string name="p_currenttrans">Current Transaction Details</string>
-    <string name="p_pendingtrans">Pending Transaction Details</string>
-    <string name="p_refundtrans">Refund Transaction Details</string>
+    <string name="p_currenttrans">Latest Transaction Details</string>
+    <string name="p_pendingtrans">Pending Transaction Details (Click to Get Status)</string>
+    <string name="p_refundtrans">Refund Transaction Details (Click to Get Status)</string>
 
 
     <string name="p_userid">Enter Mobile No.</string>
+    <string name="p_cususerid">Enter Customer Mobile No.</string>
     <string name="p_mobile">Mobile No.</string>
+    <string name="p_optname">Operator Name</string>
     <string name="p_contactid">Enter Number</string>
     <string name="p_email">Enter Email</string>
     <string name="p_psw">Password</string>
@@ -72,12 +81,13 @@
     <string name="p_benname">Enter Beneficiary Name</string>
     <string name="p_otp">Enter OTP</string>
     <string name="p_account">Enter Sender Account No.</string>
+    <string name="p_recaccount">Enter Receiver Account No.</string>
     <string name="p_amm_trans">Amount to Transfer</string>
     <string name="p_benaccount">Enter Beneficiary Account No.</string>
     <string name="p_ifsc">Enter Sender IFSC</string>
     <string name="p_amount">Enter Amount</string>
     <string name="p_tramount">Enter Transfer Amount</string>
-    <string name="p_transtionid">Enter Valid Bank Transaction Id</string>
+    <string name="p_transtionid">Enter Bank Transaction Id</string>
     <string name="p_address">Enter Address</string>
     <string name="p_remark">Enter Remarks</string>
     <string name="p_remarks">Remarks</string>
@@ -87,43 +97,65 @@
     <string name="p_branchname">Enter Branch Name</string>
     <string name="p_branchcode">Enter Branch Code</string>
 
+    <string name="p_beneficiaryId">Bene Id</string>
+    <string name="p_beneficiaryName">Receiver Name</string>
+    <string name="p_accountId">Account Id</string>
+    <string name="p_accountName">Account Name</string>
     <string name="p_names">Name</string>
     <string name="p_payeenames">Payee Name</string>
     <string name="p_ServiceFee">ServiceFee</string>
+    <string name="p_statFee">Message</string>
     <string name="p_sendnames">Sender No.</string>
     <string name="p_date1">To Date</string>
     <string name="p_date2">From Date</string>
+    <string name="p_date1for">To(yyyy-MM-dd)</string>
+    <string name="p_datefor">To(dd/MM/yyyy)</string>
+    <string name="p_dater">Deposit Date(dd/MM/yyyy)</string>
+    <string name="p_date2for">From(yyyy-MM-dd)</string>
 
     <string name="p_comnames">Company Name</string>
     <string name="p_requestid">Request ID</string>
     <string name="p_txnamount">TXN Amount</string>
     <string name="p_status">Status</string>
     <string name="p_creditreq">Generate Credit Request</string>
-    <string name="p_chhist">Channel History</string>
+    <string name="pchist">Channel History</string>
     <string name="p_req">Register User</string>
     <string name="agentName">Agent Name</string>
+    <string name="creditID">CreditID</string>
     <string name="agentBalance">Agent Balance</string>
-    <string name="p_accountno">Account</string>
+    <string name="p_accountno">AC No</string>
     <string name="p_payeeaccountno">Payee Account</string>
     <string name="cgst">CGST</string>
     <string name="igst">IGST</string>
     <string name="sgst">SGST</string>
     <string name="p_ifsccode">IFSC</string>
     <string name="p_bank">Bank</string>
+    <string name="p_bankname">Bank Name</string>
     <string name="p_payeebank">Payee Bank</string>
     <string name="p_rrn">RRN</string>
     <string name="p_amounts">Amount</string>
-    <string name="p_transid">Trans ID</string>
+    <string name="p_bal">Balance</string>
+    <string name="createdOn">CreatedOn</string>
+    <string name="p_transid">TXN ID</string>
+    <string name="p_reqamounts">Request Amount</string>
+    <string name="p_reqtype">Recharge Type</string>
+    <string name="p_txnamounts">Txn Amount</string>
+    <string name="txnid">Transaction ID</string>
+    <string name="txnStatus">Txn Status</string>
 
-    <string name="sertype">Service type</string>
+    <string name="sertype">Service Type</string>
+    <string name="sstype">Service Type</string>
     <string name="txndate">TXN Date</string>
     <string name="txniddate">TXN ID/Date</string>
     <string name="txncrdrAmount">TXN/CRDR Amount</string>
+    <string name="txnAmount">TXN Amount</string>
+    <string name="rrnNo">RRN No</string>
 
-    <string name="openingclosingBalance">Opening/Closing Balance</string>
+    <string name="openingclosingBalance">Opening/Closing Bal.</string>
     <string name="txnsettlestatus">TXN/Settle Status</string>
 
-
+    <string name="cancel">Cancel</string>
+    <string name="ok">Ok</string>
 
     <string name="prompt_getadteerror">Error in geting data,try again...</string>
 
