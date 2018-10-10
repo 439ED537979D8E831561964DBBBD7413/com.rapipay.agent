@@ -41,11 +41,15 @@ import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+import org.xmlpull.v1.XmlPullParserFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.StringReader;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -61,6 +65,7 @@ import com.rapipay.android.agent.Database.RapipayDB;
 import com.rapipay.android.agent.Model.BeneficiaryDetailsPozo;
 import com.rapipay.android.agent.Model.HeaderePozo;
 import com.rapipay.android.agent.Model.RapiPayPozo;
+import com.rapipay.android.agent.Model.VersionPozo;
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.adapter.BottomAdapter;
 import com.rapipay.android.agent.adapter.CustomSpinnerAdapter;
@@ -71,6 +76,8 @@ import com.rapipay.android.agent.main_directory.PinVerification;
 import com.rapipay.android.agent.main_directory.SpashScreenActivity;
 
 public class BaseCompactActivity extends AppCompatActivity {
+    protected  static String imei;
+    protected ArrayList<VersionPozo>  versionPozoArrayList;
     protected AutofitTextView date2_text, date1_text;
     protected FirebaseAnalytics mFirebaseAnalytics;
     protected Long tsLong;
@@ -919,14 +926,27 @@ public class BaseCompactActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onUserInteraction() {
-        super.onUserInteraction();
-        timer.start();
+    protected void onResume() {
+        super.onResume();
+        if (localStorage.getActivityState(LocalStorage.LOGOUT).equalsIgnoreCase("LOGOUT")) {
+            objTimer.cancel();
+            objTimer.start();
+        }
     }
 
-    CountDownTimer timer = new CountDownTimer(5 * 60 * 1000, 1000) {
+    @Override
+    public void onUserInteraction() {
+        super.onUserInteraction();
+        if (localStorage.getActivityState(LocalStorage.LOGOUT).equalsIgnoreCase("LOGOUT")) {
+            objTimer.cancel();
+            objTimer.start();
+        }
+    }
+
+    CountDownTimer objTimer = new CountDownTimer(15 * 60 * 1000, 1000) {
 
         public void onTick(long millisUntilFinished) {
+
             //Some code
         }
 
@@ -968,6 +988,7 @@ public class BaseCompactActivity extends AppCompatActivity {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
         localStorage.setActivityState(LocalStorage.LOGOUT, "0");
+        objTimer.cancel();
 //                }
 //                alertDialog.dismiss();
 //            }
@@ -979,5 +1000,48 @@ public class BaseCompactActivity extends AppCompatActivity {
 //            }
 //        });
 //        alertDialog = dialog.show();
+    }
+
+    public JSONObject version() {
+        tsLong = System.currentTimeMillis() / 1000;
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("serviceType", "APP_LIVE_STATUS");
+            jsonObject.put("requestType", "handset_CHannel");
+            jsonObject.put("typeMobileWeb", "mobile");
+            jsonObject.put("transactionID", "ALS" + tsLong.toString());
+            jsonObject.put("settingName", "Android");
+            jsonObject.put("imeiNo", imei);
+            jsonObject.put("checkSum",  GenerateChecksum.checkSum(imei, jsonObject.toString()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return jsonObject;
+    }
+    protected void parseXml(String xml){
+        versionPozoArrayList = new ArrayList<>();
+        try {
+            XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
+            factory.setNamespaceAware(true);
+            XmlPullParser xpp = factory.newPullParser();
+            xpp.setInput( new StringReader( xml) ); // pass input whatever xml you have
+            int eventType = xpp.getEventType();
+            while (eventType != XmlPullParser.END_DOCUMENT) {
+                VersionPozo pozo = new VersionPozo();
+                if(eventType == XmlPullParser.START_DOCUMENT) {
+                } else if(eventType == XmlPullParser.START_TAG) {
+                    pozo.setName(xpp.getName());
+                } else if(eventType == XmlPullParser.END_TAG) {
+                } else if(eventType == XmlPullParser.TEXT) {
+                    pozo.setValue(xpp.getText());
+                }
+                versionPozoArrayList.add(pozo);
+                eventType = xpp.next();
+            }
+        } catch (XmlPullParserException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

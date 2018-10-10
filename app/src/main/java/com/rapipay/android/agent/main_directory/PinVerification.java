@@ -17,19 +17,25 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.rapipay.android.agent.Model.VersionPozo;
 import com.rapipay.android.agent.utils.LocalStorage;
 import com.viewpagerindicator.CirclePageIndicator;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+import org.xmlpull.v1.XmlPullParserFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -57,18 +63,25 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
     private static final Integer[] IMAGES = {R.drawable.banner1, R.drawable.banner1, R.drawable.banner1, R.drawable.banner1};
     private ArrayList<Integer> ImagesArray;
     RecyclerView recycler_view;
+    String TAG="XML";
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.pinverification_layout);
+        localStorage.setActivityState(LocalStorage.LOGOUT, "0");
         initialize();
         init();
+        loadVersion();
 //        loadApi();
     }
 
     private void loadApi() {
         new AsyncPostMethod(WebConfig.NETWORKTRANSFER_URL, getFooterData().toString(), headerData, PinVerification.this).execute();
+    }
+
+    private void loadVersion() {
+        new AsyncPostMethod(WebConfig.UAT, version().toString(), headerData, PinVerification.this).execute();
     }
 
     private void initialize() {
@@ -215,8 +228,8 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
                     String whereClause = "apikey=?";
                     String whereArgs[] = {list.get(0).getApikey()};
                     dba.update(RapipayDB.TABLE_NAME, contentValues, whereClause, whereArgs);
-                    localStorage.setActivityState(LocalStorage.ROUTESTATE,"UPDATE");
-                    localStorage.setActivityState(LocalStorage.LOGOUT,"LOGOUT");
+                    localStorage.setActivityState(LocalStorage.ROUTESTATE, "UPDATE");
+                    localStorage.setActivityState(LocalStorage.LOGOUT, "LOGOUT");
                     Intent intent = new Intent(this, MainActivity.class);
                     startActivity(intent);
                     finish();
@@ -224,6 +237,11 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
                     if (object.has("footerImgList")) {
                         JSONArray array = object.getJSONArray("footerImgList");
                         insertFooterDetails(array, db);
+                    }
+                } else if (object.getString("serviceType").equalsIgnoreCase("APP_LIVE_STATUS")) {
+                    if (object.has("headerList")) {
+                        JSONArray array = object.getJSONArray("headerList");
+                        versionDetails(array);
                     }
                 }
             }
@@ -307,6 +325,17 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
         return jsonObject;
     }
 
+    private void versionDetails(JSONArray array) {
+        try {
+            for (int i = 0; i < array.length(); i++) {
+                JSONObject object = array.getJSONObject(i);
+                String xml = object.getString("headerValue");
+                parseXml(xml);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     private void insertFooterDetails(JSONArray array, RapipayDB db) {
         SQLiteDatabase dba = db.getWritableDatabase();
         if (db.getDetailsFooter())

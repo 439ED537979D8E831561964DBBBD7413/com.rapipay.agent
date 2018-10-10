@@ -2,7 +2,9 @@ package com.rapipay.android.agent.utils;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Base64;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -39,6 +41,13 @@ public class RouteClass {
                     intent.putExtra("sessionRefNo", object.getString("sessionRefNo"));
                     intent.putExtra("nodeAgent", "");
                     intent.putExtra("type", "");
+                    if(object.has("kycData")){
+                        JSONArray array = object.getJSONArray("kycData");
+                        JSONObject jsonObject = array.getJSONObject(0);
+                        byte[] bytes = jsonObject.toString().getBytes("utf-8");
+                        String imageEncoded = Base64.encodeToString(bytes, Base64.DEFAULT);
+                        intent.putExtra("base64", imageEncoded);
+                    }
                 }else if (localStorage.getActivityState(LocalStorage.ROUTESTATE).equalsIgnoreCase("0")) {
                     intent = new Intent(context, LoginScreenActivity.class);
                 }

@@ -1,4 +1,4 @@
-package com.rapipay.android.rapipay;
+package com.rapipay.android.agent;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("com.rapipay.android.rapipay", appContext.getPackageName());
+        assertEquals("com.rapipay.android.agent", appContext.getPackageName());
     }
 }

@@ -1,4 +1,4 @@
-package com.rapipay.android.rapipay;
+package com.rapipay.android.agent;
 
 import org.junit.Test;
 

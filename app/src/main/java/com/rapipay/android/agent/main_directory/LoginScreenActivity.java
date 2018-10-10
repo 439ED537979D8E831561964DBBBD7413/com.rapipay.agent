@@ -30,7 +30,6 @@ import com.rapipay.android.agent.utils.WebConfig;
 public class LoginScreenActivity extends BaseCompactActivity implements View.OnClickListener, RequestHandler, CustomInterface {
 
     final private static int PERMISSIONS_REQUEST_READ_PHONE_STATE = 0;
-    String imei;
     EditText input_user;
     TextInputEditText input_password;
     public static final int REQUEST_ID_MULTIPLE_PERMISSIONS = 1;
