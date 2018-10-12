@@ -35,7 +35,7 @@ import com.rapipay.android.agent.utils.WebConfig;
 
 import java.util.ArrayList;
 
-public class LoginScreenActivity extends BaseCompactActivity implements View.OnClickListener, RequestHandler, CustomInterface,VersionListener {
+public class LoginScreenActivity extends BaseCompactActivity implements View.OnClickListener, RequestHandler, CustomInterface, VersionListener {
 
     final private static int PERMISSIONS_REQUEST_READ_PHONE_STATE = 0;
     EditText input_user;
@@ -49,7 +49,6 @@ public class LoginScreenActivity extends BaseCompactActivity implements View.OnC
         setContentView(R.layout.activity_login);
         initialize();
         loadIMEI();
-        loadVersion();
     }
 
     private void initialize() {
@@ -163,13 +162,15 @@ public class LoginScreenActivity extends BaseCompactActivity implements View.OnC
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_login:
-                if (input_user.getText().toString().length()!=10)
+                if (input_user.getText().toString().length() != 10)
                     input_user.setError("Please enter mandatory field");
                 else if (input_password.getText().toString().isEmpty())
                     input_password.setError("Please enter mandatory field");
                 else
+                    loadVersion();
+
 //                    Crashlytics.getInstance().crash();
-                    new AsyncPostMethod(WebConfig.UAT, getJson_Validate().toString(), "", LoginScreenActivity.this).execute();
+
                 break;
         }
     }
@@ -209,7 +210,7 @@ public class LoginScreenActivity extends BaseCompactActivity implements View.OnC
             } else if (object.getString("responseCode").equalsIgnoreCase("75115")) {
                 customDialog_Common("KYCLAYOUTS", null, null, "RapiPay Login Failed", null, object.getString("responseMessage"), LoginScreenActivity.this);
 //                customDialog(object.getString("responseMessage"));
-            }else if (object.getString("serviceType").equalsIgnoreCase("APP_LIVE_STATUS")) {
+            } else if (object.getString("serviceType").equalsIgnoreCase("APP_LIVE_STATUS")) {
                 if (object.has("headerList")) {
                     JSONArray array = object.getJSONArray("headerList");
                     versionDetails(array, LoginScreenActivity.this);
@@ -257,6 +258,7 @@ public class LoginScreenActivity extends BaseCompactActivity implements View.OnC
     public void cancelClicked(String type, Object ob) {
 
     }
+
     @Override
     public void checkVersion(ArrayList<VersionPozo> list) {
         for (int i = 0; i < list.size(); i++) {
@@ -267,6 +269,8 @@ public class LoginScreenActivity extends BaseCompactActivity implements View.OnC
                         String version = pInfo.versionName;
                         if (!version.equalsIgnoreCase(list.get(i + 1).getValue())) {
                             customDialog_Common("KYCLAYOUTSS", null, null, "Update Available", null, "You are running on lower version please update for new versions!.", LoginScreenActivity.this);
+                        } else {
+                            new AsyncPostMethod(WebConfig.UAT, getJson_Validate().toString(), "", LoginScreenActivity.this).execute();
                         }
                     } catch (PackageManager.NameNotFoundException e) {
                         e.printStackTrace();

@@ -66,7 +66,7 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
         localStorage.setActivityState(LocalStorage.LOGOUT, "0");
         initialize();
         init();
-        loadVersion();
+//        loadVersion();
 //        loadApi();
     }
 
@@ -105,7 +105,7 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
             public void afterTextChanged(Editable s) {
                 if (s.length() == 6 && !flaf) {
                     flaf = true;
-                    new AsyncPostMethod(WebConfig.UAT, getJson_Validate(confirmpinView.getText().toString()).toString(), "", PinVerification.this).execute();
+                    loadVersion();
                     flaf = false;
                 }
             }
@@ -388,6 +388,8 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
                         String version = pInfo.versionName;
                         if (!version.equalsIgnoreCase(list.get(i + 1).getValue())) {
                             customDialog_Common("KYCLAYOUTSS", null, null, "Update Available", null, "You are running on lower version please update for new versions!.", PinVerification.this);
+                        }else {
+                            new AsyncPostMethod(WebConfig.UAT, getJson_Validate(confirmpinView.getText().toString()).toString(), "", PinVerification.this).execute();
                         }
                     } catch (PackageManager.NameNotFoundException e) {
                         e.printStackTrace();
