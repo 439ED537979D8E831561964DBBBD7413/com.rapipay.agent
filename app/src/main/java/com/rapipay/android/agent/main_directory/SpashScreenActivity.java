@@ -6,6 +6,7 @@ import android.os.Handler;
 import com.rapipay.android.agent.Database.RapipayDB;
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
+import com.rapipay.android.agent.utils.LocalStorage;
 import com.rapipay.android.agent.utils.RouteClass;
 
 public class SpashScreenActivity extends BaseCompactActivity {
@@ -15,6 +16,7 @@ public class SpashScreenActivity extends BaseCompactActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
         db = new RapipayDB(this);
+        localStorage.setActivityState(LocalStorage.LOGOUT, "0");
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {

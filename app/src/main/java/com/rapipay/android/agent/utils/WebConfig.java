@@ -4,6 +4,7 @@ public class WebConfig {
 
     public static String WEB = "http://192.168.1.101:8080/RapiPayAPIHub/";
     public static String UAT = WEB + "HandsetRegistration";
+    public static String WEBS = "http://www.rapipay.com/RapiPayAPIHub/";
     public static String EKYC = WEB + "EKYCProcess";
     public static String EKYC_FORWARD = WEB + "kycforward";
     public static String BASIC_USERID = "1000000012";

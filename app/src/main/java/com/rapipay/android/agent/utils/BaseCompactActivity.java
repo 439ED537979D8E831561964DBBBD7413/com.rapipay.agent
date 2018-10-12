@@ -71,13 +71,14 @@ import com.rapipay.android.agent.adapter.BottomAdapter;
 import com.rapipay.android.agent.adapter.CustomSpinnerAdapter;
 import com.rapipay.android.agent.adapter.ReceiptAdapter;
 import com.rapipay.android.agent.interfaces.CustomInterface;
+import com.rapipay.android.agent.interfaces.VersionListener;
 import com.rapipay.android.agent.main_directory.MainActivity;
 import com.rapipay.android.agent.main_directory.PinVerification;
 import com.rapipay.android.agent.main_directory.SpashScreenActivity;
 
 public class BaseCompactActivity extends AppCompatActivity {
-    protected  static String imei;
-    protected ArrayList<VersionPozo>  versionPozoArrayList;
+    protected static String imei;
+    protected ArrayList<VersionPozo> versionPozoArrayList;
     protected AutofitTextView date2_text, date1_text;
     protected FirebaseAnalytics mFirebaseAnalytics;
     protected Long tsLong;
@@ -930,6 +931,7 @@ public class BaseCompactActivity extends AppCompatActivity {
         super.onResume();
         if (localStorage.getActivityState(LocalStorage.LOGOUT).equalsIgnoreCase("LOGOUT")) {
             objTimer.cancel();
+            count = 15 * 60 * 3000;
             objTimer.start();
         }
     }
@@ -939,24 +941,33 @@ public class BaseCompactActivity extends AppCompatActivity {
         super.onUserInteraction();
         if (localStorage.getActivityState(LocalStorage.LOGOUT).equalsIgnoreCase("LOGOUT")) {
             objTimer.cancel();
+            count = 15 * 60 * 3000;
             objTimer.start();
         }
     }
 
-    CountDownTimer objTimer = new CountDownTimer(15 * 60 * 1000, 1000) {
+    static int count = 15 * 60 * 3000;
+    int interval = 10000;
+    CountDownTimer objTimer = new CountDownTimer(count, interval) {
 
         public void onTick(long millisUntilFinished) {
-
+            count = count - interval;
+            Log.e("TAG_INTERVAL", "" + count);
+            if (count == 0)
+                if (localStorage.getActivityState(LocalStorage.LOGOUT).equalsIgnoreCase("LOGOUT")) {
+                    customDialogLog("LOGOUT", "Session Expired", "Your Session got expired");
+                    Toast.makeText(BaseCompactActivity.this, "Your Session got expired", Toast.LENGTH_SHORT).show();
+                }
             //Some code
         }
 
         public void onFinish() {
 //            String className = BaseCompactActivity.this.getLocalClassName();
 //            if (!(className.equalsIgnoreCase("main_directory.SpashScreenActivity") ||  className.equalsIgnoreCase("main_directory.LoginScreenActivity") || className.equalsIgnoreCase("main_directory.PinActivity") ||  className.equalsIgnoreCase("main_directory.PinVerification"))) {
-            if (localStorage.getActivityState(LocalStorage.LOGOUT).equalsIgnoreCase("LOGOUT")) {
-                customDialogLog("LOGOUT", "Session Expired", "Your Session got expired");
-                Toast.makeText(BaseCompactActivity.this, "Your Session got expired", Toast.LENGTH_SHORT).show();
-            }
+//            if (localStorage.getActivityState(LocalStorage.LOGOUT).equalsIgnoreCase("LOGOUT")) {
+//                customDialogLog("LOGOUT", "Session Expired", "Your Session got expired");
+//                Toast.makeText(BaseCompactActivity.this, "Your Session got expired", Toast.LENGTH_SHORT).show();
+//            }
 
             //Logout
         }
@@ -1012,32 +1023,49 @@ public class BaseCompactActivity extends AppCompatActivity {
             jsonObject.put("transactionID", "ALS" + tsLong.toString());
             jsonObject.put("settingName", "Android");
             jsonObject.put("imeiNo", imei);
-            jsonObject.put("checkSum",  GenerateChecksum.checkSum(imei, jsonObject.toString()));
+            jsonObject.put("checkSum", GenerateChecksum.checkSum(imei, jsonObject.toString()));
         } catch (Exception e) {
             e.printStackTrace();
         }
         return jsonObject;
     }
-    protected void parseXml(String xml){
+    protected void loadVersion() {
+        new AsyncPostMethod(WebConfig.UAT, version().toString(), headerData, BaseCompactActivity.this).execute();
+    }
+    protected void versionDetails(JSONArray array, VersionListener listener) {
+        try {
+            for (int i = 0; i < array.length(); i++) {
+                JSONObject object = array.getJSONObject(i);
+                String xml = object.getString("headerValue");
+                parseXml(xml, listener);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    protected void parseXml(String xml, VersionListener listener) {
         versionPozoArrayList = new ArrayList<>();
         try {
             XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
             factory.setNamespaceAware(true);
             XmlPullParser xpp = factory.newPullParser();
-            xpp.setInput( new StringReader( xml) ); // pass input whatever xml you have
+            xpp.setInput(new StringReader(xml)); // pass input whatever xml you have
             int eventType = xpp.getEventType();
             while (eventType != XmlPullParser.END_DOCUMENT) {
                 VersionPozo pozo = new VersionPozo();
-                if(eventType == XmlPullParser.START_DOCUMENT) {
-                } else if(eventType == XmlPullParser.START_TAG) {
+                if (eventType == XmlPullParser.START_DOCUMENT) {
+                } else if (eventType == XmlPullParser.START_TAG) {
                     pozo.setName(xpp.getName());
-                } else if(eventType == XmlPullParser.END_TAG) {
-                } else if(eventType == XmlPullParser.TEXT) {
+                } else if (eventType == XmlPullParser.END_TAG) {
+                } else if (eventType == XmlPullParser.TEXT) {
                     pozo.setValue(xpp.getText());
                 }
-                versionPozoArrayList.add(pozo);
+//                if (pozo.getName()!=null && pozo.getValue()!=null)
+                    versionPozoArrayList.add(pozo);
                 eventType = xpp.next();
             }
+            if (versionPozoArrayList.size() != 0)
+                listener.checkVersion(versionPozoArrayList);
         } catch (XmlPullParserException e) {
             e.printStackTrace();
         } catch (IOException e) {

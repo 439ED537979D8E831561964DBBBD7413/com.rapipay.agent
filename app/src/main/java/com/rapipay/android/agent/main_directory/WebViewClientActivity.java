@@ -21,6 +21,8 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.webkit.CookieManager;
+import android.webkit.CookieSyncManager;
 import android.webkit.SslErrorHandler;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
@@ -35,6 +37,8 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -53,7 +57,7 @@ import com.rapipay.android.agent.utils.WebConfig;
 
 public class WebViewClientActivity extends BaseCompactActivity implements RequestHandler, View.OnClickListener,CustomInterface {
     WebView web;
-    String mobileNo, parentId, sessionKey, sessionRefNo, nodeAgent, kycType, TYPE,base64=null;
+    String mobileNo, parentId, sessionKey, sessionRefNo, nodeAgent, kycType, TYPE;
     private static final int INPUT_FILE_REQUEST_CODE = 1;
     private ValueCallback<Uri[]> mUploadMessage;
     private String mCameraPhotoPath = null;
@@ -161,7 +165,6 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
         sessionKey = getIntent().getStringExtra("sessionKey");
         sessionRefNo = getIntent().getStringExtra("sessionRefNo");
         nodeAgent = getIntent().getStringExtra("nodeAgent");
-        base64 = getIntent().getStringExtra("base64");
         if (nodeAgent.equalsIgnoreCase(""))
             kycType = "A";
         else
@@ -211,6 +214,13 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
         public void onPageFinished(WebView view, String url) {
             try {
                 if (progressDialog.isShowing()) {
+                    CookieManager cookieManager = CookieManager.getInstance();
+                    if (cookieManager == null)
+                    {}
+                    String rawCookieHeader = null;
+                    URL parsedURL = new URL(url);
+                    rawCookieHeader = cookieManager.getCookie(url);
+                    Log.e("COOKIES",rawCookieHeader);
                     progressDialog.dismiss();
                 }
             } catch (Exception exception) {
@@ -349,7 +359,6 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
             if (nodeAgent.equalsIgnoreCase("")) {
                 jsonObject.put("nodeAgentId", mobileNo);
                 jsonObject.put("sessionRefNo", sessionRefNo);
-                jsonObject.put("kycData", base64.replaceAll("\n",""));
                 form = "<html>\n" +
                         "\t<body>\n" +
                         "\t\t<form name=\"validatekyc\" id=\"validatekyc\" method=\"POST\" action=\"" + WebConfig.EKYC_FORWARD + "\">\n" +
@@ -362,7 +371,6 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
                         "\t\t\t<input name=\"tokenId\" value=\"" + tokenId + "\" type=\"hidden\"/>\n" +
                         "\t\t\t<input name=\"txnRef\" value=\"" + "VKP" + tsLong.toString() + "\" type=\"hidden\"/>\n" +
                         "\t\t\t<input name=\"orgTxnRef\" value=\"" + orgTxnRef + "\" type=\"hidden\"/>\n" +
-                        "\t\t\t<input name=\"kycData\" value=\"" + base64 + "\" type=\"hidden\"/>\n" +
                         "\t\t\t<input name=\"checkSum\" value=\"" + GenerateChecksum.checkSum(sessionKey, jsonObject.toString()) + "\" type=\"hidden\"/>\n" +
                         "\t\t\t<input type=\"submit\"/>\n" +
                         "\t\t</form>\n" +
@@ -374,7 +382,6 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
             } else {
                 jsonObject.put("nodeAgentId", nodeAgent);
                 jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
-                jsonObject.put("kycData", "");
                 form = "<html>\n" +
                         "\t<body>\n" +
                         "\t\t<form name=\"validatekyc\" id=\"validatekyc\" method=\"POST\" action=\"" + WebConfig.EKYC_FORWARD + "\">\n" +
@@ -387,7 +394,6 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
                         "\t\t\t<input name=\"tokenId\" value=\"" + tokenId + "\" type=\"hidden\"/>\n" +
                         "\t\t\t<input name=\"txnRef\" value=\"" + "VKP" + tsLong.toString() + "\" type=\"hidden\"/>\n" +
                         "\t\t\t<input name=\"orgTxnRef\" value=\"" + orgTxnRef + "\" type=\"hidden\"/>\n" +
-                        "\t\t\t<input name=\"kycData\" value=\"" + "" + "\" type=\"hidden\"/>\n" +
                         "\t\t\t<input name=\"checkSum\" value=\"" + GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()) + "\" type=\"hidden\"/>\n" +
                         "\t\t\t<input type=\"submit\"/>\n" +
                         "\t\t</form>\n" +

@@ -1,12 +1,13 @@
 package com.rapipay.android.agent.main_directory;
 
 import android.content.ContentValues;
-import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -17,25 +18,18 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Base64;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import com.rapipay.android.agent.Model.VersionPozo;
+import com.rapipay.android.agent.interfaces.VersionListener;
 import com.rapipay.android.agent.utils.LocalStorage;
 import com.viewpagerindicator.CirclePageIndicator;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-import org.xmlpull.v1.XmlPullParserFactory;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -53,7 +47,7 @@ import com.rapipay.android.agent.utils.GenerateChecksum;
 import com.rapipay.android.agent.utils.RouteClass;
 import com.rapipay.android.agent.utils.WebConfig;
 
-public class PinVerification extends BaseCompactActivity implements RequestHandler, View.OnClickListener, CustomInterface {
+public class PinVerification extends BaseCompactActivity implements RequestHandler, View.OnClickListener, CustomInterface, VersionListener {
     private ViewPager mPager;
     private static int currentPage = 0;
     private static int NUM_PAGES = 0;
@@ -63,7 +57,7 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
     private static final Integer[] IMAGES = {R.drawable.banner1, R.drawable.banner1, R.drawable.banner1, R.drawable.banner1};
     private ArrayList<Integer> ImagesArray;
     RecyclerView recycler_view;
-    String TAG="XML";
+    String TAG = "XML";
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -78,10 +72,6 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
 
     private void loadApi() {
         new AsyncPostMethod(WebConfig.NETWORKTRANSFER_URL, getFooterData().toString(), headerData, PinVerification.this).execute();
-    }
-
-    private void loadVersion() {
-        new AsyncPostMethod(WebConfig.UAT, version().toString(), headerData, PinVerification.this).execute();
     }
 
     private void initialize() {
@@ -241,7 +231,7 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
                 } else if (object.getString("serviceType").equalsIgnoreCase("APP_LIVE_STATUS")) {
                     if (object.has("headerList")) {
                         JSONArray array = object.getJSONArray("headerList");
-                        versionDetails(array);
+                        versionDetails(array, PinVerification.this);
                     }
                 }
             }
@@ -294,7 +284,11 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
     public void okClicked(String type, Object ob) {
         if (type.equalsIgnoreCase("KYCLAYOUTS"))
             confirmpinView.setText("");
-        else {
+        else if (type.equalsIgnoreCase("KYCLAYOUTSS")) {
+            Intent webIntent = new Intent(Intent.ACTION_VIEW,
+                    Uri.parse("https://play.google.com/store/apps/details?id=" + getPackageName()));
+            startActivity(webIntent);
+        } else {
             deleteTables("forgot");
             new RouteClass(PinVerification.this, null, "", localStorage, "0");
         }
@@ -325,17 +319,6 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
         return jsonObject;
     }
 
-    private void versionDetails(JSONArray array) {
-        try {
-            for (int i = 0; i < array.length(); i++) {
-                JSONObject object = array.getJSONObject(i);
-                String xml = object.getString("headerValue");
-                parseXml(xml);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
     private void insertFooterDetails(JSONArray array, RapipayDB db) {
         SQLiteDatabase dba = db.getWritableDatabase();
         if (db.getDetailsFooter())
@@ -393,5 +376,23 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
         LinearLayoutManager layoutManager = new LinearLayoutManager(PinVerification.this, LinearLayoutManager.HORIZONTAL, false);
         recycler_view.setLayoutManager(layoutManager);
         recycler_view.setAdapter(new FooterAdapter(PinVerification.this, recycler_view, list));
+    }
+
+    @Override
+    public void checkVersion(ArrayList<VersionPozo> list) {
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).getName() != null)
+                if (list.get(i).getName().equalsIgnoreCase("PROD")) {
+                    try {
+                        PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+                        String version = pInfo.versionName;
+                        if (!version.equalsIgnoreCase(list.get(i + 1).getValue())) {
+                            customDialog_Common("KYCLAYOUTSS", null, null, "Update Available", null, "You are running on lower version please update for new versions!.", PinVerification.this);
+                        }
+                    } catch (PackageManager.NameNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                }
+        }
     }
 }
