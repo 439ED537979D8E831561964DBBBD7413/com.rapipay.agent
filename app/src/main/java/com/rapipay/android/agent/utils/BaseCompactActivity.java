@@ -77,7 +77,7 @@ import com.rapipay.android.agent.main_directory.PinVerification;
 import com.rapipay.android.agent.main_directory.SpashScreenActivity;
 
 public class BaseCompactActivity extends AppCompatActivity {
-    protected static String imei;
+    protected String imei;
     protected ArrayList<VersionPozo> versionPozoArrayList;
     protected AutofitTextView date2_text, date1_text;
     protected FirebaseAnalytics mFirebaseAnalytics;
@@ -1013,7 +1013,7 @@ public class BaseCompactActivity extends AppCompatActivity {
 //        alertDialog = dialog.show();
     }
 
-    public JSONObject version() {
+    public JSONObject version(String emi) {
         tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         try {
@@ -1022,15 +1022,15 @@ public class BaseCompactActivity extends AppCompatActivity {
             jsonObject.put("typeMobileWeb", "mobile");
             jsonObject.put("transactionID", "ALS" + tsLong.toString());
             jsonObject.put("settingName", "Android");
-            jsonObject.put("imeiNo", imei);
-            jsonObject.put("checkSum", GenerateChecksum.checkSum(imei, jsonObject.toString()));
+            jsonObject.put("imeiNo", emi);
+            jsonObject.put("checkSum", GenerateChecksum.checkSum(emi, jsonObject.toString()));
         } catch (Exception e) {
             e.printStackTrace();
         }
         return jsonObject;
     }
-    protected void loadVersion() {
-        new AsyncPostMethod(WebConfig.UAT, version().toString(), headerData, BaseCompactActivity.this).execute();
+    protected void loadVersion(String emi) {
+        new AsyncPostMethod(WebConfig.UAT, version(emi).toString(), headerData, BaseCompactActivity.this).execute();
     }
     protected void versionDetails(JSONArray array, VersionListener listener) {
         try {

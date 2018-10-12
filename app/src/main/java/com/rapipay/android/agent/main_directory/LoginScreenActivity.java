@@ -30,6 +30,7 @@ import com.rapipay.android.agent.interfaces.VersionListener;
 import com.rapipay.android.agent.utils.AsyncPostMethod;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
 import com.rapipay.android.agent.utils.GenerateChecksum;
+import com.rapipay.android.agent.utils.LocalStorage;
 import com.rapipay.android.agent.utils.RouteClass;
 import com.rapipay.android.agent.utils.WebConfig;
 
@@ -155,6 +156,7 @@ public class LoginScreenActivity extends BaseCompactActivity implements View.OnC
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
             TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
             imei = telephonyManager.getDeviceId();
+            localStorage.setActivityState(LocalStorage.EMI,imei);
         }
     }
 
@@ -167,7 +169,7 @@ public class LoginScreenActivity extends BaseCompactActivity implements View.OnC
                 else if (input_password.getText().toString().isEmpty())
                     input_password.setError("Please enter mandatory field");
                 else
-                    loadVersion();
+                    loadVersion(imei);
 
 //                    Crashlytics.getInstance().crash();
 
@@ -178,8 +180,12 @@ public class LoginScreenActivity extends BaseCompactActivity implements View.OnC
     @Override
     public void chechStatus(JSONObject object) {
         try {
-            if (object.getString("responseCode").equalsIgnoreCase("200")) {
-                Toast.makeText(this, object.getString("responseMessage").toString(), Toast.LENGTH_SHORT).show();
+            if (object.getString("serviceType").equalsIgnoreCase("APP_LIVE_STATUS")) {
+                if (object.has("headerList")) {
+                    JSONArray array = object.getJSONArray("headerList");
+                    versionDetails(array, LoginScreenActivity.this);
+                }
+            }else if (object.getString("responseCode").equalsIgnoreCase("200")) {
                 new RouteClass(this, object, input_user.getText().toString(), localStorage, "PINENTERED");//
 //                Intent intent = new Intent(LoginScreenActivity.this, PinActivity.class);
 //                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -210,11 +216,6 @@ public class LoginScreenActivity extends BaseCompactActivity implements View.OnC
             } else if (object.getString("responseCode").equalsIgnoreCase("75115")) {
                 customDialog_Common("KYCLAYOUTS", null, null, "RapiPay Login Failed", null, object.getString("responseMessage"), LoginScreenActivity.this);
 //                customDialog(object.getString("responseMessage"));
-            } else if (object.getString("serviceType").equalsIgnoreCase("APP_LIVE_STATUS")) {
-                if (object.has("headerList")) {
-                    JSONArray array = object.getJSONArray("headerList");
-                    versionDetails(array, LoginScreenActivity.this);
-                }
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -105,7 +105,7 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
             public void afterTextChanged(Editable s) {
                 if (s.length() == 6 && !flaf) {
                     flaf = true;
-                    loadVersion();
+                    loadVersion(localStorage.getActivityState(LocalStorage.EMI));
                     flaf = false;
                 }
             }

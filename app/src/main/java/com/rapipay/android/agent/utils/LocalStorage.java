@@ -7,6 +7,7 @@ public class LocalStorage {
     public static String ROUTESTATE = "login";
     public static String IMAGEPATH = "image";
     public static String LOGOUT = "logout";
+    public static String EMI = "emi";
 
     public static LocalStorage localStorage;
     Context context;

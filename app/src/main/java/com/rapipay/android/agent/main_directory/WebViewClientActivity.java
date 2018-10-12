@@ -140,7 +140,7 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
                 alertPerm(getString(R.string.permissions_not_granted_read_phone_state), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        loadIMEI();
+                        loadIMEIs();
                     }
                 });
 
