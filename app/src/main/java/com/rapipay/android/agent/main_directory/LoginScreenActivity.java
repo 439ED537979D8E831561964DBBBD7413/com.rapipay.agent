@@ -3,7 +3,10 @@ package com.rapipay.android.agent.main_directory;
 import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputEditText;
@@ -15,19 +18,24 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.crashlytics.android.Crashlytics;
+import com.rapipay.android.agent.Model.VersionPozo;
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.interfaces.CustomInterface;
 import com.rapipay.android.agent.interfaces.RequestHandler;
+import com.rapipay.android.agent.interfaces.VersionListener;
 import com.rapipay.android.agent.utils.AsyncPostMethod;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
 import com.rapipay.android.agent.utils.GenerateChecksum;
 import com.rapipay.android.agent.utils.RouteClass;
 import com.rapipay.android.agent.utils.WebConfig;
 
-public class LoginScreenActivity extends BaseCompactActivity implements View.OnClickListener, RequestHandler, CustomInterface {
+import java.util.ArrayList;
+
+public class LoginScreenActivity extends BaseCompactActivity implements View.OnClickListener, RequestHandler, CustomInterface,VersionListener {
 
     final private static int PERMISSIONS_REQUEST_READ_PHONE_STATE = 0;
     EditText input_user;
@@ -41,6 +49,7 @@ public class LoginScreenActivity extends BaseCompactActivity implements View.OnC
         setContentView(R.layout.activity_login);
         initialize();
         loadIMEI();
+        loadVersion();
     }
 
     private void initialize() {
@@ -200,6 +209,11 @@ public class LoginScreenActivity extends BaseCompactActivity implements View.OnC
             } else if (object.getString("responseCode").equalsIgnoreCase("75115")) {
                 customDialog_Common("KYCLAYOUTS", null, null, "RapiPay Login Failed", null, object.getString("responseMessage"), LoginScreenActivity.this);
 //                customDialog(object.getString("responseMessage"));
+            }else if (object.getString("serviceType").equalsIgnoreCase("APP_LIVE_STATUS")) {
+                if (object.has("headerList")) {
+                    JSONArray array = object.getJSONArray("headerList");
+                    versionDetails(array, LoginScreenActivity.this);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -232,12 +246,33 @@ public class LoginScreenActivity extends BaseCompactActivity implements View.OnC
         if (type.equalsIgnoreCase("KYCLAYOUTS")) {
             input_user.setText("");
             input_password.setText("");
+        } else if (type.equalsIgnoreCase("KYCLAYOUTSS")) {
+            Intent webIntent = new Intent(Intent.ACTION_VIEW,
+                    Uri.parse("https://play.google.com/store/apps/details?id=" + getPackageName()));
+            startActivity(webIntent);
         }
     }
 
     @Override
     public void cancelClicked(String type, Object ob) {
 
+    }
+    @Override
+    public void checkVersion(ArrayList<VersionPozo> list) {
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).getName() != null)
+                if (list.get(i).getName().equalsIgnoreCase("PROD")) {
+                    try {
+                        PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+                        String version = pInfo.versionName;
+                        if (!version.equalsIgnoreCase(list.get(i + 1).getValue())) {
+                            customDialog_Common("KYCLAYOUTSS", null, null, "Update Available", null, "You are running on lower version please update for new versions!.", LoginScreenActivity.this);
+                        }
+                    } catch (PackageManager.NameNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                }
+        }
     }
 }
 
