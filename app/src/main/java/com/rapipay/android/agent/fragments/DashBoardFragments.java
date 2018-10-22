@@ -97,9 +97,16 @@ public class DashBoardFragments extends Fragment {
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                 } else if (position == 0) {
-                    Intent intent = new Intent(getActivity(), RegisterUserActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    startActivity(intent);
+                    for (int i = 0; i < MainActivity.pozoArrayList.size(); i++) {
+                        if (MainActivity.pozoArrayList.get(i).getHeaderID().equalsIgnoreCase("10"))
+                            if (MainActivity.pozoArrayList.get(i).getHeaderData().equalsIgnoreCase("Retailer")) {
+                                Toast.makeText(getActivity(),"Not Authorized to create New User!.", Toast.LENGTH_SHORT).show();
+                            }else {
+                                Intent intent = new Intent(getActivity(), RegisterUserActivity.class);
+                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                startActivity(intent);
+                            }
+                    }
                 }else if (position == 3) {
                     Intent intent = new Intent(getActivity(), PassbookActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

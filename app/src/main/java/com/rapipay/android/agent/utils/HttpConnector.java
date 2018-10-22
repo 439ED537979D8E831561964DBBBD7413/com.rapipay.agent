@@ -25,29 +25,26 @@ import javax.net.ssl.TrustManagerFactory;
 
 import com.rapipay.android.agent.R;
 
-public class HttpConnector
-{
+public class HttpConnector {
     private static HttpConnector instance = null;
     private static InputStream serverCert;
     private static SSLContext context;
     private static HostnameVerifier hostnameVerifier;
-    String result=null;
+    String result = null;
 
-    public static HttpConnector getInstance()
-    {
-        if(instance == null)
+    public static HttpConnector getInstance() {
+        if (instance == null)
             instance = new HttpConnector();
         return instance;
     }
 
-    public static void setServerCert(Context cert)
-    {
+    public static void setServerCert(Context cert) {
 //        serverCert = serverCrt;
         try {
             // Load CAs from an InputStream
             // (could be from a resource or ByteArrayInputStream or ...)
             CertificateFactory cf = CertificateFactory.getInstance("X.509");
-            InputStream in = cert.getResources().openRawResource(R.raw.serverlive);
+            InputStream in = cert.getResources().openRawResource(R.raw.server);
             InputStream caInput = new BufferedInputStream(in);
             Certificate ca;
             try {
@@ -80,18 +77,16 @@ public class HttpConnector
                     return true;
                 }
             };
-        }
-        catch(Exception ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
 
-    private HttpConnector()
-    {
+    private HttpConnector() {
 
     }
 
-    public String postData(final String url, final String xmlData , String strHeaderData ) throws Exception {
+    public String postData(final String url, final String xmlData, String strHeaderData) throws Exception {
 
         URL urlToRequest = new URL(url);
 
@@ -100,7 +95,7 @@ public class HttpConnector
 
         try {
             boolean isHttps = url.startsWith("https");
-            if(isHttps) {
+            if (isHttps) {
                 SSLSocketFactory socketFactory = null;
                 try {
 //                    if (context == null)
@@ -117,18 +112,16 @@ public class HttpConnector
 //
 //                    }
                     socketFactory = context.getSocketFactory();
-                }
-                catch(Exception e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
 
                 urlConnection = (HttpsURLConnection) urlToRequest.openConnection();
 
-                if(socketFactory != null)
-                    ((HttpsURLConnection)urlConnection).setSSLSocketFactory(socketFactory);
+                if (socketFactory != null)
+                    ((HttpsURLConnection) urlConnection).setSSLSocketFactory(socketFactory);
 
-            }
-            else {
+            } else {
                 urlConnection = (HttpURLConnection) urlToRequest.openConnection();
             }
             urlConnection.setRequestProperty("Authorization", "Basic " + new String(Base64.encode(strHeaderData.getBytes(), Base64.DEFAULT)));
@@ -137,9 +130,9 @@ public class HttpConnector
             urlConnection.setRequestProperty("Content-Type", "application/json");
             urlConnection.setConnectTimeout(90000);
             urlConnection.setReadTimeout(90000);
-            urlConnection.setRequestProperty( "Content-Length", Integer.toString( xmlData.length()));
+            urlConnection.setRequestProperty("Content-Length", Integer.toString(xmlData.length()));
             urlConnection.setFixedLengthStreamingMode(xmlData.length());
-            urlConnection.setUseCaches( false );
+            urlConnection.setUseCaches(false);
             urlConnection.addRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:221.0) Gecko/20100101 Firefox/31.0");
 
             PrintWriter out = new PrintWriter(urlConnection.getOutputStream());
@@ -155,14 +148,13 @@ public class HttpConnector
             BufferedReader br = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
             String line = "";
             StringBuilder responseOutput = new StringBuilder();
-            while((line = br.readLine()) != null ) {
+            while ((line = br.readLine()) != null) {
                 responseOutput.append(line);
             }
             br.close();
 
             return responseOutput.toString();
-        }
-        finally{
+        } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();
             }
@@ -254,10 +246,10 @@ public class HttpConnector
 //    }
 
     private static String convertInputStreamToString(InputStream inputStream) throws IOException {
-        BufferedReader bufferedReader = new BufferedReader( new InputStreamReader(inputStream));
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
         String line = "";
         String result = "";
-        while((line = bufferedReader.readLine()) != null)
+        while ((line = bufferedReader.readLine()) != null)
             result += line;
 
         inputStream.close();

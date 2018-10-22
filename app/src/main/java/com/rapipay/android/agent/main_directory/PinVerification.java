@@ -47,12 +47,15 @@ import com.rapipay.android.agent.utils.GenerateChecksum;
 import com.rapipay.android.agent.utils.RouteClass;
 import com.rapipay.android.agent.utils.WebConfig;
 
+
 public class PinVerification extends BaseCompactActivity implements RequestHandler, View.OnClickListener, CustomInterface, VersionListener {
     private ViewPager mPager;
     private static int currentPage = 0;
     private static int NUM_PAGES = 0;
     EditText confirmpinView;
     TextView toolbar_title;
+
+
     boolean flaf = false;
     private static final Integer[] IMAGES = {R.drawable.banner1, R.drawable.banner1, R.drawable.banner1, R.drawable.banner1};
     private ArrayList<Integer> ImagesArray;
@@ -388,7 +391,7 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
                         String version = pInfo.versionName;
                         if (!version.equalsIgnoreCase(list.get(i + 1).getValue())) {
                             customDialog_Common("KYCLAYOUTSS", null, null, "Update Available", null, "You are running on lower version please update for new versions!.", PinVerification.this);
-                        }else {
+                        } else {
                             new AsyncPostMethod(WebConfig.UAT, getJson_Validate(confirmpinView.getText().toString()).toString(), "", PinVerification.this).execute();
                         }
                     } catch (PackageManager.NameNotFoundException e) {

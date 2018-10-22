@@ -139,20 +139,31 @@
 
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
+                        android:weightSum="800"
                         android:orientation="horizontal">
 
                         <android.support.v7.widget.AppCompatButton
-                            android:id="@+id/btn_fund"
-                            android:layout_width="match_parent"
+                            android:id="@+id/btn_scan_submit"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:layout_marginLeft="60dp"
-                            android:layout_marginRight="60dp"
+                            android:layout_weight="400"
                             android:background="@drawable/border_button"
-                            android:gravity="center"
+                            android:onClick="onClick"
+                            android:text="@string/btnscasubmit"
+                            android:textColor="@color/white"
+                            android:textSize="16dp"
+                            android:layout_marginRight="3dp"/>
+
+                        <android.support.v7.widget.AppCompatButton
+                            android:id="@+id/btn_fund"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="400"
+                            android:background="@drawable/border_button"
                             android:onClick="onClick"
                             android:text="@string/btnsubmit"
+                            android:layout_marginLeft="3dp"
                             android:textColor="@color/white"
                             android:textSize="16dp" />
                     </LinearLayout>

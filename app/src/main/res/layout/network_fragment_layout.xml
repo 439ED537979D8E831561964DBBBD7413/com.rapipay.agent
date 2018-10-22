@@ -18,10 +18,10 @@
         android:textSize="14dp"
         android:visibility="visible" />
 
-    <android.support.v7.widget.RecyclerView
+    <ListView
         android:id="@+id/trans_details"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="5dp"
         android:gravity="center_horizontal" />

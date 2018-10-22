@@ -10,10 +10,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -27,6 +29,7 @@ import me.grantland.widget.AutofitTextView;
 import com.rapipay.android.agent.Model.NetworkHistoryPozo;
 import com.rapipay.android.agent.Model.RapiPayPozo;
 import com.rapipay.android.agent.R;
+import com.rapipay.android.agent.adapter.NetworkAdapter;
 import com.rapipay.android.agent.adapter.NetworkHistoryAdapter;
 import com.rapipay.android.agent.interfaces.RequestHandler;
 import com.rapipay.android.agent.utils.AsyncPostMethod;
@@ -38,8 +41,10 @@ public class NetworkHistoryFragment extends Fragment implements RequestHandler, 
 
     Long tsLong;
     View rv;
+    private int first = 1, last = 25;
+    private boolean isLoading;
     AutofitTextView date2_text, date1_text;
-    RecyclerView trans_details;
+    ListView trans_details;
     protected ArrayList<RapiPayPozo> list;
     private String headerData, payee;
     Spinner select_state;
@@ -47,6 +52,7 @@ public class NetworkHistoryFragment extends Fragment implements RequestHandler, 
     ArrayList<NetworkHistoryPozo> transactionPozoArrayList;
     private int selectedDate, selectedMonth, selectedYear;
     String months = null, dayss = null;
+    NetworkHistoryAdapter adapter;
 
     @Nullable
     @Override
@@ -64,7 +70,7 @@ public class NetworkHistoryFragment extends Fragment implements RequestHandler, 
         date1_text = (AutofitTextView) view.findViewById(R.id.date1);
         date1_text.setOnClickListener(this);
         view.findViewById(R.id.btn_fund).setOnClickListener(this);
-        trans_details = (RecyclerView) view.findViewById(R.id.trans_details);
+        trans_details = (ListView) view.findViewById(R.id.trans_details);
         select_state = (Spinner) view.findViewById(R.id.select_state);
         list_state = BaseCompactActivity.db.getPayee_Details();
         if (list_state.size() != 0) {
@@ -97,6 +103,24 @@ public class NetworkHistoryFragment extends Fragment implements RequestHandler, 
         ImageView fromimage = (ImageView) rv.findViewById(R.id.fromimage);
         fromimage.setOnClickListener(fromDateClicked);
         fromimage.setColorFilter(getResources().getColor(R.color.colorPrimaryDark));
+
+        trans_details.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                int lastInScreen = firstVisibleItem + visibleItemCount;
+                if (totalItemCount != 0 && totalItemCount == last && lastInScreen == totalItemCount && !isLoading) {
+                    first = last + 1;
+                    last += 25;
+                    new AsyncPostMethod(WebConfig.NETWORKTRANSFER_URL, channel_request(first,last).toString(), headerData, NetworkHistoryFragment.this, getActivity()).execute();
+                    isLoading = true;
+                }
+            }
+        });
     }
 
     @Override
@@ -112,7 +136,7 @@ public class NetworkHistoryFragment extends Fragment implements RequestHandler, 
                     date1_text.setError("Please enter valid data");
                     date1_text.requestFocus();
                 } else
-                    new AsyncPostMethod(WebConfig.NETWORKTRANSFER_URL, channel_request().toString(), headerData, NetworkHistoryFragment.this, getActivity()).execute();
+                    new AsyncPostMethod(WebConfig.NETWORKTRANSFER_URL, channel_request(first,last).toString(), headerData, NetworkHistoryFragment.this, getActivity()).execute();
                 break;
         }
     }
@@ -335,7 +359,7 @@ public class NetworkHistoryFragment extends Fragment implements RequestHandler, 
 //        }, newCalendar.get(Calendar.YEAR), newCalendar.get(Calendar.MONTH), newCalendar.get(Calendar.DAY_OF_MONTH));
 //        pickerDialog.show();
 //    }
-    public JSONObject channel_request() {
+    public JSONObject channel_request(int fromIndex, int toIndex) {
         tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         try {
@@ -349,6 +373,8 @@ public class NetworkHistoryFragment extends Fragment implements RequestHandler, 
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
             jsonObject.put("roleType", payee);
             jsonObject.put("userMobile", list.get(0).getMobilno());
+            jsonObject.put("fromIndex", String.valueOf(fromIndex));
+            jsonObject.put("toIndex", String.valueOf(toIndex));
             jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
 
         } catch (Exception e) {
@@ -390,8 +416,16 @@ public class NetworkHistoryFragment extends Fragment implements RequestHandler, 
     }
 
     private void initializeTransAdapter(ArrayList<NetworkHistoryPozo> list) {
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
-        trans_details.setLayoutManager(layoutManager);
-        trans_details.setAdapter(new NetworkHistoryAdapter(getActivity(), trans_details, list));
+//        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
+//        trans_details.setLayoutManager(layoutManager);
+//        trans_details.setAdapter(new NetworkHistoryAdapter(getActivity(), trans_details, list));
+        if (first == 1) {
+            adapter = new NetworkHistoryAdapter(list,getActivity());
+            trans_details.setAdapter(adapter);
+        }else {
+            adapter.addAll(list);
+            adapter.notifyDataSetChanged();
+        }
+        isLoading = false;
     }
 }

@@ -1,116 +1,113 @@
 <?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:pinview="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical">
 
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay">
 
-    <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:pinview="http://schemas.android.com/tools"
+        <include layout="@layout/pin_toolbar" />
+    </android.support.design.widget.AppBarLayout>
+
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/white"
-        android:orientation="vertical">
+        android:fillViewport="true"
+        android:fitsSystemWindows="true">
 
-        <android.support.design.widget.AppBarLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:theme="@style/AppTheme.AppBarOverlay">
-
-            <include layout="@layout/pin_toolbar" />
-        </android.support.design.widget.AppBarLayout>
-
-        <ScrollView
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:fillViewport="true"
-            android:fitsSystemWindows="true">
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:orientation="vertical"
+            android:theme="@style/AppTheme">
 
             <RelativeLayout
+                android:id="@+id/top"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_gravity="center"
-                android:layout_marginTop="10dp"
-                android:orientation="vertical"
-                android:theme="@style/AppTheme">
+                android:layout_height="250dp">
 
-                <RelativeLayout
-                    android:id="@+id/top"
+                <android.support.v4.view.ViewPager
+                    android:id="@+id/pager"
                     android:layout_width="match_parent"
-                    android:layout_height="250dp">
+                    android:layout_height="250dp"
+                    android:layout_alignParentTop="true" />
 
-                    <android.support.v4.view.ViewPager
-                        android:id="@+id/pager"
-                        android:layout_width="match_parent"
-                        android:layout_height="250dp"
-                        android:layout_alignParentTop="true" />
+                <com.viewpagerindicator.CirclePageIndicator
+                    android:id="@+id/indicator"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerHorizontal="true"
+                    android:gravity="bottom"
+                    android:padding="10dip"
+                    app:centered="true"
+                    app:fillColor="@color/white"
+                    app:pageColor="@color/colorPrimaryDark"
+                    app:snap="false" />
+            </RelativeLayout>
 
-                    <com.viewpagerindicator.CirclePageIndicator
-                        android:id="@+id/indicator"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentBottom="true"
-                        android:layout_centerHorizontal="true"
-                        android:gravity="bottom"
-                        android:padding="10dip"
-                        app:centered="true"
-                        app:fillColor="@color/white"
-                        app:pageColor="@color/colorPrimaryDark"
-                        app:snap="false" />
-                </RelativeLayout>
+            <LinearLayout
+                android:id="@+id/between"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/top"
+                android:orientation="vertical">
 
-                <LinearLayout
-                    android:id="@+id/between"
+                <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/top"
-                    android:orientation="vertical">
+                    android:layout_above="@+id/confirmpinView"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center"
+                    android:text="Enter Login Pin"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="16sp" />
 
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_above="@+id/confirmpinView"
-                        android:layout_marginTop="10dp"
-                        android:gravity="center"
-                        android:text="Enter Login Pin"
-                        android:textColor="@color/colorPrimaryDark"
-                        android:textSize="16sp" />
+                <EditText
+                    android:id="@+id/confirmpinView"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="55dp"
+                    android:layout_marginRight="60dp"
+                    android:gravity="center"
+                    android:inputType="numberPassword"
+                    android:maxLength="6"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textScaleX="1.4"
+                    android:textSize="18dp" />
 
-                    <EditText
-                        android:id="@+id/confirmpinView"
-                        android:layout_width="100dp"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginLeft="55dp"
-                        android:layout_marginRight="60dp"
-                        android:gravity="center"
-                        android:inputType="numberPassword"
-                        android:maxLength="6"
-                        android:textColor="@color/colorPrimaryDark"
-                        android:textScaleX="1.4"
-                        android:textSize="18dp" />
+                <TextView
+                    android:id="@+id/forget_pin"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_above="@+id/confirmpinView"
+                    android:layout_gravity="center"
+                    android:layout_marginRight="10dp"
+                    android:gravity="right"
+                    android:onClick="onClick"
+                    android:padding="5dp"
+                    android:text="Forgot Pin"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
 
-                    <TextView
-                        android:id="@+id/forget_pin"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_above="@+id/confirmpinView"
-                        android:layout_gravity="center"
-                        android:layout_marginRight="10dp"
-                        android:gravity="right"
-                        android:onClick="onClick"
-                        android:padding="5dp"
-                        android:text="Forgot Pin"
-                        android:textColor="@color/colorPrimaryDark"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
-
-                <android.support.v7.widget.RecyclerView
-                    android:id="@+id/recycler_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginTop="80dp"
-                    android:layout_below="@+id/between"
-                    android:layout_alignParentBottom="true" />
-            </RelativeLayout>
-        </ScrollView>
-    </LinearLayout>
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignParentBottom="true"
+                android:layout_below="@+id/between"
+                android:layout_marginTop="80dp" />
+        </RelativeLayout>
+    </ScrollView>
+</LinearLayout>

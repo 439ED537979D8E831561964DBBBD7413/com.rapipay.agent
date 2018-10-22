@@ -30,6 +30,7 @@
     <string name="title_notification">Notification</string>
 
     <string name="btnsubmit">Submit</string>
+    <string name="btnscasubmit">Scan &amp; Submit</string>
     <string name="btotp">*****</string>
     <string name="btnupdate">Request for Credit</string>
     <string name="btnhist">Details</string>
@@ -124,6 +125,7 @@
     <string name="creditID">CreditID</string>
     <string name="agentBalance">Agent Balance</string>
     <string name="p_accountno">AC No</string>
+    <string name="link">HTML Link</string>
     <string name="p_payeeaccountno">Payee Account</string>
     <string name="cgst">CGST</string>
     <string name="igst">IGST</string>
@@ -157,6 +159,9 @@
     <string name="cancel">Cancel</string>
     <string name="ok">Ok</string>
 
+    <string name="accept">Accept</string>
+    <string name="decline">Decline</string>
+    <string name="dialogue_message">Hello, %1$s! You have new messages.</string>
     <string name="prompt_getadteerror">Error in geting data,try again...</string>
 
 </resources>

@@ -1,7 +1,5 @@
 package com.rapipay.android.agent.main_directory;
 
-import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -67,14 +65,13 @@ public class MainActivity extends BaseCompactActivity
     public static ImageView ivHeaderPhoto;
     TextView footettext;
     NavigationView navigationView;
-    String headerData;
     private static final int CAMERA_REQUEST = 1888;
     private int SELECT_FILE = 1;
     private static String filePath;
     private static final String TAG = "Contacts";
 
     DrawerLayout drawer;
-    boolean doubleBackToExitPressedOnce = false;
+    String data, term = null;
 
     public static ArrayList<HeaderePozo> pozoArrayList;
 
@@ -88,7 +85,6 @@ public class MainActivity extends BaseCompactActivity
     }
 
     private void url() {
-        headerData = (WebConfig.BASIC_USERID + ":" + WebConfig.BASIC_PASSWORD);
         new AsyncPostMethod(WebConfig.NETWORKTRANSFER_URL, getDashBoard("GET_NODE_HEADER_DATA").toString(), headerData, MainActivity.this).execute();
     }
 
@@ -137,6 +133,7 @@ public class MainActivity extends BaseCompactActivity
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
             StrictMode.setThreadPolicy(policy);
         }
+
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -150,6 +147,7 @@ public class MainActivity extends BaseCompactActivity
                 drawer.openDrawer(GravityCompat.START);
             }
         });
+
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         View headerLayout = navigationView.inflateHeaderView(R.layout.nav_header_main);
@@ -315,16 +313,16 @@ public class MainActivity extends BaseCompactActivity
         } else if (id == R.id.nav_cpsw) {
             reset.setVisibility(View.GONE);
             fragment = new ChangePassword();
-        }else if (id == R.id.profile) {
+        } else if (id == R.id.profile) {
             reset.setVisibility(View.GONE);
             fragment = new ProfileFragment();
-        }
-        else if (fragment == null)
+        } else if (fragment == null)
             Toast.makeText(MainActivity.this, "Under Process", Toast.LENGTH_SHORT).show();
         if (fragment != null)
             fragmentReplace(fragment);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+
     }
 
     private void fragmentReplace(Fragment fragment) {
@@ -350,7 +348,8 @@ public class MainActivity extends BaseCompactActivity
             if (object.getString("responseCode").equalsIgnoreCase("200")) {
                 if (object.getString("serviceType").equalsIgnoreCase("GET_MASTER_DATA")) {
                     if (new MasterClass().getMasterData(object, db))
-                        new AsyncPostMethod(WebConfig.NETWORKTRANSFER_URL, acknowledge().toString(), headerData, MainActivity.this).execute();
+                        if (term.equalsIgnoreCase("N"))
+                            new AsyncPostMethod(WebConfig.NETWORKTRANSFER_URL, acknowledge(data, term).toString(), headerData, MainActivity.this).execute();
                 } else if (object.getString("serviceType").equalsIgnoreCase("GET_NODE_HEADER_DATA")) {
                     if (object.has("headerList")) {
                         localStorage.setActivityState(LocalStorage.ROUTESTATE, "0");
@@ -359,7 +358,7 @@ public class MainActivity extends BaseCompactActivity
                         }
                     }
                 } else if (object.getString("serviceType").equalsIgnoreCase("UPDATE_DOWNLAOD_DATA_STATUS")) {
-
+                    loadUrl();
                 }
             }
         } catch (Exception e) {
@@ -373,12 +372,24 @@ public class MainActivity extends BaseCompactActivity
         try {
             for (int i = 0; i < array.length(); i++) {
                 JSONObject object = array.getJSONObject(i);
-                if (!object.getString("headerValue").equalsIgnoreCase("DOWNLOAD_MASTER_DATA"))
+                if (!object.getString("headerValue").equalsIgnoreCase("DOWNLOAD_MASTER_DATA") && !object.getString("headerValue").equalsIgnoreCase("TnC") && !object.getString("headerValue").equalsIgnoreCase("TCLINK") && !object.getString("headerValue").equalsIgnoreCase("Parent Mobile"))
                     pozoArrayList.add(new HeaderePozo(object.getString("headerValue"), object.getString("headerData"), object.getString("headerId")));
                 else {
-                    if (object.getString("headerData").equalsIgnoreCase("Y")) {
-                        deleteTables("");
-                        callMasterDetails();
+                    if (object.getString("headerValue").equalsIgnoreCase("TnC")) {
+                        term = object.getString("headerData");
+                        if (object.getString("headerData").equalsIgnoreCase("Y")) {
+                            JSONObject object1 = array.getJSONObject(i + 1);
+                            if (object1.getString("headerValue").equalsIgnoreCase("TCLINK")) {
+                                new AsyncPostMethod(object1.getString("headerData"), "", "", MainActivity.this).execute();
+                            }
+                        }
+                    }
+                    if (object.getString("headerValue").equalsIgnoreCase("DOWNLOAD_MASTER_DATA")) {
+                        data = object.getString("headerData");
+                        if (object.getString("headerData").equalsIgnoreCase("Y")) {
+                            deleteTables("");
+                            callMasterDetails();
+                        }
                     }
                 }
             }
@@ -426,7 +437,7 @@ public class MainActivity extends BaseCompactActivity
         return jsonObject;
     }
 
-    public JSONObject acknowledge() {
+    public JSONObject acknowledge(String data, String term) {
         ArrayList<RapiPayPozo> list = db.getDetails();
         tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
@@ -436,7 +447,7 @@ public class MainActivity extends BaseCompactActivity
                 jsonObject.put("requestType", "BC_CHANNEL");
                 jsonObject.put("typeMobileWeb", "mobile");
                 jsonObject.put("transactionID", "UDDS" + tsLong.toString());
-                jsonObject.put("DataDownloadFlag", "Y");
+                jsonObject.put("DataDownloadFlag", data + "1" + term);
                 jsonObject.put("agentMobile", list.get(0).getMobilno());
                 jsonObject.put("nodeAgentId", list.get(0).getMobilno());
                 jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
@@ -453,7 +464,7 @@ public class MainActivity extends BaseCompactActivity
 
     @Override
     public void chechStat(String object) {
-
+        customDialog_Common("TERMCONDITION", null, null, "Term & Condition", "", object, MainActivity.this);
     }
 
     @Override
@@ -482,7 +493,10 @@ public class MainActivity extends BaseCompactActivity
     @Override
     public void okClicked(String type, Object ob) {
         super.onBackPressed();
-        finish();
+        if (type.equalsIgnoreCase("TERMCONDITION")) {
+            new AsyncPostMethod(WebConfig.NETWORKTRANSFER_URL, acknowledge(data, term).toString(), headerData, MainActivity.this).execute();
+        } else
+            finish();
     }
 
     @Override

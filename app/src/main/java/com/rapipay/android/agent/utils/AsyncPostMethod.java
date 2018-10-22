@@ -58,8 +58,7 @@ public class AsyncPostMethod extends AsyncTask<String, String, String> {
             if (isNetworkAvailable(context)) {
                 connector.setServerCert(context);
                 s = connector.postData(url, xmlData, strHeaderData);
-            }
-            else {
+            } else {
                 s = "false";
             }
             return s;
@@ -74,20 +73,22 @@ public class AsyncPostMethod extends AsyncTask<String, String, String> {
         super.onPostExecute(s);
         try {
             if (s != null) {
-                if (!s.equalsIgnoreCase("false")) {
+                if (s.contains("DOCTYPE")) {
+                    handler.chechStat(s);
+                } else if (!s.equalsIgnoreCase("false")) {
                     JSONObject object = new JSONObject(s);
                     if (object.has("responseCode")) {
                         if (object.getString("responseCode").equalsIgnoreCase("200") || object.getString("responseCode").equalsIgnoreCase("75059") || object.getString("responseCode").equalsIgnoreCase("300") || object.getString("responseCode").equalsIgnoreCase("101") || object.getString("responseCode").equalsIgnoreCase("75077") || object.getString("responseCode").equalsIgnoreCase("75115") || object.getString("responseCode").equalsIgnoreCase("75062") || object.getString("responseCode").equalsIgnoreCase("75061") || object.getString("responseCode").equalsIgnoreCase("75063")) {
                             handler.chechStatus(object);
-                            if(object.has("apiCommonResposne")){
+                            if (object.has("apiCommonResposne")) {
                                 JSONObject object1 = object.getJSONObject("apiCommonResposne");
                                 String balance = object1.getString("runningBalance");
-                                for(int i=0;i< MainActivity.pozoArrayList.size();i++){
-                                    if(MainActivity.pozoArrayList.get(i).getHeaderID().equalsIgnoreCase("1"))
+                                for (int i = 0; i < MainActivity.pozoArrayList.size(); i++) {
+                                    if (MainActivity.pozoArrayList.get(i).getHeaderID().equalsIgnoreCase("1"))
                                         MainActivity.pozoArrayList.get(i).setHeaderData(balance);
                                 }
                             }
-                        }else if (object.getString("responseCode").equalsIgnoreCase("60147")) {
+                        } else if (object.getString("responseCode").equalsIgnoreCase("60147")) {
                             Intent intent = new Intent(context, PinVerification.class);
                             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             context.startActivity(intent);
@@ -104,15 +105,15 @@ public class AsyncPostMethod extends AsyncTask<String, String, String> {
                     } else if (object.has("responsecode")) {
                         if (object.getString("responsecode").equalsIgnoreCase("200") || object.getString("responsecode").equalsIgnoreCase("75059") || object.getString("responsecode").equalsIgnoreCase("101") || object.getString("responsecode").equalsIgnoreCase("300") || object.getString("responsecode").equalsIgnoreCase("75077") || object.getString("responseCode").equalsIgnoreCase("75061") || object.getString("responseCode").equalsIgnoreCase("75063")) {
                             handler.chechStatus(object);
-                            if(object.has("apiCommonResposne")){
+                            if (object.has("apiCommonResposne")) {
                                 JSONObject object1 = object.getJSONObject("apiCommonResposne");
                                 String balance = object1.getString("runningBalance");
-                                for(int i=0;i< MainActivity.pozoArrayList.size();i++){
-                                    if(MainActivity.pozoArrayList.get(i).getHeaderID().equalsIgnoreCase("1"))
+                                for (int i = 0; i < MainActivity.pozoArrayList.size(); i++) {
+                                    if (MainActivity.pozoArrayList.get(i).getHeaderID().equalsIgnoreCase("1"))
                                         MainActivity.pozoArrayList.get(i).setHeaderValue(balance);
                                 }
                             }
-                        }else {
+                        } else {
                             if (object.has("responseMessage"))
                                 customDialog_Common(object.getString("responseMessage"));
                             else

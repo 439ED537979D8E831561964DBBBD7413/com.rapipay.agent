@@ -1,12 +1,17 @@
 package com.rapipay.android.agent.main_directory;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.TextView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.XML;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -76,10 +81,10 @@ public class RegisterUserActivity extends BaseCompactActivity implements Request
                 finish();
                 break;
             case R.id.btn_fund:
-                if (!ImageUtils.commonRegex(input_name.getText().toString(),150," ")) {
+                if (!ImageUtils.commonRegex(input_name.getText().toString(), 150, " ")) {
                     input_name.setError("Please enter valid data");
                     input_name.requestFocus();
-                } else if (!ImageUtils.commonRegex(input_code.getText().toString(),150,"0-9 .&")) {
+                } else if (!ImageUtils.commonRegex(input_code.getText().toString(), 150, "0-9 .&")) {
                     input_code.setError("Please enter valid data");
                     input_code.requestFocus();
                 } else if (!ImageUtils.commonAddress(input_address.getText().toString())) {
@@ -91,12 +96,63 @@ public class RegisterUserActivity extends BaseCompactActivity implements Request
                 } else if (!Patterns.EMAIL_ADDRESS.matcher(input_email.getText().toString()).matches()) {
                     input_email.setError("Please enter valid data");
                     input_email.requestFocus();
-                } else if (!ImageUtils.commonNumber(input_number.getText().toString(),10)) {
+                } else if (!ImageUtils.commonNumber(input_number.getText().toString(), 10)) {
                     input_number.setError("Please enter valid data");
                     input_number.requestFocus();
                 } else
                     new AsyncPostMethod(WebConfig.UAT, request_user().toString(), headerData, RegisterUserActivity.this).execute();
                 break;
+            case R.id.btn_scan_submit:
+                startActivityForResult(new Intent(RegisterUserActivity.this, BarcodeActivity.class), 1);
+                break;
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            if (requestCode == 1) {
+                JSONObject jsonObj = null;
+                try {
+                    String requiredValue = data.getStringExtra("Key");
+                    jsonObj = XML.toJSONObject(requiredValue);
+                    JSONObject jsonObject = jsonObj.getJSONObject("PrintLetterBarcodeData");
+                    parseJson(jsonObject);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    private void parseJson(JSONObject object) {
+        try {
+            if (object.has("name"))
+                input_name.setText(object.getString("name"));
+            if (object.has("house") && object.has("street") && object.has("lm")&& object.has("vtc") && object.has("dist")) {
+                String add = object.getString("house") +", "+ object.getString("street") +", "+ object.getString("lm")+", "+ object.getString("vtc") +", "+ object.getString("dist");
+                input_address.setText(add);
+            }else if (object.has("_house") && object.has("_street") && object.has("_lm")&& object.has("_vtc") && object.has("_dist")) {
+                String add = object.getString("_house") +", "+ object.getString("_street") +", "+ object.getString("_lm")+", "+ object.getString("_vtc") +", "+ object.getString("_dist");
+                input_address.setText(add);
+            }else if ( object.has("_loc")&& object.has("vtc") && object.has("dist")) {
+                String add = object.getString("_loc")+", "+ object.getString("vtc") +", "+ object.getString("dist");
+                input_address.setText(add);
+            }else if ( object.has("_loc")&& object.has("_vtc") && object.has("_dist")) {
+                String add = object.getString("_loc")+", "+ object.getString("vtc") +", "+ object.getString("dist");
+                input_address.setText(add);
+            }else if ( object.has("_lm")&&object.has("_loc")&& object.has("_vtc") && object.has("_dist")) {
+                String add = object.getString("_lm")+", "+object.getString("_loc")+", "+ object.getString("vtc") +", "+ object.getString("dist");
+                input_address.setText(add);
+            }
+
+            if(object.has("state"))
+                select_state.setText(object.getString("state"));
+            else if(object.has("_state"))
+                select_state.setText(object.getString("_state"));
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

@@ -7,6 +7,7 @@
     android:layout_margin="5dp"
     android:elevation="10dp"
     app:cardBackgroundColor="@color/white">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -31,17 +32,17 @@
 
             <TextView
                 android:id="@+id/dialog_cancel"
-                android:layout_alignParentRight="true"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
                 android:layout_gravity="left"
                 android:gravity="left"
                 android:padding="10dp"
                 android:text="X"
-                android:visibility="gone"
                 android:textColor="@color/white"
+                android:textSize="24dp"
                 android:textStyle="bold"
-                android:textSize="24dp"/>
+                android:visibility="gone" />
         </RelativeLayout>
 
 
@@ -529,6 +530,7 @@
                     android:text="@string/p_bank"
                     android:textColor="@color/colorPrimaryDark"
                     android:textSize="12sp" />
+
             </LinearLayout>
 
             <LinearLayout
@@ -539,20 +541,12 @@
                 android:weightSum="800">
 
                 <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="230"
-                    android:inputType="text"
-                    android:text="@string/sgst"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:id="@+id/btn_sgst"
+                    android:id="@+id/btn_linkon"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="570"
                     android:onClick="onClick"
-                    android:text="@string/p_bank"
+                    android:text="@string/link"
                     android:textColor="@color/colorPrimaryDark"
                     android:textSize="12sp" />
             </LinearLayout>
@@ -563,6 +557,13 @@
             layout="@layout/verify_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:visibility="gone" />
+
+        <include
+            android:id="@+id/accept_term"
+            layout="@layout/accept_decline"
+            android:layout_width="match_parent"
+            android:layout_height="380dp"
             android:visibility="gone" />
 
         <LinearLayout

@@ -2,12 +2,13 @@ package com.rapipay.android.agent.utils;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.Application;
 import android.app.Dialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -25,6 +26,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatButton;
 import android.text.Editable;
+import android.text.Html;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -56,10 +58,6 @@ import java.util.Calendar;
 import java.util.Locale;
 
 import me.grantland.widget.AutofitTextView;
-//                    Intent intent = new Intent(getActivity(), NetworkTab.class);
-//                    intent.putExtra("CLICKED", "0");
-//                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//                    startActivity(intent);
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.rapipay.android.agent.Database.RapipayDB;
 import com.rapipay.android.agent.Model.BeneficiaryDetailsPozo;
@@ -74,7 +72,6 @@ import com.rapipay.android.agent.interfaces.CustomInterface;
 import com.rapipay.android.agent.interfaces.VersionListener;
 import com.rapipay.android.agent.main_directory.MainActivity;
 import com.rapipay.android.agent.main_directory.PinVerification;
-import com.rapipay.android.agent.main_directory.SpashScreenActivity;
 
 public class BaseCompactActivity extends AppCompatActivity {
     protected String imei;
@@ -246,6 +243,13 @@ public class BaseCompactActivity extends AppCompatActivity {
             } else if (type.equalsIgnoreCase("KYCLAYOUTS") || type.equalsIgnoreCase("KYCLAYOUTSS") || type.equalsIgnoreCase("LOGOUT")) {
                 btn_cancel.setVisibility(View.GONE);
                 customView(alertLayout, output);
+            } else if (type.equalsIgnoreCase("TERMCONDITION")) {
+                btn_cancel.setText("Decline");
+                btn_cancel.setTextSize(10);
+                btn_ok.setText("Accept");
+                btn_ok.setTextSize(10);
+                alertLayout.findViewById(R.id.accept_term).setVisibility(View.VISIBLE);
+                customView_term(alertLayout, output);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -259,9 +263,9 @@ public class BaseCompactActivity extends AppCompatActivity {
                 else if (type.equalsIgnoreCase("KYCLAYOUTS"))
                     anInterface.okClicked(type, ob);
                 else if (type.equalsIgnoreCase("LOGOUT")) {
-                    Intent intent = new Intent(BaseCompactActivity.this, PinVerification.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intent);
+                    return_Page();
+                } else if (type.equalsIgnoreCase("TERMCONDITION")) {
+                    anInterface.okClicked(type, ob);
                 } else
                     anInterface.okClicked(type, ob);
                 alertDialog.dismiss();
@@ -270,7 +274,10 @@ public class BaseCompactActivity extends AppCompatActivity {
         btn_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                anInterface.cancelClicked(type, ob);
+                if (type.equalsIgnoreCase("TERMCONDITION"))
+                    return_Page();
+                else
+                    anInterface.cancelClicked(type, ob);
                 alertDialog.dismiss();
             }
         });
@@ -281,6 +288,12 @@ public class BaseCompactActivity extends AppCompatActivity {
             }
         });
         alertDialog = dialog.show();
+    }
+
+    protected void return_Page() {
+        Intent intent = new Intent(BaseCompactActivity.this, PinVerification.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
     }
 
     protected void serviceFee(View alertLayout, JSONObject object, BeneficiaryDetailsPozo pozo, String msg, String input) throws Exception {
@@ -411,6 +424,13 @@ public class BaseCompactActivity extends AppCompatActivity {
     protected void customView(View alertLayout, String output) throws Exception {
         TextView otpView = (TextView) alertLayout.findViewById(R.id.dialog_msg);
         otpView.setText(output);
+        otpView.setVisibility(View.VISIBLE);
+        dialog.setView(alertLayout);
+    }
+
+    protected void customView_term(View alertLayout, String output) throws Exception {
+        TextView otpView = (TextView) alertLayout.findViewById(R.id.tv_linkon);
+        otpView.setText(Html.fromHtml(output));
         otpView.setVisibility(View.VISIBLE);
         dialog.setView(alertLayout);
     }
@@ -945,6 +965,26 @@ public class BaseCompactActivity extends AppCompatActivity {
             objTimer.start();
         }
     }
+    private BroadcastReceiver mIntentReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+
+            if (action.equalsIgnoreCase("android.intent.action.SCREEN_OFF")) {
+                if (localStorage.getActivityState(LocalStorage.LOGOUT).equalsIgnoreCase("LOGOUT")) {
+                    customDialogLog("LOGOUT", "Session Expired", "Your Session got expired");
+                    Toast.makeText(BaseCompactActivity.this, "Your Session got expired", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+    };
+    @Override
+    protected void onStart() {
+        super.onStart();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Intent.ACTION_SCREEN_OFF);
+        registerReceiver(mIntentReceiver, filter);
+    }
 
     static int count = 15 * 60 * 3000;
     int interval = 10000;
@@ -1029,9 +1069,11 @@ public class BaseCompactActivity extends AppCompatActivity {
         }
         return jsonObject;
     }
+
     protected void loadVersion(String emi) {
         new AsyncPostMethod(WebConfig.UAT, version(emi).toString(), headerData, BaseCompactActivity.this).execute();
     }
+
     protected void versionDetails(JSONArray array, VersionListener listener) {
         try {
             for (int i = 0; i < array.length(); i++) {
@@ -1043,6 +1085,7 @@ public class BaseCompactActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+
     protected void parseXml(String xml, VersionListener listener) {
         versionPozoArrayList = new ArrayList<>();
         try {
@@ -1061,7 +1104,7 @@ public class BaseCompactActivity extends AppCompatActivity {
                     pozo.setValue(xpp.getText());
                 }
 //                if (pozo.getName()!=null && pozo.getValue()!=null)
-                    versionPozoArrayList.add(pozo);
+                versionPozoArrayList.add(pozo);
                 eventType = xpp.next();
             }
             if (versionPozoArrayList.size() != 0)
