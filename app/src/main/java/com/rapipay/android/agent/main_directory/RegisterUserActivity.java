@@ -221,6 +221,7 @@ public class RegisterUserActivity extends BaseCompactActivity implements Request
             if (input_name.getText().toString().isEmpty() || input_address.getText().toString().isEmpty() || select_state.getText().toString().isEmpty())
                 Toast.makeText(RegisterUserActivity.this, "Please fill entry manually", Toast.LENGTH_SHORT).show();
             input_number.setEnabled(false);
+            select_state.setEnabled(false);
         } catch (Exception e) {
             e.printStackTrace();
         }

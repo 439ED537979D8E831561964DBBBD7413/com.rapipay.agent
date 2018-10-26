@@ -247,7 +247,7 @@ public class RegisterUserFragment extends Fragment implements RequestHandler, Vi
                 select_state.setText(object.getString("_state"));
             if (input_name.getText().toString().isEmpty() || input_address.getText().toString().isEmpty() || select_state.getText().toString().isEmpty())
                 Toast.makeText(getActivity(), "Please fill entry manually", Toast.LENGTH_SHORT).show();
-
+            select_state.setEnabled(false);
         } catch (Exception e) {
             e.printStackTrace();
         }
