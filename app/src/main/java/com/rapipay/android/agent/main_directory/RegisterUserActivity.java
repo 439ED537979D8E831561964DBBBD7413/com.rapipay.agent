@@ -1,9 +1,15 @@
 package com.rapipay.android.agent.main_directory;
 
+import android.Manifest;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AlertDialog;
 import android.util.Base64;
 import android.util.Log;
 import android.util.Patterns;
@@ -30,7 +36,7 @@ import com.rapipay.android.agent.utils.ImageUtils;
 import com.rapipay.android.agent.utils.WebConfig;
 
 public class RegisterUserActivity extends BaseCompactActivity implements RequestHandler, View.OnClickListener, CustomInterface {
-
+    final private static int PERMISSIONS_REQUEST_READ_PHONE_STATE = 0;
     TextView input_name, input_number, input_address, input_email, input_code;
     TextView select_state;
     String TYPE, mobileNo;
@@ -44,6 +50,7 @@ public class RegisterUserActivity extends BaseCompactActivity implements Request
         setContentView(R.layout.register_user_activity);
         TYPE = getIntent().getStringExtra("type");
         mobileNo = getIntent().getStringExtra("mobileNo");
+        loadIMEI();
         initialize();
     }
 
@@ -186,6 +193,10 @@ public class RegisterUserActivity extends BaseCompactActivity implements Request
                 String add = object.getString("_loc") + ", " + object.getString("vtc") + ", " + object.getString("dist");
                 input_address.setText(add);
             }
+            if (object.has("loc") && object.has("vtc") && object.has("dist")) {
+                String add = object.getString("loc") + ", " + object.getString("vtc") + ", " + object.getString("dist");
+                input_address.setText(add);
+            }
             if (object.has("_loc") && object.has("_vtc") && object.has("_dist")) {
                 String add = object.getString("_loc") + ", " + object.getString("vtc") + ", " + object.getString("dist");
                 input_address.setText(add);
@@ -321,5 +332,78 @@ public class RegisterUserActivity extends BaseCompactActivity implements Request
     @Override
     public void cancelClicked(String type, Object ob) {
 
+    }
+
+    public void loadIMEI() {
+        // Check if the READ_PHONE_STATE permission is already available.
+        if (ActivityCompat.checkSelfPermission(RegisterUserActivity.this, Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+            // READ_PHONE_STATE permission has not been granted.
+//            checkAndRequestPermissions();
+            requestReadPhoneStatePermission();
+        } else {
+
+            // READ_PHONE_STATE permission is already been granted.
+            doPermissionGrantedStuffs();
+        }
+    }
+
+    private void requestReadPhoneStatePermission() {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(RegisterUserActivity.this,
+                Manifest.permission.CAMERA)) {
+            alertPerm(getString(R.string.permission_read_phone_state_rationale), new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    ActivityCompat.requestPermissions(RegisterUserActivity.this,
+                            new String[]{Manifest.permission.CAMERA},
+                            PERMISSIONS_REQUEST_READ_PHONE_STATE);
+                    doPermissionGrantedStuffs();
+                }
+            });
+
+        } else {
+            // READ_PHONE_STATE permission has not been granted yet. Request it directly.
+            ActivityCompat.requestPermissions(RegisterUserActivity.this, new String[]{Manifest.permission.CAMERA},
+                    PERMISSIONS_REQUEST_READ_PHONE_STATE);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+
+        if (requestCode == PERMISSIONS_REQUEST_READ_PHONE_STATE) {
+            // Received permission result for READ_PHONE_STATE permission.est.");
+            // Check if the only required permission has been granted
+            if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // READ_PHONE_STATE permission has been granted, proceed with displaying IMEI Number
+                doPermissionGrantedStuffs();
+
+            } else {
+                alertPerm(getString(R.string.permissions_not_granted_read_phone_state), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        loadIMEI();
+                    }
+                });
+
+            }
+        }
+    }
+
+    private void alertPerm(String msg, DialogInterface.OnClickListener okListener) {
+        new AlertDialog.Builder(RegisterUserActivity.this)
+                .setTitle("Permission Request")
+                .setMessage(msg)
+                .setCancelable(false)
+                .setPositiveButton(android.R.string.yes, okListener)
+                .setIcon(R.mipmap.ic_launcher_round)
+                .show();
+    }
+
+    private void doPermissionGrantedStuffs() {
+        if (ActivityCompat.checkSelfPermission(RegisterUserActivity.this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+//            selectImage();
+        }
     }
 }
