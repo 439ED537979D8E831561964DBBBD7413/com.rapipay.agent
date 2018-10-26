@@ -1,18 +1,22 @@
 package com.rapipay.android.agent.main_directory;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Base64;
 import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.XML;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -29,11 +33,17 @@ public class RegisterUserActivity extends BaseCompactActivity implements Request
 
     TextView input_name, input_number, input_address, input_email, input_code;
     TextView select_state;
+    String TYPE, mobileNo;
+    static String byteBase64;
+    int scan_check=0;
+    static Bitmap bitmap_trans=null;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.register_user_activity);
+        TYPE = getIntent().getStringExtra("type");
+        mobileNo = getIntent().getStringExtra("mobileNo");
         initialize();
     }
 
@@ -53,6 +63,8 @@ public class RegisterUserActivity extends BaseCompactActivity implements Request
                 customSpinner(select_state, "Select State", list_state);
             }
         });
+        if (!mobileNo.isEmpty())
+            input_number.setText(mobileNo);
 //        if (list_state.size() != 0) {
 //            ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
 //                    android.R.layout.simple_spinner_item, list_state);
@@ -84,26 +96,49 @@ public class RegisterUserActivity extends BaseCompactActivity implements Request
                 if (!ImageUtils.commonRegex(input_name.getText().toString(), 150, " ")) {
                     input_name.setError("Please enter valid data");
                     input_name.requestFocus();
-                } else if (!ImageUtils.commonRegex(input_code.getText().toString(), 150, "0-9 .&")) {
-                    input_code.setError("Please enter valid data");
-                    input_code.requestFocus();
-                } else if (!ImageUtils.commonAddress(input_address.getText().toString())) {
+                } else if (!ImageUtils.commonRegex(input_code.getText().toString(), 150, "0-9 .&") && !TYPE.equalsIgnoreCase("internal")) {
+                        input_code.setError("Please enter valid data");
+                        input_code.requestFocus();
+                } else if (input_address.getText().toString().isEmpty()) {
                     input_address.setError("Please enter valid data");
                     input_address.requestFocus();
                 } else if (select_state.getText().toString().equalsIgnoreCase("Select State")) {
                     select_state.setError("Please enter valid data");
                     select_state.requestFocus();
-                } else if (!Patterns.EMAIL_ADDRESS.matcher(input_email.getText().toString()).matches()) {
-                    input_email.setError("Please enter valid data");
-                    input_email.requestFocus();
+                } else if (!Patterns.EMAIL_ADDRESS.matcher(input_email.getText().toString()).matches() && !TYPE.equalsIgnoreCase("internal")) {
+                        input_email.setError("Please enter valid data");
+                        input_email.requestFocus();
                 } else if (!ImageUtils.commonNumber(input_number.getText().toString(), 10)) {
                     input_number.setError("Please enter valid data");
                     input_number.requestFocus();
-                } else
-                    new AsyncPostMethod(WebConfig.UAT, request_user().toString(), headerData, RegisterUserActivity.this).execute();
+                } else {
+                    if (TYPE.equalsIgnoreCase("internal")) {
+                        try {
+                            Intent intent = new Intent(RegisterUserActivity.this, WebViewClientActivity.class);
+                            intent.putExtra("mobileNo", mobileNo);
+                            String base64 = input_name.getText().toString() + "~" + input_email.getText().toString().trim() + "~" + input_code.getText().toString().trim() + "~" + input_address.getText().toString() + "~" + select_state.getText().toString()+ "~" +scan_check;
+                            byte[] bytes = base64.getBytes("utf-8");
+                            String imageEncoded = Base64.encodeToString(bytes, Base64.DEFAULT);
+                            intent.putExtra("base64", imageEncoded);
+                            intent.putExtra("parentId", list.get(0).getMobilno());
+                            intent.putExtra("sessionKey", list.get(0).getPinsession());
+                            intent.putExtra("sessionRefNo", list.get(0).getAftersessionRefNo());
+                            intent.putExtra("nodeAgent", list.get(0).getMobilno());
+                            intent.putExtra("type", "internal");
+                            startActivity(intent);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    } else
+                        new AsyncPostMethod(WebConfig.UAT, request_user().toString(), headerData, RegisterUserActivity.this).execute();
+                }
                 break;
             case R.id.btn_scan_submit:
-                startActivityForResult(new Intent(RegisterUserActivity.this, BarcodeActivity.class), 1);
+                bitmap_trans = null;
+                Intent intent = new Intent(RegisterUserActivity.this, BarcodeActivity.class);
+                intent.putExtra("type", "inside");
+                startActivityForResult(intent, 1);
+//                startActivityForResult(new Intent(RegisterUserActivity.this, BarcodeActivity.class), 1);
                 break;
         }
     }
@@ -116,6 +151,10 @@ public class RegisterUserActivity extends BaseCompactActivity implements Request
                 JSONObject jsonObj = null;
                 try {
                     String requiredValue = data.getStringExtra("Key");
+                    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                    bitmap_trans.compress(Bitmap.CompressFormat.PNG, 50, byteArrayOutputStream);
+                    byte[] byteArray = byteArrayOutputStream .toByteArray();
+                    byteBase64 = Base64.encodeToString(byteArray, Base64.DEFAULT);
                     jsonObj = XML.toJSONObject(requiredValue);
                     JSONObject jsonObject = jsonObj.getJSONObject("PrintLetterBarcodeData");
                     parseJson(jsonObject);
@@ -128,29 +167,39 @@ public class RegisterUserActivity extends BaseCompactActivity implements Request
 
     private void parseJson(JSONObject object) {
         try {
+            scan_check = 2;
             if (object.has("name"))
                 input_name.setText(object.getString("name"));
-            if (object.has("house") && object.has("street") && object.has("lm")&& object.has("vtc") && object.has("dist")) {
-                String add = object.getString("house") +", "+ object.getString("street") +", "+ object.getString("lm")+", "+ object.getString("vtc") +", "+ object.getString("dist");
-                input_address.setText(add);
-            }else if (object.has("_house") && object.has("_street") && object.has("_lm")&& object.has("_vtc") && object.has("_dist")) {
-                String add = object.getString("_house") +", "+ object.getString("_street") +", "+ object.getString("_lm")+", "+ object.getString("_vtc") +", "+ object.getString("_dist");
-                input_address.setText(add);
-            }else if ( object.has("_loc")&& object.has("vtc") && object.has("dist")) {
-                String add = object.getString("_loc")+", "+ object.getString("vtc") +", "+ object.getString("dist");
-                input_address.setText(add);
-            }else if ( object.has("_loc")&& object.has("_vtc") && object.has("_dist")) {
-                String add = object.getString("_loc")+", "+ object.getString("vtc") +", "+ object.getString("dist");
-                input_address.setText(add);
-            }else if ( object.has("_lm")&&object.has("_loc")&& object.has("_vtc") && object.has("_dist")) {
-                String add = object.getString("_lm")+", "+object.getString("_loc")+", "+ object.getString("vtc") +", "+ object.getString("dist");
+            if (object.has("house") && object.has("street") && object.has("lm") && object.has("vtc") && object.has("dist")) {
+                String add = object.getString("house") + ", " + object.getString("street") + ", " + object.getString("lm") + ", " + object.getString("vtc") + ", " + object.getString("dist");
                 input_address.setText(add);
             }
-
-            if(object.has("state"))
+            if (object.has("house") && object.has("street") && object.has("loc") && object.has("vtc") && object.has("dist")) {
+                String add = object.getString("house") + ", " + object.getString("street") + ", " + object.getString("loc") + ", " + object.getString("vtc") + ", " + object.getString("dist");
+                input_address.setText(add);
+            }
+            if (object.has("_house") && object.has("_street") && object.has("_lm") && object.has("_vtc") && object.has("_dist")) {
+                String add = object.getString("_house") + ", " + object.getString("_street") + ", " + object.getString("_lm") + ", " + object.getString("_vtc") + ", " + object.getString("_dist");
+                input_address.setText(add);
+            }
+            if (object.has("_loc") && object.has("vtc") && object.has("dist")) {
+                String add = object.getString("_loc") + ", " + object.getString("vtc") + ", " + object.getString("dist");
+                input_address.setText(add);
+            }
+            if (object.has("_loc") && object.has("_vtc") && object.has("_dist")) {
+                String add = object.getString("_loc") + ", " + object.getString("vtc") + ", " + object.getString("dist");
+                input_address.setText(add);
+            }
+            if (object.has("_lm") && object.has("_loc") && object.has("_vtc") && object.has("_dist")) {
+                String add = object.getString("_lm") + ", " + object.getString("_loc") + ", " + object.getString("vtc") + ", " + object.getString("dist");
+                input_address.setText(add);
+            }
+            if (object.has("state"))
                 select_state.setText(object.getString("state"));
-            else if(object.has("_state"))
+            if (object.has("_state"))
                 select_state.setText(object.getString("_state"));
+            if (input_name.getText().toString().isEmpty() || input_address.getText().toString().isEmpty() || select_state.getText().toString().isEmpty())
+                Toast.makeText(RegisterUserActivity.this, "Please fill entry manually", Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -167,7 +216,24 @@ public class RegisterUserActivity extends BaseCompactActivity implements Request
         try {
             if (object.getString("responseCode").equalsIgnoreCase("200")) {
                 if (object.getString("serviceType").equalsIgnoreCase("B2BTempUserRequest")) {
-                    customDialog_Common("KYCLAYOUTS", object, null, "User Registration", null, object.getString("responseMessage"), RegisterUserActivity.this);
+                    try {
+                        Intent intent = new Intent(RegisterUserActivity.this, WebViewClientActivity.class);
+                        intent.putExtra("mobileNo", input_number.getText().toString());
+                        String base64 = input_name.getText().toString() + "~" + input_email.getText().toString().trim() + "~" + input_code.getText().toString().trim() + "~" + input_address.getText().toString() + "~" + select_state.getText().toString()+ "~" +scan_check;
+                        byte[] bytes = base64.getBytes("utf-8");
+                        String imageEncoded = Base64.encodeToString(bytes, Base64.DEFAULT);
+                        intent.putExtra("base64", imageEncoded);
+                        intent.putExtra("parentId", list.get(0).getMobilno());
+                        intent.putExtra("sessionKey", list.get(0).getPinsession());
+                        intent.putExtra("sessionRefNo", list.get(0).getAftersessionRefNo());
+                        intent.putExtra("nodeAgent", list.get(0).getMobilno());
+                        intent.putExtra("type", "outside");
+                        startActivity(intent);
+                        clear();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+//                    customDialog_Common("KYCLAYOUTS", object, null, "User Registration", null, object.getString("responseMessage"), RegisterUserActivity.this);
 //                    customDialog(object.getString("responseMessage"));
                 }
             }

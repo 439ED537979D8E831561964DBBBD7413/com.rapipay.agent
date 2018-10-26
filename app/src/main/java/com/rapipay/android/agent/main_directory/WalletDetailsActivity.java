@@ -54,12 +54,18 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
     String customerId;
     int benePosition;
     private WalletBeneficiaryAdapter adapter;
+    String TYPE,mobileNo;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.wallet_details_layout);
         initialize();
+        TYPE = getIntent().getStringExtra("type");
+        mobileNo = getIntent().getStringExtra("mobileNo");
+        if (TYPE.equalsIgnoreCase("internal")) {
+            input_mobile.setText(mobileNo);
+        }
     }
 
     private void initialize() {
@@ -446,12 +452,12 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
 //    }
 
     private void callKYC() {
-        Intent intent = new Intent(WalletDetailsActivity.this, WebViewClientActivity.class);
+        Intent intent = new Intent(WalletDetailsActivity.this, RegisterUserActivity.class);
         intent.putExtra("mobileNo", input_mobile.getText().toString());
-        intent.putExtra("parentId", list.get(0).getMobilno());
-        intent.putExtra("sessionKey", list.get(0).getPinsession());
-        intent.putExtra("sessionRefNo", list.get(0).getAftersessionRefNo());
-        intent.putExtra("nodeAgent", list.get(0).getMobilno());
+//        intent.putExtra("parentId", list.get(0).getMobilno());
+//        intent.putExtra("sessionKey", list.get(0).getPinsession());
+//        intent.putExtra("sessionRefNo", list.get(0).getAftersessionRefNo());
+//        intent.putExtra("nodeAgent", list.get(0).getMobilno());
         intent.putExtra("type", "internal");
         startActivity(intent);
     }

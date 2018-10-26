@@ -54,6 +54,7 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
     private static int NUM_PAGES = 0;
     EditText confirmpinView;
     TextView toolbar_title;
+    ArrayList<HeaderePozo> bannerlist;
 
 
     boolean flaf = false;
@@ -68,9 +69,9 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
         setContentView(R.layout.pinverification_layout);
         localStorage.setActivityState(LocalStorage.LOGOUT, "0");
         initialize();
-        init();
+//        init();
 //        loadVersion();
-//        loadApi();
+        loadApi();
     }
 
     private void loadApi() {
@@ -125,13 +126,13 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
 //        });
     }
 
-    private void init() {
+    private void init(ArrayList<HeaderePozo> bannerlist) {
         ImagesArray = new ArrayList<Integer>();
         for (int i = 0; i < IMAGES.length; i++) {
             ImagesArray.add(IMAGES[i]);
         }
         mPager = (ViewPager) findViewById(R.id.pager);
-        mPager.setAdapter(new SlidingImage_Adapter(PinVerification.this, ImagesArray));
+        mPager.setAdapter(new SlidingImage_Adapter(PinVerification.this, bannerlist));
         CirclePageIndicator indicator = (CirclePageIndicator)
                 findViewById(R.id.indicator);
 
@@ -227,10 +228,13 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
                     startActivity(intent);
                     finish();
                 } else if (object.getString("serviceType").equalsIgnoreCase("GET_FOOTER_DATA")) {
-                    if (object.has("footerImgList")) {
-                        JSONArray array = object.getJSONArray("footerImgList");
-                        insertFooterDetails(array, db);
-                    }
+                    if (object.getString("imageDownloadFlag").equalsIgnoreCase("Y")) {
+                        if (object.has("footerImgList")) {
+                            JSONArray array = object.getJSONArray("footerImgList");
+                            insertFooterDetails(array, db, object.getString("timeStamp"));
+                        }
+                    }else
+                        init(db.getFooterDetail("banner"));
                 } else if (object.getString("serviceType").equalsIgnoreCase("APP_LIVE_STATUS")) {
                     if (object.has("headerList")) {
                         JSONArray array = object.getJSONArray("headerList");
@@ -312,6 +316,10 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
                 jsonObject.put("typeMobileWeb", "mobile");
                 jsonObject.put("transactionID", "GFD" + tsLong.toString());
                 jsonObject.put("nodeAgentId", list.get(0).getMobilno());
+                if (db.getFooterDetail("banner").size() != 0)
+                    jsonObject.put("timeStamp", db.getFooterDetail("banner").get(0).getTimeStamp());
+                else
+                    jsonObject.put("timeStamp", "");
                 jsonObject.put("sessionRefNo", list.get(0).getSessionRefNo());
                 jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getSession(), jsonObject.toString()));
 
@@ -322,26 +330,35 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
         return jsonObject;
     }
 
-    private void insertFooterDetails(JSONArray array, RapipayDB db) {
+    private void insertFooterDetails(JSONArray array, RapipayDB db, String timeStamp) {
+        bannerlist = new ArrayList<HeaderePozo>();
         SQLiteDatabase dba = db.getWritableDatabase();
         if (db.getDetailsFooter())
             dba.execSQL("delete from " + RapipayDB.TABLE_FOOTER);
         try {
             for (int i = 0; i < array.length(); i++) {
                 JSONObject object = array.getJSONObject(i);
-                String insertSQL = "INSERT INTO " + RapipayDB.TABLE_FOOTER + "\n" +
-                        "(" + RapipayDB.COLOMN_OPERATORID + "," + RapipayDB.COLOMN_OPERATORVALUE + "," + RapipayDB.COLOMN_OPERATORDATA + "," + RapipayDB.COLOMN_PATH + ")\n" +
-                        "VALUES \n" +
-                        "( ?, ?, ?,?);";
-
-                String imageName = "image" + i + ".jpg";
-                String path = saveToInternalStorage(base64Convert(object.getString("headerValue")), imageName);
-                dba.execSQL(insertSQL, new String[]{object.getString("headerId"), imageName, object.getString("headerData"), path});
+                if (object.getString("headerValue").equalsIgnoreCase("banner")) {
+                    bannerlist.add(new HeaderePozo(object.getString("headerValue"), object.getString("headerData"), object.getString("headerId")));
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        initializeTransAdapter(db.getFooterDetail(""));
+        if (bannerlist.size() != 0) {
+            for (int i = 0; i < bannerlist.size(); i++) {
+                String insertSQL = "INSERT INTO " + RapipayDB.TABLE_FOOTER + "\n" +
+                        "(" + RapipayDB.COLOMN_OPERATORID + "," + RapipayDB.COLOMN_OPERATORVALUE + "," + RapipayDB.COLOMN_OPERATORDATA + "," + RapipayDB.COLOMN_PATH + "," + RapipayDB.IMAGE_TIME_STAMP + ")\n" +
+                        "VALUES \n" +
+                        "( ?, ?, ?,?,?);";
+
+                String imageName = "banner" + i + ".jpg";
+                String path = saveToInternalStorage(base64Convert(bannerlist.get(i).getHeaderData()), imageName);
+                dba.execSQL(insertSQL, new String[]{bannerlist.get(i).getHeaderID(), imageName, bannerlist.get(i).getHeaderData(), path, timeStamp});
+            }
+        }
+        init(db.getFooterDetail(""));
+//        initializeTransAdapter(db.getFooterDetail(""));
     }
 
 

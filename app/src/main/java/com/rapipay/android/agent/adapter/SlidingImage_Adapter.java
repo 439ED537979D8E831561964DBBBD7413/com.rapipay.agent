@@ -2,6 +2,7 @@ package com.rapipay.android.agent.adapter;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -14,20 +15,24 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
+import com.rapipay.android.agent.Model.HeaderePozo;
 import com.rapipay.android.agent.R;
 
 public class SlidingImage_Adapter extends PagerAdapter {
 
 
-    private ArrayList<Integer> IMAGES;
+    private ArrayList<HeaderePozo> IMAGES;
     private LayoutInflater inflater;
     private Context context;
 
 
-    public SlidingImage_Adapter(Context context, ArrayList<Integer> IMAGES) {
+    public SlidingImage_Adapter(Context context, ArrayList<HeaderePozo> IMAGES) {
         this.context = context;
         this.IMAGES=IMAGES;
         inflater = LayoutInflater.from(context);
@@ -51,15 +56,28 @@ public class SlidingImage_Adapter extends PagerAdapter {
         final ImageView imageView = (ImageView) imageLayout
                 .findViewById(R.id.image);
 
-
-        imageView.setImageResource(IMAGES.get(position));
+        loadImageFromStorage(IMAGES.get(position).getHeaderValue(),imageView,IMAGES.get(position).getPath());
+//        imageView.setImageResource(IMAGES.get(position));
 //        scaleImage(imageView);
 
         view.addView(imageLayout, 0);
 
         return imageLayout;
     }
+    private void loadImageFromStorage(String name, ImageView view, String path)
+    {
 
+        try {
+            File f=new File(path, name);
+            Bitmap b = BitmapFactory.decodeStream(new FileInputStream(f));
+            view.setImageBitmap(b);
+        }
+        catch (FileNotFoundException e)
+        {
+            e.printStackTrace();
+        }
+
+    }
     @Override
     public boolean isViewFromObject(View view, Object object) {
         return view.equals(object);

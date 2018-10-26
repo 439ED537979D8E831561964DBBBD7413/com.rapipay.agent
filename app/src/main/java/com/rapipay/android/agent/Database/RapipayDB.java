@@ -47,6 +47,7 @@ public class RapipayDB extends SQLiteOpenHelper {
     public static final String COLOMN_OPERATORVALUE = "operatorsValue";
     public static final String COLOMN_OPERATORDATA = "operatorsData";
     public static final String COLOMN_PATH = "path";
+    public static final String IMAGE_TIME_STAMP = "timeStamp";
     public RapipayDB(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -60,7 +61,7 @@ public class RapipayDB extends SQLiteOpenHelper {
         db.execSQL("create table " + TABLE_OPERATOR + " ( " + COLOMN_OPERATORID + " VARCHAR(10) , " + COLOMN_OPERATORVALUE + " VARCHAR(50) , " + COLOMN_OPERATORDATA + " VARCHAR(50));");
         db.execSQL("create table " + TABLE_TRANSFERLIST + " ( " + COLOMN_OPERATORID + " VARCHAR(10) , " + COLOMN_OPERATORVALUE + " VARCHAR(50) , " + COLOMN_OPERATORDATA + " VARCHAR(50));");
         db.execSQL("create table " + TABLE_PAYERPAYEE + " ( " + COLOMN_OPERATORID + " VARCHAR(10) , " + COLOMN_OPERATORVALUE + " VARCHAR(50) , " + COLOMN_OPERATORDATA + " VARCHAR(50));");
-        db.execSQL("create table " + TABLE_FOOTER + " ( " + COLOMN_OPERATORID + " VARCHAR(10) , " + COLOMN_OPERATORVALUE + " VARCHAR(50) , " + COLOMN_OPERATORDATA + " VARCHAR(50), " + COLOMN_PATH + " VARCHAR(70));");
+        db.execSQL("create table " + TABLE_FOOTER + " ( " + COLOMN_OPERATORID + " VARCHAR(10) , " + COLOMN_OPERATORVALUE + " VARCHAR(50) , " + COLOMN_OPERATORDATA + " VARCHAR(50), " + COLOMN_PATH + " VARCHAR(70), " + IMAGE_TIME_STAMP + " VARCHAR(50));");
     }
 
     @Override
@@ -125,18 +126,6 @@ public class RapipayDB extends SQLiteOpenHelper {
     public boolean getDetails_Bank() {
         boolean flag = false;
         String selectQuery = "SELECT  * FROM " + TABLE_BANK;
-        SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery(selectQuery, null);
-        if (cursor.moveToFirst()) {
-            flag = true;
-        }else {
-            flag = false;
-        }
-        return flag;
-    }
-    public boolean getDetails_Payment() {
-        boolean flag = false;
-        String selectQuery = "SELECT  * FROM " + TABLE_PAYMENT;
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
         if (cursor.moveToFirst()) {
@@ -221,40 +210,6 @@ public class RapipayDB extends SQLiteOpenHelper {
         return list;
     }
 
-    public ArrayList<HeaderePozo> getStateDetails() {
-        ArrayList<HeaderePozo> list = new ArrayList<HeaderePozo>();
-        String selectQuery = "SELECT  * FROM " + TABLE_STATE;
-        SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery(selectQuery, null);
-        if (cursor.moveToFirst()) {
-            do {
-                HeaderePozo payPozo = new HeaderePozo();
-                payPozo.setHeaderID(cursor.getString(0));
-                payPozo.setHeaderValue(cursor.getString(1));
-                payPozo.setHeaderData(cursor.getString(2));
-                list.add(payPozo);
-            } while (cursor.moveToNext());
-        }
-        return list;
-    }
-
-    public ArrayList<HeaderePozo> getPayerDetails() {
-        ArrayList<HeaderePozo> list = new ArrayList<HeaderePozo>();
-        String selectQuery = "SELECT  * FROM " + TABLE_PAYERPAYEE;
-        SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery(selectQuery, null);
-        if (cursor.moveToFirst()) {
-            do {
-                HeaderePozo payPozo = new HeaderePozo();
-                payPozo.setHeaderID(cursor.getString(0));
-                payPozo.setHeaderValue(cursor.getString(1));
-                payPozo.setHeaderData(cursor.getString(2));
-                list.add(payPozo);
-            } while (cursor.moveToNext());
-        }
-        return list;
-    }
-
     public ArrayList<String> getTransferDetails(String condition) {
         ArrayList<String> list = new ArrayList<String>();
         list.add("Select Transfer Type");
@@ -317,6 +272,7 @@ public class RapipayDB extends SQLiteOpenHelper {
                 payPozo.setHeaderValue(cursor.getString(1));
                 payPozo.setHeaderData(cursor.getString(2));
                 payPozo.setPath(cursor.getString(3));
+                payPozo.setTimeStamp(cursor.getString(4));
                 list.add(payPozo);
             } while (cursor.moveToNext());
         }

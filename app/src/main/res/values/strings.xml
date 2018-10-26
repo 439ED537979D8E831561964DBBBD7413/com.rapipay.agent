@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">RapiPay Agent App</string>
+    <!--<string name="app_name">RapiPay Agent App</string>-->
     <string name="permission_read_phone_state_rationale">permission_read_phone_state_rationale</string>
     <string name="permissions_not_granted_read_phone_state">Cannot Proceed without allowing permissions!</string>
 

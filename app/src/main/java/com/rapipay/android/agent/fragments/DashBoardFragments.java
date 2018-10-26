@@ -28,6 +28,7 @@ import com.rapipay.android.agent.main_directory.PassbookActivity;
 import com.rapipay.android.agent.main_directory.PendingRefundActivity;
 import com.rapipay.android.agent.main_directory.ReChargeActivity;
 import com.rapipay.android.agent.main_directory.RechargeHistory;
+import com.rapipay.android.agent.main_directory.RegisterKYCTab;
 import com.rapipay.android.agent.main_directory.RegisterUserActivity;
 import com.rapipay.android.agent.main_directory.WalletDetailsActivity;
 import com.rapipay.android.agent.utils.ImageUtils;
@@ -102,8 +103,10 @@ public class DashBoardFragments extends Fragment {
                             if (MainActivity.pozoArrayList.get(i).getHeaderData().equalsIgnoreCase("Retailer")) {
                                 Toast.makeText(getActivity(),"Not Authorized to create New User!.", Toast.LENGTH_SHORT).show();
                             }else {
-                                Intent intent = new Intent(getActivity(), RegisterUserActivity.class);
+                                Intent intent = new Intent(getActivity(), RegisterKYCTab.class);
                                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                intent.putExtra("type", "Outside");
+                                intent.putExtra("mobileNo", "");
                                 startActivity(intent);
                             }
                     }
@@ -132,6 +135,8 @@ public class DashBoardFragments extends Fragment {
                     startActivity(intent);
                 } else if (position == 0) {
                     Intent intent = new Intent(getActivity(), WalletDetailsActivity.class);
+                    intent.putExtra("mobileNo", "");
+                    intent.putExtra("type", "");
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                 }else if (position == 3) {

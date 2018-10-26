@@ -47,6 +47,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.rapipay.android.agent.R;
+import com.rapipay.android.agent.fragments.RegisterUserFragment;
 import com.rapipay.android.agent.interfaces.CustomInterface;
 import com.rapipay.android.agent.interfaces.RequestHandler;
 import com.rapipay.android.agent.utils.AsyncPostMethod;
@@ -55,9 +56,9 @@ import com.rapipay.android.agent.utils.GenerateChecksum;
 import com.rapipay.android.agent.utils.WebConfig;
 
 
-public class WebViewClientActivity extends BaseCompactActivity implements RequestHandler, View.OnClickListener,CustomInterface {
+public class WebViewClientActivity extends BaseCompactActivity implements RequestHandler, View.OnClickListener, CustomInterface {
     WebView web;
-    String mobileNo, parentId, sessionKey, sessionRefNo, nodeAgent, kycType, TYPE;
+    String mobileNo, parentId, sessionKey, sessionRefNo, nodeAgent, kycType, TYPE, base64image;
     private static final int INPUT_FILE_REQUEST_CODE = 1;
     private ValueCallback<Uri[]> mUploadMessage;
     private String mCameraPhotoPath = null;
@@ -71,8 +72,8 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
         TYPE = getIntent().getStringExtra("type");
         if (TYPE.equalsIgnoreCase("internal"))
             findViewById(R.id.back_click).setVisibility(View.VISIBLE);
-        else
-            findViewById(R.id.back_click).setVisibility(View.GONE);
+        else if (TYPE.equalsIgnoreCase("outside"))
+            findViewById(R.id.back_click).setVisibility(View.VISIBLE);
         initialize();
     }
 
@@ -89,6 +90,7 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
             doPermissionGrantedStuffs();
         }
     }
+
     private void requestReadPhoneStatePermission() {
         if (ActivityCompat.shouldShowRequestPermissionRationale(WebViewClientActivity.this,
                 Manifest.permission.CAMERA)) {
@@ -147,6 +149,7 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
             }
         }
     }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -165,10 +168,12 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
         sessionKey = getIntent().getStringExtra("sessionKey");
         sessionRefNo = getIntent().getStringExtra("sessionRefNo");
         nodeAgent = getIntent().getStringExtra("nodeAgent");
-        if (nodeAgent.equalsIgnoreCase(""))
-            kycType = "A";
-        else
+        base64image = getIntent().getStringExtra("base64");
+//        base64image+="~"+RegisterUserActivity.byteBase64;
+        if (TYPE.equalsIgnoreCase("internal"))
             kycType = "C";
+        else
+            kycType = "A";
         new AsyncPostMethod(WebConfig.EKYC, getJson_Validate(mobileNo, kycType, parentId, sessionKey, sessionRefNo, nodeAgent).toString(), headerData, WebViewClientActivity.this).execute();
         web = (WebView) findViewById(R.id.webview01);
         WebSettings webSettings = web.getSettings();
@@ -215,12 +220,12 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
             try {
                 if (progressDialog.isShowing()) {
                     CookieManager cookieManager = CookieManager.getInstance();
-                    if (cookieManager == null)
-                    {}
+                    if (cookieManager == null) {
+                    }
                     String rawCookieHeader = null;
                     URL parsedURL = new URL(url);
                     rawCookieHeader = cookieManager.getCookie(url);
-                    Log.e("COOKIES",rawCookieHeader);
+                    Log.e("COOKIES", rawCookieHeader);
                     progressDialog.dismiss();
                 }
             } catch (Exception exception) {
@@ -265,6 +270,12 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
                                 Intent intent = new Intent(WebViewClientActivity.this, WalletDetailsActivity.class);
                                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                 startActivity(intent);
+                            } else if (TYPE.equalsIgnoreCase("outside")) {
+                                Intent intent = new Intent(WebViewClientActivity.this, MainActivity.class);
+                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                                intent.putExtra("type", "Outside");
+//                                intent.putExtra("mobileNo", "");
+                                startActivity(intent);
                             } else {
                                 Intent intent = new Intent(WebViewClientActivity.this, LoginScreenActivity.class);
                                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -285,7 +296,7 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
         String data = null;
         try {
             Map<String, String> map = getQueryMap(url);
-            if(map!=null) {
+            if (map != null) {
                 Set<String> keys = map.keySet();
                 for (String key : keys) {
                     System.out.println("Name=" + key);
@@ -302,7 +313,7 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
     }
 
     public Map<String, String> getQueryMap(String query) {
-        if(query.contains("?")) {
+        if (query.contains("?")) {
             String[] params = query.split("\\?");
             String[] name;
             Map<String, String> map = new HashMap<String, String>();
@@ -312,7 +323,7 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
                     map.put(name[0], name[1]);
             }
             return map;
-        }else{
+        } else {
             finish();
             return null;
         }
@@ -356,9 +367,10 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
             jsonObject.put("tokenId", tokenId);
             jsonObject.put("txnRef", "VKP" + tsLong.toString());
             jsonObject.put("orgTxnRef", orgTxnRef);
-            if (nodeAgent.equalsIgnoreCase("")) {
+            if (TYPE.equalsIgnoreCase("outside")) {
                 jsonObject.put("nodeAgentId", mobileNo);
                 jsonObject.put("sessionRefNo", sessionRefNo);
+                jsonObject.put("kycData", base64image.replaceAll("\n", ""));
                 form = "<html>\n" +
                         "\t<body>\n" +
                         "\t\t<form name=\"validatekyc\" id=\"validatekyc\" method=\"POST\" action=\"" + WebConfig.EKYC_FORWARD + "\">\n" +
@@ -371,6 +383,8 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
                         "\t\t\t<input name=\"tokenId\" value=\"" + tokenId + "\" type=\"hidden\"/>\n" +
                         "\t\t\t<input name=\"txnRef\" value=\"" + "VKP" + tsLong.toString() + "\" type=\"hidden\"/>\n" +
                         "\t\t\t<input name=\"orgTxnRef\" value=\"" + orgTxnRef + "\" type=\"hidden\"/>\n" +
+                        "\t\t\t<input name=\"kycData\" value=\"" + base64image + "\" type=\"hidden\"/>\n" +
+                        "\t\t\t<input name=\"kycImage\" value=\"" + RegisterUserFragment.byteBase64 + "\" type=\"hidden\"/>\n" +
                         "\t\t\t<input name=\"checkSum\" value=\"" + GenerateChecksum.checkSum(sessionKey, jsonObject.toString()) + "\" type=\"hidden\"/>\n" +
                         "\t\t\t<input type=\"submit\"/>\n" +
                         "\t\t</form>\n" +
@@ -382,6 +396,7 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
             } else {
                 jsonObject.put("nodeAgentId", nodeAgent);
                 jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
+                jsonObject.put("kycData", base64image.replaceAll("\n", ""));
                 form = "<html>\n" +
                         "\t<body>\n" +
                         "\t\t<form name=\"validatekyc\" id=\"validatekyc\" method=\"POST\" action=\"" + WebConfig.EKYC_FORWARD + "\">\n" +
@@ -394,6 +409,8 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
                         "\t\t\t<input name=\"tokenId\" value=\"" + tokenId + "\" type=\"hidden\"/>\n" +
                         "\t\t\t<input name=\"txnRef\" value=\"" + "VKP" + tsLong.toString() + "\" type=\"hidden\"/>\n" +
                         "\t\t\t<input name=\"orgTxnRef\" value=\"" + orgTxnRef + "\" type=\"hidden\"/>\n" +
+                        "\t\t\t<input name=\"kycData\" value=\"" + base64image + "\" type=\"hidden\"/>\n" +
+                        "\t\t\t<input name=\"kycImage\" value=\"" + RegisterUserActivity.byteBase64 + "\" type=\"hidden\"/>\n" +
                         "\t\t\t<input name=\"checkSum\" value=\"" + GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()) + "\" type=\"hidden\"/>\n" +
                         "\t\t\t<input type=\"submit\"/>\n" +
                         "\t\t</form>\n" +
@@ -467,47 +484,48 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
         }
     }
 
-    private void selectPhoto(){
-                    Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-            if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-                // Create the File where the photo should go
-                File photoFile = null;
-                try {
-                    photoFile = createImageFile();
-                    takePictureIntent.putExtra("PhotoPath", mCameraPhotoPath);
-                } catch (IOException ex) {
-                    // Error occurred while creating the File
-                    Log.e(TAG, "Unable to create Image File", ex);
-                }
-
-                // Continue only if the File was successfully created
-                if (photoFile != null) {
-                    mCameraPhotoPath = "file:" + photoFile.getAbsolutePath();
-                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
-                } else {
-                    takePictureIntent = null;
-                }
+    private void selectPhoto() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            // Create the File where the photo should go
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+                takePictureIntent.putExtra("PhotoPath", mCameraPhotoPath);
+            } catch (IOException ex) {
+                // Error occurred while creating the File
+                Log.e(TAG, "Unable to create Image File", ex);
             }
 
-            Intent contentSelectionIntent = new Intent(Intent.ACTION_GET_CONTENT);
-            contentSelectionIntent.addCategory(Intent.CATEGORY_OPENABLE);
-            contentSelectionIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-            contentSelectionIntent.setType("image/*");
-
-            Intent[] intentArray;
-            if (takePictureIntent != null) {
-                intentArray = new Intent[]{takePictureIntent, intent};
+            // Continue only if the File was successfully created
+            if (photoFile != null) {
+                mCameraPhotoPath = "file:" + photoFile.getAbsolutePath();
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
             } else {
-                intentArray = new Intent[2];
+                takePictureIntent = null;
             }
+        }
 
-            Intent chooserIntent = new Intent(Intent.ACTION_CHOOSER);
-            chooserIntent.putExtra(Intent.EXTRA_INTENT, contentSelectionIntent);
-            chooserIntent.putExtra(Intent.EXTRA_TITLE, "Image Chooser");
-            chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray);
-            startActivityForResult(Intent.createChooser(chooserIntent, "Select images"), 1);
+        Intent contentSelectionIntent = new Intent(Intent.ACTION_GET_CONTENT);
+        contentSelectionIntent.addCategory(Intent.CATEGORY_OPENABLE);
+        contentSelectionIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+        contentSelectionIntent.setType("image/*");
+
+        Intent[] intentArray;
+        if (takePictureIntent != null) {
+            intentArray = new Intent[]{takePictureIntent, intent};
+        } else {
+            intentArray = new Intent[2];
+        }
+
+        Intent chooserIntent = new Intent(Intent.ACTION_CHOOSER);
+        chooserIntent.putExtra(Intent.EXTRA_INTENT, contentSelectionIntent);
+        chooserIntent.putExtra(Intent.EXTRA_TITLE, "Image Chooser");
+        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray);
+        startActivityForResult(Intent.createChooser(chooserIntent, "Select images"), 1);
     }
+
     private void selectImage() {
         final CharSequence[] items = {"Take Photo", "Choose from Gallery", "Cancel"};
         AlertDialog.Builder builder = new AlertDialog.Builder(WebViewClientActivity.this);
@@ -601,7 +619,7 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
             super.onActivityResult(requestCode, resultCode, data);
             return;
         }
-        if(resultCode==0) {
+        if (resultCode == 0) {
             mUploadMessage.onReceiveValue(null);
             mUploadMessage = null;
             return;
@@ -675,19 +693,28 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
 
     @Override
     public void onBackPressed() {
+        Intent intent = null;
         if (TYPE.equalsIgnoreCase("internal")) {
-            Intent intent = new Intent(WebViewClientActivity.this, WalletDetailsActivity.class);
-            startActivity(intent);
+            intent = new Intent(WebViewClientActivity.this, WalletDetailsActivity.class);
+        } else if (TYPE.equalsIgnoreCase("outside")) {
+            intent = new Intent(WebViewClientActivity.this, MainActivity.class);
         } else {
-            Intent intent = new Intent(WebViewClientActivity.this, LoginScreenActivity.class);
-            startActivity(intent);
+            intent = new Intent(WebViewClientActivity.this, LoginScreenActivity.class);
         }
+        startActivity(intent);
         finish();
     }
 
     @Override
     public void okClicked(String type, Object ob) {
-        Intent intent = new Intent(WebViewClientActivity.this, LoginScreenActivity.class);
+        Intent intent = null;
+        if (TYPE.equalsIgnoreCase("internal")) {
+            intent = new Intent(WebViewClientActivity.this, WalletDetailsActivity.class);
+            intent.putExtra("mobileNo", mobileNo);
+            intent.putExtra("type", "internal");
+        }else if (TYPE.equalsIgnoreCase("outside")) {
+            intent = new Intent(WebViewClientActivity.this, MainActivity.class);
+        }
         startActivity(intent);
         finish();
     }

@@ -196,20 +196,20 @@ public class LoginScreenActivity extends BaseCompactActivity implements View.OnC
 //                intent.putExtra("sessionRefNo", object.getString("sessionRefNo"));
 //                intent.putExtra("sessionKey", object.getString("sessionKey"));
 //                startActivity(intent);
-            } else if (object.getString("responseCode").equalsIgnoreCase("75059")) {
-                if (object.getString("kycType").equalsIgnoreCase("2")) {
-                    new RouteClass(this, object, input_user.getText().toString(), localStorage, "KYCENTERED");
-//                    Intent intent = new Intent(this, WebViewClientActivity.class);
-//                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//                    intent.putExtra("mobileNo", input_user.getText().toString());
-//                    intent.putExtra("parentId", object.getString("parentID"));
-//                    intent.putExtra("sessionKey", object.getString("sessionKey"));
-//                    intent.putExtra("sessionRefNo", object.getString("sessionRefNo"));
-//                    startActivity(intent);
-                } else if (object.getString("kycType").equalsIgnoreCase("1")) {
-                    //Manual KYC
-                } else
-                    Toast.makeText(this, "KYC Mode is not Available", Toast.LENGTH_SHORT).show();
+//            } else if (object.getString("responseCode").equalsIgnoreCase("75059")) {
+//                if (object.getString("kycType").equalsIgnoreCase("2")) {
+//                    new RouteClass(this, object, input_user.getText().toString(), localStorage, "KYCENTERED");
+////                    Intent intent = new Intent(this, WebViewClientActivity.class);
+////                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+////                    intent.putExtra("mobileNo", input_user.getText().toString());
+////                    intent.putExtra("parentId", object.getString("parentID"));
+////                    intent.putExtra("sessionKey", object.getString("sessionKey"));
+////                    intent.putExtra("sessionRefNo", object.getString("sessionRefNo"));
+////                    startActivity(intent);
+//                } else if (object.getString("kycType").equalsIgnoreCase("1")) {
+//                    //Manual KYC
+//                } else
+//                    Toast.makeText(this, "KYC Mode is not Available", Toast.LENGTH_SHORT).show();
             } else if (object.getString("responseCode").equalsIgnoreCase("75115")) {
                 customDialog_Common("KYCLAYOUTS", null, null, "RapiPay Login Failed", null, object.getString("responseMessage"), LoginScreenActivity.this);
 //                customDialog(object.getString("responseMessage"));

@@ -5,6 +5,7 @@ public class HeaderePozo {
     String headerData;
     String headerID;
     String path;
+    String timeStamp;
 
     public HeaderePozo(){}
 
@@ -20,6 +21,14 @@ public class HeaderePozo {
     }
     public String getPath() {
         return path;
+    }
+
+    public String getTimeStamp() {
+        return timeStamp;
+    }
+
+    public void setTimeStamp(String timeStamp) {
+        this.timeStamp = timeStamp;
     }
 
     public void setPath(String path) {

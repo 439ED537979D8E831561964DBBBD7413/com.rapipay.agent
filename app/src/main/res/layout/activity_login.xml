@@ -21,7 +21,7 @@
         <!--android:layout_marginLeft="10dp"-->
         <!--android:layout_marginRight="10dp"-->
         <!--android:layout_marginTop="56dp">-->
-        <android.support.v4.widget.NestedScrollView
+        <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/white"
@@ -93,5 +93,5 @@
                     android:textColor="@color/white" />
 
             </LinearLayout>
-        </android.support.v4.widget.NestedScrollView>
+        </ScrollView>
     </android.support.design.widget.CoordinatorLayout>

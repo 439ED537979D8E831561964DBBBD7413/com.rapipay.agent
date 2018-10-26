@@ -951,7 +951,7 @@ public class BaseCompactActivity extends AppCompatActivity {
         super.onResume();
         if (localStorage.getActivityState(LocalStorage.LOGOUT).equalsIgnoreCase("LOGOUT")) {
             objTimer.cancel();
-            count = 15 * 60 * 3000;
+            count = 15 * 60 * 3500;
             objTimer.start();
         }
     }
@@ -961,7 +961,7 @@ public class BaseCompactActivity extends AppCompatActivity {
         super.onUserInteraction();
         if (localStorage.getActivityState(LocalStorage.LOGOUT).equalsIgnoreCase("LOGOUT")) {
             objTimer.cancel();
-            count = 15 * 60 * 3000;
+            count = 15 * 60 * 3500;
             objTimer.start();
         }
     }
@@ -986,7 +986,7 @@ public class BaseCompactActivity extends AppCompatActivity {
         registerReceiver(mIntentReceiver, filter);
     }
 
-    static int count = 15 * 60 * 3000;
+    static int count = 15 * 60 * 3500;
     int interval = 10000;
     CountDownTimer objTimer = new CountDownTimer(count, interval) {
 
