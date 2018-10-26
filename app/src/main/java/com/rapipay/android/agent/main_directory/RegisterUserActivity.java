@@ -14,6 +14,7 @@ import android.util.Base64;
 import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -55,6 +56,9 @@ public class RegisterUserActivity extends BaseCompactActivity implements Request
     }
 
     private void initialize() {
+        reset = (ImageView) findViewById(R.id.reset);
+        reset.setOnClickListener(this);
+        reset.setColorFilter(getResources().getColor(R.color.colorPrimaryDark));
         heading = (TextView) findViewById(R.id.toolbar_title);
         heading.setText("Add Network Partner");
         input_number = (TextView) findViewById(R.id.input_number);
@@ -95,6 +99,9 @@ public class RegisterUserActivity extends BaseCompactActivity implements Request
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+            case R.id.reset:
+                clear();
+                break;
             case R.id.back_click:
                 setBack_click(this);
                 finish();
@@ -222,6 +229,7 @@ public class RegisterUserActivity extends BaseCompactActivity implements Request
                 Toast.makeText(RegisterUserActivity.this, "Please fill entry manually", Toast.LENGTH_SHORT).show();
             input_number.setEnabled(false);
             select_state.setEnabled(false);
+            reset.setVisibility(View.VISIBLE);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -283,11 +291,20 @@ public class RegisterUserActivity extends BaseCompactActivity implements Request
 
     private void clear() {
         input_number.setText("");
+        input_number.setEnabled(true);
         input_name.setText("");
+        input_name.setEnabled(true);
         input_code.setText("");
+        input_code.setEnabled(true);
         input_email.setText("");
+        input_email.setEnabled(true);
         input_address.setText("");
+        input_address.setEnabled(true);
         select_state.setText("Select State");
+        select_state.setEnabled(true);
+        scan_check=0;
+        bitmap_trans=null;
+        byteBase64=null;
     }
 
     public JSONObject request_user() {

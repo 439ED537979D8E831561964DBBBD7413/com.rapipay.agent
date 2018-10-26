@@ -4,7 +4,7 @@ apply plugin: 'com.google.firebase.firebase-perf'
 android {
     compileSdkVersion 27
     defaultConfig {
-        applicationId "com.rapipay.android.agent"
+//        applicationId "com.rapipay.android.agent"
         minSdkVersion 21
         targetSdkVersion 27
         versionCode 7
@@ -19,6 +19,20 @@ android {
     }
     dataBinding {
         enabled = true
+    }
+    productFlavors {
+        Partner {
+            flavorDimensions "default"
+            resValue "string", "app_name", "Rapid Payment"
+            buildConfigField("String", "ROLL", "\"Partner\"")
+            applicationId "com.rapipay.android.partner"
+        }
+        Agent {
+            flavorDimensions "default"
+            buildConfigField("String", "ROLL", "\"Agent\"")
+            resValue "string", "app_name", "RapiPay Agent App"
+            applicationId "com.rapipay.android.agent"
+        }
     }
     useLibrary 'org.apache.http.legacy'
 }
@@ -40,6 +54,7 @@ dependencies {
     implementation 'com.crashlytics.sdk.android:crashlytics:2.9.5'
     implementation 'com.google.firebase:firebase-perf:16.1.2'
     implementation files('libs/java-json.jar')
+    implementation 'org.jsoup:jsoup:1.10.2'
 }
 apply plugin: 'com.google.gms.google-services'
 

@@ -165,7 +165,7 @@ public class RegisterUserFragment extends Fragment implements RequestHandler, Vi
                             e.printStackTrace();
                         }
                     } else
-                        new AsyncPostMethod(WebConfig.UAT, request_user().toString(), headerData,RegisterUserFragment.this, getActivity()).execute();
+                        new AsyncPostMethod(WebConfig.UAT, request_user().toString(), headerData, RegisterUserFragment.this, getActivity()).execute();
                 }
                 break;
             case R.id.btn_scan_submit:
@@ -303,11 +303,20 @@ public class RegisterUserFragment extends Fragment implements RequestHandler, Vi
 
     private void clear() {
         input_number.setText("");
+        input_number.setEnabled(true);
         input_name.setText("");
+        input_name.setEnabled(true);
         input_code.setText("");
+        input_code.setEnabled(true);
         input_email.setText("");
+        input_email.setEnabled(true);
         input_address.setText("");
+        input_address.setEnabled(true);
         select_state.setText("Select State");
+        select_state.setEnabled(true);
+        scan_check = 0;
+        bitmap_trans = null;
+        byteBase64 = null;
     }
 
     public JSONObject request_user() {
@@ -418,6 +427,7 @@ public class RegisterUserFragment extends Fragment implements RequestHandler, Vi
         });
         alertDialog = dialog.show();
     }
+
     public void loadIMEI() {
         // Check if the READ_PHONE_STATE permission is already available.
         if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA)
