@@ -276,10 +276,10 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
 //                                intent.putExtra("type", "Outside");
 //                                intent.putExtra("mobileNo", "");
                                 startActivity(intent);
-                            } else {
-                                Intent intent = new Intent(WebViewClientActivity.this, LoginScreenActivity.class);
-                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                startActivity(intent);
+//                            } else {
+//                                Intent intent = new Intent(WebViewClientActivity.this, LoginScreenActivity.class);
+//                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                                startActivity(intent);
                             }
                             finish();
                         }
@@ -367,10 +367,13 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
             jsonObject.put("tokenId", tokenId);
             jsonObject.put("txnRef", "VKP" + tsLong.toString());
             jsonObject.put("orgTxnRef", orgTxnRef);
+            jsonObject.put("nodeAgentId", nodeAgent);
+            jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
+            jsonObject.put("kycData", base64image.replaceAll("\n", ""));
             if (TYPE.equalsIgnoreCase("outside")) {
-                jsonObject.put("nodeAgentId", mobileNo);
-                jsonObject.put("sessionRefNo", sessionRefNo);
-                jsonObject.put("kycData", base64image.replaceAll("\n", ""));
+//                jsonObject.put("nodeAgentId", mobileNo);
+//                jsonObject.put("sessionRefNo", sessionRefNo);
+//                jsonObject.put("kycData", base64image.replaceAll("\n", ""));
                 form = "<html>\n" +
                         "\t<body>\n" +
                         "\t\t<form name=\"validatekyc\" id=\"validatekyc\" method=\"POST\" action=\"" + WebConfig.EKYC_FORWARD + "\">\n" +
@@ -378,14 +381,14 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
                         "\t\t\t<input name=\"requestType\" value=\"EKYC_CHANNEL\" type=\"hidden\"/>\n" +
                         "\t\t\t<input name=\"agentId\" value=\"" + parentId + "\" type=\"hidden\"/>\n" +
                         "\t\t\t<input name=\"typeMobileWeb\" value=\"mobile\" type=\"hidden\"/>\n" +
-                        "\t\t\t<input name=\"sessionRefNo\" value=\"" + sessionRefNo + "\" type=\"hidden\"/>\n" +
-                        "\t\t\t<input name=\"nodeAgentId\" value=\"" + mobileNo + "\" type=\"hidden\"/>\n" +
+                        "\t\t\t<input name=\"sessionRefNo\" value=\"" + list.get(0).getAftersessionRefNo() + "\" type=\"hidden\"/>\n" +
+                        "\t\t\t<input name=\"nodeAgentId\" value=\"" + nodeAgent + "\" type=\"hidden\"/>\n" +
                         "\t\t\t<input name=\"tokenId\" value=\"" + tokenId + "\" type=\"hidden\"/>\n" +
                         "\t\t\t<input name=\"txnRef\" value=\"" + "VKP" + tsLong.toString() + "\" type=\"hidden\"/>\n" +
                         "\t\t\t<input name=\"orgTxnRef\" value=\"" + orgTxnRef + "\" type=\"hidden\"/>\n" +
                         "\t\t\t<input name=\"kycData\" value=\"" + base64image + "\" type=\"hidden\"/>\n" +
                         "\t\t\t<input name=\"kycImage\" value=\"" + RegisterUserFragment.byteBase64 + "\" type=\"hidden\"/>\n" +
-                        "\t\t\t<input name=\"checkSum\" value=\"" + GenerateChecksum.checkSum(sessionKey, jsonObject.toString()) + "\" type=\"hidden\"/>\n" +
+                        "\t\t\t<input name=\"checkSum\" value=\"" + GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()) + "\" type=\"hidden\"/>\n" +
                         "\t\t\t<input type=\"submit\"/>\n" +
                         "\t\t</form>\n" +
                         "\t\t<script language=\"JavaScript\" type=\"text/javascript\">\n" +
@@ -394,9 +397,6 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
                         "\t</body>\n" +
                         "</html>";
             } else {
-                jsonObject.put("nodeAgentId", nodeAgent);
-                jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
-                jsonObject.put("kycData", base64image.replaceAll("\n", ""));
                 form = "<html>\n" +
                         "\t<body>\n" +
                         "\t\t<form name=\"validatekyc\" id=\"validatekyc\" method=\"POST\" action=\"" + WebConfig.EKYC_FORWARD + "\">\n" +
@@ -698,10 +698,15 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
             intent = new Intent(WebViewClientActivity.this, WalletDetailsActivity.class);
         } else if (TYPE.equalsIgnoreCase("outside")) {
             intent = new Intent(WebViewClientActivity.this, MainActivity.class);
-        } else {
-            intent = new Intent(WebViewClientActivity.this, LoginScreenActivity.class);
+//        } else if (TYPE.equalsIgnoreCase("pending")) {
+//            intent = new Intent(WebViewClientActivity.this, RegisterKYCTab.class);
+//            intent.putExtra("type", "Outside");
+//            intent.putExtra("mobileNo", "");
+//        } else {
+//            intent = new Intent(WebViewClientActivity.this, LoginScreenActivity.class);
         }
-        startActivity(intent);
+        if (intent != null)
+            startActivity(intent);
         finish();
     }
 
@@ -712,10 +717,15 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
             intent = new Intent(WebViewClientActivity.this, WalletDetailsActivity.class);
             intent.putExtra("mobileNo", mobileNo);
             intent.putExtra("type", "internal");
-        }else if (TYPE.equalsIgnoreCase("outside")) {
+        } else if (TYPE.equalsIgnoreCase("outside")) {
             intent = new Intent(WebViewClientActivity.this, MainActivity.class);
+//        } else if (TYPE.equalsIgnoreCase("pending")) {
+//            intent = new Intent(WebViewClientActivity.this, RegisterKYCTab.class);
+//            intent.putExtra("type", "Outside");
+//            intent.putExtra("mobileNo", "");
         }
-        startActivity(intent);
+        if (intent != null)
+            startActivity(intent);
         finish();
     }
 

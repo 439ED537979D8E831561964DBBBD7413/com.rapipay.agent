@@ -13,7 +13,10 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -28,6 +31,7 @@ import android.support.v7.widget.AppCompatButton;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -430,6 +434,14 @@ public class BaseCompactActivity extends AppCompatActivity {
 
     protected void customView_term(View alertLayout, String output) throws Exception {
         TextView otpView = (TextView) alertLayout.findViewById(R.id.tv_linkon);
+//        otpView.setText(Html.fromHtml(output, new Html.ImageGetter() {
+//            @Override
+//            public Drawable getDrawable(String source) {
+//                byte[] data = Base64.decode(source, Base64.DEFAULT);
+//                Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+//                return new BitmapDrawable(getResources(), bitmap);
+//            }
+//        }, null));
         otpView.setText(Html.fromHtml(output));
         otpView.setVisibility(View.VISIBLE);
         dialog.setView(alertLayout);

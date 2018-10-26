@@ -44,7 +44,7 @@ public class HttpConnector {
             // Load CAs from an InputStream
             // (could be from a resource or ByteArrayInputStream or ...)
             CertificateFactory cf = CertificateFactory.getInstance("X.509");
-            InputStream in = cert.getResources().openRawResource(R.raw.server);
+            InputStream in = cert.getResources().openRawResource(R.raw.serverlive);
             InputStream caInput = new BufferedInputStream(in);
             Certificate ca;
             try {

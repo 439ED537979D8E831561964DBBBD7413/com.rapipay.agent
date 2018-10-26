@@ -233,7 +233,7 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
                             JSONArray array = object.getJSONArray("footerImgList");
                             insertFooterDetails(array, db, object.getString("timeStamp"));
                         }
-                    }else
+                    } else
                         init(db.getFooterDetail("banner"));
                 } else if (object.getString("serviceType").equalsIgnoreCase("APP_LIVE_STATUS")) {
                     if (object.has("headerList")) {
@@ -284,7 +284,10 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
 
     @Override
     public void chechStat(String object) {
-        customDialog_Common("KYCLAYOUTS", null, null, getResources().getString(R.string.Alert), null, object, PinVerification.this);
+        if (object.contains("DOCTYPE"))
+            customDialog_Common("TERMCONDITION", null, null, "Term & Condition", "", object, PinVerification.this);
+        else
+            customDialog_Common("KYCLAYOUTS", null, null, getResources().getString(R.string.Alert), null, object, PinVerification.this);
     }
 
     @Override

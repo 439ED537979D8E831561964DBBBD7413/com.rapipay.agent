@@ -54,6 +54,10 @@
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden" />
         <activity
+            android:name=".main_directory.RegisterKYCTab"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
             android:name=".main_directory.RegisterUserActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden" />
