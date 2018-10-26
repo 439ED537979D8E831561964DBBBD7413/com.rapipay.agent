@@ -57,6 +57,7 @@
     <string name="p_optname">Operator Name</string>
     <string name="p_contactid">Enter Number</string>
     <string name="p_email">Enter Email</string>
+    <string name="p_emailss">Email</string>
     <string name="p_psw">Password</string>
     <string name="p_pin">PIN</string>
     <string name="p_chnagepsw">Change Password</string>
@@ -90,6 +91,7 @@
     <string name="p_tramount">Enter Transfer Amount</string>
     <string name="p_transtionid">Enter Bank Transaction Id</string>
     <string name="p_address">Enter Address</string>
+    <string name="p_addressss">Address</string>
     <string name="p_remark">Enter Remarks</string>
     <string name="p_remarks">Remarks</string>
     <string name="p_submit">Travel and Insurance</string>

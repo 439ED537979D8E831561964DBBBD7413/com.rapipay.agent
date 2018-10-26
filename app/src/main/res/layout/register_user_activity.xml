@@ -89,7 +89,7 @@
                             android:id="@+id/input_address"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="@string/p_address"
+                            android:hint="@string/p_addressss"
                             android:inputType="text"
                             android:maxLength="250"
                             android:textSize="16dp" />
@@ -116,7 +116,7 @@
                             android:id="@+id/input_email"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="@string/p_email"
+                            android:hint="@string/p_emailss"
                             android:inputType="text"
                             android:textSize="16dp" />
                     </android.support.design.widget.TextInputLayout>

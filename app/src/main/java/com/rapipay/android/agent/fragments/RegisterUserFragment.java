@@ -1,4 +1,4 @@
-package com.rapipay.android.agent.main_directory;
+package com.rapipay.android.agent.fragments;
 
 import android.Manifest;
 import android.content.DialogInterface;
@@ -9,69 +9,97 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.AppCompatButton;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Base64;
-import android.util.Log;
 import android.util.Patterns;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.XML;
-
-import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
-import java.util.Random;
-
+import com.rapipay.android.agent.Model.RapiPayPozo;
 import com.rapipay.android.agent.R;
+import com.rapipay.android.agent.adapter.CustomSpinnerAdapter;
 import com.rapipay.android.agent.interfaces.CustomInterface;
 import com.rapipay.android.agent.interfaces.RequestHandler;
+import com.rapipay.android.agent.main_directory.BarcodeActivity;
+import com.rapipay.android.agent.main_directory.WebViewClientActivity;
 import com.rapipay.android.agent.utils.AsyncPostMethod;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
 import com.rapipay.android.agent.utils.GenerateChecksum;
 import com.rapipay.android.agent.utils.ImageUtils;
 import com.rapipay.android.agent.utils.WebConfig;
 
-public class RegisterUserActivity extends BaseCompactActivity implements RequestHandler, View.OnClickListener, CustomInterface {
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.XML;
+
+import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.Locale;
+import java.util.Random;
+
+import static android.app.Activity.RESULT_OK;
+
+public class RegisterUserFragment extends Fragment implements RequestHandler, View.OnClickListener, CustomInterface {
     final private static int PERMISSIONS_REQUEST_READ_PHONE_STATE = 0;
     TextView input_name, input_number, input_address, input_email, input_code;
     TextView select_state;
-    String TYPE, mobileNo;
-    static String byteBase64;
-    int scan_check=0;
-    static Bitmap bitmap_trans=null;
+    String TYPE, mobileNo = "";
+    public static String byteBase64;
+    int scan_check = 0;
+    public static Bitmap bitmap_trans = null;
+    protected ArrayList<RapiPayPozo> list;
+    protected Long tsLong;
+    ArrayList<String> spinner_list;
+    protected String headerData = (WebConfig.BASIC_USERID + ":" + WebConfig.BASIC_PASSWORD);
 
+    @Nullable
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.register_user_activity);
-        TYPE = getIntent().getStringExtra("type");
-        mobileNo = getIntent().getStringExtra("mobileNo");
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+        View rv = (View) inflater.inflate(R.layout.register_kyc_frag, container, false);
+        if (BaseCompactActivity.db != null && BaseCompactActivity.db.getDetails_Rapi())
+            list = BaseCompactActivity.db.getDetails();
+        TYPE = getActivity().getIntent().getStringExtra("type");
+        mobileNo = getActivity().getIntent().getStringExtra("mobileNo");
         loadIMEI();
-        initialize();
+        initialize(rv);
+        return rv;
     }
+//    @Override
+//    public void onCreate(@Nullable Bundle savedInstanceState) {
+//        super.onCreate(savedInstanceState);
+//        setContentView(R.layout.register_user_activity);
+//
+//        initialize();
+//    }
 
-    private void initialize() {
-        heading = (TextView) findViewById(R.id.toolbar_title);
-        heading.setText("Add Network Partner");
-        input_number = (TextView) findViewById(R.id.input_number);
-        input_address = (TextView) findViewById(R.id.input_address);
-        input_email = (TextView) findViewById(R.id.input_email);
-        input_code = (TextView) findViewById(R.id.input_code);
-        input_name = (TextView) findViewById(R.id.input_name);
-        select_state = (TextView) findViewById(R.id.select_state);
+    private void initialize(View view) {
+        input_number = (TextView) view.findViewById(R.id.input_number);
+        input_address = (TextView) view.findViewById(R.id.input_address);
+        input_email = (TextView) view.findViewById(R.id.input_email);
+        input_code = (TextView) view.findViewById(R.id.input_code);
+        input_name = (TextView) view.findViewById(R.id.input_name);
+        select_state = (TextView) view.findViewById(R.id.select_state);
         select_state.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ArrayList<String> list_state = db.getState_Details();
+                ArrayList<String> list_state = BaseCompactActivity.db.getState_Details();
                 customSpinner(select_state, "Select State", list_state);
             }
         });
         if (!mobileNo.isEmpty())
             input_number.setText(mobileNo);
+        view.findViewById(R.id.btn_fund).setOnClickListener(this);
+        view.findViewById(R.id.btn_scan_submit).setOnClickListener(this);
 //        if (list_state.size() != 0) {
 //            ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
 //                    android.R.layout.simple_spinner_item, list_state);
@@ -95,17 +123,17 @@ public class RegisterUserActivity extends BaseCompactActivity implements Request
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.back_click:
-                setBack_click(this);
-                finish();
-                break;
+//            case R.id.back_click:
+//                setBack_click(this);
+//                finish();
+//                break;
             case R.id.btn_fund:
                 if (!ImageUtils.commonRegex(input_name.getText().toString(), 150, " ")) {
                     input_name.setError("Please enter valid data");
                     input_name.requestFocus();
                 } else if (!ImageUtils.commonRegex(input_code.getText().toString(), 150, "0-9 .&") && !TYPE.equalsIgnoreCase("internal")) {
-                        input_code.setError("Please enter valid data");
-                        input_code.requestFocus();
+                    input_code.setError("Please enter valid data");
+                    input_code.requestFocus();
                 } else if (input_address.getText().toString().isEmpty()) {
                     input_address.setError("Please enter valid data");
                     input_address.requestFocus();
@@ -113,17 +141,17 @@ public class RegisterUserActivity extends BaseCompactActivity implements Request
                     select_state.setError("Please enter valid data");
                     select_state.requestFocus();
                 } else if (!Patterns.EMAIL_ADDRESS.matcher(input_email.getText().toString()).matches() && !TYPE.equalsIgnoreCase("internal")) {
-                        input_email.setError("Please enter valid data");
-                        input_email.requestFocus();
+                    input_email.setError("Please enter valid data");
+                    input_email.requestFocus();
                 } else if (!ImageUtils.commonNumber(input_number.getText().toString(), 10)) {
                     input_number.setError("Please enter valid data");
                     input_number.requestFocus();
                 } else {
                     if (TYPE.equalsIgnoreCase("internal")) {
                         try {
-                            Intent intent = new Intent(RegisterUserActivity.this, WebViewClientActivity.class);
+                            Intent intent = new Intent(getActivity(), WebViewClientActivity.class);
                             intent.putExtra("mobileNo", mobileNo);
-                            String base64 = input_name.getText().toString() + "~" + input_email.getText().toString().trim() + "~" + input_code.getText().toString().trim() + "~" + input_address.getText().toString() + "~" + select_state.getText().toString()+ "~" +scan_check;
+                            String base64 = input_name.getText().toString() + "~" + input_email.getText().toString().trim() + "~" + input_code.getText().toString().trim() + "~" + input_address.getText().toString() + "~" + select_state.getText().toString() + "~" + scan_check;
                             byte[] bytes = base64.getBytes("utf-8");
                             String imageEncoded = Base64.encodeToString(bytes, Base64.DEFAULT);
                             intent.putExtra("base64", imageEncoded);
@@ -137,21 +165,20 @@ public class RegisterUserActivity extends BaseCompactActivity implements Request
                             e.printStackTrace();
                         }
                     } else
-                        new AsyncPostMethod(WebConfig.UAT, request_user().toString(), headerData, RegisterUserActivity.this).execute();
+                        new AsyncPostMethod(WebConfig.UAT, request_user().toString(), headerData,RegisterUserFragment.this, getActivity()).execute();
                 }
                 break;
             case R.id.btn_scan_submit:
                 bitmap_trans = null;
-                Intent intent = new Intent(RegisterUserActivity.this, BarcodeActivity.class);
-                intent.putExtra("type", "inside");
+                Intent intent = new Intent(getActivity(), BarcodeActivity.class);
+                intent.putExtra("type", "Outside");
                 startActivityForResult(intent, 1);
-//                startActivityForResult(new Intent(RegisterUserActivity.this, BarcodeActivity.class), 1);
                 break;
         }
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
             if (requestCode == 1) {
@@ -160,7 +187,7 @@ public class RegisterUserActivity extends BaseCompactActivity implements Request
                     String requiredValue = data.getStringExtra("Key");
                     ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                     bitmap_trans.compress(Bitmap.CompressFormat.PNG, 50, byteArrayOutputStream);
-                    byte[] byteArray = byteArrayOutputStream .toByteArray();
+                    byte[] byteArray = byteArrayOutputStream.toByteArray();
                     byteBase64 = Base64.encodeToString(byteArray, Base64.DEFAULT);
                     jsonObj = XML.toJSONObject(requiredValue);
                     JSONObject jsonObject = jsonObj.getJSONObject("PrintLetterBarcodeData");
@@ -219,17 +246,11 @@ public class RegisterUserActivity extends BaseCompactActivity implements Request
             if (object.has("_state"))
                 select_state.setText(object.getString("_state"));
             if (input_name.getText().toString().isEmpty() || input_address.getText().toString().isEmpty() || select_state.getText().toString().isEmpty())
-                Toast.makeText(RegisterUserActivity.this, "Please fill entry manually", Toast.LENGTH_SHORT).show();
-            input_number.setEnabled(false);
+                Toast.makeText(getActivity(), "Please fill entry manually", Toast.LENGTH_SHORT).show();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    @Override
-    public void onBackPressed() {
-        setBack_click(this);
-        finish();
     }
 
     @Override
@@ -238,9 +259,9 @@ public class RegisterUserActivity extends BaseCompactActivity implements Request
             if (object.getString("responseCode").equalsIgnoreCase("200")) {
                 if (object.getString("serviceType").equalsIgnoreCase("B2BTempUserRequest")) {
                     try {
-                        Intent intent = new Intent(RegisterUserActivity.this, WebViewClientActivity.class);
+                        Intent intent = new Intent(getActivity(), WebViewClientActivity.class);
                         intent.putExtra("mobileNo", input_number.getText().toString());
-                        String base64 = input_name.getText().toString() + "~" + input_email.getText().toString().trim() + "~" + input_code.getText().toString().trim() + "~" + input_address.getText().toString() + "~" + select_state.getText().toString()+ "~" +scan_check;
+                        String base64 = input_name.getText().toString() + "~" + input_email.getText().toString().trim() + "~" + input_code.getText().toString().trim() + "~" + input_address.getText().toString() + "~" + select_state.getText().toString() + "~" + scan_check;
                         byte[] bytes = base64.getBytes("utf-8");
                         String imageEncoded = Base64.encodeToString(bytes, Base64.DEFAULT);
                         intent.putExtra("base64", imageEncoded);
@@ -344,9 +365,62 @@ public class RegisterUserActivity extends BaseCompactActivity implements Request
 
     }
 
+    protected AlertDialog.Builder dialog;
+    CustomSpinnerAdapter adapter = null;
+    protected AlertDialog alertDialog;
+
+    protected void customSpinner(final TextView viewText, final String type, final ArrayList<String> list_spinner) {
+        spinner_list = list_spinner;
+        dialog = new AlertDialog.Builder(getActivity());
+        LayoutInflater inflater = getLayoutInflater();
+        View alertLayout = inflater.inflate(R.layout.custom_spinner_layout, null);
+        TextView text = (TextView) alertLayout.findViewById(R.id.spinner_title);
+        final EditText search = (EditText) alertLayout.findViewById(R.id.input_search);
+        text.setText(type);
+        search.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                String text = search.getText().toString().toLowerCase(Locale.getDefault());
+                adapter.filter(text);
+            }
+        });
+        ListView listLeft = (ListView) alertLayout.findViewById(R.id.list_view);
+        AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
+        if (spinner_list.size() != 0) {
+            adapter = new CustomSpinnerAdapter(spinner_list, getActivity());
+            listLeft.setAdapter(adapter);
+        }
+        listLeft.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                viewText.setText(list_spinner.get(position));
+                viewText.setError(null);
+                alertDialog.dismiss();
+            }
+        });
+        dialog.setCancelable(false);
+        dialog.setView(alertLayout);
+        btn_ok.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alertDialog.dismiss();
+            }
+        });
+        alertDialog = dialog.show();
+    }
     public void loadIMEI() {
         // Check if the READ_PHONE_STATE permission is already available.
-        if (ActivityCompat.checkSelfPermission(RegisterUserActivity.this, Manifest.permission.CAMERA)
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
             // READ_PHONE_STATE permission has not been granted.
 //            checkAndRequestPermissions();
@@ -359,12 +433,12 @@ public class RegisterUserActivity extends BaseCompactActivity implements Request
     }
 
     private void requestReadPhoneStatePermission() {
-        if (ActivityCompat.shouldShowRequestPermissionRationale(RegisterUserActivity.this,
+        if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),
                 Manifest.permission.CAMERA)) {
             alertPerm(getString(R.string.permission_read_phone_state_rationale), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    ActivityCompat.requestPermissions(RegisterUserActivity.this,
+                    ActivityCompat.requestPermissions(getActivity(),
                             new String[]{Manifest.permission.CAMERA},
                             PERMISSIONS_REQUEST_READ_PHONE_STATE);
                     doPermissionGrantedStuffs();
@@ -373,7 +447,7 @@ public class RegisterUserActivity extends BaseCompactActivity implements Request
 
         } else {
             // READ_PHONE_STATE permission has not been granted yet. Request it directly.
-            ActivityCompat.requestPermissions(RegisterUserActivity.this, new String[]{Manifest.permission.CAMERA},
+            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CAMERA},
                     PERMISSIONS_REQUEST_READ_PHONE_STATE);
         }
     }
@@ -402,7 +476,7 @@ public class RegisterUserActivity extends BaseCompactActivity implements Request
     }
 
     private void alertPerm(String msg, DialogInterface.OnClickListener okListener) {
-        new AlertDialog.Builder(RegisterUserActivity.this)
+        new AlertDialog.Builder(getActivity())
                 .setTitle("Permission Request")
                 .setMessage(msg)
                 .setCancelable(false)
@@ -412,7 +486,7 @@ public class RegisterUserActivity extends BaseCompactActivity implements Request
     }
 
     private void doPermissionGrantedStuffs() {
-        if (ActivityCompat.checkSelfPermission(RegisterUserActivity.this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
 //            selectImage();
         }
     }
