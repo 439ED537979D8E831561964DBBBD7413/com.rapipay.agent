@@ -125,7 +125,7 @@ public class PendingKyc extends Fragment implements RequestHandler {
     public void chechStatus(JSONObject object) {
         try {
             if (object.getString("responseCode").equalsIgnoreCase("200")) {
-                if (object.getString("serviceType").equalsIgnoreCase("PENDING_AGENT_KYC")) {
+//                if (object.getString("serviceType").equalsIgnoreCase("PENDING_AGENT_KYC")) {
                     try {
                         if (object.has("agentKycPendingList")) {
                             insertLastTransDetails(object.getJSONArray("agentKycPendingList"));
@@ -133,7 +133,7 @@ public class PendingKyc extends Fragment implements RequestHandler {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                }
+//                }
             }
         } catch (Exception e) {
             e.printStackTrace();

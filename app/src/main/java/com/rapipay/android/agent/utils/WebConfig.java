@@ -2,7 +2,7 @@ package com.rapipay.android.agent.utils;
 
 public class WebConfig {
 
-    public static String WEB = "http://192.168.1.101:8080/RapiPayAPIHub/";
+    public static String WEB = "https://rapipay.com/RapiPayAPIHub/";
     public static String UAT = WEB + "HandsetRegistration";
     public static String WEBS = "http://www.rapipay.com/RapiPayAPIHub/";
     public static String EKYC = WEB + "EKYCProcess";
