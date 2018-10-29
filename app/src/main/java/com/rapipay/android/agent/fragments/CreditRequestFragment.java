@@ -8,6 +8,12 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -519,14 +525,31 @@ public class CreditRequestFragment extends Fragment implements RequestHandler, V
         });
         builder.show();
     }
+    private Bitmap addWaterMark(Bitmap src) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
+        String currentDateandTime = sdf.format(new Date());
+        int w = src.getWidth();
+        int h = src.getHeight();
+        Bitmap result = Bitmap.createBitmap(w, h, src.getConfig());
+        Canvas canvas = new Canvas(result);
+        canvas.drawBitmap(src, 0, 0, null);
+        Paint paint = new Paint();
+        paint.setColor(Color.WHITE); // Text Color
+        paint.setTextSize(10);
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_OVER)); // Text Overlapping Pattern
+        Bitmap waterMark = BitmapFactory.decodeResource(getResources(), R.drawable.rapipay);
+        canvas.drawBitmap(waterMark, 0, 0, paint);
+        canvas.drawText(currentDateandTime, w/4, h-10, paint);
 
+        return result;
+    }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
             if (requestCode == CAMERA_REQUEST) {
                 Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
-                imageBase64 = getBytesFromBitmap(thumbnail);
+                imageBase64 = getBytesFromBitmap(addWaterMark(thumbnail));
                 SimpleDateFormat formatter = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
                 Date now = new Date();
                 File destination = new File(Environment.getExternalStorageDirectory(),
@@ -543,7 +566,7 @@ public class CreditRequestFragment extends Fragment implements RequestHandler, V
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                imageBase64 = getBytesFromBitmap(thumbnail);
+                imageBase64 = getBytesFromBitmap(addWaterMark(thumbnail));
                 Uri selectedImageUri = data.getData();
                 String[] projection = {MediaStore.MediaColumns.DATA};
                 CursorLoader cursorLoader = new CursorLoader(getActivity(), selectedImageUri, projection, null, null,

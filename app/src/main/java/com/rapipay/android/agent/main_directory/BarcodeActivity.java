@@ -7,9 +7,12 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
@@ -36,7 +39,9 @@ import com.rapipay.android.agent.utils.BaseCompactActivity;
 
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class BarcodeActivity extends BaseCompactActivity implements VersionListener {
 
@@ -162,9 +167,9 @@ public class BarcodeActivity extends BaseCompactActivity implements VersionListe
                                     public void onPictureTaken(byte[] bytes) {
                                         Bitmap decodedByte = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
                                         if (TYPE.equalsIgnoreCase("outside"))
-                                            RegisterUserFragment.bitmap_trans = getResizedBitmap(decodedByte, 600);
+                                            RegisterUserFragment.bitmap_trans = getResizedBitmap(addWaterMark(decodedByte), 600);
                                         else
-                                            RegisterUserActivity.bitmap_trans = getResizedBitmap(decodedByte, 600);
+                                            RegisterUserActivity.bitmap_trans = getResizedBitmap(addWaterMark(decodedByte), 600);
                                         setResult(RESULT_OK, intent);
                                         finish();
                                     }
@@ -178,7 +183,24 @@ public class BarcodeActivity extends BaseCompactActivity implements VersionListe
             }
         });
     }
+    private Bitmap addWaterMark(Bitmap src) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
+        String currentDateandTime = sdf.format(new Date());
+        int w = src.getWidth();
+        int h = src.getHeight();
+        Bitmap result = Bitmap.createBitmap(w, h, src.getConfig());
+        Canvas canvas = new Canvas(result);
+        canvas.drawBitmap(src, 0, 0, null);
+        Paint paint = new Paint();
+        paint.setColor(Color.WHITE); // Text Color
+        paint.setTextSize(10);
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_OVER)); // Text Overlapping Pattern
+        Bitmap waterMark = BitmapFactory.decodeResource(getResources(), R.drawable.rapipay);
+        canvas.drawBitmap(waterMark, 0, 0, paint);
+        canvas.drawText(currentDateandTime, w/4, h-10, paint);
 
+        return result;
+    }
     public Bitmap getResizedBitmap(Bitmap image, int maxSize) {
         int width = image.getWidth();
         int height = image.getHeight();

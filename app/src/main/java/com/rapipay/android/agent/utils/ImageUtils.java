@@ -20,7 +20,7 @@ public class ImageUtils {
     public static ArrayList<ImagePozo> getFourthImageUrl() {
         ArrayList<ImagePozo> list = new ArrayList<>();
         list.clear();
-        list.add(new ImagePozo(1, "Wallet Fund Transfer", R.drawable.wallet));
+        list.add(new ImagePozo(1, "RapiPay Wallet Fund Transfer", R.drawable.wallet));
         list.add(new ImagePozo(2, "BC Fund Transfer", R.drawable.bc));
         list.add(new ImagePozo(3, "Pending & Refund", R.drawable.refund));
         list.add(new ImagePozo(3, "Transaction History", R.drawable.transhistory));
