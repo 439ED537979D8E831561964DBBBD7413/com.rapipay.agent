@@ -532,21 +532,28 @@
                     android:textSize="12sp" />
 
             </LinearLayout>
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="3sp"
                 android:orientation="horizontal"
+                android:layout_margin="3sp"
                 android:weightSum="800">
 
                 <TextView
-                    android:id="@+id/btn_linkon"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="230"
+                    android:inputType="text"
+                    android:text="@string/sgst"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/btn_sgst"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="570"
                     android:onClick="onClick"
-                    android:text="@string/link"
+                    android:text="@string/p_bank"
                     android:textColor="@color/colorPrimaryDark"
                     android:textSize="12sp" />
             </LinearLayout>

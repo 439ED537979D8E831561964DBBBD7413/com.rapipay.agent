@@ -383,6 +383,8 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
                         }
                     }
                 }
+            }else if (object.getString("responseCode").equalsIgnoreCase("101")) {
+                customDialog_Common("Money Transfer", null, null, "KYCLAYOUT", object.getString("responseMessage"));
             }
         } catch (Exception e) {
             e.printStackTrace();

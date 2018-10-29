@@ -538,7 +538,7 @@ public class CreditRequestFragment extends Fragment implements RequestHandler, V
         paint.setTextSize(10);
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_OVER)); // Text Overlapping Pattern
         Bitmap waterMark = BitmapFactory.decodeResource(getResources(), R.drawable.rapipay);
-        canvas.drawBitmap(waterMark, 0, 0, paint);
+//        canvas.drawBitmap(waterMark, 0, 0, paint);
         canvas.drawText(currentDateandTime, w/4, h-10, paint);
 
         return result;
