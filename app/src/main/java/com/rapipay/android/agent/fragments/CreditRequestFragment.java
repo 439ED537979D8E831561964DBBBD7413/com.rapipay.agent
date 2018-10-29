@@ -496,7 +496,7 @@ public class CreditRequestFragment extends Fragment implements RequestHandler, V
 //
 //        startActivityForResult(Intent.createChooser(chooserIntent, "Select images"), SELECT_FILE);
 
-        final CharSequence[] items = {"Capture Image", "Choose from Gallery", "Cancel"};
+        final CharSequence[] items = {"Capture Image", "Cancel"};
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(getActivity());
         builder.setIcon(R.drawable.camera);
         builder.setTitle("Add Photo!");
@@ -507,10 +507,10 @@ public class CreditRequestFragment extends Fragment implements RequestHandler, V
                     Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                     startActivityForResult(cameraIntent, CAMERA_REQUEST);
 
-                } else if (items[item].equals("Choose from Gallery")) {
-                    Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    intent.setType("image/*");
-                    startActivityForResult(Intent.createChooser(intent, "Select File"), SELECT_FILE);
+//                } else if (items[item].equals("Choose from Gallery")) {
+//                    Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+//                    intent.setType("image/*");
+//                    startActivityForResult(Intent.createChooser(intent, "Select File"), SELECT_FILE);
 
                 } else if (items[item].equals("Cancel")) {
                     dialog.dismiss();

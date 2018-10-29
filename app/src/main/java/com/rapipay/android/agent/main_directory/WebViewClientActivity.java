@@ -123,7 +123,10 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
 
     private void doPermissionGrantedStuffs() {
         if (ActivityCompat.checkSelfPermission(WebViewClientActivity.this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-            selectPhoto();
+            if (TYPE.equalsIgnoreCase("internal"))
+                selectPhotoCustomer();
+            else if (TYPE.equalsIgnoreCase("outside"))
+                selectPhotoAgent();
         }
     }
 
@@ -484,7 +487,7 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
         }
     }
 
-    private void selectPhoto() {
+    private void selectPhotoCustomer() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
@@ -506,7 +509,48 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
                 takePictureIntent = null;
             }
         }
+        startActivityForResult(Intent.createChooser(takePictureIntent, "Select images"), 1);
+//        Intent contentSelectionIntent = new Intent(Intent.ACTION_GET_CONTENT);
+//        contentSelectionIntent.addCategory(Intent.CATEGORY_OPENABLE);
+//        contentSelectionIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+//        contentSelectionIntent.setType("image/*");
+//
+//        Intent[] intentArray;
+//        if (takePictureIntent != null) {
+//            intentArray = new Intent[]{takePictureIntent};
+//        } else {
+//            intentArray = new Intent[1];
+//        }
+//
+//        Intent chooserIntent = new Intent(Intent.ACTION_CHOOSER);
+//        chooserIntent.putExtra(Intent.EXTRA_INTENT, contentSelectionIntent);
+//        chooserIntent.putExtra(Intent.EXTRA_TITLE, "Image Chooser");
+//        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray);
+//        startActivityForResult(Intent.createChooser(chooserIntent, "Select images"), 1);
+    }
 
+    private void selectPhotoAgent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            // Create the File where the photo should go
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+                takePictureIntent.putExtra("PhotoPath", mCameraPhotoPath);
+            } catch (IOException ex) {
+                // Error occurred while creating the File
+                Log.e(TAG, "Unable to create Image File", ex);
+            }
+
+            // Continue only if the File was successfully created
+            if (photoFile != null) {
+                mCameraPhotoPath = "file:" + photoFile.getAbsolutePath();
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
+            } else {
+                takePictureIntent = null;
+            }
+        }
         Intent contentSelectionIntent = new Intent(Intent.ACTION_GET_CONTENT);
         contentSelectionIntent.addCategory(Intent.CATEGORY_OPENABLE);
         contentSelectionIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
@@ -514,7 +558,7 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
 
         Intent[] intentArray;
         if (takePictureIntent != null) {
-            intentArray = new Intent[]{takePictureIntent, intent};
+            intentArray = new Intent[]{takePictureIntent,intent};
         } else {
             intentArray = new Intent[2];
         }
@@ -536,7 +580,6 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
             public void onClick(DialogInterface dialog, int item) {
                 if (items[item].equals("Take Photo")) {
                     Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                     if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
                         // Create the File where the photo should go
                         File photoFile = null;
@@ -575,10 +618,10 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
                     chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray);
                     startActivityForResult(Intent.createChooser(chooserIntent, "Select images"), 1);
 
-                } else if (items[item].equals("Choose from Gallery")) {
-                    Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    intent.setType("image/*");
-                    startActivityForResult(Intent.createChooser(intent, "Select File"), 1);
+//                } else if (items[item].equals("Choose from Gallery")) {
+//                    Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+//                    intent.setType("image/*");
+//                    startActivityForResult(Intent.createChooser(intent, "Select File"), 1);
 
                 } else if (items[item].equals("Cancel")) {
                     dialog.dismiss();
@@ -696,6 +739,8 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
         Intent intent = null;
         if (TYPE.equalsIgnoreCase("internal")) {
             intent = new Intent(WebViewClientActivity.this, WalletDetailsActivity.class);
+            intent.putExtra("mobileNo", "");
+            intent.putExtra("type", "");
         } else if (TYPE.equalsIgnoreCase("outside")) {
             intent = new Intent(WebViewClientActivity.this, MainActivity.class);
 //        } else if (TYPE.equalsIgnoreCase("pending")) {

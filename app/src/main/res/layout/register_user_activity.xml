@@ -143,7 +143,7 @@
                         android:weightSum="800"
                         android:orientation="horizontal">
 
-                        <android.support.v7.widget.AppCompatButton
+                        <Button
                             android:id="@+id/btn_scan_submit"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
@@ -155,7 +155,7 @@
                             android:textSize="16dp"
                             android:layout_marginRight="3dp"/>
 
-                        <android.support.v7.widget.AppCompatButton
+                        <Button
                             android:id="@+id/btn_fund"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
