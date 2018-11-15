@@ -24,6 +24,7 @@ import android.widget.TextView;
 
 import com.rapipay.android.agent.Model.VersionPozo;
 import com.rapipay.android.agent.interfaces.VersionListener;
+import com.rapipay.android.agent.utils.ChangeTask;
 import com.rapipay.android.agent.utils.LocalStorage;
 import com.viewpagerindicator.CirclePageIndicator;
 
@@ -54,7 +55,7 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
     private static int NUM_PAGES = 0;
     EditText confirmpinView;
     TextView toolbar_title;
-    ArrayList<HeaderePozo> bannerlist;
+    ArrayList<HeaderePozo> bannerlist, imagelist;
 
 
     boolean flaf = false;
@@ -234,7 +235,7 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
                             insertFooterDetails(array, db, object.getString("timeStamp"));
                         }
                     } else
-                        init(db.getFooterDetail("banner"));
+                        init(db.getFooterDetail(""));
                 } else if (object.getString("serviceType").equalsIgnoreCase("APP_LIVE_STATUS")) {
                     if (object.has("headerList")) {
                         JSONArray array = object.getJSONArray("headerList");
@@ -335,6 +336,7 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
 
     private void insertFooterDetails(JSONArray array, RapipayDB db, String timeStamp) {
         bannerlist = new ArrayList<HeaderePozo>();
+        imagelist = new ArrayList<HeaderePozo>();
         SQLiteDatabase dba = db.getWritableDatabase();
         if (db.getDetailsFooter())
             dba.execSQL("delete from " + RapipayDB.TABLE_FOOTER);
@@ -344,6 +346,9 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
                 if (object.getString("headerValue").equalsIgnoreCase("banner")) {
                     bannerlist.add(new HeaderePozo(object.getString("headerValue"), object.getString("headerData"), object.getString("headerId")));
                 }
+//                else
+//                    imagelist.add(new HeaderePozo(object.getString("headerValue"), object.getString("headerData"), object.getString("headerId")));
+
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -358,6 +363,19 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
                 String imageName = "banner" + i + ".jpg";
                 String path = saveToInternalStorage(base64Convert(bannerlist.get(i).getHeaderData()), imageName);
                 dba.execSQL(insertSQL, new String[]{bannerlist.get(i).getHeaderID(), imageName, bannerlist.get(i).getHeaderData(), path, timeStamp});
+            }
+        }
+        if (imagelist.size() != 0) {
+            for (int i = 0; i < imagelist.size(); i++) {
+                String insertSQL = "INSERT INTO " + RapipayDB.TABLE_FOOTER + "\n" +
+                        "(" + RapipayDB.COLOMN_OPERATORID + "," + RapipayDB.COLOMN_OPERATORVALUE + "," + RapipayDB.COLOMN_OPERATORDATA + "," + RapipayDB.COLOMN_PATH + "," + RapipayDB.IMAGE_TIME_STAMP + ")\n" +
+                        "VALUES \n" +
+                        "( ?, ?, ?,?,?);";
+
+                String imageName = imagelist.get(i).getHeaderValue() + ".jpg";
+                new ChangeTask(imagelist.get(i).getHeaderData(), PinVerification.this).execute();
+                String path = saveToInternalStorage(base64Convert(imagelist.get(i).getHeaderData()), imageName);
+                dba.execSQL(insertSQL, new String[]{imagelist.get(i).getHeaderID(), imageName, imagelist.get(i).getHeaderData(), path, timeStamp});
             }
         }
         init(db.getFooterDetail(""));

@@ -142,39 +142,42 @@ public class BarcodeActivity extends BaseCompactActivity implements VersionListe
 
                         @Override
                         public void run() {
-
-                            if (barcodes.valueAt(0).email != null) {
-                                txtBarcodeValue.removeCallbacks(null);
-                                intentData = barcodes.valueAt(0).email.address;
+                            try {
+                                if (barcodes.valueAt(0).email != null) {
+                                    txtBarcodeValue.removeCallbacks(null);
+                                    intentData = barcodes.valueAt(0).email.address;
 //                                    txtBarcodeValue.setText(intentData);
-                                isEmail = true;
+                                    isEmail = true;
 //                                    btnAction.setText("ADD CONTENT TO THE MAIL");
-                            } else {
-                                isEmail = false;
+                                } else {
+                                    isEmail = false;
 //                                    btnAction.setText("LAUNCH URL");
-                                intentData = barcodes.valueAt(0).displayValue;
+                                    intentData = barcodes.valueAt(0).displayValue;
 //                                    txtBarcodeValue.setText(intentData);
-                                final Intent intent = getIntent();
-                                intent.putExtra("Key", intentData);
+                                    final Intent intent = getIntent();
+                                    intent.putExtra("Key", intentData);
 
-                                cameraSource.takePicture(new CameraSource.ShutterCallback() {
-                                    @Override
-                                    public void onShutter() {
+                                    cameraSource.takePicture(new CameraSource.ShutterCallback() {
+                                        @Override
+                                        public void onShutter() {
 
-                                    }
-                                }, new CameraSource.PictureCallback() {
-                                    @Override
-                                    public void onPictureTaken(byte[] bytes) {
-                                        Bitmap decodedByte = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                                        if (TYPE.equalsIgnoreCase("outside"))
-                                            RegisterUserFragment.bitmap_trans = getResizedBitmap(addWaterMark(decodedByte), 600);
-                                        else
-                                            RegisterUserActivity.bitmap_trans = getResizedBitmap(addWaterMark(decodedByte), 600);
-                                        setResult(RESULT_OK, intent);
-                                        finish();
-                                    }
-                                });
+                                        }
+                                    }, new CameraSource.PictureCallback() {
+                                        @Override
+                                        public void onPictureTaken(byte[] bytes) {
+                                            Bitmap decodedByte = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                                            if (TYPE.equalsIgnoreCase("outside"))
+                                                RegisterUserFragment.bitmap_trans = getResizedBitmap(decodedByte, 600);
+                                            else
+                                                RegisterUserActivity.bitmap_trans = getResizedBitmap(decodedByte, 600);
+                                            setResult(RESULT_OK, intent);
+                                            finish();
+                                        }
+                                    });
+                                }
 
+                            }catch (Exception e){
+                                e.printStackTrace();
                             }
                         }
                     });
@@ -183,6 +186,7 @@ public class BarcodeActivity extends BaseCompactActivity implements VersionListe
             }
         });
     }
+
     private Bitmap addWaterMark(Bitmap src) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
         String currentDateandTime = sdf.format(new Date());
@@ -197,10 +201,11 @@ public class BarcodeActivity extends BaseCompactActivity implements VersionListe
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_OVER)); // Text Overlapping Pattern
         Bitmap waterMark = BitmapFactory.decodeResource(getResources(), R.drawable.rapipay);
 //        canvas.drawBitmap(waterMark, 0, 0, paint);
-        canvas.drawText(currentDateandTime, w/2, h-10, paint);
+        canvas.drawText(currentDateandTime, w / 2, h - 10, paint);
 
         return result;
     }
+
     public Bitmap getResizedBitmap(Bitmap image, int maxSize) {
         int width = image.getWidth();
         int height = image.getHeight();

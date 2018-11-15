@@ -41,9 +41,9 @@ public class RegisterUserActivity extends BaseCompactActivity implements Request
     TextView input_name, input_number, input_address, input_email, input_code;
     TextView select_state;
     String TYPE, mobileNo;
-    static String byteBase64;
-    int scan_check=0;
-    static Bitmap bitmap_trans=null;
+    static String byteBase64="";
+    public static int scan_check = 0;
+    static Bitmap bitmap_trans = null;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -56,11 +56,16 @@ public class RegisterUserActivity extends BaseCompactActivity implements Request
     }
 
     private void initialize() {
+        bitmap_trans = null;
+        byteBase64 = "";
         reset = (ImageView) findViewById(R.id.reset);
         reset.setOnClickListener(this);
         reset.setColorFilter(getResources().getColor(R.color.colorPrimaryDark));
         heading = (TextView) findViewById(R.id.toolbar_title);
-        heading.setText("Add Network Partner");
+        if (TYPE.equalsIgnoreCase("internal"))
+            heading.setText("Customer KYC");
+        else
+            heading.setText("Add Network Partner");
         input_number = (TextView) findViewById(R.id.input_number);
         input_address = (TextView) findViewById(R.id.input_address);
         input_email = (TextView) findViewById(R.id.input_email);
@@ -74,6 +79,7 @@ public class RegisterUserActivity extends BaseCompactActivity implements Request
                 customSpinner(select_state, "Select State", list_state);
             }
         });
+        scan_check=0;
         if (!mobileNo.isEmpty())
             input_number.setText(mobileNo);
 //        if (list_state.size() != 0) {
@@ -111,8 +117,8 @@ public class RegisterUserActivity extends BaseCompactActivity implements Request
                     input_name.setError("Please enter valid data");
                     input_name.requestFocus();
                 } else if (!ImageUtils.commonRegex(input_code.getText().toString(), 150, "0-9 .&") && !TYPE.equalsIgnoreCase("internal")) {
-                        input_code.setError("Please enter valid data");
-                        input_code.requestFocus();
+                    input_code.setError("Please enter valid data");
+                    input_code.requestFocus();
                 } else if (input_address.getText().toString().isEmpty()) {
                     input_address.setError("Please enter valid data");
                     input_address.requestFocus();
@@ -120,8 +126,8 @@ public class RegisterUserActivity extends BaseCompactActivity implements Request
                     select_state.setError("Please enter valid data");
                     select_state.requestFocus();
                 } else if (!Patterns.EMAIL_ADDRESS.matcher(input_email.getText().toString()).matches() && !TYPE.equalsIgnoreCase("internal")) {
-                        input_email.setError("Please enter valid data");
-                        input_email.requestFocus();
+                    input_email.setError("Please enter valid data");
+                    input_email.requestFocus();
                 } else if (!ImageUtils.commonNumber(input_number.getText().toString(), 10)) {
                     input_number.setError("Please enter valid data");
                     input_number.requestFocus();
@@ -130,7 +136,7 @@ public class RegisterUserActivity extends BaseCompactActivity implements Request
                         try {
                             Intent intent = new Intent(RegisterUserActivity.this, WebViewClientActivity.class);
                             intent.putExtra("mobileNo", mobileNo);
-                            String base64 = input_name.getText().toString() + "~" + input_email.getText().toString().trim() + "~" + input_code.getText().toString().trim() + "~" + input_address.getText().toString() + "~" + select_state.getText().toString()+ "~" +scan_check;
+                            String base64 = input_name.getText().toString() + "~" + input_email.getText().toString().trim() + "~" + input_code.getText().toString().trim() + "~" + input_address.getText().toString() + "~" + select_state.getText().toString() + "~" + scan_check;
                             byte[] bytes = base64.getBytes("utf-8");
                             String imageEncoded = Base64.encodeToString(bytes, Base64.DEFAULT);
                             intent.putExtra("base64", imageEncoded);
@@ -149,6 +155,7 @@ public class RegisterUserActivity extends BaseCompactActivity implements Request
                 break;
             case R.id.btn_scan_submit:
                 bitmap_trans = null;
+                byteBase64 = "";
                 Intent intent = new Intent(RegisterUserActivity.this, BarcodeActivity.class);
                 intent.putExtra("type", "inside");
                 startActivityForResult(intent, 1);
@@ -167,7 +174,7 @@ public class RegisterUserActivity extends BaseCompactActivity implements Request
                     String requiredValue = data.getStringExtra("Key");
                     ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                     bitmap_trans.compress(Bitmap.CompressFormat.PNG, 50, byteArrayOutputStream);
-                    byte[] byteArray = byteArrayOutputStream .toByteArray();
+                    byte[] byteArray = byteArrayOutputStream.toByteArray();
                     byteBase64 = Base64.encodeToString(byteArray, Base64.DEFAULT);
                     jsonObj = XML.toJSONObject(requiredValue);
                     JSONObject jsonObject = jsonObj.getJSONObject("PrintLetterBarcodeData");
@@ -187,37 +194,39 @@ public class RegisterUserActivity extends BaseCompactActivity implements Request
                 input_name.setEnabled(false);
             }
             if (object.has("house") && object.has("street") && object.has("lm") && object.has("vtc") && object.has("dist")) {
-                String add = object.getString("house") + ", " + object.getString("street") + ", " + object.getString("lm") + ", " + object.getString("vtc") + ", " + object.getString("dist");
+                String add = object.getString("house") + ", " + object.getString("street") + ", " + object.getString("lm") + ", " + object.getString("vtc").replaceAll("^\\s+", "") + ", " + object.getString("dist");
                 input_address.setText(add);
                 input_address.setEnabled(false);
-            }
-            if (object.has("house") && object.has("street") && object.has("loc") && object.has("vtc") && object.has("dist")) {
-                String add = object.getString("house") + ", " + object.getString("street") + ", " + object.getString("loc") + ", " + object.getString("vtc") + ", " + object.getString("dist");
+            }else if (object.has("street") && object.has("lm") && object.has("vtc") && object.has("dist")) {
+                String add =  object.getString("street") + ", " + object.getString("lm") + ", " + object.getString("vtc").replaceAll("^\\s+", "") + ", " + object.getString("dist");
+                input_address.setText(add.replace("null,",""));
+                input_address.setEnabled(false);
+            } else if (object.has("house") && object.has("street") && object.has("lm") && object.has("loc") && object.has("vtc") && object.has("dist")) {
+                String add = object.getString("house") + ", " + object.getString("street") + ", " + object.getString("lm") + ", " + object.getString("loc") + ", " + object.getString("vtc").replaceAll("^\\s+", "") + ", " + object.getString("dist");
                 input_address.setText(add);
                 input_address.setEnabled(false);
-            }
-            if (object.has("_house") && object.has("_street") && object.has("_lm") && object.has("_vtc") && object.has("_dist")) {
-                String add = object.getString("_house") + ", " + object.getString("_street") + ", " + object.getString("_lm") + ", " + object.getString("_vtc") + ", " + object.getString("_dist");
+            } else if (object.has("house") && object.has("street") && object.has("loc") && object.has("vtc") && object.has("dist")) {
+                String add = object.getString("house") + ", " + object.getString("street") + ", " + object.getString("loc") + ", " + object.getString("vtc").replaceAll("^\\s+", "") + ", " + object.getString("dist");
                 input_address.setText(add);
                 input_address.setEnabled(false);
-            }
-            if (object.has("_loc") && object.has("vtc") && object.has("dist")) {
-                String add = object.getString("_loc") + ", " + object.getString("vtc") + ", " + object.getString("dist");
+            } else if (object.has("_house") && object.has("_street") && object.has("_lm") && object.has("_vtc") && object.has("_dist")) {
+                String add = object.getString("_house") + ", " + object.getString("_street") + ", " + object.getString("_lm") + ", " + object.getString("_vtc").replaceAll("^\\s+", "") + ", " + object.getString("_dist");
                 input_address.setText(add);
                 input_address.setEnabled(false);
-            }
-            if (object.has("loc") && object.has("vtc") && object.has("dist")) {
-                String add = object.getString("loc") + ", " + object.getString("vtc") + ", " + object.getString("dist");
+            } else if (object.has("_loc") && object.has("vtc") && object.has("dist")) {
+                String add = object.getString("_loc") + ", " + object.getString("vtc").replaceAll("^\\s+", "") + ", " + object.getString("dist");
                 input_address.setText(add);
                 input_address.setEnabled(false);
-            }
-            if (object.has("_loc") && object.has("_vtc") && object.has("_dist")) {
-                String add = object.getString("_loc") + ", " + object.getString("vtc") + ", " + object.getString("dist");
+            } else if (object.has("loc") && object.has("vtc") && object.has("dist")) {
+                String add = object.getString("loc") + ", " + object.getString("vtc").replaceAll("^\\s+", "") + ", " + object.getString("dist");
                 input_address.setText(add);
                 input_address.setEnabled(false);
-            }
-            if (object.has("_lm") && object.has("_loc") && object.has("_vtc") && object.has("_dist")) {
-                String add = object.getString("_lm") + ", " + object.getString("_loc") + ", " + object.getString("vtc") + ", " + object.getString("dist");
+            } else if (object.has("_loc") && object.has("_vtc") && object.has("_dist")) {
+                String add = object.getString("_loc") + ", " + object.getString("_vtc").replaceAll("^\\s+", "") + ", " + object.getString("_dist");
+                input_address.setText(add);
+                input_address.setEnabled(false);
+            } else if (object.has("_lm") && object.has("_loc") && object.has("_vtc") && object.has("_dist")) {
+                String add = object.getString("_lm") + ", " + object.getString("_loc") + ", " + object.getString("vtc").replaceAll("^\\s+", "") + ", " + object.getString("dist");
                 input_address.setText(add);
                 input_address.setEnabled(false);
             }
@@ -227,13 +236,13 @@ public class RegisterUserActivity extends BaseCompactActivity implements Request
                 select_state.setText(object.getString("_state"));
             if (input_name.getText().toString().isEmpty() || input_address.getText().toString().isEmpty() || select_state.getText().toString().isEmpty())
                 Toast.makeText(RegisterUserActivity.this, "Please fill entry manually", Toast.LENGTH_SHORT).show();
-            input_number.setEnabled(false);
             select_state.setEnabled(false);
             reset.setVisibility(View.VISIBLE);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
 
     @Override
     public void onBackPressed() {
@@ -249,7 +258,7 @@ public class RegisterUserActivity extends BaseCompactActivity implements Request
                     try {
                         Intent intent = new Intent(RegisterUserActivity.this, WebViewClientActivity.class);
                         intent.putExtra("mobileNo", input_number.getText().toString());
-                        String base64 = input_name.getText().toString() + "~" + input_email.getText().toString().trim() + "~" + input_code.getText().toString().trim() + "~" + input_address.getText().toString() + "~" + select_state.getText().toString()+ "~" +scan_check;
+                        String base64 = input_name.getText().toString() + "~" + input_email.getText().toString().trim() + "~" + input_code.getText().toString().trim() + "~" + input_address.getText().toString() + "~" + select_state.getText().toString() + "~" + scan_check;
                         byte[] bytes = base64.getBytes("utf-8");
                         String imageEncoded = Base64.encodeToString(bytes, Base64.DEFAULT);
                         intent.putExtra("base64", imageEncoded);
@@ -302,9 +311,9 @@ public class RegisterUserActivity extends BaseCompactActivity implements Request
         input_address.setEnabled(true);
         select_state.setText("Select State");
         select_state.setEnabled(true);
-        scan_check=0;
-        bitmap_trans=null;
-        byteBase64=null;
+        scan_check = 0;
+        bitmap_trans = null;
+        byteBase64 = null;
     }
 
     public JSONObject request_user() {

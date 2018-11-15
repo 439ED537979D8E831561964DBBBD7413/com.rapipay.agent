@@ -25,6 +25,7 @@ import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatButton;
@@ -62,6 +63,7 @@ import java.util.Calendar;
 import java.util.Locale;
 
 import me.grantland.widget.AutofitTextView;
+
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.rapipay.android.agent.Database.RapipayDB;
 import com.rapipay.android.agent.Model.BeneficiaryDetailsPozo;
@@ -947,11 +949,17 @@ public class BaseCompactActivity extends AppCompatActivity {
                     f.setReadable(true, false);
                     final Intent intent = new Intent(android.content.Intent.ACTION_SEND);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(f));
+
+                    Uri apkURI = FileProvider.getUriForFile(
+                            BaseCompactActivity.this,
+                            BaseCompactActivity.this.getApplicationContext()
+                                    .getPackageName() + ".provider", f);
+                    intent.putExtra(Intent.EXTRA_STREAM, apkURI);
                     intent.setType("image/png");
                     startActivity(Intent.createChooser(intent, "Share image via"));
                     alertDialog.dismiss();
                 } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
         });
@@ -977,11 +985,13 @@ public class BaseCompactActivity extends AppCompatActivity {
             objTimer.start();
         }
     }
+
+    boolean isRegister = false;
     private BroadcastReceiver mIntentReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-
+            isRegister = true;
             if (action.equalsIgnoreCase("android.intent.action.SCREEN_OFF")) {
                 if (localStorage.getActivityState(LocalStorage.LOGOUT).equalsIgnoreCase("LOGOUT")) {
                     customDialogLog("LOGOUT", "Session Expired", "Your Session got expired");
@@ -990,6 +1000,7 @@ public class BaseCompactActivity extends AppCompatActivity {
             }
         }
     };
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -998,8 +1009,17 @@ public class BaseCompactActivity extends AppCompatActivity {
         registerReceiver(mIntentReceiver, filter);
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (isRegister) {
+            unregisterReceiver(mIntentReceiver);
+            isRegister = false;
+        }
+    }
+
     static int count = 15 * 60 * 3500;
-    int interval = 10000;
+    int interval = 3000;
     CountDownTimer objTimer = new CountDownTimer(count, interval) {
 
         public void onTick(long millisUntilFinished) {

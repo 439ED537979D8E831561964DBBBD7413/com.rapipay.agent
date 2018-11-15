@@ -83,6 +83,8 @@ public class RegisterUserFragment extends Fragment implements RequestHandler, Vi
 //    }
 
     private void initialize(View view) {
+        bitmap_trans = null;
+        byteBase64 = "";
         input_number = (TextView) view.findViewById(R.id.input_number);
         input_address = (TextView) view.findViewById(R.id.input_address);
         input_email = (TextView) view.findViewById(R.id.input_email);
@@ -170,6 +172,7 @@ public class RegisterUserFragment extends Fragment implements RequestHandler, Vi
                 break;
             case R.id.btn_scan_submit:
                 bitmap_trans = null;
+                byteBase64 = "";
                 Intent intent = new Intent(getActivity(), BarcodeActivity.class);
                 intent.putExtra("type", "Outside");
                 startActivityForResult(intent, 1);
@@ -207,37 +210,39 @@ public class RegisterUserFragment extends Fragment implements RequestHandler, Vi
                 input_name.setEnabled(false);
             }
             if (object.has("house") && object.has("street") && object.has("lm") && object.has("vtc") && object.has("dist")) {
-                String add = object.getString("house") + ", " + object.getString("street") + ", " + object.getString("lm") + ", " + object.getString("vtc") + ", " + object.getString("dist");
+                String add = object.getString("house") + ", " + object.getString("street") + ", " + object.getString("lm") + ", " + object.getString("vtc").replaceAll("^\\s+", "") + ", " + object.getString("dist");
                 input_address.setText(add);
                 input_address.setEnabled(false);
-            }
-            if (object.has("house") && object.has("street") && object.has("loc") && object.has("vtc") && object.has("dist")) {
-                String add = object.getString("house") + ", " + object.getString("street") + ", " + object.getString("loc") + ", " + object.getString("vtc") + ", " + object.getString("dist");
+            }else if (object.has("street") && object.has("lm") && object.has("vtc") && object.has("dist")) {
+                String add =  object.getString("street") + ", " + object.getString("lm") + ", " + object.getString("vtc").replaceAll("^\\s+", "") + ", " + object.getString("dist");
+                input_address.setText(add.replace("null,",""));
+                input_address.setEnabled(false);
+            } else if (object.has("house") && object.has("street") && object.has("lm") && object.has("loc") && object.has("vtc") && object.has("dist")) {
+                String add = object.getString("house") + ", " + object.getString("street") + ", " + object.getString("lm") + ", " + object.getString("loc") + ", " + object.getString("vtc").replaceAll("^\\s+", "") + ", " + object.getString("dist");
                 input_address.setText(add);
                 input_address.setEnabled(false);
-            }
-            if (object.has("_house") && object.has("_street") && object.has("_lm") && object.has("_vtc") && object.has("_dist")) {
-                String add = object.getString("_house") + ", " + object.getString("_street") + ", " + object.getString("_lm") + ", " + object.getString("_vtc") + ", " + object.getString("_dist");
+            } else if (object.has("house") && object.has("street") && object.has("loc") && object.has("vtc") && object.has("dist")) {
+                String add = object.getString("house") + ", " + object.getString("street") + ", " + object.getString("loc") + ", " + object.getString("vtc").replaceAll("^\\s+", "") + ", " + object.getString("dist");
                 input_address.setText(add);
                 input_address.setEnabled(false);
-            }
-            if (object.has("_loc") && object.has("vtc") && object.has("dist")) {
-                String add = object.getString("_loc") + ", " + object.getString("vtc") + ", " + object.getString("dist");
+            } else if (object.has("_house") && object.has("_street") && object.has("_lm") && object.has("_vtc") && object.has("_dist")) {
+                String add = object.getString("_house") + ", " + object.getString("_street") + ", " + object.getString("_lm") + ", " + object.getString("_vtc").replaceAll("^\\s+", "") + ", " + object.getString("_dist");
                 input_address.setText(add);
                 input_address.setEnabled(false);
-            }
-            if (object.has("loc") && object.has("vtc") && object.has("dist")) {
-                String add = object.getString("loc") + ", " + object.getString("vtc") + ", " + object.getString("dist");
+            } else if (object.has("_loc") && object.has("vtc") && object.has("dist")) {
+                String add = object.getString("_loc") + ", " + object.getString("vtc").replaceAll("^\\s+", "") + ", " + object.getString("dist");
                 input_address.setText(add);
                 input_address.setEnabled(false);
-            }
-            if (object.has("_loc") && object.has("_vtc") && object.has("_dist")) {
-                String add = object.getString("_loc") + ", " + object.getString("vtc") + ", " + object.getString("dist");
+            } else if (object.has("loc") && object.has("vtc") && object.has("dist")) {
+                String add = object.getString("loc") + ", " + object.getString("vtc").replaceAll("^\\s+", "") + ", " + object.getString("dist");
                 input_address.setText(add);
                 input_address.setEnabled(false);
-            }
-            if (object.has("_lm") && object.has("_loc") && object.has("_vtc") && object.has("_dist")) {
-                String add = object.getString("_lm") + ", " + object.getString("_loc") + ", " + object.getString("vtc") + ", " + object.getString("dist");
+            } else if (object.has("_loc") && object.has("_vtc") && object.has("_dist")) {
+                String add = object.getString("_loc") + ", " + object.getString("_vtc").replaceAll("^\\s+", "") + ", " + object.getString("_dist");
+                input_address.setText(add);
+                input_address.setEnabled(false);
+            } else if (object.has("_lm") && object.has("_loc") && object.has("_vtc") && object.has("_dist")) {
+                String add = object.getString("_lm") + ", " + object.getString("_loc") + ", " + object.getString("vtc").replaceAll("^\\s+", "") + ", " + object.getString("dist");
                 input_address.setText(add);
                 input_address.setEnabled(false);
             }
@@ -248,10 +253,12 @@ public class RegisterUserFragment extends Fragment implements RequestHandler, Vi
             if (input_name.getText().toString().isEmpty() || input_address.getText().toString().isEmpty() || select_state.getText().toString().isEmpty())
                 Toast.makeText(getActivity(), "Please fill entry manually", Toast.LENGTH_SHORT).show();
             select_state.setEnabled(false);
+//            reset.setVisibility(View.VISIBLE);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
 
     @Override
     public void chechStatus(JSONObject object) {

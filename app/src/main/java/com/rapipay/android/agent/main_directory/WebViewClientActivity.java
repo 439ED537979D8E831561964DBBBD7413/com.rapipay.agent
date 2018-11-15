@@ -4,6 +4,8 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ClipData;
+import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -35,6 +37,7 @@ import android.widget.Toast;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
@@ -125,9 +128,16 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
 
     private void doPermissionGrantedStuffs() {
         if (ActivityCompat.checkSelfPermission(WebViewClientActivity.this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-            if (TYPE.equalsIgnoreCase("internal"))
-                selectPhotoCustomer();
-            else if (TYPE.equalsIgnoreCase("outside"))
+            if (TYPE.equalsIgnoreCase("internal")) {
+                if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                    // Do something for lollipop and above versions
+                    selectPhotoCustomer();
+                } else {
+                    // do something for phones running an SDK before lollipop
+                    selectPhotoAgent();
+                }
+
+            } else if (TYPE.equalsIgnoreCase("outside") || TYPE.equalsIgnoreCase("pending"))
                 selectPhotoAgent();
         }
     }
@@ -274,9 +284,18 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
                         } else if (object.getString("responseCode").equalsIgnoreCase("60147") || object.getString("responseCode").equalsIgnoreCase("60173")) {
                             deleteFile();
                             if (TYPE.equalsIgnoreCase("internal")) {
-                                Intent intent = new Intent(WebViewClientActivity.this, WalletDetailsActivity.class);
-                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                startActivity(intent);
+                                if (RegisterUserActivity.scan_check == 2) {
+                                    Intent intent = new Intent(WebViewClientActivity.this, WalletDetailsActivity.class);
+                                    intent.putExtra("mobileNo", "");
+                                    intent.putExtra("type", "");
+                                    startActivity(intent);
+                                } else {
+                                    Intent intent = new Intent(WebViewClientActivity.this, MainActivity.class);
+                                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                    //                                intent.putExtra("type", "Outside");
+                                    //                                intent.putExtra("mobileNo", "");
+                                    startActivity(intent);
+                                }
                             } else if (TYPE.equalsIgnoreCase("outside")) {
                                 Intent intent = new Intent(WebViewClientActivity.this, MainActivity.class);
                                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -391,7 +410,7 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
             jsonObject.put("nodeAgentId", nodeAgent);
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
             jsonObject.put("kycData", base64image.replaceAll("\n", ""));
-            if (TYPE.equalsIgnoreCase("outside")) {
+            if (TYPE.equalsIgnoreCase("outside") || TYPE.equalsIgnoreCase("pending")) {
                 //                jsonObject.put("nodeAgentId", mobileNo);
                 //                jsonObject.put("sessionRefNo", sessionRefNo);
                 //                jsonObject.put("kycData", base64image.replaceAll("\n", ""));
@@ -507,7 +526,6 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
 
     private void selectPhotoCustomer() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
             // Create the File where the photo should go
             File photoFile = null;
@@ -518,7 +536,6 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
                 // Error occurred while creating the File
                 Log.e(TAG, "Unable to create Image File", ex);
             }
-
             // Continue only if the File was successfully created
             if (photoFile != null) {
                 mCameraPhotoPath = "file:" + photoFile.getAbsolutePath();
@@ -560,7 +577,6 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
                 // Error occurred while creating the File
                 Log.e(TAG, "Unable to create Image File", ex);
             }
-
             // Continue only if the File was successfully created
             if (photoFile != null) {
                 mCameraPhotoPath = "file:" + photoFile.getAbsolutePath();
@@ -758,9 +774,21 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
         deleteFile();
         Intent intent = null;
         if (TYPE.equalsIgnoreCase("internal")) {
-            intent = new Intent(WebViewClientActivity.this, WalletDetailsActivity.class);
-            intent.putExtra("mobileNo", "");
-            intent.putExtra("type", "");
+            if (RegisterUserActivity.scan_check == 2) {
+                intent = new Intent(WebViewClientActivity.this, WalletDetailsActivity.class);
+                intent.putExtra("mobileNo", "");
+                intent.putExtra("type", "");
+                startActivity(intent);
+            } else {
+                intent = new Intent(WebViewClientActivity.this, MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                //                                intent.putExtra("type", "Outside");
+                //                                intent.putExtra("mobileNo", "");
+                startActivity(intent);
+            }
+//            intent = new Intent(WebViewClientActivity.this, WalletDetailsActivity.class);
+//            intent.putExtra("mobileNo", "");
+//            intent.putExtra("type", "");
         } else if (TYPE.equalsIgnoreCase("outside")) {
             intent = new Intent(WebViewClientActivity.this, MainActivity.class);
             //        } else if (TYPE.equalsIgnoreCase("pending")) {
@@ -779,9 +807,21 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
     public void okClicked(String type, Object ob) {
         Intent intent = null;
         if (TYPE.equalsIgnoreCase("internal")) {
-            intent = new Intent(WebViewClientActivity.this, WalletDetailsActivity.class);
-            intent.putExtra("mobileNo", mobileNo);
-            intent.putExtra("type", "internal");
+            if (RegisterUserActivity.scan_check == 2) {
+                intent = new Intent(WebViewClientActivity.this, WalletDetailsActivity.class);
+                intent.putExtra("mobileNo", mobileNo);
+                intent.putExtra("type", "internal");
+                startActivity(intent);
+            } else {
+                intent = new Intent(WebViewClientActivity.this, MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                //                                intent.putExtra("type", "Outside");
+                //                                intent.putExtra("mobileNo", "");
+                startActivity(intent);
+            }
+//            intent = new Intent(WebViewClientActivity.this, WalletDetailsActivity.class);
+//            intent.putExtra("mobileNo", mobileNo);
+//            intent.putExtra("type", "internal");
         } else if (TYPE.equalsIgnoreCase("outside")) {
             intent = new Intent(WebViewClientActivity.this, MainActivity.class);
             //        } else if (TYPE.equalsIgnoreCase("pending")) {

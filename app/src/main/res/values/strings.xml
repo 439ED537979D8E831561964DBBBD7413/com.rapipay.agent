@@ -30,7 +30,7 @@
     <string name="title_notification">Notification</string>
 
     <string name="btnsubmit">Submit</string>
-    <string name="btnscasubmit">Scan &amp; Submit</string>
+    <string name="btnscasubmit">Scan</string>
     <string name="btotp">*****</string>
     <string name="btnupdate">Request for Credit</string>
     <string name="btnhist">Details</string>

@@ -37,7 +37,7 @@ public class RegisterKYCTab extends BaseCompactActivity implements View.OnClickL
         transFragment = new PendingKyc();
 //        transFragment = new CreditTransFragment();
 
-        tabLayout.addTab(tabLayout.newTab().setText("New KYC"), true);
+        tabLayout.addTab(tabLayout.newTab().setText("Agent KYC"), true);
         tabLayout.addTab(tabLayout.newTab().setText("Pending/Reject KYC"));
     }
 
