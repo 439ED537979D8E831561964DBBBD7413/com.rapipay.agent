@@ -79,6 +79,23 @@
                 android:layout_marginTop="5dp"
                 android:scrollbars="horizontal"
                 android:gravity="center_horizontal" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="10dp"
+                android:gravity="center"
+                android:padding="5dp"
+                android:text="@string/p_mpos"
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="12dp" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recycler_view6"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="5dp"
+                android:gravity="center_horizontal" />
 
             <TextView
                 android:layout_width="match_parent"

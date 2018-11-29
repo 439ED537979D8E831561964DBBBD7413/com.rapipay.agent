@@ -375,22 +375,22 @@ public class MainActivity extends BaseCompactActivity
                 if (!object.getString("headerValue").equalsIgnoreCase("DOWNLOAD_MASTER_DATA") && !object.getString("headerValue").equalsIgnoreCase("TnC") && !object.getString("headerValue").equalsIgnoreCase("TCLINK") && !object.getString("headerValue").equalsIgnoreCase("Parent Mobile"))
                     pozoArrayList.add(new HeaderePozo(object.getString("headerValue"), object.getString("headerData"), object.getString("headerId")));
                 else {
-                    if (object.getString("headerValue").equalsIgnoreCase("TnC")) {
-                        term = object.getString("headerData");
-                        if (object.getString("headerData").equalsIgnoreCase("Y")) {
-                            JSONObject object1 = array.getJSONObject(i + 1);
-                            if (object1.getString("headerValue").equalsIgnoreCase("TCLINK")) {
-                                new AsyncPostMethod(object1.getString("headerData"), "", "", MainActivity.this).execute();
-                            }
+                if (object.getString("headerValue").equalsIgnoreCase("TnC")) {
+                    term = object.getString("headerData");
+                    if (object.getString("headerData").equalsIgnoreCase("Y")) {
+                        JSONObject object1 = array.getJSONObject(i + 1);
+                        if (object1.getString("headerValue").equalsIgnoreCase("TCLINK")) {
+                            new AsyncPostMethod(object1.getString("headerData"), "", "", MainActivity.this).execute();
                         }
                     }
-                    if (object.getString("headerValue").equalsIgnoreCase("DOWNLOAD_MASTER_DATA")) {
-                        data = object.getString("headerData");
-                        if (object.getString("headerData").equalsIgnoreCase("Y")) {
-                            deleteTables("");
-                            callMasterDetails();
-                        }
+                }
+                if (object.getString("headerValue").equalsIgnoreCase("DOWNLOAD_MASTER_DATA")) {
+                    data = object.getString("headerData");
+                    if (object.getString("headerData").equalsIgnoreCase("Y")) {
+                        deleteTables("");
+                        callMasterDetails();
                     }
+                }
                 }
             }
             for (int j = 0; j < pozoArrayList.size(); j++) {
@@ -398,9 +398,13 @@ public class MainActivity extends BaseCompactActivity
                     balance = format(pozoArrayList.get(j).getHeaderData());
                 }
             }
-        } catch (Exception e) {
+        } catch (
+                Exception e)
+
+        {
             e.printStackTrace();
         }
+
         itemSelection(0);
 //        setse
 //        bindWidgetsWithAnEvent();

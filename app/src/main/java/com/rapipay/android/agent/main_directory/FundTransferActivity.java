@@ -45,7 +45,7 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
     AppCompatButton btn_otpsubmit, btn_fund, btn_verify;
     LinearLayout sender_layout, otp_layout, fundlayout, beneficiary_layout, last_tran_layout;
     String otpRefId, fund_transferId, ifsc_code;
-    TextView bank_select;
+    TextView bank_select,text_ben;
     ImageView btn_sender, btn_search;
     RecyclerView beneficiary_details, trans_details;
     ArrayList<BeneficiaryDetailsPozo> beneficiaryDetailsPozoslist;
@@ -72,6 +72,7 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
         reset = (ImageView) findViewById(R.id.reset);
         reset.setOnClickListener(this);
         reset.setColorFilter(getResources().getColor(R.color.colorPrimaryDark));
+        text_ben = (TextView) findViewById(R.id.text_ben);
         heading = (TextView) findViewById(R.id.toolbar_title);
         if (balance != null)
             heading.setText("BC Fund Transfer (Balance : Rs." + balance + ")");
@@ -345,12 +346,14 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
 //                    customDialog_Common("Money Transfer", null, null, "KYCLAYOUT", object.getString("responseMessage"));
 //                    customDialog_Common("Fund Transfer Details",object,pozo,"VerifyLayout",input_name.getText().toString());
                 } else if (object.getString("serviceType").equalsIgnoreCase("SENDER_COMPLETE_DETAILS")) {
+                    hideKeyboard(FundTransferActivity.this);
                     otp_layout.setVisibility(View.GONE);
                     btn_sender.setVisibility(View.GONE);
                     sender_layout.setVisibility(View.VISIBLE);
                     fundlayout.setVisibility(View.VISIBLE);
                     clear();
                     input_name.setText(object.getString("senderName"));
+                    text_ben.setText("Beneficiary Details (Available Limit : Rs " + format(object.getString("remainingLimit")) + ")");
 
 //                    if (list_bank.size() != 0) {
 //                        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,

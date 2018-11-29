@@ -1,0 +1,168 @@
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay">
+
+        <include layout="@layout/toolbar" />
+    </android.support.design.widget.AppBarLayout>
+
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:theme="@style/AppTheme">
+
+            <TextView
+                android:id="@+id/heading"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/colorPrimaryDark"
+                android:gravity="center"
+                android:padding="5dp"
+                android:text="@string/pchist"
+                android:textColor="@color/white"
+                android:visibility="gone" />
+            <!--  Email Label -->
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/mobile_top"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_weight="700">
+
+                <EditText
+                    android:id="@+id/input_mobile"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/p_mobile"
+                    android:inputType="number"
+                    android:maxLength="10"
+                    android:textSize="16dp" />
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:layout_marginTop="8dp">
+
+                <EditText
+                    android:id="@+id/input_amount"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/p_amount"
+                    android:inputType="number"
+                    android:maxLength="10"
+                    android:textSize="16dp" />
+            </android.support.design.widget.TextInputLayout>
+
+            <Spinner
+                android:id="@+id/select_bank"
+                style="@style/Widget.AppCompat.Spinner.Underlined"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:layout_marginTop="5dp"
+                android:spinnerMode="dropdown"
+                android:visibility="gone" />
+            <LinearLayout
+                android:orientation="horizontal" android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:weightSum="800"
+                android:visibility="gone"
+                android:id="@+id/inflate_main">
+
+                <TextView
+                    android:layout_weight="240"
+                    android:layout_width="0dp"
+                    android:text="EMI AMOUNT"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/amount"/>
+                <TextView
+                    android:layout_weight="240"
+                    android:layout_width="0dp"
+                    android:text="EMI PERCENT"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/percentage"/>
+                <TextView
+                    android:layout_weight="240"
+                    android:layout_width="0dp"
+                    android:text="EMI TENURE"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/tenure"/>
+                <CheckBox
+                    android:visibility="gone"
+                    android:layout_weight="80"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/check_list"/>
+
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                android:id="@+id/inflate_tenureee"/>
+
+
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/getEmidetails"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:background="@drawable/border_button"
+                android:onClick="onClick"
+                android:text="Click to Get EMI"
+                android:textColor="@color/white"
+                android:textSize="14dp"
+                android:visibility="gone" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="800">
+
+                <android.support.v7.widget.AppCompatButton
+                    android:id="@+id/btn_fund"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:layout_weight="400"
+                    android:background="@drawable/border_button"
+                    android:onClick="onClick"
+                    android:text="@string/btnsubmit"
+                    android:textColor="@color/white"
+                    android:textSize="10dp" />
+
+                <android.support.v7.widget.AppCompatButton
+                    android:id="@+id/reciept_details"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:layout_weight="400"
+                    android:background="@drawable/border_button"
+                    android:onClick="onClick"
+                    android:text="@string/reciept_details"
+                    android:textColor="@color/white"
+                    android:textSize="10dp"
+                    android:visibility="gone" />
+            </LinearLayout>
+        </LinearLayout>
+
+    </android.support.v4.widget.NestedScrollView>
+</android.support.design.widget.CoordinatorLayout>

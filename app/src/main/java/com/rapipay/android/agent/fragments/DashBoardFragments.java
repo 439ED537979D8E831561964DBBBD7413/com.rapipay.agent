@@ -17,10 +17,12 @@ import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.adapter.HeaderAdapter;
 import com.rapipay.android.agent.adapter.SimpleStringRecyclerViewAdapter;
 import com.rapipay.android.agent.interfaces.ClickListener;
+import com.rapipay.android.agent.main_directory.CashOutClass;
 import com.rapipay.android.agent.main_directory.ChannelHistoryActivity;
 import com.rapipay.android.agent.main_directory.CreditTabPage;
 import com.rapipay.android.agent.main_directory.DailyCommissionActivity;
 import com.rapipay.android.agent.main_directory.FundTransferActivity;
+import com.rapipay.android.agent.main_directory.MPOSRegistration;
 import com.rapipay.android.agent.main_directory.MainActivity;
 import com.rapipay.android.agent.main_directory.NetworkTab;
 import com.rapipay.android.agent.main_directory.NetworkTransferActivity;
@@ -35,7 +37,7 @@ import com.rapipay.android.agent.utils.ImageUtils;
 import com.rapipay.android.agent.utils.RecyclerTouchListener;
 
 public class DashBoardFragments extends Fragment {
-    RecyclerView recycler_view, recycler_view2, recycler_view3, recycler_view4, recycler_view5;
+    RecyclerView recycler_view, recycler_view2, recycler_view3, recycler_view4, recycler_view5,recycler_view6;
     View rv;
 
     @Override
@@ -60,6 +62,7 @@ public class DashBoardFragments extends Fragment {
         recycler_view3 = (RecyclerView) view.findViewById(R.id.recycler_view3);
         recycler_view4 = (RecyclerView) view.findViewById(R.id.recycler_view4);
         recycler_view5 = (RecyclerView) view.findViewById(R.id.recycler_view5);
+        recycler_view6 = (RecyclerView) view.findViewById(R.id.recycler_view6);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
         recycler_view.setLayoutManager(layoutManager);
         recycler_view.setAdapter(new SimpleStringRecyclerViewAdapter(getActivity(), recycler_view, ImageUtils.getFirstImageUrl(), "first"));
@@ -72,12 +75,44 @@ public class DashBoardFragments extends Fragment {
         LinearLayoutManager layoutManager4 = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
         recycler_view4.setLayoutManager(layoutManager4);
         recycler_view4.setAdapter(new SimpleStringRecyclerViewAdapter(getActivity(), recycler_view4, ImageUtils.getFourthImageUrl(), "fourth"));
-
+        LinearLayoutManager layoutManager6 = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
+        recycler_view6.setLayoutManager(layoutManager6);
+        recycler_view6.setAdapter(new SimpleStringRecyclerViewAdapter(getActivity(), recycler_view6, ImageUtils.getSixthImageUrl(), "fourth"));
         //recycler listener
         recycler_view3.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), recycler_view3, new ClickListener() {
             @Override
             public void onClick(View view, int position) {
                 Toast.makeText(getActivity(),"Under Process", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onLongClick(View view, int position) {
+
+            }
+        }));
+        recycler_view6.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), recycler_view6, new ClickListener() {
+            @Override
+            public void onClick(View view, int position) {
+                if (position == 0) {
+                    Intent intent = new Intent(getActivity(), MPOSRegistration.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                }else if (position == 1) {
+                    Intent intent = new Intent(getActivity(), CashOutClass.class);
+                    intent.putExtra("typeput", "CASHOUT");
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                }else if (position ==2) {
+                    Intent intent = new Intent(getActivity(), CashOutClass.class);
+                    intent.putExtra("typeput", "SALE");
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                }else if (position ==3) {
+                    Intent intent = new Intent(getActivity(), CashOutClass.class);
+                    intent.putExtra("typeput", "EMI");
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                }
             }
 
             @Override

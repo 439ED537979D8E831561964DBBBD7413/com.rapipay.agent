@@ -30,6 +30,7 @@
     <string name="title_notification">Notification</string>
 
     <string name="btnsubmit">Submit</string>
+    <string name="reciept_details">Reciept Details</string>
     <string name="btnscasubmit">Scan</string>
     <string name="btotp">*****</string>
     <string name="btnupdate">Request for Credit</string>
@@ -78,7 +79,7 @@
     <string name="p_telephone">Telephone</string>
     <string name="p_recharge">Recharge and Bill Payment</string>
     <string name="p_travel">Travel and Insurance</string>
-
+    <string name="p_mpos">MPOS</string>
     <string name="p_name">Enter Sender Name</string>
     <string name="p_benname">Enter Beneficiary Name</string>
     <string name="p_otp">Enter OTP</string>

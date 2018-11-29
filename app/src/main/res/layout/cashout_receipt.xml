@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+
+        <LinearLayout
+            android:id="@+id/main_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_launcher" />
+
+            <TextView
+                android:id="@+id/agent_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:gravity="center"
+                android:padding="3dp"
+                android:text="@string/app_name"
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="16dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="800">
+
+                <LinearLayout
+                    android:id="@+id/listLeft"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="500"
+                    android:padding="5dp"
+                    android:orientation="vertical"
+                    android:scrollbars="none"
+                    android:transcriptMode="normal" />
+
+                <LinearLayout
+                    android:id="@+id/listRight"
+                    android:layout_width="0dp"
+                    android:orientation="vertical"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="300"
+                    android:padding="5dp"
+                    android:scrollbars="none"
+                    android:transcriptMode="normal" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/medium"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="3dp"
+                android:transcriptMode="normal" />
+
+            <LinearLayout
+                android:id="@+id/listbottom"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="3dp"
+                android:transcriptMode="normal" />
+
+        </LinearLayout>
+        <RelativeLayout
+            android:id="@+id/amount_layout"
+            android:layout_below="@+id/main_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:padding="3dp"
+                android:text="Amount "
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="18dp"/>
+            <TextView
+                android:id="@+id/amount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:padding="3dp"
+                android:text="@string/app_name"
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="16dp"/>
+        </RelativeLayout>
+
+        <TextView
+            android:layout_below="@+id/amount_layout"
+            android:id="@+id/pinve"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:gravity="center"
+            android:text="PIN VERIFIED OK"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="18dp"/>
+        <TextView
+            android:layout_below="@+id/pinve"
+            android:id="@+id/signa"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:gravity="center"
+            android:text="SIGNATURE NOT REQUIRED"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="18dp"/>
+        <TextView
+            android:layout_below="@+id/signa"
+            android:id="@+id/dash"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:gravity="center"
+            android:text="---------------------------------"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="16dp"/>
+        <TextView
+            android:layout_below="@+id/dash"
+            android:id="@+id/custom_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:gravity="center"
+            android:text="fedf"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="16dp"/>
+        <RelativeLayout
+            android:layout_below="@+id/custom_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true">
+
+            <ImageView
+                android:id="@+id/share"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toLeftOf="@+id/btn_ok"
+                android:padding="3dp"
+                android:src="@drawable/share" />
+
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/btn_ok"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_gravity="right"
+                android:background="@drawable/border_button"
+                android:onClick="onClick"
+                android:padding="3dp"
+                android:text="@string/ok"
+                android:textColor="@color/white"
+                android:textSize="14dp" />
+        </RelativeLayout>
+    </RelativeLayout>
+</ScrollView>

@@ -62,7 +62,7 @@ import com.rapipay.android.agent.utils.WebConfig;
 
 public class WebViewClientActivity extends BaseCompactActivity implements RequestHandler, View.OnClickListener, CustomInterface {
     WebView web;
-    String mobileNo, parentId, sessionKey, sessionRefNo, nodeAgent, kycType, TYPE, base64image;
+    String mobileNo, parentId,DocumentType, PancardDetails, sessionKey, sessionRefNo, nodeAgent, kycType, TYPE, base64image;
     private static final int INPUT_FILE_REQUEST_CODE = 1;
     private ValueCallback<Uri[]> mUploadMessage;
     private String mCameraPhotoPath = null;
@@ -189,7 +189,7 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
             kycType = "C";
         else
             kycType = "A";
-        new AsyncPostMethod(WebConfig.EKYC, getJson_Validate(mobileNo, kycType, parentId, sessionKey, sessionRefNo, nodeAgent).toString(), headerData, WebViewClientActivity.this).execute();
+        new AsyncPostMethod(WebConfig.EKYC, getJson_Validate(mobileNo, kycType, parentId,PancardDetails,DocumentType, sessionKey, sessionRefNo, nodeAgent).toString(), headerData, WebViewClientActivity.this).execute();
         web = (WebView) findViewById(R.id.webview01);
         WebSettings webSettings = web.getSettings();
         webSettings.setAppCacheEnabled(true);
@@ -602,67 +602,6 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
         chooserIntent.putExtra(Intent.EXTRA_TITLE, "Image Chooser");
         chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray);
         startActivityForResult(Intent.createChooser(chooserIntent, "Select images"), 1);
-    }
-
-    private void selectImage() {
-        final CharSequence[] items = {"Take Photo", "Choose from Gallery", "Cancel"};
-        AlertDialog.Builder builder = new AlertDialog.Builder(WebViewClientActivity.this);
-        builder.setIcon(R.drawable.camera);
-        builder.setTitle("Add Photo!");
-        builder.setItems(items, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int item) {
-                if (items[item].equals("Take Photo")) {
-                    Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-                        // Create the File where the photo should go
-                        File photoFile = null;
-                        try {
-                            photoFile = createImageFile();
-                            takePictureIntent.putExtra("PhotoPath", mCameraPhotoPath);
-                        } catch (IOException ex) {
-                            // Error occurred while creating the File
-                            Log.e(TAG, "Unable to create Image File", ex);
-                        }
-
-                        // Continue only if the File was successfully created
-                        if (photoFile != null) {
-                            mCameraPhotoPath = "file:" + photoFile.getAbsolutePath();
-                            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
-                        } else {
-                            takePictureIntent = null;
-                        }
-                    }
-
-                    Intent contentSelectionIntent = new Intent(Intent.ACTION_GET_CONTENT);
-                    contentSelectionIntent.addCategory(Intent.CATEGORY_OPENABLE);
-                    contentSelectionIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-                    contentSelectionIntent.setType("image/*");
-
-                    Intent[] intentArray;
-                    if (takePictureIntent != null) {
-                        intentArray = new Intent[]{takePictureIntent};
-                    } else {
-                        intentArray = new Intent[1];
-                    }
-
-                    Intent chooserIntent = new Intent(Intent.ACTION_CHOOSER);
-                    chooserIntent.putExtra(Intent.EXTRA_INTENT, contentSelectionIntent);
-                    chooserIntent.putExtra(Intent.EXTRA_TITLE, "Image Chooser");
-                    chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray);
-                    startActivityForResult(Intent.createChooser(chooserIntent, "Select images"), 1);
-
-                    //                } else if (items[item].equals("Choose from Gallery")) {
-                    //                    Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    //                    intent.setType("image/*");
-                    //                    startActivityForResult(Intent.createChooser(intent, "Select File"), 1);
-
-                } else if (items[item].equals("Cancel")) {
-                    dialog.dismiss();
-                }
-            }
-        });
-        builder.show();
     }
 
     private File createImageFile() throws IOException {

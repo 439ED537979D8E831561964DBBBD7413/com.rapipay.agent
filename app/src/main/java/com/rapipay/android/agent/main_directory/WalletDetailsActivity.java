@@ -354,12 +354,13 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
                             clear();
                         } else {
                             clear();
+                            hideKeyboard(WalletDetailsActivity.this);
                             sender_layout.setVisibility(View.VISIBLE);
                             fundlayout.setVisibility(View.VISIBLE);
                             btn_sender.setVisibility(View.GONE);
                             input_name.setText(object.getString("customerName"));
                             customerId = object.getString("customerId");
-                            text_ben.setText("Beneficiary Details (Transfer Limit : Rs" + format(object.getString("thLimit")) + ")");
+                            text_ben.setText("Beneficiary Details Transfer Limit" + "\n" +  "Daily : Rs " + format(object.getString("dailyRemainigLimit"))  + "\n" +  "Monthly : Rs " + format(object.getString("monthlyRemainigLimit")));
 //                            list_bank = db.geBankDetails("");
 //                            if (list_bank.size() != 0) {
 //                                ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,

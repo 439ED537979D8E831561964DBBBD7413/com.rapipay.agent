@@ -23,12 +23,22 @@ public class ImageUtils {
         list.add(new ImagePozo(1, "RapiPay Wallet Fund Transfer", R.drawable.wallet));
         list.add(new ImagePozo(2, "BC Fund Transfer", R.drawable.bc));
         list.add(new ImagePozo(3, "Pending & Refund", R.drawable.refund));
-        list.add(new ImagePozo(3, "Transaction History", R.drawable.transhistory));
+        list.add(new ImagePozo(4, "Transaction History", R.drawable.transhistory));
+        return list;
+    }
+    public static ArrayList<ImagePozo> getSixthImageUrl() {
+        ArrayList<ImagePozo> list = new ArrayList<>();
+        list.clear();
+        list.add(new ImagePozo(1,"MPOS Ragistration",R.drawable.mposreg));
+//        list.add(new ImagePozo(2,"Cash@Pos",R.drawable.transhistory));
+//        list.add(new ImagePozo(3, "Sale", R.drawable.transhistory));
+//        list.add(new ImagePozo(4, "EMI", R.drawable.transhistory));
         return list;
     }
 
     public static ArrayList<ImagePozo> getSecondImageUrl() {
         ArrayList<ImagePozo> list = new ArrayList<>();
+
         list.clear();
         list.add(new ImagePozo(1, "Prepaid Mobile Recharge", R.drawable.mobile));
         list.add(new ImagePozo(2, "Postpaid Mobile", R.drawable.mobile));

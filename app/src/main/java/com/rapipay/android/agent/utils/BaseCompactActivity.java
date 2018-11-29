@@ -154,7 +154,7 @@ public class BaseCompactActivity extends AppCompatActivity {
         return directory.getAbsolutePath();
     }
 
-    public JSONObject getJson_Validate(String mobileNo, String kycType, String parentID, String sessionKey, String sessionRefNo, String nodeAgent) {
+    public JSONObject getJson_Validate(String mobileNo, String kycType, String parentID, String sessionKey, String documentType, String PancardDetails, String sessionRefNo, String nodeAgent) {
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("serviceType", "KYC_PROCESS");
@@ -164,6 +164,8 @@ public class BaseCompactActivity extends AppCompatActivity {
             jsonObject.put("agentId", parentID);
             jsonObject.put("mobileNo", mobileNo);
             jsonObject.put("kycType", kycType);
+            jsonObject.put("PancardDetails", PancardDetails);
+            jsonObject.put("DocumentType", documentType);
             jsonObject.put("responseUrl", WebConfig.RESPONSE_URL);
             if (nodeAgent.equalsIgnoreCase("")) {
                 jsonObject.put("nodeAgentId", mobileNo);
@@ -818,7 +820,282 @@ public class BaseCompactActivity extends AppCompatActivity {
         alertDialog = dialog.show();
     }
 
+    protected void customReceiptCastSaleOut(final String type, ArrayList<String> left, ArrayList<String> right, ArrayList<String> bottom, ArrayList<String> medium,String amount,String name, final CustomInterface anInterface) {
+        this.anInterface = anInterface;
+        dialog = new AlertDialog.Builder(this);
+        LayoutInflater inflater = getLayoutInflater();
+        View alertLayout = inflater.inflate(R.layout.cashout_receipt, null);
+
+        main_layout = (LinearLayout) alertLayout.findViewById(R.id.main_layout);
+
+        main_layout.setDrawingCacheEnabled(true);
+        main_layout.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+        main_layout.layout(0, 0, main_layout.getMeasuredWidth(), main_layout.getMeasuredHeight());
+        main_layout.buildDrawingCache(true);
+
+        TextView text = (TextView) alertLayout.findViewById(R.id.agent_name);
+        TextView custom_name = (TextView) alertLayout.findViewById(R.id.custom_name);
+        TextView amounts = (TextView) alertLayout.findViewById(R.id.amount);
+        amounts.setText("Rs  "+amount);
+        custom_name.setText(name);
+        LinearLayout mediums = (LinearLayout) main_layout.findViewById(R.id.medium);
+        text.setText(type);
+        LinearLayout listLeft = (LinearLayout) main_layout.findViewById(R.id.listLeft);
+        LinearLayout listRight = (LinearLayout) main_layout.findViewById(R.id.listRight);
+        LinearLayout listbottom = (LinearLayout) main_layout.findViewById(R.id.listbottom);
+        AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
+        ImageView share = (ImageView) alertLayout.findViewById(R.id.share);
+        share.setColorFilter(getResources().getColor(R.color.colorPrimaryDark));
+        if (left.size() != 0) {
+            for (int k = 0; k < left.size(); k++) {
+                View inflate = inflater.inflate(R.layout.pos_receipt, null);
+                AutofitTextView recycler_text = (AutofitTextView) inflate.findViewById(R.id.recycler_text);
+                recycler_text.setText(left.get(k));
+                listLeft.addView(inflate);
+            }
+        }
+        if (right.size() != 0) {
+            for (int j = 0; j < right.size(); j++) {
+                View inflate = inflater.inflate(R.layout.pos_receipt, null);
+                AutofitTextView recycler_text = (AutofitTextView) inflate.findViewById(R.id.recycler_text);
+                recycler_text.setText(right.get(j));
+                listRight.addView(inflate);
+            }
+        }
+        if (medium.size() != 0) {
+            for (int j = 0; j < medium.size(); j++) {
+                View inflate = inflater.inflate(R.layout.pos_mid_receipt, null);
+                AutofitTextView recycler_text = (AutofitTextView) inflate.findViewById(R.id.recycler_text);
+                recycler_text.setText(medium.get(j));
+                mediums.addView(inflate);
+            }
+        }
+        if (bottom.size() != 0) {
+            for (int j = 0; j < bottom.size(); j++) {
+                View inflate = inflater.inflate(R.layout.pos_receipt, null);
+                AutofitTextView recycler_text = (AutofitTextView) inflate.findViewById(R.id.recycler_text);
+                recycler_text.setText(bottom.get(j));
+                listbottom.addView(inflate);
+            }
+        }
+//        if (bottom.size() != 0) {
+//            for (int i = 0; i < bottom.size(); i++) {
+//                View inflate = inflater.inflate(R.layout.bottom_layout, null);
+//                AutofitTextView btn_name = (AutofitTextView) inflate.findViewById(R.id.btn_name);
+//                TextView btn_p_bank = (TextView) inflate.findViewById(R.id.btn_p_bank);
+//                LinearLayout top = (LinearLayout) inflate.findViewById(R.id.top);
+//                if (i % 2 == 0)
+//                    top.setBackgroundColor(getResources().getColor(R.color.colorbackground));
+//                else
+//                    top.setBackgroundColor(getResources().getColor(R.color.white));
+//                if (bottom.get(i).getHeaderValue().equalsIgnoreCase("Txn. ID/RRN/STATUS")) {
+//                    top.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
+//                    btn_name.setTextColor(getResources().getColor(R.color.white));
+//                    btn_p_bank.setTextColor(getResources().getColor(R.color.white));
+//                } else {
+//                    btn_name.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
+//                    btn_p_bank.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
+//                }
+//                btn_name.setText(bottom.get(i).getHeaderData());
+//                btn_p_bank.setText(bottom.get(i).getHeaderValue());
+//                listbottom.addView(inflate);
+//            }
+//        }
+        dialog.setCancelable(false);
+        dialog.setView(alertLayout);
+        btn_ok.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                anInterface.okClicked(type, null);
+                alertDialog.dismiss();
+            }
+        });
+        share.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Bitmap b = Bitmap.createBitmap(main_layout.getDrawingCache());
+                main_layout.setDrawingCacheEnabled(false);
+                ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                b.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+
+                File f = new File(Environment.getExternalStorageDirectory() + File.separator + "v2i.jpg");
+                try {
+                    f.createNewFile();
+                    FileOutputStream fo = new FileOutputStream(f);
+                    fo.write(bytes.toByteArray());
+                    fo.flush();
+                    fo.close();
+                    f.setReadable(true, false);
+                    final Intent intent = new Intent(android.content.Intent.ACTION_SEND);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                    Uri apkURI = FileProvider.getUriForFile(
+                            BaseCompactActivity.this,
+                            BaseCompactActivity.this.getApplicationContext()
+                                    .getPackageName() + ".provider", f);
+                    intent.putExtra(Intent.EXTRA_STREAM, apkURI);
+                    intent.setType("image/png");
+                    startActivity(Intent.createChooser(intent, "Share image via"));
+                    alertDialog.dismiss();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        alertDialog = dialog.show();
+        alertDialog.getWindow().setLayout(1200, 1800);
+    }
+
     protected void customReceiptNew(final String type, final JSONObject object, final CustomInterface anInterface) {
+        this.anInterface = anInterface;
+        left = new ArrayList<>();
+        right = new ArrayList<>();
+        medium = new ArrayList<>();
+        bottom = new ArrayList<>();
+        try {
+            JSONArray array = object.getJSONArray("getTxnReceiptDataList");
+            for (int i = 0; i < array.length(); i++) {
+                JSONObject jsonObject = array.getJSONObject(i);
+                if (jsonObject.getString("displayType").equalsIgnoreCase("L")) {
+                    if (jsonObject.getString("headerValue").equalsIgnoreCase("null"))
+                        left.add(jsonObject.getString("headerText") + " " + "NA");
+                    else
+                        left.add(jsonObject.getString("headerText") + " " + jsonObject.getString("headerValue"));
+                }
+                if (jsonObject.getString("displayType").equalsIgnoreCase("R")) {
+                    if (jsonObject.getString("headerValue").equalsIgnoreCase("null"))
+                        right.add(jsonObject.getString("headerText") + " " + "NA");
+                    else
+                        right.add(jsonObject.getString("headerText") + " " + jsonObject.getString("headerValue"));
+                }
+                if (jsonObject.getString("displayType").equalsIgnoreCase("M")) {
+                    if (jsonObject.getString("headerValue").equalsIgnoreCase("null"))
+                        medium.add(jsonObject.getString("headerText") + " " + "NA");
+                    else
+                        medium.add(jsonObject.getString("headerText") + " " + jsonObject.getString("headerValue"));
+                }
+                if (jsonObject.getString("displayType").equalsIgnoreCase("D")) {
+                    if (jsonObject.getString("headerValue").equalsIgnoreCase("null"))
+                        bottom.add(new HeaderePozo(jsonObject.getString("headerText"), "NA"));
+                    else
+                        bottom.add(new HeaderePozo(jsonObject.getString("headerText"), jsonObject.getString("headerValue")));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        dialog = new AlertDialog.Builder(this);
+        LayoutInflater inflater = getLayoutInflater();
+        View alertLayout = inflater.inflate(R.layout.receipt_layout_new, null);
+
+        main_layout = (LinearLayout) alertLayout.findViewById(R.id.main_layout);
+
+        main_layout.setDrawingCacheEnabled(true);
+        main_layout.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+        main_layout.layout(0, 0, main_layout.getMeasuredWidth(), main_layout.getMeasuredHeight());
+        main_layout.buildDrawingCache(true);
+
+        TextView text = (TextView) alertLayout.findViewById(R.id.dialog_title);
+        TextView mediums = (TextView) main_layout.findViewById(R.id.medium);
+        text.setText(type);
+        LinearLayout listLeft = (LinearLayout) main_layout.findViewById(R.id.listLeft);
+        LinearLayout listRight = (LinearLayout) main_layout.findViewById(R.id.listRight);
+        LinearLayout listbottom = (LinearLayout) main_layout.findViewById(R.id.listbottom);
+        AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
+        ImageView share = (ImageView) alertLayout.findViewById(R.id.share);
+        share.setColorFilter(getResources().getColor(R.color.colorPrimaryDark));
+        if (left.size() != 0) {
+            for (int k = 0; k < left.size(); k++) {
+                View inflate = inflater.inflate(R.layout.receipt_list, null);
+                AutofitTextView recycler_text = (AutofitTextView) inflate.findViewById(R.id.recycler_text);
+                if (k == 1)
+                    recycler_text.setTypeface(recycler_text.getTypeface(), Typeface.BOLD);
+                recycler_text.setText(left.get(k));
+                listLeft.addView(inflate);
+            }
+        }
+        if (right.size() != 0) {
+            for (int j = 0; j < right.size(); j++) {
+                View inflate = inflater.inflate(R.layout.receipt_list, null);
+                AutofitTextView recycler_text = (AutofitTextView) inflate.findViewById(R.id.recycler_text);
+                if (j == 1)
+                    recycler_text.setTypeface(recycler_text.getTypeface(), Typeface.BOLD);
+                recycler_text.setText(right.get(j));
+                listRight.addView(inflate);
+            }
+        }
+        if (medium.size() == 1)
+            mediums.setText(medium.get(0));
+        if (bottom.size() != 0) {
+            for (int i = 0; i < bottom.size(); i++) {
+                View inflate = inflater.inflate(R.layout.bottom_layout, null);
+                AutofitTextView btn_name = (AutofitTextView) inflate.findViewById(R.id.btn_name);
+                TextView btn_p_bank = (TextView) inflate.findViewById(R.id.btn_p_bank);
+                LinearLayout top = (LinearLayout) inflate.findViewById(R.id.top);
+                if (i % 2 == 0)
+                    top.setBackgroundColor(getResources().getColor(R.color.colorbackground));
+                else
+                    top.setBackgroundColor(getResources().getColor(R.color.white));
+                if (bottom.get(i).getHeaderValue().equalsIgnoreCase("Txn. ID/RRN/STATUS")) {
+                    top.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
+                    btn_name.setTextColor(getResources().getColor(R.color.white));
+                    btn_p_bank.setTextColor(getResources().getColor(R.color.white));
+                } else {
+                    btn_name.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
+                    btn_p_bank.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
+                }
+                btn_name.setText(bottom.get(i).getHeaderData());
+                btn_p_bank.setText(bottom.get(i).getHeaderValue());
+                listbottom.addView(inflate);
+            }
+        }
+        dialog.setCancelable(false);
+        dialog.setView(alertLayout);
+        btn_ok.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                anInterface.okClicked(type, object);
+                alertDialog.dismiss();
+            }
+        });
+        share.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Bitmap b = Bitmap.createBitmap(main_layout.getDrawingCache());
+                main_layout.setDrawingCacheEnabled(false);
+                ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                b.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+
+                File f = new File(Environment.getExternalStorageDirectory() + File.separator + "v2i.jpg");
+                try {
+                    f.createNewFile();
+                    FileOutputStream fo = new FileOutputStream(f);
+                    fo.write(bytes.toByteArray());
+                    fo.flush();
+                    fo.close();
+                    f.setReadable(true, false);
+                    final Intent intent = new Intent(android.content.Intent.ACTION_SEND);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                    Uri apkURI = FileProvider.getUriForFile(
+                            BaseCompactActivity.this,
+                            BaseCompactActivity.this.getApplicationContext()
+                                    .getPackageName() + ".provider", f);
+                    intent.putExtra(Intent.EXTRA_STREAM, apkURI);
+                    intent.setType("image/png");
+                    startActivity(Intent.createChooser(intent, "Share image via"));
+                    alertDialog.dismiss();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        alertDialog = dialog.show();
+    }
+
+    protected void customReceiptForTransaction(final String type, final JSONObject object, final CustomInterface anInterface) {
         this.anInterface = anInterface;
         left = new ArrayList<>();
         right = new ArrayList<>();
@@ -1034,55 +1311,15 @@ public class BaseCompactActivity extends AppCompatActivity {
         }
 
         public void onFinish() {
-//            String className = BaseCompactActivity.this.getLocalClassName();
-//            if (!(className.equalsIgnoreCase("main_directory.SpashScreenActivity") ||  className.equalsIgnoreCase("main_directory.LoginScreenActivity") || className.equalsIgnoreCase("main_directory.PinActivity") ||  className.equalsIgnoreCase("main_directory.PinVerification"))) {
-//            if (localStorage.getActivityState(LocalStorage.LOGOUT).equalsIgnoreCase("LOGOUT")) {
-//                customDialogLog("LOGOUT", "Session Expired", "Your Session got expired");
-//                Toast.makeText(BaseCompactActivity.this, "Your Session got expired", Toast.LENGTH_SHORT).show();
-//            }
-
-            //Logout
         }
     };
 
     protected void customDialogLog(final String type, String msg, String output) {
-//        dialog = new AlertDialog.Builder(BaseCompactActivity.this);
-//        LayoutInflater inflater = getLayoutInflater();
-//        View alertLayout = inflater.inflate(R.layout.custom_layout_common, null);
-//        TextView text = (TextView) alertLayout.findViewById(R.id.dialog_title);
-//        TextView dialog_cancel = (TextView) alertLayout.findViewById(R.id.dialog_cancel);
-//        text.setText(msg);
-//        AppCompatButton btn_cancel = (AppCompatButton) alertLayout.findViewById(R.id.btn_cancel);
-//        AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
-//        try {
-//            if (type.equalsIgnoreCase("LOGOUT")) {
-//                btn_cancel.setVisibility(View.GONE);
-//                customView(alertLayout, output);
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        dialog.setCancelable(false);
-//        btn_ok.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if (type.equalsIgnoreCase("LOGOUT")) {
         Intent intent = new Intent(BaseCompactActivity.this, PinVerification.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
         localStorage.setActivityState(LocalStorage.LOGOUT, "0");
         objTimer.cancel();
-//                }
-//                alertDialog.dismiss();
-//            }
-//        });
-//        dialog_cancel.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                alertDialog.dismiss();
-//            }
-//        });
-//        alertDialog = dialog.show();
     }
 
     public JSONObject version(String emi) {
