@@ -34,6 +34,7 @@ import com.rapipay.android.agent.interfaces.CustomInterface;
 import com.rapipay.android.agent.interfaces.RequestHandler;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
 import com.rapipay.android.agent.utils.GenerateChecksum;
+import com.rapipay.android.agent.utils.WebConfig;
 
 import org.json.JSONObject;
 
@@ -58,6 +59,7 @@ public class MPOSRegistration extends BaseCompactActivity implements RequestHand
     private static final String TAG = MainActivity.class.getSimpleName();
     ArrayList<String> listPath = new ArrayList<>();
     private long size = 0;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,7 +82,7 @@ public class MPOSRegistration extends BaseCompactActivity implements RequestHand
             jsonObject.put("trnasactionId", "GFD" + tsLong.toString());
             form = "<html>\n" +
                     "\t<body>\n" +
-                    "\t\t<form name=\"mposRegister\" id=\"mposRegister\" method=\"POST\" action=\"http://192.168.1.106:8082/KYC_RAPIPAY_APP/EnrollmentFormService" + "" + "\">\n" +
+                    "\t\t<form name=\"mposRegister\" id=\"mposRegister\" method=\"POST\" action=\"" + WebConfig.MPOSREG + "" + "\">\n" +
                     "\t\t\t<input name=\"serviceType\" value=\"GET_FORM_DATA\" type=\"hidden\"/>\n" +
                     "\t\t\t<input name=\"mobileNo\" value=\"" + list.get(0).getMobilno() + "\" type=\"hidden\"/>\n" +
                     "\t\t\t<input name=\"agentId\" value=\"" + list.get(0).getMobilno() + "\" type=\"hidden\"/>\n" +
@@ -129,6 +131,7 @@ public class MPOSRegistration extends BaseCompactActivity implements RequestHand
         if (formPostData != null)
             web.loadDataWithBaseURL("", formPostData, "text/html", "UTF-8", "");
     }
+
     public class PQChromeClient extends WebChromeClient {
 
         // For Android 5.0+
@@ -142,6 +145,7 @@ public class MPOSRegistration extends BaseCompactActivity implements RequestHand
             return true;
         }
     }
+
     private void selectPhotoAgent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
@@ -181,6 +185,7 @@ public class MPOSRegistration extends BaseCompactActivity implements RequestHand
         chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray);
         startActivityForResult(Intent.createChooser(chooserIntent, "Select images"), 1);
     }
+
     @Override
     public void chechStatus(JSONObject object) {
         try {
@@ -275,17 +280,22 @@ public class MPOSRegistration extends BaseCompactActivity implements RequestHand
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
             // TODO Auto-generated method stub
-            String response = inputStreamAsString(url);
-            if (response != null) {
-                try {
-                    if (response.equalsIgnoreCase("User Cancel The Request")||response.equalsIgnoreCase("Data Inserted Successfully!")) {
-                        setBack_click(MPOSRegistration.this);
-                        finish();
+            if (url.contains("?")) {
+                String response = inputStreamAsString(url);
+                if (response != null) {
+                    try {
+                        if (response.equalsIgnoreCase("User Cancel The Request")) {
+                            setBack_click(MPOSRegistration.this);
+                            finish();
+                        } else
+                            customDialog_Common("KYCLAYOUTS", null, null, getResources().getString(R.string.Alert), null, response, MPOSRegistration.this);
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
-            }
+            } else if (url.contains("forwordEntity"))
+                web.loadUrl(url);
             return true;
 
         }
@@ -299,9 +309,9 @@ public class MPOSRegistration extends BaseCompactActivity implements RequestHand
                 Set<String> keys = map.keySet();
                 for (String key : keys) {
                     System.out.println("Name=" + key);
-                    System.out.println("Value=" + map.get(key).replaceAll("%20", " "));
+                    System.out.println("Value=" + map.get(key));
                     byte[] value = Base64.decode(map.get(key).getBytes("UTF-8"), Base64.DEFAULT);
-                    data = map.get(key).replaceAll("%20", " ");
+                    data = new String(value, StandardCharsets.UTF_8);
                 }
                 return data;
             }
@@ -340,6 +350,7 @@ public class MPOSRegistration extends BaseCompactActivity implements RequestHand
     public void cancelClicked(String type, Object ob) {
 
     }
+
     public void loadIMEIs() {
         // Check if the READ_PHONE_STATE permission is already available.
         if (ActivityCompat.checkSelfPermission(MPOSRegistration.this, Manifest.permission.CAMERA)
@@ -396,7 +407,7 @@ public class MPOSRegistration extends BaseCompactActivity implements RequestHand
 //                }
 //
 //            } else if (TYPE.equalsIgnoreCase("outside") || TYPE.equalsIgnoreCase("pending"))
-                selectPhotoAgent();
+            selectPhotoAgent();
         }
     }
 
@@ -422,6 +433,7 @@ public class MPOSRegistration extends BaseCompactActivity implements RequestHand
             }
         }
     }
+
     private File createImageFile() throws IOException {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());

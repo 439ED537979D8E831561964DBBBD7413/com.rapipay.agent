@@ -29,7 +29,7 @@ public class ImageUtils {
     public static ArrayList<ImagePozo> getSixthImageUrl() {
         ArrayList<ImagePozo> list = new ArrayList<>();
         list.clear();
-        list.add(new ImagePozo(1,"MPOS Ragistration",R.drawable.mposreg));
+        list.add(new ImagePozo(1,"MPOS Registration",R.drawable.mposreg));
 //        list.add(new ImagePozo(2,"Cash@Pos",R.drawable.transhistory));
 //        list.add(new ImagePozo(3, "Sale", R.drawable.transhistory));
 //        list.add(new ImagePozo(4, "EMI", R.drawable.transhistory));

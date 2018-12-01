@@ -50,6 +50,7 @@ import com.pnsol.sdk.payment.PaymentInitialization;
 import com.pnsol.sdk.vo.AcquirerEmiDetailsVO;
 import com.pnsol.sdk.vo.HostResponse;
 import com.pnsol.sdk.vo.TransactionVO;
+import com.rapipay.android.agent.Model.MPOSModel;
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.adapter.AcquirerBanksListAdapter;
 import com.rapipay.android.agent.interfaces.CustomInterface;
@@ -87,6 +88,7 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
     Handler handler;
     EditText input_mobile, input_amount;
     AppCompatButton btn_fund, receipt_details;
+    ArrayList<AcquirerEmiDetailsVO> arrayLists;
     AccountValidator validator;
     String typeput;
     private Location mylocation;
@@ -103,6 +105,7 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
     ArrayList<AcquirerEmiDetailsVO> acquirerBanksList;
     private Spinner select_bank;
     private LinearLayout inflate_tenureee;
+    private ArrayList<MPOSModel> mposModelArrayList;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -125,9 +128,22 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
             public void handleMessage(android.os.Message msg) {
                 if (typeput.equalsIgnoreCase("EMI")) {
                     if (msg.what == SUCCESS) {
-                        if (check.equalsIgnoreCase("validate")) {
+                        if (check.equalsIgnoreCase("lastvalidate")) {
+                            for (int i = 0; i < mposModelArrayList.size(); i++) {
+                                if (mposModelArrayList.get(i).isIsflag())
+                                    for (int j = 0; j < arrayLists.size(); j++) {
+                                        if (mposModelArrayList.get(i).getAmount().equalsIgnoreCase(String.valueOf(arrayLists.get(j).getEmiAmount()))) {
+                                            initialization = new PaymentInitialization(getApplicationContext());
+                                            initialization.initiateTransaction(handler, DeviceType.ME30S, accessBluetoothDetails(),
+                                                    input_amount.getText().toString() + ".00", PaymentTransactionConstants.EMI,
+                                                    PaymentTransactionConstants.CREDIT, input_mobile.getText().toString(),
+                                                    mylocation.getLatitude(), mylocation.getLongitude(),
+                                                    orderID, null, arrayLists.get(j));
+                                        }
+                                    }
+                            }
+                        } else if (check.equalsIgnoreCase("validate")) {
                             bankList();
-
                         } else if (check.equalsIgnoreCase("list")) {
                             acquirerBanksList = new ArrayList<AcquirerEmiDetailsVO>();
                             acquirerBanksList = (ArrayList<AcquirerEmiDetailsVO>) msg.obj;
@@ -136,16 +152,22 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                             select_bank.setVisibility(View.VISIBLE);
                             select_bank.setAdapter(adapter);
                             findViewById(R.id.btn_fund).setVisibility(View.GONE);
-                            findViewById(R.id.getEmidetails).setVisibility(View.VISIBLE);
+                            findViewById(R.id.getEmidetails).setVisibility(View.GONE);
                         } else if (check.equalsIgnoreCase("EMIDETAILS")) {
-                            ArrayList<AcquirerEmiDetailsVO> arrayList = new
-                                    ArrayList<AcquirerEmiDetailsVO>();
-                            arrayList = (ArrayList<AcquirerEmiDetailsVO>) msg.obj;
+                            arrayLists = new ArrayList<AcquirerEmiDetailsVO>();
+                            arrayLists = (ArrayList<AcquirerEmiDetailsVO>) msg.obj;
                             findViewById(R.id.inflate_main).setVisibility(View.VISIBLE);
-                            inflate_tenure(arrayList, inflate_tenureee);
+                            findViewById(R.id.getdetails).setVisibility(View.VISIBLE);
+                            findViewById(R.id.getEmidetails).setVisibility(View.GONE);
+                            mposModelArrayList = new ArrayList<>();
+                            for (int i = 0; i < arrayLists.size(); i++) {
+                                mposModelArrayList.add(new MPOSModel(String.valueOf(arrayLists.get(i).getEmiAmount()), String.valueOf(arrayLists.get(i).getEmiPercentage()), String.valueOf(arrayLists.get(i).getEmiTenure()), false));
+                            }
+                            if (mposModelArrayList.size() != 0)
+                                inflate_tenure(mposModelArrayList, inflate_tenureee);
                         }
                     }
-                } else {
+                } else{
                     if (msg.what == SUCCESS) {
                         if (!transactionFlag) {
                             // From server data we get bluetooth mac addressm and merchantrefno which will be changes here
@@ -174,16 +196,22 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
 
                     }
                 }
-                if (msg.what == FAIL) {
+                if (msg.what == FAIL)
+
+                {
                     Toast.makeText(CashOutClass.this, (String) msg.obj, Toast.LENGTH_SHORT).show();
                 }
-                if (msg.what == SOCKET_NOT_CONNECTED) {
+                if (msg.what == SOCKET_NOT_CONNECTED)
+
+                {
 //                    alertMessage((String) msg.obj);
                 }
 //                if (msg.what == PaymentTransactionConstants.SUCCESS) {
 //
 //                }
-                if (msg.what == CHIP_TRANSACTION_APPROVED) {
+                if (msg.what == CHIP_TRANSACTION_APPROVED)
+
+                {
                     try {
                         TransactionVO vo = (TransactionVO) msg.obj;
                         PaymentInitialization initialization = new PaymentInitialization(CashOutClass.this);
@@ -199,20 +227,32 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                     //get data from vo and pass in api to server
                     //   new AsyncPostMethod(WebConfig.FUNDTRANSFER_URL, getCashOutTransaction(type).toString(), headerData, CashOutClass.this).execute();
                 }
-                if (msg.what == QPOS_DEVICE) {
+                if (msg.what == QPOS_DEVICE)
+
+                {
 //                    alertMessage((String) msg.obj);
-                } else if (msg.what == TRANSACTION_FAILED || msg.what == CHIP_TRANSACTION_DECLINED || msg.what == SWIP_TRANSACTION_DECLINED) {
+                } else if (msg.what == TRANSACTION_FAILED || msg.what == CHIP_TRANSACTION_DECLINED || msg.what == SWIP_TRANSACTION_DECLINED)
+
+                {
                     TransactionVO vo = (TransactionVO) msg.obj;
 //                    alertMessage("Transaction Status : " + vo.getStatus());
-                } else if (msg.what == ERROR_MESSAGE) {
+                } else if (msg.what == ERROR_MESSAGE)
+
+                {
 //                    alertMessage((String) msg.obj);
-                } else if (msg.what == TRANSACTION_PENDING) {
+                } else if (msg.what == TRANSACTION_PENDING)
+
+                {
                     ;
 //                    alertMessage((String) msg.obj);
-                } else if (msg.what == DISPLAY_STATUS) {
+                } else if (msg.what == DISPLAY_STATUS)
+
+                {
                     Toast.makeText(CashOutClass.this,
                             (String) msg.obj, Toast.LENGTH_SHORT).show();
-                } else if (msg.what == QPOS_EMV_MULITPLE_APPLICATION) {
+                } else if (msg.what == QPOS_EMV_MULITPLE_APPLICATION)
+
+                {
                     ArrayList<String> applicationList = (ArrayList<String>) msg.obj;
 //                    emvList = (ListView) findViewById(R.id.application_list);
 //                    emvList.setVisibility(View.VISIBLE);
@@ -239,7 +279,9 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                 }
             }
 
-        };
+        }
+
+        ;
 
     }
 
@@ -264,6 +306,9 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 acquirerEmiDetailsVO = acquirerBanksList.get(position);
+                findViewById(R.id.inflate_main).setVisibility(View.GONE);
+                findViewById(R.id.getdetails).setVisibility(View.GONE);
+                findViewById(R.id.getEmidetails).setVisibility(View.VISIBLE);
                 inflate_tenureee.removeAllViews();
             }
 
@@ -274,7 +319,7 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
         });
     }
 
-    private void inflate_tenure(ArrayList<AcquirerEmiDetailsVO> arrayList, LinearLayout inflate_tenureee) {
+    private void inflate_tenure(final ArrayList<MPOSModel> arrayList, LinearLayout inflate_tenureee) {
         if (arrayList.size() != 0) {
             inflate_tenureee.setVisibility(View.VISIBLE);
             inflate_tenureee.removeAllViews();
@@ -296,18 +341,22 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                             LinearLayout layout = (LinearLayout) linearLayout.getChildAt(i);
                             CheckBox boxs = (CheckBox) layout.getChildAt(3);
                             if (box.getId() == boxs.getId()) {
-                                if (!box.isChecked())
+                                if (!box.isChecked()) {
                                     box.setChecked(isChecked);
+                                    arrayList.get(box.getId()).setIsflag(true);
+                                }
                             } else if (box.getId() != boxs.getId()) {
-                                if (boxs.isChecked())
+                                if (boxs.isChecked()) {
                                     boxs.setChecked(false);
+                                    arrayList.get(boxs.getId()).setIsflag(false);
+                                }
                             }
                         }
                     }
                 });
-                amount.setText(String.valueOf(arrayList.get(i).getEmiAmount()));
-                percentage.setText(String.valueOf(arrayList.get(i).getEmiPercentage()));
-                tenure.setText(String.valueOf(arrayList.get(i).getEmiTenure()));
+                amount.setText(String.valueOf(arrayList.get(i).getAmount()));
+                percentage.setText(String.valueOf(arrayList.get(i).getPercent()));
+                tenure.setText(String.valueOf(arrayList.get(i).getTenure()));
                 inflate_tenureee.addView(view);
             }
         }
@@ -345,6 +394,11 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                     initialization.getSelectedBankEMITenureList(handler, input_amount.getText().toString(), acquirerEmiDetailsVO);
                     check = "EMIDETAILS";
                 }
+                break;
+            case R.id.getdetails:
+                validator.accountActivation(handler, mid, tid);
+                check = "lastvalidate";
+
                 break;
         }
     }

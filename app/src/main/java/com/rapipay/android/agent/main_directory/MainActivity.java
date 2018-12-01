@@ -39,6 +39,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import com.google.android.gms.vision.text.Text;
 import com.rapipay.android.agent.Model.BankDetailsPozo;
 import com.rapipay.android.agent.Model.HeaderePozo;
 import com.rapipay.android.agent.Model.RapiPayPozo;
@@ -72,6 +73,7 @@ public class MainActivity extends BaseCompactActivity
 
     DrawerLayout drawer;
     String data, term = null;
+    TextView tv;
 
     public static ArrayList<HeaderePozo> pozoArrayList;
 
@@ -100,6 +102,8 @@ public class MainActivity extends BaseCompactActivity
         switch (v.getId()) {
             case R.id.reset:
                 url();
+                tv.setText("");
+                tv.setVisibility(View.GONE);
                 break;
         }
     }
@@ -125,6 +129,8 @@ public class MainActivity extends BaseCompactActivity
     private void initialization() {
         reset = (ImageView) findViewById(R.id.reset);
         reset.setOnClickListener(this);
+        tv = (TextView) this.findViewById(R.id.mywidget);
+        tv.setSelected(true);
         reset.setColorFilter(getResources().getColor(R.color.colorPrimaryDark));
 //        reset.setVisibility(View.VISIBLE);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -372,8 +378,12 @@ public class MainActivity extends BaseCompactActivity
         try {
             for (int i = 0; i < array.length(); i++) {
                 JSONObject object = array.getJSONObject(i);
-                if (!object.getString("headerValue").equalsIgnoreCase("DOWNLOAD_MASTER_DATA") && !object.getString("headerValue").equalsIgnoreCase("TnC") && !object.getString("headerValue").equalsIgnoreCase("TCLINK") && !object.getString("headerValue").equalsIgnoreCase("Parent Mobile"))
+                if (!object.getString("headerValue").equalsIgnoreCase("Notice") &&!object.getString("headerValue").equalsIgnoreCase("DOWNLOAD_MASTER_DATA") && !object.getString("headerValue").equalsIgnoreCase("TnC") && !object.getString("headerValue").equalsIgnoreCase("TCLINK") && !object.getString("headerValue").equalsIgnoreCase("Parent Mobile"))
                     pozoArrayList.add(new HeaderePozo(object.getString("headerValue"), object.getString("headerData"), object.getString("headerId")));
+                else if (object.getString("headerValue").equalsIgnoreCase("Notice")){
+                    tv.setText(object.getString("headerData"));
+                    tv.setVisibility(View.VISIBLE);
+                }
                 else {
                 if (object.getString("headerValue").equalsIgnoreCase("TnC")) {
                     term = object.getString("headerData");
