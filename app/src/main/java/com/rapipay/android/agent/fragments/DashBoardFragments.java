@@ -141,6 +141,7 @@ public class DashBoardFragments extends Fragment {
                                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                 intent.putExtra("type", "outside");
                                 intent.putExtra("customerType", "A");
+                                intent.putExtra("mobileNo", "");
                                 startActivity(intent);
                             }
                     }

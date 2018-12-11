@@ -196,6 +196,7 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
 
                 {
                     try {
+                        clear();
                         progessDialog.hide_progress();
                         transactionFlag = false;
                         Toast.makeText(CashOutClass.this, (String) msg.obj, Toast.LENGTH_SHORT).show();
@@ -212,6 +213,7 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                     try {
                         progessDialog.hide_progress();
                         transactionFlag = false;
+                        clear();
                         Toast.makeText(CashOutClass.this, (String) msg.obj, Toast.LENGTH_SHORT).show();
                         JSONObject object = new JSONObject();
                         object.put("responseCode", msg.what);
@@ -247,6 +249,7 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                     try {
                         progessDialog.hide_progress();
                         transactionFlag = false;
+                        clear();
                         Toast.makeText(CashOutClass.this, (String) msg.obj, Toast.LENGTH_SHORT).show();
                         JSONObject object = new JSONObject();
                         object.put("responseCode", msg.what);
@@ -260,6 +263,7 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                     try {
                         progessDialog.hide_progress();
                         transactionFlag = false;
+                        clear();
                         Toast.makeText(CashOutClass.this, (String) msg.obj, Toast.LENGTH_SHORT).show();
                         JSONObject object = new JSONObject();
                         object.put("responseCode", msg.what);
@@ -273,6 +277,7 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                     try {
                         progessDialog.hide_progress();
                         transactionFlag = false;
+                        clear();
                         Toast.makeText(CashOutClass.this, (String) msg.obj, Toast.LENGTH_SHORT).show();
                         JSONObject object = new JSONObject();
                         object.put("responseCode", msg.what);
@@ -319,6 +324,14 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
         ;
     }
 
+    private void clear(){
+        input_amount.setText("");
+        input_mobile.setText("");
+        findViewById(R.id.inflate_main).setVisibility(View.GONE);
+        findViewById(R.id.getdetails).setVisibility(View.GONE);
+        findViewById(R.id.getEmidetails).setVisibility(View.GONE);
+        findViewById(R.id.btn_fund).setVisibility(View.VISIBLE);
+    }
     AcquirerEmiDetailsVO acquirerEmiDetailsVO = null;
 
     private void initialize() {
@@ -489,6 +502,12 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
         return jsonObject;
     }
 
+    @Override
+    public void onBackPressed() {
+        setBack_click(this);
+        finish();
+    }
+
     public JSONObject updateCashOutDetails(String hostResponse) {
         transactionFlag = false;
         tsLong = System.currentTimeMillis() / 1000;
@@ -533,6 +552,7 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                 }
                 if (object.getString("serviceType").equalsIgnoreCase("Update_Mpos_Txn")) {
                     JSONArray array = object.getJSONArray("objHeaderData");
+                    clear();
                     if (array.length() != 0)
                         generateReceipt(array);
 
