@@ -181,11 +181,14 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                         }
                         if (transactionFlag) {
                             progessDialog.hide_progress();
-                            type = (HostResponse) msg.obj;
                             try {
-                                Gson gson = new Gson();
-                                String json = gson.toJson(type);
-                                new AsyncPostMethod(WebConfig.CASHOUT_URL, updateCashOutDetails(json).toString(), headerData, CashOutClass.this).execute();
+                                if (accessBluetoothDetails() != null) {
+                                    type = (HostResponse) msg.obj;
+                                    Gson gson = new Gson();
+                                    String json = gson.toJson(type);
+                                    new AsyncPostMethod(WebConfig.CASHOUT_URL, updateCashOutDetails(json).toString(), headerData, CashOutClass.this).execute();
+                                } else
+                                    Toast.makeText(CashOutClass.this, "Please pair device through bluetooth", Toast.LENGTH_SHORT).show();
                             } catch (Exception e) {
 
                             }
@@ -200,10 +203,13 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                         progessDialog.hide_progress();
                         transactionFlag = false;
                         Toast.makeText(CashOutClass.this, (String) msg.obj, Toast.LENGTH_SHORT).show();
-                        JSONObject object = new JSONObject();
-                        object.put("responseCode", msg.what);
-                        object.put("responseValue", msg.obj);
-                        new AsyncPostMethod(WebConfig.CASHOUT_URL, updateCashOutDetails(object.toString()).toString(), headerData, CashOutClass.this).execute();
+                        if (accessBluetoothDetails() != null) {
+                            JSONObject object = new JSONObject();
+                            object.put("responseCode", msg.what);
+                            object.put("responseValue", msg.obj);
+                            new AsyncPostMethod(WebConfig.CASHOUT_URL, updateCashOutDetails(object.toString()).toString(), headerData, CashOutClass.this).execute();
+                        } else
+                            Toast.makeText(CashOutClass.this, "Please pair device through bluetooth", Toast.LENGTH_SHORT).show();
                     } catch (Exception e) {
                     }
                 }
@@ -215,10 +221,13 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                         transactionFlag = false;
                         clear();
                         Toast.makeText(CashOutClass.this, (String) msg.obj, Toast.LENGTH_SHORT).show();
-                        JSONObject object = new JSONObject();
-                        object.put("responseCode", msg.what);
-                        object.put("responseValue", msg.obj);
-                        new AsyncPostMethod(WebConfig.CASHOUT_URL, updateCashOutDetails(object.toString()).toString(), headerData, CashOutClass.this).execute();
+                        if (accessBluetoothDetails() != null) {
+                            JSONObject object = new JSONObject();
+                            object.put("responseCode", msg.what);
+                            object.put("responseValue", msg.obj);
+                            new AsyncPostMethod(WebConfig.CASHOUT_URL, updateCashOutDetails(object.toString()).toString(), headerData, CashOutClass.this).execute();
+                        } else
+                            Toast.makeText(CashOutClass.this, "Please pair device through bluetooth", Toast.LENGTH_SHORT).show();
                     } catch (Exception e) {
                     }
 //                    alertMessage((String) msg.obj);
@@ -251,11 +260,15 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                         transactionFlag = false;
                         clear();
                         Toast.makeText(CashOutClass.this, (String) msg.obj, Toast.LENGTH_SHORT).show();
-                        JSONObject object = new JSONObject();
-                        object.put("responseCode", msg.what);
-                        object.put("responseValue", msg.obj);
-                        new AsyncPostMethod(WebConfig.CASHOUT_URL, updateCashOutDetails(object.toString()).toString(), headerData, CashOutClass.this).execute();
+                        if (accessBluetoothDetails() != null) {
+                            JSONObject object = new JSONObject();
+                            object.put("responseCode", msg.what);
+                            object.put("responseValue", msg.obj);
+                            new AsyncPostMethod(WebConfig.CASHOUT_URL, updateCashOutDetails(object.toString()).toString(), headerData, CashOutClass.this).execute();
+                        } else
+                            Toast.makeText(CashOutClass.this, "Please pair device through bluetooth", Toast.LENGTH_SHORT).show();
                     } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 } else if (msg.what == ERROR_MESSAGE)
 
@@ -265,10 +278,13 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                         transactionFlag = false;
                         clear();
                         Toast.makeText(CashOutClass.this, (String) msg.obj, Toast.LENGTH_SHORT).show();
-                        JSONObject object = new JSONObject();
-                        object.put("responseCode", msg.what);
-                        object.put("responseValue", msg.obj);
-                        new AsyncPostMethod(WebConfig.CASHOUT_URL, updateCashOutDetails(object.toString()).toString(), headerData, CashOutClass.this).execute();
+                        if (accessBluetoothDetails() != null) {
+                            JSONObject object = new JSONObject();
+                            object.put("responseCode", msg.what);
+                            object.put("responseValue", msg.obj);
+                            new AsyncPostMethod(WebConfig.CASHOUT_URL, updateCashOutDetails(object.toString()).toString(), headerData, CashOutClass.this).execute();
+                        } else
+                            Toast.makeText(CashOutClass.this, "Please pair device through bluetooth", Toast.LENGTH_SHORT).show();
                     } catch (Exception e) {
                     }
                 } else if (msg.what == TRANSACTION_PENDING)
@@ -279,10 +295,13 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                         transactionFlag = false;
                         clear();
                         Toast.makeText(CashOutClass.this, (String) msg.obj, Toast.LENGTH_SHORT).show();
-                        JSONObject object = new JSONObject();
-                        object.put("responseCode", msg.what);
-                        object.put("responseValue", msg.obj);
-                        new AsyncPostMethod(WebConfig.CASHOUT_URL, updateCashOutDetails(object.toString()).toString(), headerData, CashOutClass.this).execute();
+                        if (accessBluetoothDetails() != null) {
+                            JSONObject object = new JSONObject();
+                            object.put("responseCode", msg.what);
+                            object.put("responseValue", msg.obj);
+                            new AsyncPostMethod(WebConfig.CASHOUT_URL, updateCashOutDetails(object.toString()).toString(), headerData, CashOutClass.this).execute();
+                        } else
+                            Toast.makeText(CashOutClass.this, "Please pair device through bluetooth", Toast.LENGTH_SHORT).show();
                     } catch (Exception e) {
                     }
                 } else if (msg.what == DISPLAY_STATUS)
@@ -293,30 +312,6 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                 } else if (msg.what == QPOS_EMV_MULITPLE_APPLICATION)
 
                 {
-                    ArrayList<String> applicationList = (ArrayList<String>) msg.obj;
-//                    emvList = (ListView) findViewById(R.id.application_list);
-//                    emvList.setVisibility(View.VISIBLE);
-//                    ArrayAdapter<String> adapter = new
-//                            ArrayAdapter<String>(
-// rialNumber.this, android.R.layout.simple_list_item_1,
-//                            applicationList);
-//                    emvList.setAdapter(adapter);
-//                    emvList.setOnItemClickListener(new AdapterView.OnItemClickListener() {24
-//                        Strictly Private &Confidential –
-//                        Property of
-//                        Payswiff Solutions
-//                        Pvt.Ltd.All Rights
-//                        Reserved
-//                        @Override
-//
-//                        public void onItemClick(AdapterView<?> parent, View view,
-//                                                int position, long id) {
-//                            if (initialization != null) {
-//                                initialization.getQposListener().executeSelectedEMVApplication(position);
-//                                emvList.setVisibility(View.GONE);
-//                            }
-//                        }
-//                    });
                 }
             }
         }
@@ -324,7 +319,7 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
         ;
     }
 
-    private void clear(){
+    private void clear() {
         input_amount.setText("");
         input_mobile.setText("");
         findViewById(R.id.inflate_main).setVisibility(View.GONE);
@@ -332,6 +327,7 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
         findViewById(R.id.getEmidetails).setVisibility(View.GONE);
         findViewById(R.id.btn_fund).setVisibility(View.VISIBLE);
     }
+
     AcquirerEmiDetailsVO acquirerEmiDetailsVO = null;
 
     private void initialize() {
@@ -433,8 +429,12 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                 } else if (!ImageUtils.commonAmount(input_amount.getText().toString())) {
                     input_amount.setError("Please enter amount");
                     input_amount.requestFocus();
-                } else
-                    new AsyncPostMethod(WebConfig.CASHOUT_URL, getCashOutDetails(input_mobile.getText().toString(), input_amount.getText().toString()).toString(), headerData, CashOutClass.this).execute();
+                } else {
+                    if (accessBluetoothDetails() != null)
+                        new AsyncPostMethod(WebConfig.CASHOUT_URL, getCashOutDetails(input_mobile.getText().toString(), input_amount.getText().toString()).toString(), headerData, CashOutClass.this).execute();
+                    else
+                        Toast.makeText(CashOutClass.this, "Please pair device through bluetooth", Toast.LENGTH_SHORT).show();
+                }
                 break;
             case R.id.back_click:
                 setBack_click(this);
@@ -542,7 +542,7 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
             if (object.has("apiCommonResposne")) {
                 JSONObject object1 = object.getJSONObject("apiCommonResposne");
                 String balance = object1.getString("runningBalance");
-                heading.setText("CashOut (Balance : Rs." + format(balance) + ")");
+                heading.setText(typeput + " (Balance : Rs." + format(balance) + ")");
             }
             if (object.getString("responseCode").equalsIgnoreCase("200")) {
                 if (object.getString("serviceType").equalsIgnoreCase("Initiate_Mpos_Txn")) {
@@ -566,7 +566,7 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
     int i = 0;
 
     private void generateReceipt(JSONArray array) {
-        i=0;
+        i = 0;
         try {
             ArrayList<String> left = new ArrayList<>();
             ArrayList<String> right = new ArrayList<>();
@@ -590,7 +590,6 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                         break;
                     case "Txn Date:":
                         left.add(object.getString("headerData") + " " + object.getString("headerValue"));
-                        right.add(object.getString("headerData") + " " + object.getString("headerValue"));
                         break;
                     case "TID:":
                         right.add(object.getString("headerData") + " " + object.getString("headerValue"));
