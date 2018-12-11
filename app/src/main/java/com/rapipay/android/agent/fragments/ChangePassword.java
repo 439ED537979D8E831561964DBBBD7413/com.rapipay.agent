@@ -73,7 +73,7 @@ public class ChangePassword extends Fragment implements RequestHandler, View.OnC
                 } else if (!pinView.getText().toString().equalsIgnoreCase(confirmpinView.getText().toString()))
                     pinView.setError("New and Confirm password cannot be different");
                 else
-                    new AsyncPostMethod(WebConfig.UAT, getJson_Validate().toString(), "", ChangePassword.this, getActivity()).execute();
+                    new AsyncPostMethod(WebConfig.LOGIN_URL, getJson_Validate().toString(), "", ChangePassword.this, getActivity()).execute();
                 break;
         }
     }

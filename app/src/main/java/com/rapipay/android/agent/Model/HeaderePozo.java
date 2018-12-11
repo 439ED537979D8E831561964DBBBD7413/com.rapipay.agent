@@ -9,6 +9,13 @@ public class HeaderePozo {
 
     public HeaderePozo(){}
 
+    public HeaderePozo(String headerValue, String headerData, String headerID, String path) {
+        this.headerValue = headerValue;
+        this.headerData = headerData;
+        this.headerID = headerID;
+        this.path = path;
+    }
+
     public HeaderePozo(String headerValue, String headerData, String headerID) {
         this.headerValue = headerValue;
         this.headerData = headerData;

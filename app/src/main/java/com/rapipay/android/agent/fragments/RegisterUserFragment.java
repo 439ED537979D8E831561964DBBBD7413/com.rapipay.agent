@@ -167,7 +167,7 @@ public class RegisterUserFragment extends Fragment implements RequestHandler, Vi
                             e.printStackTrace();
                         }
                     } else
-                        new AsyncPostMethod(WebConfig.UAT, request_user().toString(), headerData, RegisterUserFragment.this, getActivity()).execute();
+                        new AsyncPostMethod(WebConfig.LOGIN_URL, request_user().toString(), headerData, RegisterUserFragment.this, getActivity()).execute();
                 }
                 break;
             case R.id.btn_scan_submit:
@@ -213,9 +213,9 @@ public class RegisterUserFragment extends Fragment implements RequestHandler, Vi
                 String add = object.getString("house") + ", " + object.getString("street") + ", " + object.getString("lm") + ", " + object.getString("vtc").replaceAll("^\\s+", "") + ", " + object.getString("dist");
                 input_address.setText(add);
                 input_address.setEnabled(false);
-            }else if (object.has("street") && object.has("lm") && object.has("vtc") && object.has("dist")) {
-                String add =  object.getString("street") + ", " + object.getString("lm") + ", " + object.getString("vtc").replaceAll("^\\s+", "") + ", " + object.getString("dist");
-                input_address.setText(add.replace("null,",""));
+            } else if (object.has("street") && object.has("lm") && object.has("vtc") && object.has("dist")) {
+                String add = object.getString("street") + ", " + object.getString("lm") + ", " + object.getString("vtc").replaceAll("^\\s+", "") + ", " + object.getString("dist");
+                input_address.setText(add.replace("null,", ""));
                 input_address.setEnabled(false);
             } else if (object.has("house") && object.has("street") && object.has("lm") && object.has("loc") && object.has("vtc") && object.has("dist")) {
                 String add = object.getString("house") + ", " + object.getString("street") + ", " + object.getString("lm") + ", " + object.getString("loc") + ", " + object.getString("vtc").replaceAll("^\\s+", "") + ", " + object.getString("dist");
@@ -265,25 +265,19 @@ public class RegisterUserFragment extends Fragment implements RequestHandler, Vi
         try {
             if (object.getString("responseCode").equalsIgnoreCase("200")) {
                 if (object.getString("serviceType").equalsIgnoreCase("B2BTempUserRequest")) {
-                    try {
-                        Intent intent = new Intent(getActivity(), WebViewClientActivity.class);
-                        intent.putExtra("mobileNo", input_number.getText().toString());
-                        String base64 = input_name.getText().toString() + "~" + input_email.getText().toString().trim() + "~" + input_code.getText().toString().trim() + "~" + input_address.getText().toString() + "~" + select_state.getText().toString() + "~" + scan_check;
-                        byte[] bytes = base64.getBytes("utf-8");
-                        String imageEncoded = Base64.encodeToString(bytes, Base64.DEFAULT);
-                        intent.putExtra("base64", imageEncoded);
-                        intent.putExtra("parentId", list.get(0).getMobilno());
-                        intent.putExtra("sessionKey", list.get(0).getPinsession());
-                        intent.putExtra("sessionRefNo", list.get(0).getAftersessionRefNo());
-                        intent.putExtra("nodeAgent", list.get(0).getMobilno());
-                        intent.putExtra("type", "outside");
-                        startActivity(intent);
-                        clear();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-//                    customDialog_Common("KYCLAYOUTS", object, null, "User Registration", null, object.getString("responseMessage"), RegisterUserActivity.this);
-//                    customDialog(object.getString("responseMessage"));
+                    Intent intent = new Intent(getActivity(), WebViewClientActivity.class);
+                    intent.putExtra("mobileNo", input_number.getText().toString());
+                    String base64 = input_name.getText().toString() + "~" + input_email.getText().toString().trim() + "~" + input_code.getText().toString().trim() + "~" + input_address.getText().toString() + "~" + select_state.getText().toString() + "~" + scan_check;
+                    byte[] bytes = base64.getBytes("utf-8");
+                    String imageEncoded = Base64.encodeToString(bytes, Base64.DEFAULT);
+                    intent.putExtra("base64", imageEncoded);
+                    intent.putExtra("parentId", list.get(0).getMobilno());
+                    intent.putExtra("sessionKey", list.get(0).getPinsession());
+                    intent.putExtra("sessionRefNo", list.get(0).getAftersessionRefNo());
+                    intent.putExtra("nodeAgent", list.get(0).getMobilno());
+                    intent.putExtra("type", "outside");
+                    startActivity(intent);
+                    clear();
                 }
             }
         } catch (Exception e) {

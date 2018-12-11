@@ -95,13 +95,16 @@ public class AsyncPostMethod extends AsyncTask<String, String, String> {
                             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             context.startActivity(intent);
                         } else {
-                            if (object.getString("serviceType").equalsIgnoreCase("PinVerify"))
-                                handler.chechStat(object.getString("responseMessage"));
-                            else if (object.getString("serviceType").equalsIgnoreCase("ValidCredentialService"))
-                                handler.chechStat(object.getString("responseMessage"));
-                            else if (object.has("responseMessage"))
+                            if(object.has("serviceType")) {
+                                if (object.getString("serviceType").equalsIgnoreCase("PinVerify"))
+                                    handler.chechStat(object.getString("responseMessage"));
+                                else if (object.getString("serviceType").equalsIgnoreCase("ValidCredentialService"))
+                                    handler.chechStat(object.getString("responseMessage"));
+                                else
+                                    customDialog_Common(object.getString("responseMessage"));
+                            }else if (object.has("responseMessage"))
                                 customDialog_Common(object.getString("responseMessage"));
-                            else
+                            else if (object.has("responseMsg"))
                                 customDialog_Common(object.getString("responseMsg"));
                         }
                     } else if (object.has("responsecode")) {

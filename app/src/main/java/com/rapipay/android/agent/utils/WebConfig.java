@@ -14,8 +14,11 @@ public class WebConfig {
     public static String RECHARGE_URL = WEB + "UBPService";
     public static String WALLETTRANSFER_URL = WEB + "DMTService";
     public static String PASSBOOK_URL = WEB + "CommonReport";
-    public static String CASHOUT_URL = WEBMain +"MposService/MposTxnServlet";
+    public static String CASHOUT_URL = WEBMain+"MposService/MposTxnServlet";
     public static String MPOSREG = WEBMain +"KYC_RAPIPAY_APP/EnrollmentFormService";
-//    public static String CommonReport = "http://192.168.1.110:8080/TxnReportingApp/CommonReport";
-//     public static String LOGIN_URL="http://192.168.1.110:8080/SecLogOnApp/SecLogOn";
+    public static String CommonReport = WEBMain+"TxnReportingApp/CommonReport";
+    public static String LOGIN_URL=WEBMain+"SecLogOnApp/SecLogOnService";
+     public WebConfig(String main){
+         WEBMain = main;
+     }
 }

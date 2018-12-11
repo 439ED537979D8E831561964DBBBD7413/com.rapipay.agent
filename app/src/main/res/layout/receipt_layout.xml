@@ -1,112 +1,59 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent"-->
-    <!--android:fitsSystemWindows="true">-->
+<?xml version="1.0" encoding="utf-8"?><!--<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"--><!--android:layout_width="match_parent"--><!--android:layout_height="match_parent"--><!--android:fitsSystemWindows="true">-->
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/dialog_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left"
+        android:background="@color/colorPrimaryDark"
+        android:gravity="left"
+        android:padding="15dp"
+        android:text="@string/app_name"
+        android:textColor="@color/white"
+        android:textSize="18dp" />
+
+
+    <ListView
+        android:layout_below="@+id/dialog_title"
+        android:id="@+id/listbottom"
+        android:layout_width="match_parent"
+        android:layout_height="350dp"
+        android:padding="5dp" />
 
     <RelativeLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_below="@+id/listbottom"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="wrap_content">
 
-        <TextView
-            android:id="@+id/dialog_title"
-            android:layout_width="match_parent"
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/btn_cancel"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="left"
-            android:background="@color/colorPrimaryDark"
-            android:gravity="left"
-            android:padding="15dp"
-            android:text="@string/app_name"
+            android:layout_marginRight="5dp"
+            android:layout_toLeftOf="@+id/btn_ok"
+            android:background="@drawable/border_button"
+            android:onClick="onClick"
+            android:padding="5dp"
+            android:text="@string/cancel"
             android:textColor="@color/white"
-            android:textSize="18dp" />
+            android:textSize="16dp" />
 
-        <LinearLayout
-            android:layout_below="@+id/dialog_title"
-            android:id="@+id/main_layout"
-            android:layout_width="match_parent"
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/btn_ok"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@color/white"
-            android:orientation="vertical">
-
-            <ImageView
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:layout_gravity="center"
-                android:src="@drawable/ic_launcher" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:weightSum="800">
-
-                <ListView
-                    android:id="@+id/listLeft"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="500"
-                    android:padding="5dp"
-                    android:scrollbars="none"
-                    android:transcriptMode="normal" />
-
-                <ListView
-                    android:id="@+id/listRight"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="300"
-                    android:padding="5dp"
-                    android:scrollbars="none"
-                    android:transcriptMode="normal" />
-
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/medium"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/colorPrimaryDark"
-                android:padding="2dp"
-                android:text="DESCRIPTION "
-                android:textColor="@color/white"
-                android:textSize="14sp" />
-
-            <ListView
-                android:id="@+id/listbottom"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="5dp"
-                android:transcriptMode="normal" />
-
-
-        </LinearLayout>
-
-        <RelativeLayout
-           android:layout_alignParentBottom="true"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <ImageView
-                android:id="@+id/share"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_toLeftOf="@+id/btn_ok"
-                android:padding="5dp"
-                android:src="@drawable/share" />
-
-            <android.support.v7.widget.AppCompatButton
-                android:id="@+id/btn_ok"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_gravity="right"
-                android:background="@drawable/border_button"
-                android:onClick="onClick"
-                android:padding="5dp"
-                android:text="@string/ok"
-                android:textColor="@color/white"
-                android:textSize="16dp" />
-        </RelativeLayout>
+            android:layout_alignParentRight="true"
+            android:layout_gravity="right"
+            android:background="@drawable/border_button"
+            android:onClick="onClick"
+            android:padding="5dp"
+            android:text="@string/ok"
+            android:textColor="@color/white"
+            android:textSize="16dp" />
     </RelativeLayout>
-<!--</ScrollView>-->
+</RelativeLayout><!--</ScrollView>-->

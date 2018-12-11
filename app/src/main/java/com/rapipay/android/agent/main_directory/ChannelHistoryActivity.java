@@ -84,7 +84,7 @@ public class ChannelHistoryActivity extends BaseCompactActivity implements View.
                 if (totalItemCount != 0 && totalItemCount == last && lastInScreen == totalItemCount && !isLoading) {
                     first = last + 1;
                     last += 25;
-                    new AsyncPostMethod(WebConfig.PASSBOOK_URL, channel_request(first, last).toString(), headerData, ChannelHistoryActivity.this).execute();
+                    new AsyncPostMethod(WebConfig.CommonReport, channel_request(first, last).toString(), headerData, ChannelHistoryActivity.this).execute();
                     isLoading = true;
                 }
             }
@@ -127,7 +127,7 @@ public class ChannelHistoryActivity extends BaseCompactActivity implements View.
                     date1_text.setError("Please enter mandatory field");
                     Toast.makeText(this, "Please enter mandatory field", Toast.LENGTH_SHORT).show();
                 } else if (!date1_text.getText().toString().isEmpty() && !date2_text.getText().toString().isEmpty())
-                    new AsyncPostMethod(WebConfig.PASSBOOK_URL, channel_request(first, last).toString(), headerData, ChannelHistoryActivity.this).execute();
+                    new AsyncPostMethod(WebConfig.CommonReport, channel_request(first, last).toString(), headerData, ChannelHistoryActivity.this).execute();
                 break;
         }
     }

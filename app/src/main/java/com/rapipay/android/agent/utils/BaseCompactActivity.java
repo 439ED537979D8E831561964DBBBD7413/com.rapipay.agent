@@ -438,14 +438,6 @@ public class BaseCompactActivity extends AppCompatActivity {
 
     protected void customView_term(View alertLayout, String output) throws Exception {
         TextView otpView = (TextView) alertLayout.findViewById(R.id.tv_linkon);
-//        otpView.setText(Html.fromHtml(output, new Html.ImageGetter() {
-//            @Override
-//            public Drawable getDrawable(String source) {
-//                byte[] data = Base64.decode(source, Base64.DEFAULT);
-//                Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-//                return new BitmapDrawable(getResources(), bitmap);
-//            }
-//        }, null));
         otpView.setText(Html.fromHtml(output));
         otpView.setVisibility(View.VISIBLE);
         dialog.setView(alertLayout);
@@ -665,38 +657,13 @@ public class BaseCompactActivity extends AppCompatActivity {
 
     protected void customReceipt(final String type, final JSONObject object, final CustomInterface anInterface) {
         this.anInterface = anInterface;
-        left = new ArrayList<>();
-        right = new ArrayList<>();
-        medium = new ArrayList<>();
-        bottom = new ArrayList<>();
+        ArrayList<HeaderePozo> medium = new ArrayList<HeaderePozo>();
         try {
-            JSONArray array = object.getJSONArray("getTxnReceiptDataList");
+            JSONArray array = object.getJSONArray("objMposData");
             for (int i = 0; i < array.length(); i++) {
                 JSONObject jsonObject = array.getJSONObject(i);
-                if (jsonObject.getString("displayType").equalsIgnoreCase("L")) {
-                    if (jsonObject.getString("headerValue").equalsIgnoreCase("null"))
-                        left.add(jsonObject.getString("headerText") + " " + "NA");
-                    else
-                        left.add(jsonObject.getString("headerText") + " " + jsonObject.getString("headerValue"));
-                }
-                if (jsonObject.getString("displayType").equalsIgnoreCase("R")) {
-                    if (jsonObject.getString("headerValue").equalsIgnoreCase("null"))
-                        right.add(jsonObject.getString("headerText") + " " + "NA");
-                    else
-                        right.add(jsonObject.getString("headerText") + " " + jsonObject.getString("headerValue"));
-                }
-                if (jsonObject.getString("displayType").equalsIgnoreCase("M")) {
-                    if (jsonObject.getString("headerValue").equalsIgnoreCase("null"))
-                        medium.add(jsonObject.getString("headerText") + " " + "NA");
-                    else
-                        medium.add(jsonObject.getString("headerText") + " " + jsonObject.getString("headerValue"));
-                }
-                if (jsonObject.getString("displayType").equalsIgnoreCase("D")) {
-                    if (jsonObject.getString("headerValue").equalsIgnoreCase("null"))
-                        bottom.add(new HeaderePozo(jsonObject.getString("headerText"), "NA"));
-                    else
-                        bottom.add(new HeaderePozo(jsonObject.getString("headerText"), jsonObject.getString("headerValue")));
-                }
+                if (jsonObject.getString("displayFlag").equalsIgnoreCase("D"))
+                    medium.add(new HeaderePozo(jsonObject.getString("headerValue"), jsonObject.getString("headerData"), jsonObject.getString("headerId"), jsonObject.getString("displayFlag")));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -704,32 +671,13 @@ public class BaseCompactActivity extends AppCompatActivity {
         dialog = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
         View alertLayout = inflater.inflate(R.layout.receipt_layout, null);
-
-        main_layout = (LinearLayout) alertLayout.findViewById(R.id.main_layout);
-
-        main_layout.setDrawingCacheEnabled(true);
-        main_layout.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
-                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
-        main_layout.layout(0, 0, main_layout.getMeasuredWidth(), main_layout.getMeasuredHeight());
-        main_layout.buildDrawingCache(true);
-
         TextView text = (TextView) alertLayout.findViewById(R.id.dialog_title);
-        TextView mediums = (TextView) main_layout.findViewById(R.id.medium);
         text.setText(type);
-        ListView listLeft = (ListView) main_layout.findViewById(R.id.listLeft);
-        ListView listRight = (ListView) main_layout.findViewById(R.id.listRight);
-        ListView listbottom = (ListView) main_layout.findViewById(R.id.listbottom);
+        ListView listbottom = (ListView) alertLayout.findViewById(R.id.listbottom);
         AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
-        ImageView share = (ImageView) alertLayout.findViewById(R.id.share);
-        share.setColorFilter(getResources().getColor(R.color.colorPrimaryDark));
-        if (left.size() != 0)
-            listLeft.setAdapter(new ReceiptAdapter(left, this));
-        if (right.size() != 0)
-            listRight.setAdapter(new ReceiptAdapter(right, this));
-        if (medium.size() == 1)
-            mediums.setText(medium.get(0));
-        if (bottom.size() != 0)
-            listbottom.setAdapter(new BottomAdapter(bottom, this));
+        AppCompatButton btn_cancel = (AppCompatButton) alertLayout.findViewById(R.id.btn_cancel);
+        if (medium.size() != 0)
+            listbottom.setAdapter(new BottomAdapter(medium, this));
         dialog.setCancelable(false);
         dialog.setView(alertLayout);
         btn_ok.setOnClickListener(new View.OnClickListener() {
@@ -739,30 +687,11 @@ public class BaseCompactActivity extends AppCompatActivity {
                 alertDialog.dismiss();
             }
         });
-        share.setOnClickListener(new View.OnClickListener() {
+        btn_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Bitmap b = Bitmap.createBitmap(main_layout.getDrawingCache());
-                main_layout.setDrawingCacheEnabled(false);
-                ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-                b.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-
-                File f = new File(Environment.getExternalStorageDirectory() + File.separator + "v2i.jpg");
-                try {
-                    f.createNewFile();
-                    FileOutputStream fo = new FileOutputStream(f);
-                    fo.write(bytes.toByteArray());
-                    fo.flush();
-                    fo.close();
-                    f.setReadable(true, false);
-                    final Intent intent = new Intent(android.content.Intent.ACTION_SEND);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(f));
-                    intent.setType("image/png");
-                    startActivity(Intent.createChooser(intent, "Share image via"));
-                    alertDialog.dismiss();
-                } catch (Exception e) {
-                }
+                anInterface.cancelClicked(type, object);
+                alertDialog.dismiss();
             }
         });
         alertDialog = dialog.show();
@@ -820,7 +749,7 @@ public class BaseCompactActivity extends AppCompatActivity {
         alertDialog = dialog.show();
     }
 
-    protected void customReceiptCastSaleOut(final String type, ArrayList<String> left, ArrayList<String> right, ArrayList<String> bottom, ArrayList<String> medium,String amount,String name, final CustomInterface anInterface) {
+    protected void customReceiptCastSaleOut(final String type, ArrayList<String> left, ArrayList<String> right, ArrayList<String> bottom, ArrayList<String> medium, String amount, String name, final CustomInterface anInterface) {
         this.anInterface = anInterface;
         dialog = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
@@ -837,7 +766,7 @@ public class BaseCompactActivity extends AppCompatActivity {
         TextView text = (TextView) alertLayout.findViewById(R.id.agent_name);
         TextView custom_name = (TextView) alertLayout.findViewById(R.id.custom_name);
         TextView amounts = (TextView) alertLayout.findViewById(R.id.amount);
-        amounts.setText("Rs  "+amount);
+        amounts.setText("Rs  " + amount);
         custom_name.setText(name);
         LinearLayout mediums = (LinearLayout) main_layout.findViewById(R.id.medium);
         text.setText(type);
@@ -944,7 +873,7 @@ public class BaseCompactActivity extends AppCompatActivity {
             }
         });
         alertDialog = dialog.show();
-        alertDialog.getWindow().setLayout(1200, 1800);
+//        alertDialog.getWindow().setLayout(1300, 1850);
     }
 
     protected void customReceiptNew(final String type, final JSONObject object, final CustomInterface anInterface) {
@@ -1340,7 +1269,7 @@ public class BaseCompactActivity extends AppCompatActivity {
     }
 
     protected void loadVersion(String emi) {
-        new AsyncPostMethod(WebConfig.UAT, version(emi).toString(), headerData, BaseCompactActivity.this).execute();
+        new AsyncPostMethod(WebConfig.LOGIN_URL, version(emi).toString(), headerData, BaseCompactActivity.this).execute();
     }
 
     protected void versionDetails(JSONArray array, VersionListener listener) {

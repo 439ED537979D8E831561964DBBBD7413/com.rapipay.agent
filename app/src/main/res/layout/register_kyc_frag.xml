@@ -135,8 +135,8 @@
                     android:layout_marginRight="3dp"
                     android:layout_weight="400"
                     android:background="@drawable/border_button"
-                    android:onClick="onClick"
                     android:clickable="true"
+                    android:onClick="onClick"
                     android:text="@string/btnscasubmit"
                     android:textColor="@color/white"
                     android:textSize="16dp" />
@@ -148,8 +148,8 @@
                     android:layout_marginLeft="3dp"
                     android:layout_weight="400"
                     android:background="@drawable/border_button"
-                    android:onClick="onClick"
                     android:clickable="true"
+                    android:onClick="onClick"
                     android:text="@string/btnsubmit"
                     android:textColor="@color/white"
                     android:textSize="16dp" />

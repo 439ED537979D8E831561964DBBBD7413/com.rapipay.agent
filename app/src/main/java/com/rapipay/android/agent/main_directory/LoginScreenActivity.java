@@ -272,7 +272,7 @@ public class LoginScreenActivity extends BaseCompactActivity implements View.OnC
                         if (!version.equalsIgnoreCase(list.get(i + 1).getValue())) {
                             customDialog_Common("KYCLAYOUTSS", null, null, "Update Available", null, "You are running on lower version please update for new versions!.", LoginScreenActivity.this);
                         } else {
-                            new AsyncPostMethod(WebConfig.UAT, getJson_Validate().toString(), "", LoginScreenActivity.this).execute();
+                            new AsyncPostMethod(WebConfig.LOGIN_URL, getJson_Validate().toString(), "", LoginScreenActivity.this).execute();
                         }
                     } catch (PackageManager.NameNotFoundException e) {
                         e.printStackTrace();

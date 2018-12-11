@@ -30,9 +30,9 @@ public class ImageUtils {
         ArrayList<ImagePozo> list = new ArrayList<>();
         list.clear();
         list.add(new ImagePozo(1,"MPOS Registration",R.drawable.mposreg));
-//        list.add(new ImagePozo(2,"Cash@Pos",R.drawable.transhistory));
-//        list.add(new ImagePozo(3, "Sale", R.drawable.transhistory));
-//        list.add(new ImagePozo(4, "EMI", R.drawable.transhistory));
+        list.add(new ImagePozo(2,"Cash@Pos",R.drawable.mposcash));
+        list.add(new ImagePozo(3, "Sale", R.drawable.mposale));
+        list.add(new ImagePozo(4, "EMI", R.drawable.mposemi));
         return list;
     }
 

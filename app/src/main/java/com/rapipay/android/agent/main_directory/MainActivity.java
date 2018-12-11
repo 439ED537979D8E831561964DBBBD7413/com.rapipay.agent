@@ -44,6 +44,7 @@ import com.rapipay.android.agent.Model.BankDetailsPozo;
 import com.rapipay.android.agent.Model.HeaderePozo;
 import com.rapipay.android.agent.Model.RapiPayPozo;
 import com.rapipay.android.agent.R;
+import com.rapipay.android.agent.fragments.ChangeMobileFragment;
 import com.rapipay.android.agent.fragments.ChangePassword;
 import com.rapipay.android.agent.fragments.ChangePinFragment;
 import com.rapipay.android.agent.fragments.DashBoardFragments;
@@ -322,6 +323,9 @@ public class MainActivity extends BaseCompactActivity
         } else if (id == R.id.profile) {
             reset.setVisibility(View.GONE);
             fragment = new ProfileFragment();
+        }else if (id == R.id.nav_Cmobile) {
+            reset.setVisibility(View.GONE);
+            fragment = new ChangeMobileFragment();
         } else if (fragment == null)
             Toast.makeText(MainActivity.this, "Under Process", Toast.LENGTH_SHORT).show();
         if (fragment != null)
@@ -378,7 +382,7 @@ public class MainActivity extends BaseCompactActivity
         try {
             for (int i = 0; i < array.length(); i++) {
                 JSONObject object = array.getJSONObject(i);
-                if (!object.getString("headerValue").equalsIgnoreCase("Notice") &&!object.getString("headerValue").equalsIgnoreCase("DOWNLOAD_MASTER_DATA") && !object.getString("headerValue").equalsIgnoreCase("TnC") && !object.getString("headerValue").equalsIgnoreCase("TCLINK") && !object.getString("headerValue").equalsIgnoreCase("Parent Mobile"))
+                if (!object.getString("headerValue").equalsIgnoreCase("Notice") &&!object.getString("headerValue").equalsIgnoreCase("DOWNLOAD_MASTER_DATA") && !object.getString("headerValue").equalsIgnoreCase("TnC") && !object.getString("headerValue").equalsIgnoreCase("TCLINK") && !object.getString("headerValue").equalsIgnoreCase("Parent Mobile") && !object.getString("headerValue").equalsIgnoreCase("TOBECREATE"))
                     pozoArrayList.add(new HeaderePozo(object.getString("headerValue"), object.getString("headerData"), object.getString("headerId")));
                 else if (object.getString("headerValue").equalsIgnoreCase("Notice")){
                     tv.setText(object.getString("headerData"));
@@ -408,8 +412,7 @@ public class MainActivity extends BaseCompactActivity
                     balance = format(pozoArrayList.get(j).getHeaderData());
                 }
             }
-        } catch (
-                Exception e)
+        } catch (Exception e)
 
         {
             e.printStackTrace();
@@ -424,7 +427,7 @@ public class MainActivity extends BaseCompactActivity
     private void callMasterDetails() {
         ArrayList<BankDetailsPozo> list = db.geBanktDetails("");
         if (list.size() == 0) {
-            new AsyncPostMethod(WebConfig.NETWORKTRANSFER_URL, getMaster_Validate().toString(), headerData, MainActivity.this).execute();
+            new AsyncPostMethod(WebConfig.CommonReport, getMaster_Validate().toString(), headerData, MainActivity.this).execute();
         }
     }
 

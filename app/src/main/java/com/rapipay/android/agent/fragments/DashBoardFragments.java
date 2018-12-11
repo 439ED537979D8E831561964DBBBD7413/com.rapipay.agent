@@ -31,7 +31,6 @@ import com.rapipay.android.agent.main_directory.PendingRefundActivity;
 import com.rapipay.android.agent.main_directory.ReChargeActivity;
 import com.rapipay.android.agent.main_directory.RechargeHistory;
 import com.rapipay.android.agent.main_directory.RegisterKYCTab;
-import com.rapipay.android.agent.main_directory.RegisterUserActivity;
 import com.rapipay.android.agent.main_directory.WalletDetailsActivity;
 import com.rapipay.android.agent.utils.ImageUtils;
 import com.rapipay.android.agent.utils.RecyclerTouchListener;
@@ -141,7 +140,7 @@ public class DashBoardFragments extends Fragment {
                                 Intent intent = new Intent(getActivity(), RegisterKYCTab.class);
                                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                 intent.putExtra("type", "outside");
-                                intent.putExtra("mobileNo", "");
+                                intent.putExtra("customerType", "A");
                                 startActivity(intent);
                             }
                     }

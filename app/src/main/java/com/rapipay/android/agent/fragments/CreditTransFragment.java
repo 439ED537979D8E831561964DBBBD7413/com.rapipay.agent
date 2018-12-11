@@ -154,7 +154,7 @@ public class CreditTransFragment extends Fragment implements RequestHandler, Vie
                     date1_text.setError("Please enter valid data");
                     date1_text.requestFocus();
                 }else 
-                    new AsyncPostMethod(WebConfig.NETWORKTRANSFER_URL, channel_request().toString(), headerData, CreditTransFragment.this, getActivity()).execute();
+                    new AsyncPostMethod(WebConfig.CommonReport, channel_request().toString(), headerData, CreditTransFragment.this, getActivity()).execute();
                 break;
         }
     }

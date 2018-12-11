@@ -74,7 +74,7 @@ public class NetworkTransFragment extends Fragment implements RequestHandler {
 
     private void loadApi() {
         logList.add(new NetworkManagePozo(list.get(0).getMobilno(), list.get(0).getMobilno()));
-        new AsyncPostMethod(WebConfig.NETWORKTRANSFER_URL, getNetwork_Validate("GET_MY_NODE_DETAILS", list.get(0).getMobilno(), first, last).toString(), headerData, NetworkTransFragment.this, getActivity()).execute();
+        new AsyncPostMethod(WebConfig.CommonReport, getNetwork_Validate("GET_MY_NODE_DETAILS", list.get(0).getMobilno(), first, last).toString(), headerData, NetworkTransFragment.this, getActivity()).execute();
     }
 
     private void initialize(View rv) {
@@ -102,7 +102,7 @@ public class NetworkTransFragment extends Fragment implements RequestHandler {
                 if (totalItemCount != 0 && totalItemCount == last && lastInScreen == totalItemCount && !isLoading) {
                     first = last + 1;
                     last += 25;
-                    new AsyncPostMethod(WebConfig.NETWORKTRANSFER_URL, getNetwork_Validate("GET_MY_NODE_DETAILS", list.get(0).getMobilno(), first, last).toString(), headerData, NetworkTransFragment.this, getActivity()).execute();
+                    new AsyncPostMethod(WebConfig.CommonReport, getNetwork_Validate("GET_MY_NODE_DETAILS", list.get(0).getMobilno(), first, last).toString(), headerData, NetworkTransFragment.this, getActivity()).execute();
                     isLoading = true;
                 }
             }
@@ -403,7 +403,7 @@ public class NetworkTransFragment extends Fragment implements RequestHandler {
 //        alert.show();
 //    }
     private void url() {
-        new AsyncPostMethod(WebConfig.NETWORKTRANSFER_URL, getDashBoard("GET_NODE_HEADER_DATA").toString(), headerData, getActivity()).execute();
+        new AsyncPostMethod(WebConfig.CommonReport, getDashBoard("GET_NODE_HEADER_DATA").toString(), headerData, getActivity()).execute();
     }
 
     public JSONObject getDashBoard(String servicetype) {

@@ -86,29 +86,23 @@
                 android:id="@+id/inflate_main">
 
                 <TextView
-                    android:layout_weight="240"
+                    android:layout_weight="277"
                     android:layout_width="0dp"
                     android:text="EMI AMOUNT"
                     android:layout_height="wrap_content"
                     android:id="@+id/amount"/>
                 <TextView
-                    android:layout_weight="240"
+                    android:layout_weight="277"
                     android:layout_width="0dp"
                     android:text="EMI PERCENT"
                     android:layout_height="wrap_content"
                     android:id="@+id/percentage"/>
                 <TextView
-                    android:layout_weight="240"
+                    android:layout_weight="276"
                     android:layout_width="0dp"
                     android:text="EMI TENURE"
                     android:layout_height="wrap_content"
                     android:id="@+id/tenure"/>
-                <CheckBox
-                    android:visibility="gone"
-                    android:layout_weight="80"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/check_list"/>
 
             </LinearLayout>
             <LinearLayout
@@ -116,7 +110,14 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:visibility="gone"
-                android:id="@+id/inflate_tenureee"/>
+                android:id="@+id/inflate_tenureee">
+                <ListView
+                    android:id="@+id/lv_imflate"
+                    android:layout_width="match_parent"
+                    android:layout_height="160dp"
+                    android:listSelector="@android:color/darker_gray"
+                    />
+            </LinearLayout>
 
 
             <android.support.v7.widget.AppCompatButton

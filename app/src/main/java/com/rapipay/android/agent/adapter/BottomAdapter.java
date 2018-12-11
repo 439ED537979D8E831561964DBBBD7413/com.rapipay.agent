@@ -11,6 +11,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import me.grantland.widget.AutofitTextView;
+
 import com.rapipay.android.agent.Model.HeaderePozo;
 import com.rapipay.android.agent.R;
 
@@ -36,32 +37,34 @@ public class BottomAdapter extends ArrayAdapter<HeaderePozo> {
     @Override
     public View getView(int position, View view, ViewGroup parent) {
         ViewHolder viewHolder; // view lookup cache stored in tag
-        if (view == null) {
-            viewHolder = new ViewHolder();
-            LayoutInflater inflater = LayoutInflater.from(getContext());
-            view = inflater.inflate(R.layout.bottom_layout, parent, false);
-            viewHolder.btn_name = (AutofitTextView) view.findViewById(R.id.btn_name);
-            viewHolder.btn_p_bank = (TextView) view.findViewById(R.id.btn_p_bank);
-            viewHolder.top = (LinearLayout) view.findViewById(R.id.top);
+            if (view == null) {
+                viewHolder = new ViewHolder();
+                LayoutInflater inflater = LayoutInflater.from(getContext());
+                view = inflater.inflate(R.layout.bottom_layout, parent, false);
+                viewHolder.btn_name = (AutofitTextView) view.findViewById(R.id.btn_name);
+                viewHolder.btn_p_bank = (TextView) view.findViewById(R.id.btn_p_bank);
+                viewHolder.top = (LinearLayout) view.findViewById(R.id.top);
 
-            view.setTag(viewHolder);
-        } else {
-            viewHolder = (ViewHolder) view.getTag();
-        }
-        if (position % 2 == 0)
-            viewHolder.top.setBackgroundColor(mContext.getResources().getColor(R.color.colorbackground));
-        else
-            viewHolder.top.setBackgroundColor(mContext.getResources().getColor(R.color.white));
-        if (mValues.get(position).getHeaderValue().equalsIgnoreCase("Txn. ID/RRN/STATUS")) {
-            viewHolder.top.setBackgroundColor(mContext.getResources().getColor(R.color.colorPrimaryDark));
-            viewHolder.btn_name.setTextColor(mContext.getResources().getColor(R.color.white));
-            viewHolder.btn_p_bank.setTextColor(mContext.getResources().getColor(R.color.white));
-        } else {
-            viewHolder.btn_name.setTextColor(mContext.getResources().getColor(R.color.colorPrimaryDark));
-            viewHolder.btn_p_bank.setTextColor(mContext.getResources().getColor(R.color.colorPrimaryDark));
-        }
-        viewHolder.btn_name.setText(mValues.get(position).getHeaderData());
-        viewHolder.btn_p_bank.setText(mValues.get(position).getHeaderValue());
+                view.setTag(viewHolder);
+            } else {
+                viewHolder = (ViewHolder) view.getTag();
+            }
+
+            if (position % 2 == 0)
+                viewHolder.top.setBackgroundColor(mContext.getResources().getColor(R.color.colorbackground));
+            else
+                viewHolder.top.setBackgroundColor(mContext.getResources().getColor(R.color.white));
+            if (mValues.get(position).getHeaderValue().equalsIgnoreCase("Txn. ID/RRN/STATUS")) {
+                viewHolder.top.setBackgroundColor(mContext.getResources().getColor(R.color.colorPrimaryDark));
+                viewHolder.btn_name.setTextColor(mContext.getResources().getColor(R.color.white));
+                viewHolder.btn_p_bank.setTextColor(mContext.getResources().getColor(R.color.white));
+            } else {
+                viewHolder.btn_name.setTextColor(mContext.getResources().getColor(R.color.colorPrimaryDark));
+                viewHolder.btn_p_bank.setTextColor(mContext.getResources().getColor(R.color.colorPrimaryDark));
+            }
+
+            viewHolder.btn_name.setText(mValues.get(position).getHeaderData());
+            viewHolder.btn_p_bank.setText(mValues.get(position).getHeaderValue());
         return view;
     }
 }

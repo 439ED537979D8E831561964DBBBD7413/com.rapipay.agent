@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 
 import com.rapipay.android.agent.R;
+import com.rapipay.android.agent.fragments.AgentKYCFragment;
 import com.rapipay.android.agent.fragments.NetworkHistoryFragment;
 import com.rapipay.android.agent.fragments.PendingKyc;
 import com.rapipay.android.agent.fragments.RegisterUserFragment;

@@ -109,6 +109,18 @@
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden" />
         <activity
+            android:name=".main_directory.KYCFormActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name=".main_directory.WebViewVerify"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name=".main_directory.CustomerKYCActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
             android:name=".main_directory.DailyCommissionActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden" />

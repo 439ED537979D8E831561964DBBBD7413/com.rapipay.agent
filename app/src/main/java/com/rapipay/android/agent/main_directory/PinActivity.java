@@ -105,7 +105,7 @@ public class PinActivity extends BaseCompactActivity implements View.OnClickList
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_login:
-                new AsyncPostMethod(WebConfig.UAT, getJson_Validate().toString(), "", PinActivity.this).execute();
+                new AsyncPostMethod(WebConfig.LOGIN_URL, getJson_Validate().toString(), "", PinActivity.this).execute();
                 break;
         }
     }
@@ -177,7 +177,7 @@ public class PinActivity extends BaseCompactActivity implements View.OnClickList
     private void callBankDetails() {
         boolean bank_flag = db.getDetails_Bank();
         if (bank_flag == false) {
-            new AsyncPostMethod(WebConfig.NETWORKTRANSFER_URL, getMaster_Validate().toString(), headerData, PinActivity.this).execute();
+            new AsyncPostMethod(WebConfig.CommonReport, getMaster_Validate().toString(), headerData, PinActivity.this).execute();
         }
     }
 

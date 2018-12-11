@@ -24,12 +24,11 @@
                 android:orientation="horizontal">
 
                 <android.support.v7.widget.RecyclerView
+                    android:layout_marginTop="3dp"
                     android:id="@+id/recycler_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:layout_marginBottom="3dp"
-                    android:layout_marginTop="5dp"
                     android:gravity="center_horizontal" />
             </LinearLayout>
 
@@ -39,17 +38,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
+                android:layout_marginTop="2dp"
                 android:gravity="center_horizontal" />
-
             <TextView
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="10dp"
+                android:layout_height="1.5dp"
+                android:background="@color/colorbackground"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:gravity="center"
-                android:padding="5dp"
+                android:padding="2dp"
                 android:text="@string/p_moneytransfer"
+                android:textStyle="bold"
                 android:textColor="@color/colorPrimaryDark"
                 android:textSize="12dp" />
 
@@ -58,16 +59,20 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="5dp"
+                android:layout_marginTop="2dp"
                 android:gravity="center_horizontal" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="1.5dp"
+                android:background="@color/colorbackground"/>
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginTop="10dp"
                 android:gravity="center"
-                android:padding="5dp"
+                android:padding="2dp"
                 android:text="@string/p_recharge"
+                android:textStyle="bold"
                 android:textColor="@color/colorPrimaryDark"
                 android:textSize="12dp" />
 
@@ -76,16 +81,20 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="5dp"
+                android:layout_marginTop="2dp"
                 android:scrollbars="horizontal"
                 android:gravity="center_horizontal" />
             <TextView
                 android:layout_width="match_parent"
+                android:layout_height="1.5dp"
+                android:background="@color/colorbackground"/>
+            <TextView
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginTop="10dp"
                 android:gravity="center"
-                android:padding="5dp"
+                android:padding="2dp"
                 android:text="@string/p_mpos"
+                android:textStyle="bold"
                 android:textColor="@color/colorPrimaryDark"
                 android:textSize="12dp" />
 
@@ -94,26 +103,34 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="5dp"
+                android:layout_marginTop="2dp"
                 android:gravity="center_horizontal" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="1.5dp"
+                android:background="@color/colorbackground"/>
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginTop="10dp"
                 android:gravity="center"
-                android:padding="5dp"
+                android:padding="2dp"
                 android:text="@string/p_travel"
+                android:textStyle="bold"
                 android:textColor="@color/colorPrimaryDark"
-                android:textSize="12dp" />
+                android:textSize="12dp"/>
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/recycler_view3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="5dp"
+                android:layout_marginTop="2dp"
                 android:gravity="center_horizontal" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="1.5dp"
+                android:background="@color/colorbackground"/>
 
         </LinearLayout>
     </LinearLayout>

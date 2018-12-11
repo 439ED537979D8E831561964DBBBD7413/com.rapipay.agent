@@ -30,6 +30,7 @@ public class RapipayDB extends SQLiteOpenHelper {
     // Table 2
     public static final String TABLE_OPERATOR = "Operators";
     public static final String TABLE_FOOTER = "Footer";
+    public static final String TABLE_KYC = "KYCList";
     public static final String TABLE_TRANSFERLIST = "TransferList";
     public static final String TABLE_PAYERPAYEE = "PAYERPAYEE";
     public static final String TABLE_BANK = "BankDetails";
@@ -48,6 +49,34 @@ public class RapipayDB extends SQLiteOpenHelper {
     public static final String COLOMN_OPERATORDATA = "operatorsData";
     public static final String COLOMN_PATH = "path";
     public static final String IMAGE_TIME_STAMP = "timeStamp";
+
+    public static final String MOBILENO = "mobileno";
+    public static final String USER_NAME = "username";
+    public static final String DOB = "dob";
+    public static final String EMAILID = "emailid";
+    public static final String COMPANY_NAME = "comapnyname";
+    public static final String PASSPORT_PHOTO = "passprtphoto";
+    public static final String PERSONAL_CLICKED = "personalclicked";
+    public static final String ADDRESS = "timeStamp";
+    public static final String CITY = "timeStamp";
+    public static final String STATE = "timeStamp";
+    public static final String PINCODE = "timeStamp";
+    public static final String DOCUMENTID = "timeStamp";
+    public static final String DOCUMENTTYPE = "timeStamp";
+    public static final String DOCUMENTFRONT = "timeStamp";
+    public static final String DOCUMENTBACK = "timeStamp";
+    public static final String ADDRESS_CLICKED = "timeStamp";
+    public static final String DOCUMENTFRONT_PHOTO = "timeStamp";
+    public static final String DOCUMENTBACK_PHOTO = "timeStamp";
+    public static final String PANNUMBER = "timeStamp";
+    public static final String PAN_PHOTO = "timeStamp";
+    public static final String GSTINNUMBER = "timeStamp";
+    public static final String GSTIN_PHOTO = "timeStamp";
+    public static final String BUISNESS_CLICKED = "timeStamp";
+    public static final String SELF_PHOTO = "timeStamp";
+    public static final String SIGN_PHOTO = "timeStamp";
+    public static final String VERIFY_CLICKED = "timeStamp";
+
     public RapipayDB(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -62,6 +91,8 @@ public class RapipayDB extends SQLiteOpenHelper {
         db.execSQL("create table " + TABLE_TRANSFERLIST + " ( " + COLOMN_OPERATORID + " VARCHAR(10) , " + COLOMN_OPERATORVALUE + " VARCHAR(50) , " + COLOMN_OPERATORDATA + " VARCHAR(50));");
         db.execSQL("create table " + TABLE_PAYERPAYEE + " ( " + COLOMN_OPERATORID + " VARCHAR(10) , " + COLOMN_OPERATORVALUE + " VARCHAR(50) , " + COLOMN_OPERATORDATA + " VARCHAR(50));");
         db.execSQL("create table " + TABLE_FOOTER + " ( " + COLOMN_OPERATORID + " VARCHAR(10) , " + COLOMN_OPERATORVALUE + " VARCHAR(50) , " + COLOMN_OPERATORDATA + " VARCHAR(50), " + COLOMN_PATH + " VARCHAR(70), " + IMAGE_TIME_STAMP + " VARCHAR(50));");
+
+        db.execSQL("create table " + TABLE_KYC + " ( " + MOBILENO + " VARCHAR(10) , " + USER_NAME + " VARCHAR(100) , " + DOB + " VARCHAR(12), " + EMAILID + " VARCHAR(70), " + COMPANY_NAME + " VARCHAR(50), " + PASSPORT_PHOTO + " VARCHAR(70), " + PERSONAL_CLICKED + " VARCHAR(70));");
     }
 
     @Override

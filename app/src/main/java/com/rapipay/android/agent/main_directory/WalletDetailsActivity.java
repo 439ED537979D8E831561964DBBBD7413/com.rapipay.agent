@@ -455,6 +455,7 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
     private void callKYC() {
         Intent intent = new Intent(WalletDetailsActivity.this, RegisterUserActivity.class);
         intent.putExtra("mobileNo", input_mobile.getText().toString());
+        intent.putExtra("customerType", "C");
 //        intent.putExtra("parentId", list.get(0).getMobilno());
 //        intent.putExtra("sessionKey", list.get(0).getPinsession());
 //        intent.putExtra("sessionRefNo", list.get(0).getAftersessionRefNo());
