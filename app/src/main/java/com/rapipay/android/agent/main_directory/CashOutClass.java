@@ -259,7 +259,10 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                         progessDialog.hide_progress();
                         transactionFlag = false;
                         clear();
-                        Toast.makeText(CashOutClass.this, (String) msg.obj, Toast.LENGTH_SHORT).show();
+                        if (msg.what == 1032)
+                            Toast.makeText(CashOutClass.this, ((TransactionVO) msg.obj).getStatus(), Toast.LENGTH_SHORT).show();
+                        else
+                            Toast.makeText(CashOutClass.this, (String) msg.obj, Toast.LENGTH_SHORT).show();
                         if (accessBluetoothDetails() != null) {
                             JSONObject object = new JSONObject();
                             object.put("responseCode", msg.what);
