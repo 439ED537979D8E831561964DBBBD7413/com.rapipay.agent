@@ -10,7 +10,6 @@ import android.view.View;
 
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.fragments.AgentKYCFragment;
-import com.rapipay.android.agent.fragments.NetworkHistoryFragment;
 import com.rapipay.android.agent.fragments.PendingKyc;
 import com.rapipay.android.agent.fragments.RegisterUserFragment;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
@@ -18,7 +17,7 @@ import com.rapipay.android.agent.utils.BaseCompactActivity;
 public class RegisterKYCTab extends BaseCompactActivity implements View.OnClickListener{
 
     TabLayout tabLayout;
-    RegisterUserFragment fragment_credit;
+    AgentKYCFragment fragment_credit;
     PendingKyc transFragment;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -34,7 +33,7 @@ public class RegisterKYCTab extends BaseCompactActivity implements View.OnClickL
     }
 
     private void setupTabLayout() {
-        fragment_credit = new RegisterUserFragment();
+        fragment_credit = new AgentKYCFragment();
         transFragment = new PendingKyc();
 //        transFragment = new CreditTransFragment();
 

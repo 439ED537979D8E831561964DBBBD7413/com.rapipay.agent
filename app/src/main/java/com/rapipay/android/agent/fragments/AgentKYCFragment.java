@@ -17,12 +17,16 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.rapipay.android.agent.Database.RapipayDB;
+import com.rapipay.android.agent.Model.NewKYCPozo;
 import com.rapipay.android.agent.Model.RapiPayPozo;
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.interfaces.RequestHandler;
 import com.rapipay.android.agent.main_directory.BarcodeActivity;
+import com.rapipay.android.agent.main_directory.CustomerKYCActivity;
 import com.rapipay.android.agent.main_directory.KYCFormActivity;
 import com.rapipay.android.agent.utils.AsyncPostMethod;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
@@ -47,14 +51,15 @@ public class AgentKYCFragment extends Fragment implements RequestHandler, View.O
     AppCompatButton sub_btn;
     Spinner spinner;
     String[] items = new String[]{"Select Document Type", "Aadhar Card", "Voter Id Card", "Driving License", "Passport"};
-    String spinner_value = "", TYPE, customerType;
-    String type = "";
+    String spinner_value = "", TYPE, mobileNo, customerType;
+    String type = "MANUAL";
+    private ArrayList<NewKYCPozo> newKYCList_Personal = null,newKYCList_Address=null,newKYCList_Buisness=null,newKYCList_Verify=null;
     protected String headerData = (WebConfig.BASIC_USERID + ":" + WebConfig.BASIC_PASSWORD);
-
+    private  View rv=null;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        View rv = (View) inflater.inflate(R.layout.activity_kyc_new, container, false);
+        rv = (View) inflater.inflate(R.layout.activity_kyc_new, container, false);
         if (BaseCompactActivity.db != null && BaseCompactActivity.db.getDetails_Rapi())
             list = BaseCompactActivity.db.getDetails();
         TYPE = getActivity().getIntent().getStringExtra("type");
@@ -87,7 +92,7 @@ public class AgentKYCFragment extends Fragment implements RequestHandler, View.O
                     InputFilter[] filterArray = new InputFilter[1];
                     filterArray[0] = new InputFilter.LengthFilter(12);
                     documentid.setFilters(filterArray);
-                }else
+                } else
                     documentid.setInputType(InputType.TYPE_CLASS_TEXT);
             }
 
@@ -103,8 +108,7 @@ public class AgentKYCFragment extends Fragment implements RequestHandler, View.O
         rv.findViewById(R.id.adrs_btn).setOnClickListener(this);
         rv.findViewById(R.id.business_btn).setOnClickListener(this);
         rv.findViewById(R.id.verification_btn).setOnClickListener(this);
-        if (!TYPE.equalsIgnoreCase("outside"))
-            rv.findViewById(R.id.buisness_layout).setVisibility(View.GONE);
+
     }
 
     @Override
@@ -121,7 +125,7 @@ public class AgentKYCFragment extends Fragment implements RequestHandler, View.O
                     documentid.setError("Please enter valid data");
                     documentid.requestFocus();
                 } else
-                    new AsyncPostMethod("http://192.168.1.105:8080/KYC_RAPIPAY_APP/EKYCProcess", request_user(customerType).toString(), headerData, AgentKYCFragment.this, getActivity()).execute();
+                    new AsyncPostMethod(WebConfig.EKYC_FORWARD, request_user(customerType).toString(), headerData,AgentKYCFragment.this, getActivity()).execute();
                 break;
             case R.id.scan_btn:
                 type = "SCAN";
@@ -147,7 +151,11 @@ public class AgentKYCFragment extends Fragment implements RequestHandler, View.O
                 intent.putExtra("type", type);
                 intent.putExtra("persons", TYPE);
                 intent.putExtra("button", "personal");
-                intent.putExtra("customerType", "A");
+                intent.putExtra("customerType", "C");
+                if (newKYCList_Personal != null && newKYCList_Personal.size() != 0)
+                    intent.putExtra("localPersonal", "true");
+                else
+                    intent.putExtra("localPersonal", "false");
                 intent.putExtra("mobileNo", mobile_no.getText().toString());
                 if (jsonObject != null) {
                     intent.putExtra("scandata", jsonObject.toString());
@@ -161,7 +169,12 @@ public class AgentKYCFragment extends Fragment implements RequestHandler, View.O
                 intent.putExtra("type", type);
                 intent.putExtra("persons", TYPE);
                 intent.putExtra("button", "address");
-                intent.putExtra("customerType", "A");
+                intent.putExtra("customerType", "C");
+                intent.putExtra("mobileNo", mobile_no.getText().toString());
+                if (newKYCList_Address != null && newKYCList_Address.size() != 0)
+                    intent.putExtra("localAddress", "true");
+                else
+                    intent.putExtra("localAddress", "false");
                 if (jsonObject != null) {
                     intent.putExtra("scandata", jsonObject.toString());
                 }
@@ -174,15 +187,32 @@ public class AgentKYCFragment extends Fragment implements RequestHandler, View.O
                 intent.putExtra("type", type);
                 intent.putExtra("persons", TYPE);
                 intent.putExtra("button", "buisness");
-                intent.putExtra("customerType", "A");
+                intent.putExtra("customerType", "C");
+                intent.putExtra("mobileNo", mobile_no.getText().toString());
+                intent.putExtra("documentType", spinner_value);
+                intent.putExtra("documentID", documentid.getText().toString());
+                if (newKYCList_Buisness != null && newKYCList_Buisness.size() != 0)
+                    intent.putExtra("localBusiness", "true");
+                else
+                    intent.putExtra("localBusiness", "false");
                 startActivityForResult(intent, 2);
                 break;
             case R.id.verification_btn:
                 intent = new Intent(getActivity(), KYCFormActivity.class);
                 intent.putExtra("type", type);
                 intent.putExtra("persons", TYPE);
-                intent.putExtra("customerType", "A");
+                intent.putExtra("customerType", "C");
                 intent.putExtra("button", "verification");
+                intent.putExtra("mobileNo", mobile_no.getText().toString());
+                intent.putExtra("documentType", spinner_value);
+                intent.putExtra("documentID", documentid.getText().toString());
+                intent.putExtra("localPersonal", "true");
+                intent.putExtra("localAddress", "true");
+                intent.putExtra("localBusiness", "true");
+                if (newKYCList_Verify != null && newKYCList_Verify.size() != 0)
+                    intent.putExtra("localVerify", "true");
+                else
+                    intent.putExtra("localVerify", "false");
                 startActivityForResult(intent, 2);
                 break;
         }
@@ -221,16 +251,49 @@ public class AgentKYCFragment extends Fragment implements RequestHandler, View.O
         return jsonObject;
     }
 
-
     @Override
     public void chechStatus(JSONObject object) {
         try {
             if (object.getString("responseCode").equalsIgnoreCase("200")) {
                 if (object.getString("serviceType").equalsIgnoreCase("VALIDATE_KYC_DETAILS")) {
                     if (object.getString("responseMessage").equalsIgnoreCase("success")) {
-                        scan_data.setVisibility(View.VISIBLE);
-                        sub_btn.setVisibility(View.GONE);
+                        String condition = "where " + RapipayDB.MOBILENO + "='" + mobile_no.getText().toString() + "'" + " AND " + RapipayDB.DOCUMENTTYPE + "='" + spinner_value + "'" + " AND " + RapipayDB.DOCUMENTID + "='" + documentid.getText().toString() + "'";
+                        newKYCList_Personal = BaseCompactActivity.db.getKYCDetails_Personal(condition);
+                        if (newKYCList_Personal != null && newKYCList_Personal.size() != 0) {
+                            rv.findViewById(R.id.prsnl_btn).setBackgroundColor(getResources().getColor(R.color.green));
+                            documentid.setText(newKYCList_Personal.get(0).getDOCUMENTID());
+                            documentid.setEnabled(false);
+                            TextView documentype = (TextView) rv.findViewById(R.id.documentype);
+                            documentype.setVisibility(View.VISIBLE);
+                            documentype.setEnabled(false);
+                            documentype.setText(newKYCList_Personal.get(0).getDOCUMENTTYPE());
+                            spinner.setVisibility(View.GONE);
+                            sub_btn.setVisibility(View.GONE);
+                            kyc_layout_bottom.setVisibility(View.VISIBLE);
+                            newKYCList_Address = BaseCompactActivity.db.getKYCDetails_Address(condition);
+                            if (newKYCList_Address.size() != 0) {
+                                rv.findViewById(R.id.adrs_btn).setBackgroundColor(getResources().getColor(R.color.green));
+                                rv.findViewById(R.id.address_layout).setVisibility(View.VISIBLE);
+                                newKYCList_Buisness = BaseCompactActivity.db.getKYCDetails_BUISNESS(condition);
+                                if (newKYCList_Buisness.size() != 0) {
+                                    rv.findViewById(R.id.business_btn).setBackgroundColor(getResources().getColor(R.color.green));
+                                    rv.findViewById(R.id.buisness_layout).setVisibility(View.VISIBLE);
+                                    newKYCList_Verify = BaseCompactActivity.db.getKYCDetails_VERIFY(condition);
+                                    if (newKYCList_Verify.size() != 0) {
+                                        rv.findViewById(R.id.verification_btn).setBackgroundColor(getResources().getColor(R.color.green));
+                                        rv.findViewById(R.id.verification_button).setVisibility(View.VISIBLE);
+                                    } else
+                                        rv.findViewById(R.id.verification_button).setVisibility(View.VISIBLE);
+                                } else
+                                    rv.findViewById(R.id.buisness_layout).setVisibility(View.VISIBLE);
+                            } else
+                                rv.findViewById(R.id.address_layout).setVisibility(View.VISIBLE);
+                        } else {
+                            scan_data.setVisibility(View.VISIBLE);
+                            sub_btn.setVisibility(View.GONE);
+                        }
                         hideKeyboard(getActivity());
+
                     }
                 }
             }
@@ -266,62 +329,5 @@ public class AgentKYCFragment extends Fragment implements RequestHandler, View.O
             }
         }
     }
-
-//    private void parseJson(JSONObject object) {
-//        try {
-//            scan_check = 2;
-//            if (object.has("name")) {
-//                input_name.setText(object.getString("name"));
-//                input_name.setEnabled(false);
-//            }
-//            if (object.has("house") && object.has("street") && object.has("lm") && object.has("vtc") && object.has("dist")) {
-//                String add = object.getString("house") + ", " + object.getString("street") + ", " + object.getString("lm") + ", " + object.getString("vtc").replaceAll("^\\s+", "") + ", " + object.getString("dist");
-//                input_address.setText(add);
-//                input_address.setEnabled(false);
-//            } else if (object.has("street") && object.has("lm") && object.has("vtc") && object.has("dist")) {
-//                String add = object.getString("street") + ", " + object.getString("lm") + ", " + object.getString("vtc").replaceAll("^\\s+", "") + ", " + object.getString("dist");
-//                input_address.setText(add.replace("null,", ""));
-//                input_address.setEnabled(false);
-//            } else if (object.has("house") && object.has("street") && object.has("lm") && object.has("loc") && object.has("vtc") && object.has("dist")) {
-//                String add = object.getString("house") + ", " + object.getString("street") + ", " + object.getString("lm") + ", " + object.getString("loc") + ", " + object.getString("vtc").replaceAll("^\\s+", "") + ", " + object.getString("dist");
-//                input_address.setText(add);
-//                input_address.setEnabled(false);
-//            } else if (object.has("house") && object.has("street") && object.has("loc") && object.has("vtc") && object.has("dist")) {
-//                String add = object.getString("house") + ", " + object.getString("street") + ", " + object.getString("loc") + ", " + object.getString("vtc").replaceAll("^\\s+", "") + ", " + object.getString("dist");
-//                input_address.setText(add);
-//                input_address.setEnabled(false);
-//            } else if (object.has("_house") && object.has("_street") && object.has("_lm") && object.has("_vtc") && object.has("_dist")) {
-//                String add = object.getString("_house") + ", " + object.getString("_street") + ", " + object.getString("_lm") + ", " + object.getString("_vtc").replaceAll("^\\s+", "") + ", " + object.getString("_dist");
-//                input_address.setText(add);
-//                input_address.setEnabled(false);
-//            } else if (object.has("_loc") && object.has("vtc") && object.has("dist")) {
-//                String add = object.getString("_loc") + ", " + object.getString("vtc").replaceAll("^\\s+", "") + ", " + object.getString("dist");
-//                input_address.setText(add);
-//                input_address.setEnabled(false);
-//            } else if (object.has("loc") && object.has("vtc") && object.has("dist")) {
-//                String add = object.getString("loc") + ", " + object.getString("vtc").replaceAll("^\\s+", "") + ", " + object.getString("dist");
-//                input_address.setText(add);
-//                input_address.setEnabled(false);
-//            } else if (object.has("_loc") && object.has("_vtc") && object.has("_dist")) {
-//                String add = object.getString("_loc") + ", " + object.getString("_vtc").replaceAll("^\\s+", "") + ", " + object.getString("_dist");
-//                input_address.setText(add);
-//                input_address.setEnabled(false);
-//            } else if (object.has("_lm") && object.has("_loc") && object.has("_vtc") && object.has("_dist")) {
-//                String add = object.getString("_lm") + ", " + object.getString("_loc") + ", " + object.getString("vtc").replaceAll("^\\s+", "") + ", " + object.getString("dist");
-//                input_address.setText(add);
-//                input_address.setEnabled(false);
-//            }
-//            if (object.has("state"))
-//                select_state.setText(object.getString("state"));
-//            if (object.has("_state"))
-//                select_state.setText(object.getString("_state"));
-//            if (input_name.getText().toString().isEmpty() || input_address.getText().toString().isEmpty() || select_state.getText().toString().isEmpty())
-//                Toast.makeText(getActivity(), "Please fill entry manually", Toast.LENGTH_SHORT).show();
-//            select_state.setEnabled(false);
-////            reset.setVisibility(View.VISIBLE);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
 
 }
