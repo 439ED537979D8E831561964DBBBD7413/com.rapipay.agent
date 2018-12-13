@@ -1,21 +1,15 @@
 package com.rapipay.android.agent.main_directory;
 
-import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.net.http.SslError;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.Base64;
 import android.util.Log;
@@ -39,13 +33,10 @@ import com.rapipay.android.agent.utils.WebConfig;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -59,14 +50,13 @@ public class MPOSRegistration extends BaseCompactActivity implements RequestHand
     private static final String TAG = MainActivity.class.getSimpleName();
     ArrayList<String> listPath = new ArrayList<>();
     private long size = 0;
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.webview_layout);
         mpos_service();
+        TYPE="outside";
     }
-
     public String getmpos_Validate() {
         String form = null;
         JSONObject jsonObject = new JSONObject();
@@ -105,8 +95,6 @@ public class MPOSRegistration extends BaseCompactActivity implements RequestHand
         }
         return form;
     }
-
-
     public void mpos_service() {
         heading = (TextView) findViewById(R.id.toolbar_title);
         heading.setText("MPOS Registration");
@@ -131,7 +119,6 @@ public class MPOSRegistration extends BaseCompactActivity implements RequestHand
         if (formPostData != null)
             web.loadDataWithBaseURL("", formPostData, "text/html", "UTF-8", "");
     }
-
     public class PQChromeClient extends WebChromeClient {
 
         // For Android 5.0+
@@ -141,51 +128,10 @@ public class MPOSRegistration extends BaseCompactActivity implements RequestHand
                 mUploadMessage.onReceiveValue(null);
             }
             mUploadMessage = filePath;
-            loadIMEIs();
+            loadCamera();
             return true;
         }
     }
-
-    private void selectPhotoAgent() {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            // Create the File where the photo should go
-            File photoFile = null;
-            try {
-                photoFile = createImageFile();
-                takePictureIntent.putExtra("PhotoPath", mCameraPhotoPath);
-            } catch (IOException ex) {
-                // Error occurred while creating the File
-                Log.e(TAG, "Unable to create Image File", ex);
-            }
-            // Continue only if the File was successfully created
-            if (photoFile != null) {
-                mCameraPhotoPath = "file:" + photoFile.getAbsolutePath();
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
-            } else {
-                takePictureIntent = null;
-            }
-        }
-        Intent contentSelectionIntent = new Intent(Intent.ACTION_GET_CONTENT);
-        contentSelectionIntent.addCategory(Intent.CATEGORY_OPENABLE);
-        contentSelectionIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-        contentSelectionIntent.setType("image/*");
-
-        Intent[] intentArray;
-        if (takePictureIntent != null) {
-            intentArray = new Intent[]{takePictureIntent, intent};
-        } else {
-            intentArray = new Intent[2];
-        }
-
-        Intent chooserIntent = new Intent(Intent.ACTION_CHOOSER);
-        chooserIntent.putExtra(Intent.EXTRA_INTENT, contentSelectionIntent);
-        chooserIntent.putExtra(Intent.EXTRA_TITLE, "Image Chooser");
-        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray);
-        startActivityForResult(Intent.createChooser(chooserIntent, "Select images"), 1);
-    }
-
     @Override
     public void chechStatus(JSONObject object) {
         try {
@@ -198,18 +144,15 @@ public class MPOSRegistration extends BaseCompactActivity implements RequestHand
             e.printStackTrace();
         }
     }
-
     @Override
     public void chechStat(String object) {
 
     }
-
     @Override
     public void onBackPressed() {
         setBack_click(this);
         finish();
     }
-
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -219,7 +162,6 @@ public class MPOSRegistration extends BaseCompactActivity implements RequestHand
                 break;
         }
     }
-
     public class myWebClient extends WebViewClient {
         ProgressDialog progressDialog;
 
@@ -300,7 +242,6 @@ public class MPOSRegistration extends BaseCompactActivity implements RequestHand
 
         }
     }
-
     public String inputStreamAsString(String url) {
         String data = null;
         try {
@@ -320,7 +261,6 @@ public class MPOSRegistration extends BaseCompactActivity implements RequestHand
         }
         return null;
     }
-
     public Map<String, String> getQueryMap(String query) {
         if (query.contains("?")) {
             String[] params = query.split("\\?");
@@ -337,7 +277,6 @@ public class MPOSRegistration extends BaseCompactActivity implements RequestHand
             return null;
         }
     }
-
     @Override
     public void okClicked(String type, Object ob) {
         if (type.equalsIgnoreCase("KYCLAYOUTS")) {
@@ -345,109 +284,10 @@ public class MPOSRegistration extends BaseCompactActivity implements RequestHand
             finish();
         }
     }
-
     @Override
     public void cancelClicked(String type, Object ob) {
 
     }
-
-    public void loadIMEIs() {
-        // Check if the READ_PHONE_STATE permission is already available.
-        if (ActivityCompat.checkSelfPermission(MPOSRegistration.this, Manifest.permission.CAMERA)
-                != PackageManager.PERMISSION_GRANTED) {
-            // READ_PHONE_STATE permission has not been granted.
-            //            checkAndRequestPermissions();
-            requestReadPhoneStatePermission();
-        } else {
-
-            // READ_PHONE_STATE permission is already been granted.
-            doPermissionGrantedStuffs();
-        }
-    }
-
-    private void requestReadPhoneStatePermission() {
-        if (ActivityCompat.shouldShowRequestPermissionRationale(MPOSRegistration.this,
-                Manifest.permission.CAMERA)) {
-            alertPerm(getString(R.string.permission_read_phone_state_rationale), new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    ActivityCompat.requestPermissions(MPOSRegistration.this,
-                            new String[]{Manifest.permission.CAMERA},
-                            PERMISSIONS_REQUEST_READ_PHONE_STATE);
-                    doPermissionGrantedStuffs();
-                }
-            });
-
-        } else {
-            // READ_PHONE_STATE permission has not been granted yet. Request it directly.
-            ActivityCompat.requestPermissions(MPOSRegistration.this, new String[]{Manifest.permission.CAMERA},
-                    PERMISSIONS_REQUEST_READ_PHONE_STATE);
-        }
-    }
-
-    private void alertPerm(String msg, DialogInterface.OnClickListener okListener) {
-        new AlertDialog.Builder(MPOSRegistration.this)
-                .setTitle("Permission Request")
-                .setMessage(msg)
-                .setCancelable(false)
-                .setPositiveButton(android.R.string.yes, okListener)
-                .setIcon(R.mipmap.ic_launcher_round)
-                .show();
-    }
-
-    private void doPermissionGrantedStuffs() {
-        if (ActivityCompat.checkSelfPermission(MPOSRegistration.this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-//            if (TYPE.equalsIgnoreCase("internal")) {
-//                if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-//                    // Do something for lollipop and above versions
-//                    selectPhotoCustomer();
-//                } else {
-//                    // do something for phones running an SDK before lollipop
-//                    selectPhotoAgent();
-//                }
-//
-//            } else if (TYPE.equalsIgnoreCase("outside") || TYPE.equalsIgnoreCase("pending"))
-            selectPhotoAgent();
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-
-        if (requestCode == PERMISSIONS_REQUEST_READ_PHONE_STATE) {
-            // Received permission result for READ_PHONE_STATE permission.est.");
-            // Check if the only required permission has been granted
-            if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // READ_PHONE_STATE permission has been granted, proceed with displaying IMEI Number
-                doPermissionGrantedStuffs();
-
-            } else {
-                alertPerm(getString(R.string.permissions_not_granted_read_phone_state), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        loadIMEIs();
-                    }
-                });
-
-            }
-        }
-    }
-
-    private File createImageFile() throws IOException {
-        // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES);
-        File imageFile = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
-        );
-        return imageFile;
-    }
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode != INPUT_FILE_REQUEST_CODE || mUploadMessage == null) {
@@ -505,5 +345,4 @@ public class MPOSRegistration extends BaseCompactActivity implements RequestHand
             mUploadMessage = null;
         }
     }
-
 }

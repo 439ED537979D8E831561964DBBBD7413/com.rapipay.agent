@@ -159,9 +159,21 @@ public class CustomerKYCActivity extends BaseCompactActivity implements RequestH
                 intent.putExtra("persons", TYPE);
                 intent.putExtra("button", "personal");
                 intent.putExtra("customerType", "C");
-                if (newKYCList_Personal != null && newKYCList_Personal.size() != 0)
+                if (newKYCList_Personal != null && newKYCList_Personal.size() != 0) {
                     intent.putExtra("localPersonal", "true");
-                else
+                    if (newKYCList_Address != null && newKYCList_Address.size() != 0) {
+                        intent.putExtra("localAddress", "true");
+                        if (newKYCList_Buisness != null && newKYCList_Buisness.size() != 0) {
+                            intent.putExtra("localBusiness", "true");
+                            if (newKYCList_Verify != null && newKYCList_Verify.size() != 0)
+                                intent.putExtra("localVerify", "true");
+                            else
+                                intent.putExtra("localVerify", "false");
+                        }else
+                            intent.putExtra("localBusiness", "false");
+                    }else
+                        intent.putExtra("localAddress", "false");
+                }else
                     intent.putExtra("localPersonal", "false");
                 intent.putExtra("mobileNo", mobile_no.getText().toString());
                 if (jsonObject != null) {
@@ -178,9 +190,17 @@ public class CustomerKYCActivity extends BaseCompactActivity implements RequestH
                 intent.putExtra("button", "address");
                 intent.putExtra("customerType", "C");
                 intent.putExtra("mobileNo", mobile_no.getText().toString());
-                if (newKYCList_Address != null && newKYCList_Address.size() != 0)
+                if (newKYCList_Address != null && newKYCList_Address.size() != 0) {
                     intent.putExtra("localAddress", "true");
-                else
+                    if (newKYCList_Buisness != null && newKYCList_Buisness.size() != 0) {
+                        intent.putExtra("localBusiness", "true");
+                        if (newKYCList_Verify != null && newKYCList_Verify.size() != 0)
+                            intent.putExtra("localVerify", "true");
+                        else
+                            intent.putExtra("localVerify", "false");
+                    }else
+                        intent.putExtra("localBusiness", "false");
+                }else
                     intent.putExtra("localAddress", "false");
                 if (jsonObject != null) {
                     intent.putExtra("scandata", jsonObject.toString());
@@ -198,9 +218,13 @@ public class CustomerKYCActivity extends BaseCompactActivity implements RequestH
                 intent.putExtra("mobileNo", mobile_no.getText().toString());
                 intent.putExtra("documentType", spinner_value);
                 intent.putExtra("documentID", documentid.getText().toString());
-                if (newKYCList_Buisness != null && newKYCList_Buisness.size() != 0)
+                if (newKYCList_Buisness != null && newKYCList_Buisness.size() != 0) {
                     intent.putExtra("localBusiness", "true");
-                else
+                    if (newKYCList_Verify != null && newKYCList_Verify.size() != 0)
+                        intent.putExtra("localVerify", "true");
+                    else
+                        intent.putExtra("localVerify", "false");
+                }else
                     intent.putExtra("localBusiness", "false");
                 startActivityForResult(intent, 2);
                 break;
@@ -223,6 +247,12 @@ public class CustomerKYCActivity extends BaseCompactActivity implements RequestH
                 startActivityForResult(intent, 2);
                 break;
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        resumeCall();
     }
 
     public void hideKeyboard(Activity activity) {
@@ -276,6 +306,7 @@ public class CustomerKYCActivity extends BaseCompactActivity implements RequestH
                             documentype.setText(newKYCList_Personal.get(0).getDOCUMENTTYPE());
                             spinner.setVisibility(View.GONE);
                             sub_btn.setVisibility(View.GONE);
+                            scan_data.setVisibility(View.GONE);
                             kyc_layout_bottom.setVisibility(View.VISIBLE);
                             newKYCList_Address = db.getKYCDetails_Address(condition);
                             if (newKYCList_Address.size() != 0) {
@@ -309,6 +340,41 @@ public class CustomerKYCActivity extends BaseCompactActivity implements RequestH
         }
     }
 
+    private void resumeCall(){
+        String condition = "where " + RapipayDB.MOBILENO + "='" + mobileNo + "'" + " AND " + RapipayDB.DOCUMENTTYPE + "='" + spinner_value + "'" + " AND " + RapipayDB.DOCUMENTID + "='" + documentid.getText().toString() + "'";
+        newKYCList_Personal = db.getKYCDetails_Personal(condition);
+        if (newKYCList_Personal != null && newKYCList_Personal.size() != 0) {
+            findViewById(R.id.prsnl_btn).setBackgroundColor(getResources().getColor(R.color.green));
+            documentid.setText(newKYCList_Personal.get(0).getDOCUMENTID());
+            documentid.setEnabled(false);
+            TextView documentype = (TextView) findViewById(R.id.documentype);
+            documentype.setVisibility(View.VISIBLE);
+            documentype.setEnabled(false);
+            documentype.setText(newKYCList_Personal.get(0).getDOCUMENTTYPE());
+            spinner.setVisibility(View.GONE);
+            sub_btn.setVisibility(View.GONE);
+            kyc_layout_bottom.setVisibility(View.VISIBLE);
+            scan_data.setVisibility(View.GONE);
+            newKYCList_Address = db.getKYCDetails_Address(condition);
+            if (newKYCList_Address.size() != 0) {
+                findViewById(R.id.adrs_btn).setBackgroundColor(getResources().getColor(R.color.green));
+                findViewById(R.id.address_layout).setVisibility(View.VISIBLE);
+                newKYCList_Buisness = db.getKYCDetails_BUISNESS(condition);
+                if (newKYCList_Buisness.size() != 0) {
+                    findViewById(R.id.business_btn).setBackgroundColor(getResources().getColor(R.color.green));
+                    findViewById(R.id.buisness_layout).setVisibility(View.VISIBLE);
+                    newKYCList_Verify = db.getKYCDetails_VERIFY(condition);
+                    if (newKYCList_Verify.size() != 0) {
+                        findViewById(R.id.verification_btn).setBackgroundColor(getResources().getColor(R.color.green));
+                        findViewById(R.id.verification_button).setVisibility(View.VISIBLE);
+                    } else
+                        findViewById(R.id.verification_button).setVisibility(View.VISIBLE);
+                } else
+                    findViewById(R.id.buisness_layout).setVisibility(View.VISIBLE);
+            } else
+                findViewById(R.id.address_layout).setVisibility(View.VISIBLE);
+        }
+    }
     @Override
     public void chechStat(String object) {
 

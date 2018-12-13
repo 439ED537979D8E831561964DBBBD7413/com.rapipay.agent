@@ -224,8 +224,8 @@ public class RapipayDB extends SQLiteOpenHelper {
                 payPozo.setMOBILENO(cursor.getString(0));
                 payPozo.setUSER_NAME(cursor.getString(1));
                 payPozo.setDOB(cursor.getString(2));
-                payPozo.setCOMPANY_NAME(cursor.getString(3));
-                payPozo.setEMAILID(cursor.getString(4));
+                payPozo.setEMAILID(cursor.getString(3));
+                payPozo.setCOMPANY_NAME(cursor.getString(4));
                 payPozo.setPASSPORT_PHOTO(cursor.getString(5));
                 payPozo.setPERSONAL_CLICKED(cursor.getString(6));
                 payPozo.setDOCUMENTTYPE(cursor.getString(7));

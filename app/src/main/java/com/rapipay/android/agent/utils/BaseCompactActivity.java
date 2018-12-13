@@ -13,15 +13,14 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Environment;
 import android.provider.ContactsContract;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -32,7 +31,6 @@ import android.support.v7.widget.AppCompatButton;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
-import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -58,8 +56,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 
 import me.grantland.widget.AutofitTextView;
@@ -73,7 +73,6 @@ import com.rapipay.android.agent.Model.VersionPozo;
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.adapter.BottomAdapter;
 import com.rapipay.android.agent.adapter.CustomSpinnerAdapter;
-import com.rapipay.android.agent.adapter.ReceiptAdapter;
 import com.rapipay.android.agent.interfaces.CustomInterface;
 import com.rapipay.android.agent.interfaces.VersionListener;
 import com.rapipay.android.agent.main_directory.MainActivity;
@@ -91,6 +90,7 @@ public class BaseCompactActivity extends AppCompatActivity {
     public static RapipayDB db;
     protected ArrayList<RapiPayPozo> list;
     final protected static int PERMISSIONS_REQUEST_READ_PHONE_STATE = 0;
+    final protected static int PERMISSIONS_REQUEST_CAMERA_STATE = 1;
     protected LocalStorage localStorage;
     protected String headerData = (WebConfig.BASIC_USERID + ":" + WebConfig.BASIC_PASSWORD);
     private int selectedDate, selectedMonth, selectedYear;
@@ -100,13 +100,15 @@ public class BaseCompactActivity extends AppCompatActivity {
     ArrayList<String> left, right, medium, spinner_list;
     ArrayList<HeaderePozo> bottom;
     LinearLayout main_layout;
+    protected String mCameraPhotoPath = null;
+    protected static final String TAG = MainActivity.class.getSimpleName();
+    protected ArrayList<String> listPath = new ArrayList<>();
+    protected String TYPE="";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        align_text_center();
         tsLong = System.currentTimeMillis() / 1000;
-        // Obtain the FirebaseAnalytics instance.
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         localStorage = LocalStorage.getInstance(this);
         hideKeyboard(this);
@@ -132,15 +134,11 @@ public class BaseCompactActivity extends AppCompatActivity {
 
     protected String saveToInternalStorage(Bitmap bitmapImage, String name) {
         ContextWrapper cw = new ContextWrapper(getApplicationContext());
-        // path to /data/data/yourapp/app_data/imageDir
         File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
-        // Create imageDir
         File mypath = new File(directory, name);
-
         FileOutputStream fos = null;
         try {
             fos = new FileOutputStream(mypath);
-            // Use the compress method on the BitMap object to write image to the OutputStream
             bitmapImage.compress(Bitmap.CompressFormat.JPEG, 50, fos);
         } catch (Exception e) {
             e.printStackTrace();
@@ -185,9 +183,7 @@ public class BaseCompactActivity extends AppCompatActivity {
 
     public void hideKeyboard(Activity activity) {
         InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
-        //Find the currently focused view, so we can grab the correct window token from it.
         View view = activity.getCurrentFocus();
-        //If no view currently has focus, create a new one, just so we can grab a window token from it
         if (view == null) {
             view = new View(activity);
         }
@@ -319,13 +315,7 @@ public class BaseCompactActivity extends AppCompatActivity {
         TextView btn_bank = (TextView) alertLayout.findViewById(R.id.btn_bank_service);
         TextView btn_amount_servide = (TextView) alertLayout.findViewById(R.id.btn_amount_servide);
         TextView change = (TextView) alertLayout.findViewById(R.id.change);
-//        if(object.getString("sForComm").equalsIgnoreCase("1"))
         change.setText(object.getString("sForComm"));
-//        else if(object.getString("").equalsIgnoreCase("1"))
-//            change.setText("Service Fee");
-//        if (ben_amount == null)
-//            btn_amount_servide.setText(object.getString("txnAmount"));
-//        else
         btn_amount_servide.setText(object.getString("txnAmount"));
         if (!pozo.getAccountno().equalsIgnoreCase("null"))
             btn_account.setText(pozo.getAccountno());
@@ -359,28 +349,13 @@ public class BaseCompactActivity extends AppCompatActivity {
         TextView btn_bank = (TextView) alertLayout.findViewById(R.id.btn_bank_service);
         TextView btn_amount_servide = (TextView) alertLayout.findViewById(R.id.btn_amount_servide);
         TextView change = (TextView) alertLayout.findViewById(R.id.change);
-//        if(object.getString("sForComm").equalsIgnoreCase("1"))
         change.setText(object.getString("sForComm"));
-//        else if(object.getString("").equalsIgnoreCase("1"))
-//            change.setText("Service Fee");
-//        if (ben_amount == null)
-//            btn_amount_servide.setText(object.getString("txnAmount"));
-//        else
         btn_amount_servide.setText(object.getString("txnAmount"));
-//        if (!pozo.getAccountno().equalsIgnoreCase("null"))
-//            btn_account.setText(pozo.getAccountno());
-//        else
         btn_account.setText(accountNo);
         btn_sendname.setText(input);
-//        if (msg.equalsIgnoreCase("Sure you want to Transfer?")) {
         String condition = "where " + RapipayDB.COLOMN_IFSC + "='" + ifsc_code + "'";
         btn_bank.setText(db.geBank(condition).get(0));
-//        } else
-//            btn_bank.setText(pozo.getBank());
-//        if (!pozo.getName().equalsIgnoreCase("null"))
         btn_name.setText(name);
-//        else
-//            btn_name.setText("NA");
         dialog.setView(alertLayout);
     }
 
@@ -562,7 +537,6 @@ public class BaseCompactActivity extends AppCompatActivity {
                 } else if (phoneNumber.length() == 10) {
                     input_number.setText(phoneNumber);
                 }
-//
             } else if (phoneNumber.startsWith("0")) {
                 if (phoneNumber.length() == 11) {
                     String str_getMOBILE = phoneNumber.substring(1);
@@ -578,15 +552,10 @@ public class BaseCompactActivity extends AppCompatActivity {
 
 
     public void loadIMEI() {
-        // Check if the READ_PHONE_STATE permission is already available.
         if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_CONTACTS)
                 != PackageManager.PERMISSION_GRANTED) {
-            // READ_PHONE_STATE permission has not been granted.
-//            checkAndRequestPermissions();
             requestReadPhoneStatePermission();
         } else {
-
-            // READ_PHONE_STATE permission is already been granted.
             doPermissionGrantedStuffs();
         }
     }
@@ -605,26 +574,17 @@ public class BaseCompactActivity extends AppCompatActivity {
             });
 
         } else {
-            // READ_PHONE_STATE permission has not been granted yet. Request it directly.
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_CONTACTS},
                     PERMISSIONS_REQUEST_READ_PHONE_STATE);
         }
     }
-
-    /**
-     * Callback received when a permissions request has been completed.
-     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
 
         if (requestCode == PERMISSIONS_REQUEST_READ_PHONE_STATE) {
-            // Received permission result for READ_PHONE_STATE permission.est.");
-            // Check if the only required permission has been granted
             if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // READ_PHONE_STATE permission has been granted, proceed with displaying IMEI Number
                 doPermissionGrantedStuffs();
-
             } else {
                 alertPerm(getString(R.string.permissions_not_granted_read_phone_state), new DialogInterface.OnClickListener() {
                     @Override
@@ -632,7 +592,17 @@ public class BaseCompactActivity extends AppCompatActivity {
                         loadIMEI();
                     }
                 });
-
+            }
+        } else if (requestCode == PERMISSIONS_REQUEST_CAMERA_STATE) {
+            if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                doCameraPermissionGrantedStuffs();
+            } else {
+                alertPerm(getString(R.string.permissions_not_granted_read_phone_state), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        loadCamera();
+                    }
+                });
             }
         }
     }
@@ -754,15 +724,12 @@ public class BaseCompactActivity extends AppCompatActivity {
         dialog = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
         View alertLayout = inflater.inflate(R.layout.cashout_receipt, null);
-
         main_layout = (LinearLayout) alertLayout.findViewById(R.id.main_layout);
-
         main_layout.setDrawingCacheEnabled(true);
         main_layout.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
                 View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
         main_layout.layout(0, 0, main_layout.getMeasuredWidth(), main_layout.getMeasuredHeight());
         main_layout.buildDrawingCache(true);
-
         TextView text = (TextView) alertLayout.findViewById(R.id.agent_name);
         TextView custom_name = (TextView) alertLayout.findViewById(R.id.custom_name);
         TextView amounts = (TextView) alertLayout.findViewById(R.id.amount);
@@ -808,29 +775,6 @@ public class BaseCompactActivity extends AppCompatActivity {
                 listbottom.addView(inflate);
             }
         }
-//        if (bottom.size() != 0) {
-//            for (int i = 0; i < bottom.size(); i++) {
-//                View inflate = inflater.inflate(R.layout.bottom_layout, null);
-//                AutofitTextView btn_name = (AutofitTextView) inflate.findViewById(R.id.btn_name);
-//                TextView btn_p_bank = (TextView) inflate.findViewById(R.id.btn_p_bank);
-//                LinearLayout top = (LinearLayout) inflate.findViewById(R.id.top);
-//                if (i % 2 == 0)
-//                    top.setBackgroundColor(getResources().getColor(R.color.colorbackground));
-//                else
-//                    top.setBackgroundColor(getResources().getColor(R.color.white));
-//                if (bottom.get(i).getHeaderValue().equalsIgnoreCase("Txn. ID/RRN/STATUS")) {
-//                    top.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
-//                    btn_name.setTextColor(getResources().getColor(R.color.white));
-//                    btn_p_bank.setTextColor(getResources().getColor(R.color.white));
-//                } else {
-//                    btn_name.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
-//                    btn_p_bank.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
-//                }
-//                btn_name.setText(bottom.get(i).getHeaderData());
-//                btn_p_bank.setText(bottom.get(i).getHeaderValue());
-//                listbottom.addView(inflate);
-//            }
-//        }
         dialog.setCancelable(false);
         dialog.setView(alertLayout);
         btn_ok.setOnClickListener(new View.OnClickListener() {
@@ -1236,9 +1180,7 @@ public class BaseCompactActivity extends AppCompatActivity {
                     customDialogLog("LOGOUT", "Session Expired", "Your Session got expired");
                     Toast.makeText(BaseCompactActivity.this, "Your Session got expired", Toast.LENGTH_SHORT).show();
                 }
-            //Some code
         }
-
         public void onFinish() {
         }
     };
@@ -1301,7 +1243,6 @@ public class BaseCompactActivity extends AppCompatActivity {
                 } else if (eventType == XmlPullParser.TEXT) {
                     pozo.setValue(xpp.getText());
                 }
-//                if (pozo.getName()!=null && pozo.getValue()!=null)
                 versionPozoArrayList.add(pozo);
                 eventType = xpp.next();
             }
@@ -1312,5 +1253,128 @@ public class BaseCompactActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void loadCamera() {
+        if (ActivityCompat.checkSelfPermission(BaseCompactActivity.this, Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+            requestCameraPermission();
+        } else {
+            doCameraPermissionGrantedStuffs();
+        }
+    }
+
+    private void requestCameraPermission() {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(BaseCompactActivity.this,
+                Manifest.permission.CAMERA)) {
+            alertPerm(getString(R.string.permission_read_phone_state_rationale), new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    ActivityCompat.requestPermissions(BaseCompactActivity.this,
+                            new String[]{Manifest.permission.CAMERA},
+                            PERMISSIONS_REQUEST_CAMERA_STATE);
+                    doPermissionGrantedStuffs();
+                }
+            });
+        } else {
+            ActivityCompat.requestPermissions(BaseCompactActivity.this, new String[]{Manifest.permission.CAMERA},
+                    PERMISSIONS_REQUEST_CAMERA_STATE);
+        }
+    }
+
+    private void doCameraPermissionGrantedStuffs() {
+        if (ActivityCompat.checkSelfPermission(BaseCompactActivity.this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+            if (TYPE.equalsIgnoreCase("internal")) {
+                if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                    selectPhotoCustomer();
+                } else {
+                    selectPhotoAgent();
+                }
+            } else if (TYPE.equalsIgnoreCase("outside") || TYPE.equalsIgnoreCase("pending"))
+                selectPhotoAgent();
+        }
+    }
+
+    protected void selectPhotoCustomer() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+                takePictureIntent.putExtra("PhotoPath", mCameraPhotoPath);
+            } catch (IOException ex) {
+                Log.e(TAG, "Unable to create Image File", ex);
+            }
+            if (photoFile != null) {
+                mCameraPhotoPath = "file:" + photoFile.getAbsolutePath();
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
+            } else {
+                takePictureIntent = null;
+            }
+        }
+        startActivityForResult(Intent.createChooser(takePictureIntent, "Select images"), 1);
+    }
+
+    protected void selectPhotoAgent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+                takePictureIntent.putExtra("PhotoPath", mCameraPhotoPath);
+            } catch (IOException ex) {
+                Log.e(TAG, "Unable to create Image File", ex);
+            }
+            if (photoFile != null) {
+                mCameraPhotoPath = "file:" + photoFile.getAbsolutePath();
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
+            } else {
+                takePictureIntent = null;
+            }
+        }
+        Intent contentSelectionIntent = new Intent(Intent.ACTION_GET_CONTENT);
+        contentSelectionIntent.addCategory(Intent.CATEGORY_OPENABLE);
+        contentSelectionIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+        contentSelectionIntent.setType("image/*");
+
+        Intent[] intentArray;
+        if (takePictureIntent != null) {
+            intentArray = new Intent[]{takePictureIntent, intent};
+        } else {
+            intentArray = new Intent[2];
+        }
+        Intent chooserIntent = new Intent(Intent.ACTION_CHOOSER);
+        chooserIntent.putExtra(Intent.EXTRA_INTENT, contentSelectionIntent);
+        chooserIntent.putExtra(Intent.EXTRA_TITLE, "Image Chooser");
+        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray);
+        startActivityForResult(Intent.createChooser(chooserIntent, "Select images"), 1);
+    }
+
+    protected File createImageFile() throws IOException {
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES);
+        File imageFile = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+        return imageFile;
+    }
+
+    protected void deleteFile() {
+        if (listPath.size() != 0)
+            for (int i = 0; i < listPath.size(); i++) {
+                File fdelete = new File(listPath.get(i));
+                if (fdelete.exists()) {
+                    if (fdelete.delete()) {
+                        System.out.println("file Deleted :" + listPath.get(i));
+                    } else {
+                        System.out.println("file not Deleted :" + listPath.get(i));
+                    }
+                }
+            }
     }
 }

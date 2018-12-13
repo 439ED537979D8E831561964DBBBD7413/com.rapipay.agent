@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -69,15 +70,18 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
     private JSONObject kycMapData = new JSONObject();
     private JSONObject kycMapImage = new JSONObject();
     private CustomProgessDialog customProgessDialog;
+    private String clicked = "";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.kyc_personal_detail);
         initialize();
+        loadCamera();
     }
 
     private void initialize() {
+        TYPE = "NOTHING";
         customerType = getIntent().getStringExtra("customerType");
         type = getIntent().getStringExtra("type");
         mobileNo = getIntent().getStringExtra("mobileNo");
@@ -159,24 +163,30 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
     }
 
     private void getPersonalDetails() {
-        if (getIntent().getStringExtra("localPersonal").equalsIgnoreCase("true")) {
-            String condition = "where " + RapipayDB.MOBILENO + "='" + mobileNo + "'" + " AND " + RapipayDB.DOCUMENTTYPE + "='" + documentType + "'" + " AND " + RapipayDB.DOCUMENTID + "='" + documentID + "'";
-            ArrayList<NewKYCPozo> newKYCList_Personal = db.getKYCDetails_Personal(condition);
-            if (newKYCList_Personal.size() == 1) {
-                input_name.setText(newKYCList_Personal.get(0).getUSER_NAME());
-                input_email.setText(newKYCList_Personal.get(0).getEMAILID());
-                input_comp.setText(newKYCList_Personal.get(0).getCOMPANY_NAME());
-                date1_text.setText(newKYCList_Personal.get(0).getDOB());
-                if (!newKYCList_Personal.get(0).getPASSPORT_PHOTO().equalsIgnoreCase("")) {
-                    loadImageFromStorage(newKYCList_Personal.get(0).getIMAGE_NAME(), (ImageView) findViewById(R.id.passportphotoimage), newKYCList_Personal.get(0).getPASSPORT_PHOTO());
-                    findViewById(R.id.passportphoto).setVisibility(View.GONE);
+        try {
+            if (getIntent().getStringExtra("localPersonal").equalsIgnoreCase("true") || clicked.equalsIgnoreCase("business")) {
+                String condition = "where " + RapipayDB.MOBILENO + "='" + mobileNo + "'" + " AND " + RapipayDB.DOCUMENTTYPE + "='" + documentType + "'" + " AND " + RapipayDB.DOCUMENTID + "='" + documentID + "'";
+                ArrayList<NewKYCPozo> newKYCList_Personal = db.getKYCDetails_Personal(condition);
+                if (newKYCList_Personal.size() == 1) {
+                    input_name.setText(newKYCList_Personal.get(0).getUSER_NAME());
+                    input_email.setText(newKYCList_Personal.get(0).getEMAILID());
+                    input_comp.setText(newKYCList_Personal.get(0).getCOMPANY_NAME());
+                    date1_text.setText(newKYCList_Personal.get(0).getDOB());
+                    if (!newKYCList_Personal.get(0).getPASSPORT_PHOTO().equalsIgnoreCase("")) {
+                        loadImageFromStorage(newKYCList_Personal.get(0).getIMAGE_NAME(), (ImageView) findViewById(R.id.passportphotoimage), newKYCList_Personal.get(0).getPASSPORT_PHOTO());
+                        findViewById(R.id.passportphoto).setVisibility(View.GONE);
+                        if (!kycMapImage.has("passportPhoto"))
+                            kycMapImage.put("passportPhoto", getBitmap((ImageView) findViewById(R.id.passportphotoimage)));
+                    }
+                    input_name.setEnabled(false);
+                    input_email.setEnabled(false);
+                    input_comp.setEnabled(false);
+                    date1_text.setEnabled(false);
+                    mapPersonalData(newKYCList_Personal);
                 }
-                input_name.setEnabled(false);
-                input_email.setEnabled(false);
-                input_comp.setEnabled(false);
-                date1_text.setEnabled(false);
-
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -187,27 +197,55 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
     }
 
     private void getAddressDetails() {
-        if (getIntent().getStringExtra("localAddress").equalsIgnoreCase("true")) {
-            String condition = "where " + RapipayDB.MOBILENO + "='" + mobileNo + "'" + " AND " + RapipayDB.DOCUMENTTYPE + "='" + documentType + "'" + " AND " + RapipayDB.DOCUMENTID + "='" + documentID + "'";
-            ArrayList<NewKYCPozo> newKYCList_Address = db.getKYCDetails_Address(condition);
-            if (newKYCList_Address.size() == 1) {
-                input_address.setText(newKYCList_Address.get(0).getADDRESS());
-                city_name.setText(newKYCList_Address.get(0).getCITY());
-                select_state.setText(newKYCList_Address.get(0).getSTATE());
-                pin_code.setText(newKYCList_Address.get(0).getPINCODE());
-                if (!newKYCList_Address.get(0).getDOCUMENTFRONT_PHOTO().equalsIgnoreCase("")) {
-                    loadImageFromStorage(newKYCList_Address.get(0).getDOCUMENTFRONT_IMAGENAME(), (ImageView) findViewById(R.id.documentfrontimage), newKYCList_Address.get(0).getDOCUMENTFRONT_PHOTO());
-                    findViewById(R.id.documentfront).setVisibility(View.GONE);
+        try {
+            if (getIntent().getStringExtra("localAddress").equalsIgnoreCase("true") || clicked.equalsIgnoreCase("business")) {
+                String condition = "where " + RapipayDB.MOBILENO + "='" + mobileNo + "'" + " AND " + RapipayDB.DOCUMENTTYPE + "='" + documentType + "'" + " AND " + RapipayDB.DOCUMENTID + "='" + documentID + "'";
+                ArrayList<NewKYCPozo> newKYCList_Address = db.getKYCDetails_Address(condition);
+                if (newKYCList_Address.size() == 1) {
+                    input_address.setText(newKYCList_Address.get(0).getADDRESS());
+                    city_name.setText(newKYCList_Address.get(0).getCITY());
+                    select_state.setText(newKYCList_Address.get(0).getSTATE());
+                    pin_code.setText(newKYCList_Address.get(0).getPINCODE());
+                    if (!newKYCList_Address.get(0).getDOCUMENTFRONT_PHOTO().equalsIgnoreCase("")) {
+                        loadImageFromStorage(newKYCList_Address.get(0).getDOCUMENTFRONT_IMAGENAME(), (ImageView) findViewById(R.id.documentfrontimage), newKYCList_Address.get(0).getDOCUMENTFRONT_PHOTO());
+                        findViewById(R.id.documentfront).setVisibility(View.GONE);
+                        if (!kycMapImage.has("uploadFront"))
+                            kycMapImage.put("uploadFront", getBitmap((ImageView) findViewById(R.id.documentfrontimage)));
+                    }
+                    if (!newKYCList_Address.get(0).getDOCUMENTBACK_PHOTO().equalsIgnoreCase("")) {
+                        loadImageFromStorage(newKYCList_Address.get(0).getDOCUMENTBACK_IMAGENAME(), (ImageView) findViewById(R.id.documentbackimage), newKYCList_Address.get(0).getDOCUMENTBACK_PHOTO());
+                        findViewById(R.id.documentback).setVisibility(View.GONE);
+                        if (!kycMapImage.has("uploadBack"))
+                            kycMapImage.put("uploadBack", getBitmap((ImageView) findViewById(R.id.documentbackimage)));
+                    }
+                    input_address.setEnabled(false);
+                    city_name.setEnabled(false);
+                    select_state.setEnabled(false);
+                    pin_code.setEnabled(false);
+                    mapAddressData(newKYCList_Address);
                 }
-                if (!newKYCList_Address.get(0).getDOCUMENTBACK_PHOTO().equalsIgnoreCase("")) {
-                    loadImageFromStorage(newKYCList_Address.get(0).getDOCUMENTBACK_IMAGENAME(), (ImageView) findViewById(R.id.documentbackimage), newKYCList_Address.get(0).getDOCUMENTBACK_PHOTO());
-                    findViewById(R.id.documentback).setVisibility(View.GONE);
-                }
-                input_address.setEnabled(false);
-                city_name.setEnabled(false);
-                select_state.setEnabled(false);
-                pin_code.setEnabled(false);
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void mapAddressData(ArrayList<NewKYCPozo> newKYCPozoArrayList) {
+        try {
+            if (!kycMapData.has("address"))
+                kycMapData.put("address", newKYCPozoArrayList.get(0).getADDRESS());
+            if (!kycMapData.has("city"))
+                kycMapData.put("city", newKYCPozoArrayList.get(0).getCITY());
+            if (!kycMapData.has("state"))
+                kycMapData.put("state", newKYCPozoArrayList.get(0).getSTATE());
+            if (!kycMapData.has("pinCode"))
+                kycMapData.put("pinCode", newKYCPozoArrayList.get(0).getPINCODE());
+            if (!kycMapData.has("documentId"))
+                kycMapData.put("documentId", newKYCPozoArrayList.get(0).getDOCUMENTID());
+            if (!kycMapData.has("documentType"))
+                kycMapData.put("documentType", newKYCPozoArrayList.get(0).getDOCUMENTTYPE());
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -216,48 +254,78 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
             getBusinessDetails();
         }
     }
+
     private void fillVerify() {
         if (button.equalsIgnoreCase("verification")) {
             getVerifyDetails();
         }
     }
+
     private void getVerifyDetails() {
-        if (getIntent().getStringExtra("localVerify").equalsIgnoreCase("true")) {
-            String condition = "where " + RapipayDB.MOBILENO + "='" + mobileNo + "'" + " AND " + RapipayDB.DOCUMENTTYPE + "='" + documentType + "'" + " AND " + RapipayDB.DOCUMENTID + "='" + documentID + "'";
-            ArrayList<NewKYCPozo> newKYCList_Verify = db.getKYCDetails_VERIFY(condition);
-            if (newKYCList_Verify.size() == 1) {
-                if (!newKYCList_Verify.get(0).getSELF_PHOTO().equalsIgnoreCase("")) {
-                    loadImageFromStorage(newKYCList_Verify.get(0).getSELF_PHOTO_IMAGENAME(), (ImageView) findViewById(R.id.selfphoto), newKYCList_Verify.get(0).getSELF_PHOTO());
-                    findViewById(R.id.self_photo).setVisibility(View.GONE);
+        try {
+            if (getIntent().getStringExtra("localVerify").equalsIgnoreCase("true")) {
+                String condition = "where " + RapipayDB.MOBILENO + "='" + mobileNo + "'" + " AND " + RapipayDB.DOCUMENTTYPE + "='" + documentType + "'" + " AND " + RapipayDB.DOCUMENTID + "='" + documentID + "'";
+                ArrayList<NewKYCPozo> newKYCList_Verify = db.getKYCDetails_VERIFY(condition);
+                if (newKYCList_Verify.size() == 1) {
+                    if (!newKYCList_Verify.get(0).getSELF_PHOTO().equalsIgnoreCase("")) {
+                        loadImageFromStorage(newKYCList_Verify.get(0).getSELF_PHOTO_IMAGENAME(), (ImageView) findViewById(R.id.selfphoto), newKYCList_Verify.get(0).getSELF_PHOTO());
+                        findViewById(R.id.self_photo).setVisibility(View.GONE);
+                        if (!kycMapImage.has("selfPhoto"))
+                            kycMapImage.put("selfPhoto", getBitmap((ImageView) findViewById(R.id.selfphoto)));
+                    }
+                    if (!newKYCList_Verify.get(0).getSIGN_PHOTO().equalsIgnoreCase("")) {
+                        loadImageFromStorage(newKYCList_Verify.get(0).getSIGN_PHOTO_IMAGENAME(), (ImageView) findViewById(R.id.signphoto), newKYCList_Verify.get(0).getSIGN_PHOTO());
+                        findViewById(R.id.sign_photo).setVisibility(View.GONE);
+                        if (!kycMapImage.has("signPhoto"))
+                            kycMapImage.put("signPhoto", getBitmap((ImageView) findViewById(R.id.signphoto)));
+                    }
                 }
-                if (!newKYCList_Verify.get(0).getSIGN_PHOTO().equalsIgnoreCase("")) {
-                    loadImageFromStorage(newKYCList_Verify.get(0).getSIGN_PHOTO_IMAGENAME(), (ImageView) findViewById(R.id.signphoto), newKYCList_Verify.get(0).getSIGN_PHOTO());
-                    findViewById(R.id.sign_photo).setVisibility(View.GONE);
-                }
-                pan_no.setEnabled(false);
-                gsin_no.setEnabled(false);
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
+
     private void getBusinessDetails() {
-        if (getIntent().getStringExtra("localBusiness").equalsIgnoreCase("true")) {
-            String condition = "where " + RapipayDB.MOBILENO + "='" + mobileNo + "'" + " AND " + RapipayDB.DOCUMENTTYPE + "='" + documentType + "'" + " AND " + RapipayDB.DOCUMENTID + "='" + documentID + "'";
-            ArrayList<NewKYCPozo> newKYCList_Business = db.getKYCDetails_BUISNESS(condition);
-            if (newKYCList_Business.size() == 1) {
-                pan_no.setText(newKYCList_Business.get(0).getPANNUMBER());
-                gsin_no.setText(newKYCList_Business.get(0).getGSTINNUMBER());
-                if (!newKYCList_Business.get(0).getPAN_PHOTO().equalsIgnoreCase("")) {
-                    loadImageFromStorage(newKYCList_Business.get(0).getPAN_PHOTO_IMAGENAME(), (ImageView) findViewById(R.id.panphoto), newKYCList_Business.get(0).getPAN_PHOTO());
-                    findViewById(R.id.pan_photo).setVisibility(View.GONE);
+        try {
+            if (getIntent().getStringExtra("localBusiness").equalsIgnoreCase("true") || clicked.equalsIgnoreCase("business")) {
+                String condition = "where " + RapipayDB.MOBILENO + "='" + mobileNo + "'" + " AND " + RapipayDB.DOCUMENTTYPE + "='" + documentType + "'" + " AND " + RapipayDB.DOCUMENTID + "='" + documentID + "'";
+                ArrayList<NewKYCPozo> newKYCList_Business = db.getKYCDetails_BUISNESS(condition);
+                if (newKYCList_Business.size() == 1) {
+                    pan_no.setText(newKYCList_Business.get(0).getPANNUMBER());
+                    gsin_no.setText(newKYCList_Business.get(0).getGSTINNUMBER());
+                    if (!newKYCList_Business.get(0).getPAN_PHOTO().equalsIgnoreCase("")) {
+                        loadImageFromStorage(newKYCList_Business.get(0).getPAN_PHOTO_IMAGENAME(), (ImageView) findViewById(R.id.panphoto), newKYCList_Business.get(0).getPAN_PHOTO());
+                        findViewById(R.id.pan_photo).setVisibility(View.GONE);
+                        if (!kycMapImage.has("pancardImg"))
+                            kycMapImage.put("pancardImg", getBitmap((ImageView) findViewById(R.id.panphoto)));
+                    }
+                    if (!newKYCList_Business.get(0).getSHOP_PHOTO().equalsIgnoreCase("")) {
+                        loadImageFromStorage(newKYCList_Business.get(0).getSHOP_PHOTO_IMAGENAME(), (ImageView) findViewById(R.id.shopphoto), newKYCList_Business.get(0).getSHOP_PHOTO());
+                        findViewById(R.id.shop_photo).setVisibility(View.GONE);
+                        if (!kycMapImage.has("shopPhoto"))
+                            kycMapImage.put("shopPhoto", getBitmap((ImageView) findViewById(R.id.shopphoto)));
+                    }
+                    pan_no.setEnabled(false);
+                    gsin_no.setEnabled(false);
+                    mapBusinessData(newKYCList_Business);
                 }
-                if (!newKYCList_Business.get(0).getSHOP_PHOTO().equalsIgnoreCase("")) {
-                    loadImageFromStorage(newKYCList_Business.get(0).getSHOP_PHOTO_IMAGENAME(), (ImageView) findViewById(R.id.shopphoto), newKYCList_Business.get(0).getSHOP_PHOTO());
-                    findViewById(R.id.shop_photo).setVisibility(View.GONE);
-                }
-                pan_no.setEnabled(false);
-                gsin_no.setEnabled(false);
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+    }
+
+    private void mapBusinessData(ArrayList<NewKYCPozo> newKYCPozoArrayList) {
+        try {
+            if (!kycMapData.has("panNo"))
+                kycMapData.put("panNo", newKYCPozoArrayList.get(0).getPANNUMBER());
+            if (!kycMapData.has("gstIN"))
+                kycMapData.put("gstIN", newKYCPozoArrayList.get(0).getGSTINNUMBER());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     private void loadImageFromStorage(String name, ImageView view, String path) {
@@ -322,9 +390,12 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
                             kycMapData.put("lastName", token[1]);
                         findViewById(R.id.personal_layout).setVisibility(View.GONE);
                         findViewById(R.id.address_details).setVisibility(View.VISIBLE);
+                        if (getIntent().hasExtra("localAddress"))
+                            getAddressDetails();
                         parseAddressJson(scandata);
                         if (getIntent().getStringExtra("localPersonal").equalsIgnoreCase("false"))
                             insertPersonal(kycMapData, kycMapImage, input_name.getText().toString(), documentID, documentType, customerType);
+                        clicked = "personal";
                     }
                     break;
                 case R.id.sub_btn_address:
@@ -338,8 +409,15 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
                         findViewById(R.id.personal_layout).setVisibility(View.GONE);
                         findViewById(R.id.address_details).setVisibility(View.GONE);
                         findViewById(R.id.business_detail).setVisibility(View.VISIBLE);
-                        if (getIntent().getStringExtra("localAddress").equalsIgnoreCase("false"))
+                        if (getIntent().hasExtra("localAddress")) {
+                            if (getIntent().getStringExtra("localAddress").equalsIgnoreCase("false"))
+                                insertAddress(kycMapData, kycMapImage, documentID, documentType, customerType);
+                        } else if (clicked.equalsIgnoreCase("personal")) {
                             insertAddress(kycMapData, kycMapImage, documentID, documentType, customerType);
+                            clicked = "address";
+                        }
+                        if (getIntent().hasExtra("localBusiness"))
+                            getBusinessDetails();
                     }
                     break;
                 case R.id.sub_btn_buisness:
@@ -350,31 +428,80 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
                         findViewById(R.id.address_details).setVisibility(View.GONE);
                         findViewById(R.id.business_detail).setVisibility(View.GONE);
                         findViewById(R.id.verification_layout).setVisibility(View.VISIBLE);
-                        if (getIntent().getStringExtra("localBusiness").equalsIgnoreCase("false"))
+                        if (getIntent().hasExtra("localBusiness")) {
+                            if (getIntent().getStringExtra("localBusiness").equalsIgnoreCase("false"))
+                                insertBuisness(kycMapData, kycMapImage, documentID, documentType, customerType);
+                        } else if (clicked.equalsIgnoreCase("address")) {
                             insertBuisness(kycMapData, kycMapImage, documentID, documentType, customerType);
+                            clicked = "business";
+                        }
+                        if (getIntent().hasExtra("localVerify"))
+                            getVerifyDetails();
                     }
                     break;
                 case R.id.sub_btn_verify:
-                    getPersonalDetails();
-                    getAddressDetails();
-                    getBusinessDetails();
+                    if (getIntent().hasExtra("localPersonal"))
+                        getPersonalDetails();
+                    if (getIntent().hasExtra("localAddress"))
+                        getAddressDetails();
+                    if (getIntent().hasExtra("localBusiness"))
+                        getBusinessDetails();
                     if (personalValidation())
                         if (addressValidation())
                             if (buisnessValidation())
                                 if (oursValidation()) {
-                                    if (getIntent().getStringExtra("localVerify").equalsIgnoreCase("false"))
+                                    if (getIntent().hasExtra("localVerify")) {
+                                        if (getIntent().getStringExtra("localVerify").equalsIgnoreCase("false"))
+                                            insertVerify(kycMapData, kycMapImage, documentID, documentType, customerType);
+                                    } else if (clicked.equalsIgnoreCase("business")) {
                                         insertVerify(kycMapData, kycMapImage, documentID, documentType, customerType);
+                                        clicked = "verify";
+                                    }
                                     reDirectWebView();
                                 }
                     break;
             }
         } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void mapPersonalData(ArrayList<NewKYCPozo> newKYCPozoArrayList) {
+        try {
+            if (!kycMapData.has("mobileNo"))
+                kycMapData.put("mobileNo", newKYCPozoArrayList.get(0).getMOBILENO());
+            if (!kycMapData.has("dob"))
+                kycMapData.put("dob", newKYCPozoArrayList.get(0).getDOB());
+            if (!kycMapData.has("email"))
+                kycMapData.put("email", newKYCPozoArrayList.get(0).getEMAILID());
+            if (!kycMapData.has("companyName"))
+                kycMapData.put("companyName", newKYCPozoArrayList.get(0).getCOMPANY_NAME());
+            String[] token = newKYCPozoArrayList.get(0).getUSER_NAME().split(" ");
+            if (!kycMapData.has("firstName"))
+                kycMapData.put("firstName", token[0]);
+            int count = token.length;
+            if (count > 2) {
+                if (!kycMapData.has("middleName"))
+                    kycMapData.put("middleName", token[1]);
+                StringBuilder builder = new StringBuilder();
+                for (int i = 2; i < count; i++) {
+                    builder.append(token[i] + " ");
+                }
+                if (!kycMapData.has("lastName"))
+                    kycMapData.put("lastName", builder.toString());
+            } else if (count >= 2) {
+                if (!kycMapData.has("lastName"))
+                    kycMapData.put("lastName", token[1]);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
     private void reDirectWebView() {
         formData = getsession_ValidateKyc(customerType);
         Intent intent = new Intent(KYCFormActivity.this, WebViewVerify.class);
+        intent.putExtra("persons", persons);
         startActivity(intent);
     }
 
@@ -396,7 +523,7 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
             jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
             form = "<html>\n" +
                     "\t<body>\n" +
-                    "\t\t<form name=\"validatekyc\" id=\"validatekyc\" method=\"POST\" action=\"" + WebConfig.EKYC_FORWARD + "\">\n" +
+                    "\t\t<form name=\"validatekyc\" id=\"validatekyc\" method=\"POST\" action=\"" + WebConfig.EKYC_FORWARD_POST + "\">\n" +
                     "\t\t\t<input name=\"requestedData\" value=\"" + getDataBase64(jsonObject.toString()) + "\" type=\"hidden\"/>\n" +
                     "\t\t\t<input name=\"documentsListData\" value=\"" + getDataBase64(kycMapImage.toString()) + "\" type=\"hidden\"/>\n" +
                     "\t\t\t<input type=\"submit\"/>\n" +
@@ -778,6 +905,11 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private Bitmap getBitmap(ImageView imageView) {
+        BitmapDrawable drawable = (BitmapDrawable) imageView.getDrawable();
+        return drawable.getBitmap();
     }
 
     private void insertBuisness(JSONObject mapValue, JSONObject mapPhoto, String documentID, String documentType, String customerType) {

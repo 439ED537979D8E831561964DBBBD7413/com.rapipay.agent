@@ -1,30 +1,21 @@
 package com.rapipay.android.agent.main_directory;
 
-import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ClipData;
-import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.net.http.SslError;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.Base64;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.webkit.CookieManager;
-import android.webkit.CookieSyncManager;
 import android.webkit.SslErrorHandler;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
@@ -37,15 +28,9 @@ import android.widget.Toast;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -62,12 +47,9 @@ import com.rapipay.android.agent.utils.WebConfig;
 
 public class WebViewClientActivity extends BaseCompactActivity implements RequestHandler, View.OnClickListener, CustomInterface {
     WebView web;
-    String mobileNo, parentId,DocumentType, PancardDetails, sessionKey, sessionRefNo, nodeAgent, kycType, TYPE, base64image;
+    String mobileNo, parentId,DocumentType, PancardDetails, sessionKey, sessionRefNo, nodeAgent, kycType,base64image;
     private static final int INPUT_FILE_REQUEST_CODE = 1;
     private ValueCallback<Uri[]> mUploadMessage;
-    private String mCameraPhotoPath = null;
-    private static final String TAG = MainActivity.class.getSimpleName();
-    ArrayList<String> listPath = new ArrayList<>();
     private long size = 0;
 
     @Override
@@ -81,90 +63,6 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
             findViewById(R.id.back_click).setVisibility(View.VISIBLE);
         initialize();
     }
-
-    public void loadIMEIs() {
-        // Check if the READ_PHONE_STATE permission is already available.
-        if (ActivityCompat.checkSelfPermission(WebViewClientActivity.this, Manifest.permission.CAMERA)
-                != PackageManager.PERMISSION_GRANTED) {
-            // READ_PHONE_STATE permission has not been granted.
-            //            checkAndRequestPermissions();
-            requestReadPhoneStatePermission();
-        } else {
-
-            // READ_PHONE_STATE permission is already been granted.
-            doPermissionGrantedStuffs();
-        }
-    }
-
-    private void requestReadPhoneStatePermission() {
-        if (ActivityCompat.shouldShowRequestPermissionRationale(WebViewClientActivity.this,
-                Manifest.permission.CAMERA)) {
-            alertPerm(getString(R.string.permission_read_phone_state_rationale), new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    ActivityCompat.requestPermissions(WebViewClientActivity.this,
-                            new String[]{Manifest.permission.CAMERA},
-                            PERMISSIONS_REQUEST_READ_PHONE_STATE);
-                    doPermissionGrantedStuffs();
-                }
-            });
-
-        } else {
-            // READ_PHONE_STATE permission has not been granted yet. Request it directly.
-            ActivityCompat.requestPermissions(WebViewClientActivity.this, new String[]{Manifest.permission.CAMERA},
-                    PERMISSIONS_REQUEST_READ_PHONE_STATE);
-        }
-    }
-
-    private void alertPerm(String msg, DialogInterface.OnClickListener okListener) {
-        new AlertDialog.Builder(WebViewClientActivity.this)
-                .setTitle("Permission Request")
-                .setMessage(msg)
-                .setCancelable(false)
-                .setPositiveButton(android.R.string.yes, okListener)
-                .setIcon(R.mipmap.ic_launcher_round)
-                .show();
-    }
-
-    private void doPermissionGrantedStuffs() {
-        if (ActivityCompat.checkSelfPermission(WebViewClientActivity.this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-            if (TYPE.equalsIgnoreCase("internal")) {
-                if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-                    // Do something for lollipop and above versions
-                    selectPhotoCustomer();
-                } else {
-                    // do something for phones running an SDK before lollipop
-                    selectPhotoAgent();
-                }
-
-            } else if (TYPE.equalsIgnoreCase("outside") || TYPE.equalsIgnoreCase("pending"))
-                selectPhotoAgent();
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-
-        if (requestCode == PERMISSIONS_REQUEST_READ_PHONE_STATE) {
-            // Received permission result for READ_PHONE_STATE permission.est.");
-            // Check if the only required permission has been granted
-            if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // READ_PHONE_STATE permission has been granted, proceed with displaying IMEI Number
-                doPermissionGrantedStuffs();
-
-            } else {
-                alertPerm(getString(R.string.permissions_not_granted_read_phone_state), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        loadIMEIs();
-                    }
-                });
-
-            }
-        }
-    }
-
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -381,20 +279,6 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
         }
     }
 
-    private void deleteFile() {
-        if (listPath.size() != 0)
-            for (int i = 0; i < listPath.size(); i++) {
-                File fdelete = new File(listPath.get(i));
-                if (fdelete.exists()) {
-                    if (fdelete.delete()) {
-                        System.out.println("file Deleted :" + listPath.get(i));
-                    } else {
-                        System.out.println("file not Deleted :" + listPath.get(i));
-                    }
-                }
-            }
-    }
-
     public String getsession_ValidateKyc(String tokenId, String orgTxnRef) {
         tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
@@ -467,7 +351,6 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
         return null;
     }
 
-
     public class PQChromeClient extends WebChromeClient {
 
         // For Android 5.0+
@@ -477,7 +360,7 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
                 mUploadMessage.onReceiveValue(null);
             }
             mUploadMessage = filePath;
-            loadIMEIs();
+            loadCamera();
             //            selectImage();
             //            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             //            Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
@@ -522,100 +405,6 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
             return true;
 
         }
-    }
-
-    private void selectPhotoCustomer() {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            // Create the File where the photo should go
-            File photoFile = null;
-            try {
-                photoFile = createImageFile();
-                takePictureIntent.putExtra("PhotoPath", mCameraPhotoPath);
-            } catch (IOException ex) {
-                // Error occurred while creating the File
-                Log.e(TAG, "Unable to create Image File", ex);
-            }
-            // Continue only if the File was successfully created
-            if (photoFile != null) {
-                mCameraPhotoPath = "file:" + photoFile.getAbsolutePath();
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
-            } else {
-                takePictureIntent = null;
-            }
-        }
-        startActivityForResult(Intent.createChooser(takePictureIntent, "Select images"), 1);
-        //        Intent contentSelectionIntent = new Intent(Intent.ACTION_GET_CONTENT);
-        //        contentSelectionIntent.addCategory(Intent.CATEGORY_OPENABLE);
-        //        contentSelectionIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-        //        contentSelectionIntent.setType("image/*");
-        //
-        //        Intent[] intentArray;
-        //        if (takePictureIntent != null) {
-        //            intentArray = new Intent[]{takePictureIntent};
-        //        } else {
-        //            intentArray = new Intent[1];
-        //        }
-        //
-        //        Intent chooserIntent = new Intent(Intent.ACTION_CHOOSER);
-        //        chooserIntent.putExtra(Intent.EXTRA_INTENT, contentSelectionIntent);
-        //        chooserIntent.putExtra(Intent.EXTRA_TITLE, "Image Chooser");
-        //        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray);
-        //        startActivityForResult(Intent.createChooser(chooserIntent, "Select images"), 1);
-    }
-
-    private void selectPhotoAgent() {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            // Create the File where the photo should go
-            File photoFile = null;
-            try {
-                photoFile = createImageFile();
-                takePictureIntent.putExtra("PhotoPath", mCameraPhotoPath);
-            } catch (IOException ex) {
-                // Error occurred while creating the File
-                Log.e(TAG, "Unable to create Image File", ex);
-            }
-            // Continue only if the File was successfully created
-            if (photoFile != null) {
-                mCameraPhotoPath = "file:" + photoFile.getAbsolutePath();
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
-            } else {
-                takePictureIntent = null;
-            }
-        }
-        Intent contentSelectionIntent = new Intent(Intent.ACTION_GET_CONTENT);
-        contentSelectionIntent.addCategory(Intent.CATEGORY_OPENABLE);
-        contentSelectionIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-        contentSelectionIntent.setType("image/*");
-
-        Intent[] intentArray;
-        if (takePictureIntent != null) {
-            intentArray = new Intent[]{takePictureIntent, intent};
-        } else {
-            intentArray = new Intent[2];
-        }
-
-        Intent chooserIntent = new Intent(Intent.ACTION_CHOOSER);
-        chooserIntent.putExtra(Intent.EXTRA_INTENT, contentSelectionIntent);
-        chooserIntent.putExtra(Intent.EXTRA_TITLE, "Image Chooser");
-        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray);
-        startActivityForResult(Intent.createChooser(chooserIntent, "Select images"), 1);
-    }
-
-    private File createImageFile() throws IOException {
-        // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES);
-        File imageFile = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
-        );
-        return imageFile;
     }
 
     public boolean onKeyDown(int keyCode, KeyEvent event) {
