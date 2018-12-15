@@ -21,6 +21,8 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.TextView;
 
+import com.rapipay.android.agent.Database.RapipayDB;
+import com.rapipay.android.agent.Model.NewKYCPozo;
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.interfaces.CustomInterface;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
@@ -38,7 +40,7 @@ import java.util.Set;
 public class WebViewVerify extends BaseCompactActivity implements CustomInterface, View.OnClickListener {
     WebView web;
     private ValueCallback<Uri[]> mUploadMessage;
-    private String TYPE;
+    private String TYPE,mobileNo,documentType,documentID;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -51,6 +53,9 @@ public class WebViewVerify extends BaseCompactActivity implements CustomInterfac
         heading = (TextView) findViewById(R.id.toolbar_title);
         heading.setText("KYC Registration");
         TYPE = getIntent().getStringExtra("persons");
+        mobileNo = getIntent().getStringExtra("mobileNo");
+        documentType = getIntent().getStringExtra("documentType");
+        documentID = getIntent().getStringExtra("documentID");
 //        String formData = getIntent().getStringExtra("formData");
         web = (WebView) findViewById(R.id.webview01);
         WebSettings webSettings = web.getSettings();
@@ -270,7 +275,12 @@ public class WebViewVerify extends BaseCompactActivity implements CustomInterfac
 
     @Override
     public void okClicked(String type, Object ob) {
-
+        if (type.equalsIgnoreCase("KYCLAYOUTS")) {
+            String condition = "where " + RapipayDB.MOBILENO + "='" + mobileNo + "'" + " AND " + RapipayDB.DOCUMENTTYPE + "='" + documentType + "'" + " AND " + RapipayDB.DOCUMENTID + "='" + documentID + "'";
+            db.deleteRow(condition);
+            setBack_click(this);
+            finish();
+        }
     }
 
     @Override

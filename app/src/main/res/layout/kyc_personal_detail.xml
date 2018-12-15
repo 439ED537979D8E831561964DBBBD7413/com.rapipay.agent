@@ -116,6 +116,7 @@
                     android:textSize="14sp" />
 
                 <ImageView
+                    android:layout_marginTop="5dp"
                     android:id="@+id/passportphotoimage"
                     android:layout_width="100dp"
                     android:layout_height="100dp"
@@ -232,6 +233,7 @@
                     android:textSize="14sp" />
 
                 <ImageView
+                    android:layout_marginTop="5dp"
                     android:id="@+id/documentfrontimage"
                     android:layout_width="100dp"
                     android:layout_height="100dp"
@@ -252,6 +254,7 @@
                     android:textSize="14sp" />
 
                 <ImageView
+                    android:layout_marginTop="5dp"
                     android:id="@+id/documentbackimage"
                     android:layout_width="100dp"
                     android:layout_height="100dp"
@@ -306,6 +309,7 @@
                     android:textSize="14sp" />
 
                 <ImageView
+                    android:layout_marginTop="5dp"
                     android:id="@+id/panphoto"
                     android:layout_width="100dp"
                     android:layout_height="100dp"
@@ -340,6 +344,7 @@
                     android:textSize="14sp" />
 
                 <ImageView
+                    android:layout_marginTop="5dp"
                     android:id="@+id/shopphoto"
                     android:layout_width="100dp"
                     android:layout_height="100dp"
@@ -395,6 +400,7 @@
                     android:textSize="14sp" />
 
                 <ImageView
+                    android:layout_marginTop="5dp"
                     android:id="@+id/cust_panphoto"
                     android:layout_width="100dp"
                     android:layout_height="100dp"
@@ -437,6 +443,7 @@
                     android:textSize="14sp" />
 
                 <ImageView
+                    android:layout_marginTop="5dp"
                     android:id="@+id/selfphoto"
                     android:layout_width="100dp"
                     android:layout_height="100dp"
@@ -458,6 +465,7 @@
                     android:textSize="14sp" />
 
                 <ImageView
+                    android:layout_marginTop="5dp"
                     android:id="@+id/signphoto"
                     android:layout_width="100dp"
                     android:layout_height="100dp"

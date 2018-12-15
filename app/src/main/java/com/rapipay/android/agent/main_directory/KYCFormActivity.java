@@ -167,7 +167,7 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
             if (getIntent().getStringExtra("localPersonal").equalsIgnoreCase("true") || clicked.equalsIgnoreCase("business")) {
                 String condition = "where " + RapipayDB.MOBILENO + "='" + mobileNo + "'" + " AND " + RapipayDB.DOCUMENTTYPE + "='" + documentType + "'" + " AND " + RapipayDB.DOCUMENTID + "='" + documentID + "'";
                 ArrayList<NewKYCPozo> newKYCList_Personal = db.getKYCDetails_Personal(condition);
-                if (newKYCList_Personal.size() == 1) {
+                if (newKYCList_Personal.size() != 0) {
                     input_name.setText(newKYCList_Personal.get(0).getUSER_NAME());
                     input_email.setText(newKYCList_Personal.get(0).getEMAILID());
                     input_comp.setText(newKYCList_Personal.get(0).getCOMPANY_NAME());
@@ -176,7 +176,7 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
                         loadImageFromStorage(newKYCList_Personal.get(0).getIMAGE_NAME(), (ImageView) findViewById(R.id.passportphotoimage), newKYCList_Personal.get(0).getPASSPORT_PHOTO());
                         findViewById(R.id.passportphoto).setVisibility(View.GONE);
                         if (!kycMapImage.has("passportPhoto"))
-                            kycMapImage.put("passportPhoto", getBitmap((ImageView) findViewById(R.id.passportphotoimage)));
+                            kycMapImage.put("passportPhoto", getBase64(getBitmap((ImageView) findViewById(R.id.passportphotoimage))));
                     }
                     input_name.setEnabled(false);
                     input_email.setEnabled(false);
@@ -201,7 +201,7 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
             if (getIntent().getStringExtra("localAddress").equalsIgnoreCase("true") || clicked.equalsIgnoreCase("business")) {
                 String condition = "where " + RapipayDB.MOBILENO + "='" + mobileNo + "'" + " AND " + RapipayDB.DOCUMENTTYPE + "='" + documentType + "'" + " AND " + RapipayDB.DOCUMENTID + "='" + documentID + "'";
                 ArrayList<NewKYCPozo> newKYCList_Address = db.getKYCDetails_Address(condition);
-                if (newKYCList_Address.size() == 1) {
+                if (newKYCList_Address.size() != 0) {
                     input_address.setText(newKYCList_Address.get(0).getADDRESS());
                     city_name.setText(newKYCList_Address.get(0).getCITY());
                     select_state.setText(newKYCList_Address.get(0).getSTATE());
@@ -210,13 +210,13 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
                         loadImageFromStorage(newKYCList_Address.get(0).getDOCUMENTFRONT_IMAGENAME(), (ImageView) findViewById(R.id.documentfrontimage), newKYCList_Address.get(0).getDOCUMENTFRONT_PHOTO());
                         findViewById(R.id.documentfront).setVisibility(View.GONE);
                         if (!kycMapImage.has("uploadFront"))
-                            kycMapImage.put("uploadFront", getBitmap((ImageView) findViewById(R.id.documentfrontimage)));
+                            kycMapImage.put("uploadFront", getBase64(getBitmap((ImageView) findViewById(R.id.documentfrontimage))));
                     }
                     if (!newKYCList_Address.get(0).getDOCUMENTBACK_PHOTO().equalsIgnoreCase("")) {
                         loadImageFromStorage(newKYCList_Address.get(0).getDOCUMENTBACK_IMAGENAME(), (ImageView) findViewById(R.id.documentbackimage), newKYCList_Address.get(0).getDOCUMENTBACK_PHOTO());
                         findViewById(R.id.documentback).setVisibility(View.GONE);
                         if (!kycMapImage.has("uploadBack"))
-                            kycMapImage.put("uploadBack", getBitmap((ImageView) findViewById(R.id.documentbackimage)));
+                            kycMapImage.put("uploadBack", getBase64(getBitmap((ImageView) findViewById(R.id.documentbackimage))));
                     }
                     input_address.setEnabled(false);
                     city_name.setEnabled(false);
@@ -266,18 +266,18 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
             if (getIntent().getStringExtra("localVerify").equalsIgnoreCase("true")) {
                 String condition = "where " + RapipayDB.MOBILENO + "='" + mobileNo + "'" + " AND " + RapipayDB.DOCUMENTTYPE + "='" + documentType + "'" + " AND " + RapipayDB.DOCUMENTID + "='" + documentID + "'";
                 ArrayList<NewKYCPozo> newKYCList_Verify = db.getKYCDetails_VERIFY(condition);
-                if (newKYCList_Verify.size() == 1) {
+                if (newKYCList_Verify.size() != 0) {
                     if (!newKYCList_Verify.get(0).getSELF_PHOTO().equalsIgnoreCase("")) {
                         loadImageFromStorage(newKYCList_Verify.get(0).getSELF_PHOTO_IMAGENAME(), (ImageView) findViewById(R.id.selfphoto), newKYCList_Verify.get(0).getSELF_PHOTO());
                         findViewById(R.id.self_photo).setVisibility(View.GONE);
                         if (!kycMapImage.has("selfPhoto"))
-                            kycMapImage.put("selfPhoto", getBitmap((ImageView) findViewById(R.id.selfphoto)));
+                            kycMapImage.put("selfPhoto", getBase64(getBitmap((ImageView) findViewById(R.id.selfphoto))));
                     }
                     if (!newKYCList_Verify.get(0).getSIGN_PHOTO().equalsIgnoreCase("")) {
                         loadImageFromStorage(newKYCList_Verify.get(0).getSIGN_PHOTO_IMAGENAME(), (ImageView) findViewById(R.id.signphoto), newKYCList_Verify.get(0).getSIGN_PHOTO());
                         findViewById(R.id.sign_photo).setVisibility(View.GONE);
                         if (!kycMapImage.has("signPhoto"))
-                            kycMapImage.put("signPhoto", getBitmap((ImageView) findViewById(R.id.signphoto)));
+                            kycMapImage.put("signPhoto", getBase64(getBitmap((ImageView) findViewById(R.id.signphoto))));
                     }
                 }
             }
@@ -291,20 +291,20 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
             if (getIntent().getStringExtra("localBusiness").equalsIgnoreCase("true") || clicked.equalsIgnoreCase("business")) {
                 String condition = "where " + RapipayDB.MOBILENO + "='" + mobileNo + "'" + " AND " + RapipayDB.DOCUMENTTYPE + "='" + documentType + "'" + " AND " + RapipayDB.DOCUMENTID + "='" + documentID + "'";
                 ArrayList<NewKYCPozo> newKYCList_Business = db.getKYCDetails_BUISNESS(condition);
-                if (newKYCList_Business.size() == 1) {
+                if (newKYCList_Business.size() != 0) {
                     pan_no.setText(newKYCList_Business.get(0).getPANNUMBER());
                     gsin_no.setText(newKYCList_Business.get(0).getGSTINNUMBER());
                     if (!newKYCList_Business.get(0).getPAN_PHOTO().equalsIgnoreCase("")) {
                         loadImageFromStorage(newKYCList_Business.get(0).getPAN_PHOTO_IMAGENAME(), (ImageView) findViewById(R.id.panphoto), newKYCList_Business.get(0).getPAN_PHOTO());
                         findViewById(R.id.pan_photo).setVisibility(View.GONE);
                         if (!kycMapImage.has("pancardImg"))
-                            kycMapImage.put("pancardImg", getBitmap((ImageView) findViewById(R.id.panphoto)));
+                            kycMapImage.put("pancardImg", getBase64(getBitmap((ImageView) findViewById(R.id.panphoto))));
                     }
                     if (!newKYCList_Business.get(0).getSHOP_PHOTO().equalsIgnoreCase("")) {
                         loadImageFromStorage(newKYCList_Business.get(0).getSHOP_PHOTO_IMAGENAME(), (ImageView) findViewById(R.id.shopphoto), newKYCList_Business.get(0).getSHOP_PHOTO());
                         findViewById(R.id.shop_photo).setVisibility(View.GONE);
                         if (!kycMapImage.has("shopPhoto"))
-                            kycMapImage.put("shopPhoto", getBitmap((ImageView) findViewById(R.id.shopphoto)));
+                            kycMapImage.put("shopPhoto", getBase64(getBitmap((ImageView) findViewById(R.id.shopphoto))));
                     }
                     pan_no.setEnabled(false);
                     gsin_no.setEnabled(false);
@@ -327,18 +327,6 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
         }
 
     }
-
-    private void loadImageFromStorage(String name, ImageView view, String path) {
-        try {
-            File f = new File(path, name);
-            Bitmap b = BitmapFactory.decodeStream(new FileInputStream(f));
-            view.setImageBitmap(b);
-            view.setVisibility(View.VISIBLE);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
-
     @Override
     public void onClick(View v) {
         try {
@@ -502,6 +490,9 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
         formData = getsession_ValidateKyc(customerType);
         Intent intent = new Intent(KYCFormActivity.this, WebViewVerify.class);
         intent.putExtra("persons", persons);
+        intent.putExtra("mobileNo", mobileNo);
+        intent.putExtra("documentType", documentType);
+        intent.putExtra("documentID", documentID);
         startActivity(intent);
     }
 
@@ -661,8 +652,25 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
                 return false;
             } else
                 return true;
-        } else
-            return true;
+        } else if (persons.equalsIgnoreCase("internal")) {
+            if (pan_no.getText().length() != 0) {
+                if (!pan_no.getText().toString().matches("^[A-Za-z]{5}[0-9]{4}[A-Za-z]{1}$")) {
+                    pan_no.setError("Please enter valid data");
+                    pan_no.requestFocus();
+                    return false;
+                } else if (pan_no.getText().toString().matches("^[A-Za-z]{5}[0-9]{4}[A-Za-z]{1}$")) {
+                    if (panphoto.getDrawable() == null) {
+                        TextView pan_photo = (TextView) findViewById(R.id.pan_photo);
+                        pan_photo.setError("Please enter valid data");
+                        pan_photo.requestFocus();
+                        return false;
+                    } else
+                        return true;
+                }
+            } else
+                return true;
+        }
+        return true;
     }
 
     private void selectImage(final int id1, final int id2) {
@@ -760,7 +768,7 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
 
     private String getBase64(Bitmap bitmap) {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 50, byteArrayOutputStream);
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
         byte[] byteArray = byteArrayOutputStream.toByteArray();
         return Base64.encodeToString(byteArray, Base64.DEFAULT);
     }
@@ -958,11 +966,5 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    private Bitmap base64Convert(String encodedImage) {
-        byte[] decodedString = Base64.decode(encodedImage, Base64.DEFAULT);
-        Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-        return decodedByte;
     }
 }

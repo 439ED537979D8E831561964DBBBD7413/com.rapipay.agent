@@ -1,40 +1,61 @@
-<android.support.v7.widget.Toolbar
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/toolbar"
     android:layout_width="match_parent"
     android:layout_height="?attr/actionBarSize"
     android:background="@color/white"
-    app:popupTheme="@style/AppTheme.PopupOverlay"
     app:contentInsetEnd="0dp"
-    app:contentInsetStart="0dp">
+    app:contentInsetStart="0dp"
+    app:popupTheme="@style/AppTheme.PopupOverlay">
 
-    <ImageView android:id="@+id/back_click"
+    <ImageView
+        android:id="@+id/back_click"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_gravity="left"
         android:layout_marginLeft="5dp"
-        android:scaleType="fitStart"
         android:onClick="onClick"
-        android:src="@drawable/home"/>
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="left"
-        android:textSize="12dp"
-        android:gravity="left"
-        android:inputType="textMultiLine"
-        android:layout_marginLeft="5dp"
-        android:text="@string/app_name"
-        android:textColor="@color/colorPrimaryDark"
-        android:id="@+id/toolbar_title" />
-    <ImageView android:id="@+id/reset"
+        android:scaleType="fitStart"
+        android:src="@drawable/home" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/toolbar_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:layout_marginLeft="5dp"
+            android:gravity="left"
+            android:inputType="textMultiLine"
+            android:text="@string/app_name"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="12dp" />
+
+        <TextView
+            android:id="@+id/baseurl"
+            android:layout_toRightOf="@+id/toolbar_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:layout_marginLeft="15dp"
+            android:gravity="left"
+            android:inputType="textMultiLine"
+            android:text="@string/baseurl"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="12dp" />
+    </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/reset"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_gravity="right|center"
-        android:scaleType="fitStart"
         android:layout_marginRight="5dp"
         android:onClick="onClick"
+        android:scaleType="fitStart"
         android:src="@drawable/reset"
-        android:visibility="gone"/>
+        android:visibility="gone" />
 </android.support.v7.widget.Toolbar>

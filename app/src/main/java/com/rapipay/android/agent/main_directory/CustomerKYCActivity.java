@@ -120,6 +120,7 @@ public class CustomerKYCActivity extends BaseCompactActivity implements RequestH
         Intent intent = null;
         switch (v.getId()) {
             case R.id.back_click:
+                setBack_click(CustomerKYCActivity.this);
                 finish();
                 break;
             case R.id.sub_btn:
@@ -158,7 +159,7 @@ public class CustomerKYCActivity extends BaseCompactActivity implements RequestH
                 intent.putExtra("type", type);
                 intent.putExtra("persons", TYPE);
                 intent.putExtra("button", "personal");
-                intent.putExtra("customerType", "C");
+                intent.putExtra("customerType", customerType);
                 if (newKYCList_Personal != null && newKYCList_Personal.size() != 0) {
                     intent.putExtra("localPersonal", "true");
                     if (newKYCList_Address != null && newKYCList_Address.size() != 0) {
@@ -188,7 +189,7 @@ public class CustomerKYCActivity extends BaseCompactActivity implements RequestH
                 intent.putExtra("type", type);
                 intent.putExtra("persons", TYPE);
                 intent.putExtra("button", "address");
-                intent.putExtra("customerType", "C");
+                intent.putExtra("customerType", customerType);
                 intent.putExtra("mobileNo", mobile_no.getText().toString());
                 if (newKYCList_Address != null && newKYCList_Address.size() != 0) {
                     intent.putExtra("localAddress", "true");
@@ -214,7 +215,7 @@ public class CustomerKYCActivity extends BaseCompactActivity implements RequestH
                 intent.putExtra("type", type);
                 intent.putExtra("persons", TYPE);
                 intent.putExtra("button", "buisness");
-                intent.putExtra("customerType", "C");
+                intent.putExtra("customerType", customerType);
                 intent.putExtra("mobileNo", mobile_no.getText().toString());
                 intent.putExtra("documentType", spinner_value);
                 intent.putExtra("documentID", documentid.getText().toString());
@@ -232,7 +233,7 @@ public class CustomerKYCActivity extends BaseCompactActivity implements RequestH
                 intent = new Intent(CustomerKYCActivity.this, KYCFormActivity.class);
                 intent.putExtra("type", type);
                 intent.putExtra("persons", TYPE);
-                intent.putExtra("customerType", "C");
+                intent.putExtra("customerType", customerType);
                 intent.putExtra("button", "verification");
                 intent.putExtra("mobileNo", mobile_no.getText().toString());
                 intent.putExtra("documentType", spinner_value);

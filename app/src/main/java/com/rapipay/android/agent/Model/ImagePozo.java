@@ -3,7 +3,22 @@ package com.rapipay.android.agent.Model;
 public class ImagePozo {
     int imageId;
     String imageName;
+    String imagePath;
     int imageUrl;
+
+    public ImagePozo(){}
+    public ImagePozo(String imageName, String imagePath) {
+        this.imageName = imageName;
+        this.imagePath = imagePath;
+    }
+
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
+    }
 
     public ImagePozo(int imageId, String imageName, int imageUrl) {
         this.imageId = imageId;

@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "1046244990559",
+    "firebase_url": "https://rapipayagentapp.firebaseio.com",
+    "project_id": "rapipayagentapp",
+    "storage_bucket": "rapipayagentapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1046244990559:android:f56a80ac863321bb",
+        "android_client_info": {
+          "package_name": "com.rapipay.android.partner"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1046244990559-2pfr7cpblg6144gllel87tsqfo2b33ue.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.rapipay.android.partner",
+            "certificate_hash": "169a1de2b8bdebb883da827041780688a7e63ae7"
+          }
+        },
+        {
+          "client_id": "1046244990559-05dq0rjrvbc55ona8mdurdk260894gm4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC-JyhYtNxeH8mIeHWHFkp01st4t5agVMU"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1046244990559-05dq0rjrvbc55ona8mdurdk260894gm4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

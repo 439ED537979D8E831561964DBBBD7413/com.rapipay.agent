@@ -7,6 +7,7 @@
 
 
     <string name="dialog_button_ok">OK</string>
+    <string name="baseurl"></string>
     <string name="dialog_button_cancel">Cancel</string>
     <string name="prompt_Internet">Internet is not Running</string>
 

@@ -16,6 +16,7 @@ import org.json.JSONObject;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import com.rapipay.android.agent.BuildConfig;
 import com.rapipay.android.agent.Database.RapipayDB;
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.adapter.SmsReceiver;
@@ -25,6 +26,7 @@ import com.rapipay.android.agent.interfaces.SmsListener;
 import com.rapipay.android.agent.utils.AsyncPostMethod;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
 import com.rapipay.android.agent.utils.GenerateChecksum;
+import com.rapipay.android.agent.utils.LocalStorage;
 import com.rapipay.android.agent.utils.MasterClass;
 import com.rapipay.android.agent.utils.RouteClass;
 import com.rapipay.android.agent.utils.WebConfig;
@@ -139,6 +141,16 @@ public class PinActivity extends BaseCompactActivity implements View.OnClickList
                     if (new MasterClass().getMasterData(object, db))
                         new AsyncPostMethod(WebConfig.NETWORKTRANSFER_URL, acknowledge().toString(), headerData, PinActivity.this).execute();
                 } else if (object.getString("serviceType").equalsIgnoreCase("UPDATE_DOWNLAOD_DATA_STATUS")) {
+                    new AsyncPostMethod(WebConfig.LOGIN_URL, getWLDetails().toString(), headerData, PinActivity.this).execute();
+//                    customDialog_Common("KYCLAYOUTS", null, null, "Pin Registration", null, "Pin Registration Successful, Do you want to proceed ?", PinActivity.this);
+//                    customDialog();
+                }else if (object.getString("serviceType").equalsIgnoreCase("WL_DOMAIN_DETAILS")) {
+                    if(object.has("invoiceLogo"))
+                        insertImages("invoiceLogo",object);
+                    if(object.has("loginLogo"))
+                        insertImages("loginLogo",object);
+                    if(object.has("leftLogo"))
+                        insertImages("leftLogo",object);
                     customDialog_Common("KYCLAYOUTS", null, null, "Pin Registration", null, "Pin Registration Successful, Do you want to proceed ?", PinActivity.this);
 //                    customDialog();
                 }
@@ -148,22 +160,59 @@ public class PinActivity extends BaseCompactActivity implements View.OnClickList
         }
     }
 
+    private void insertImages(String imageName,JSONObject object){
+        try{
+            String insertSQL = "INSERT INTO " + RapipayDB.TABLE_IMAGES + "\n" +
+                    "(" + RapipayDB.IMAGE_NAME + "," + RapipayDB.IMAGE_PATH_WL  + ")\n" +
+                    "VALUES \n" +
+                    "( ?, ?);";
+            SQLiteDatabase dba = db.getWritableDatabase();
+            String wlimageName = imageName+".jpg";
+            String path = saveToInternalStorage(base64Convert(object.getString(imageName)), wlimageName);
+            dba.execSQL(insertSQL, new String[]{wlimageName, path});
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
     public JSONObject acknowledge() {
-        SimpleDateFormat format = new SimpleDateFormat("ddMMyyyyHHmmss");
-        Date date = new Date();
+        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         if (list.size() != 0) {
             try {
                 jsonObject.put("serviceType", "UPDATE_DOWNLAOD_DATA_STATUS");
                 jsonObject.put("requestType", "BC_Channel");
                 jsonObject.put("typeMobileWeb", "mobile");
-                jsonObject.put("transactionID", "UDDS" + format.format(date));
+                jsonObject.put("transactionID", "UDDS" + tsLong.toString());
                 jsonObject.put("DataDownloadFlag", "Y");
                 jsonObject.put("agentMobile", list.get(0).getMobilno());
                 jsonObject.put("nodeAgentId", list.get(0).getMobilno());
                 jsonObject.put("sessionRefNo", list.get(0).getSessionRefNo());
                 jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getSession(), jsonObject.toString()));
 
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            Toast.makeText(this, "Blank Value", Toast.LENGTH_SHORT).show();
+        }
+        return jsonObject;
+    }
+    public JSONObject getWLDetails() {
+        tsLong = System.currentTimeMillis() / 1000;
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date date = new Date();
+        JSONObject jsonObject = new JSONObject();
+        if (list.size() != 0) {
+            try {
+                jsonObject.put("serviceType", "WL_DOMAIN_DETAILS");
+                jsonObject.put("requestType", "HANDSET_CHANNEL");
+                jsonObject.put("typeMobileWeb", "mobile");
+                jsonObject.put("nodeAgentId", list.get(0).getMobilno());
+                jsonObject.put("transactionID", "WLDD" + tsLong.toString());
+                jsonObject.put("timeStamp", format.format(date));
+                jsonObject.put("appType", BuildConfig.USERTYPE);
+                jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getSession(), jsonObject.toString()));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -183,15 +232,14 @@ public class PinActivity extends BaseCompactActivity implements View.OnClickList
 
     public JSONObject getMaster_Validate() {
         list = db.getDetails();
-        SimpleDateFormat format = new SimpleDateFormat("ddMMyyyyHHmmss");
-        Date date = new Date();
+        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         if (list.size() != 0) {
             try {
                 jsonObject.put("serviceType", "GET_MASTER_DATA");
                 jsonObject.put("requestType", "BC_CHANNEL");
                 jsonObject.put("typeMobileWeb", "mobile");
-                jsonObject.put("transactionID", "GMD" + format.format(date));
+                jsonObject.put("transactionID", "GMD" + tsLong.toString());
                 jsonObject.put("nodeAgentId", list.get(0).getMobilno());
                 jsonObject.put("sessionRefNo", list.get(0).getSessionRefNo());
                 jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getSession(), jsonObject.toString()));
@@ -205,25 +253,6 @@ public class PinActivity extends BaseCompactActivity implements View.OnClickList
         return jsonObject;
     }
 
-//    private void customDialog() {
-//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//        builder.setTitle(R.string.app_name);
-//        builder.setMessage("Pin Registration Successful, Do you want to proceed ?")
-//                .setCancelable(false)
-//                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-//                    public void onClick(DialogInterface dialog, int id) {
-//                        new RouteClass(PinActivity.this, null, null, localStorage, null);
-//                    }
-//                })
-//                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-//                    public void onClick(DialogInterface dialog, int id) {
-//                        dialog.dismiss();
-//                    }
-//                });
-//        AlertDialog alert = builder.create();
-//        alert.show();
-//    }
-
     @Override
     public void chechStat(String object) {
 
@@ -235,8 +264,11 @@ public class PinActivity extends BaseCompactActivity implements View.OnClickList
             Intent intent = new Intent(this, LoginScreenActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
-        } else
-            new RouteClass(PinActivity.this, null, null, localStorage, null);
+            deleteTables("forgot");
+        } else if (type.equalsIgnoreCase("KYCLAYOUTS")) {
+            localStorage.setActivityState(LocalStorage.ROUTESTATE,"PINVERIFIED");
+            new RouteClass(PinActivity.this, null, null, localStorage, "KYCLAYOUTS");
+        }
         finish();
     }
 

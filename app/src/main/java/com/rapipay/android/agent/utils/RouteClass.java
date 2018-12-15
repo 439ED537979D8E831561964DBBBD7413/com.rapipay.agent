@@ -2,6 +2,7 @@ package com.rapipay.android.agent.utils;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.util.Base64;
 
 import org.json.JSONArray;
@@ -9,6 +10,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import com.rapipay.android.agent.Database.RapipayDB;
 import com.rapipay.android.agent.Model.RapiPayPozo;
 import com.rapipay.android.agent.main_directory.LoginScreenActivity;
 import com.rapipay.android.agent.main_directory.PinActivity;
@@ -52,8 +54,11 @@ public class RouteClass {
                     intent = new Intent(context, LoginScreenActivity.class);
                 }
             } else if (list.size() != 0) {
-                if (!list.get(0).getSession().isEmpty()) {
+                if ((!list.get(0).getSession().isEmpty() && localStorage.getActivityState(LocalStorage.ROUTESTATE).equalsIgnoreCase("0")) || localStorage.getActivityState(LocalStorage.ROUTESTATE).equalsIgnoreCase("PINVERIFIED")) {
                     intent = new Intent(context, PinVerification.class);
+                }else if (list.get(0).getAftersessionRefNo().isEmpty() && localStorage.getActivityState(LocalStorage.ROUTESTATE).equalsIgnoreCase("0")) {
+                    deleteTables("forgot");
+                    intent = new Intent(context, LoginScreenActivity.class);
                 }
             }
             if (intent != null) {
@@ -65,6 +70,23 @@ public class RouteClass {
 
         {
             e.printStackTrace();
+        }
+    }
+    protected void deleteTables(String type) {
+        SQLiteDatabase dba = BaseCompactActivity.db.getWritableDatabase();
+        dba.execSQL("delete from " + RapipayDB.TABLE_BANK);
+        dba.execSQL("delete from " + RapipayDB.TABLE_PAYMENT);
+        dba.execSQL("delete from " + RapipayDB.TABLE_STATE);
+        dba.execSQL("delete from " + RapipayDB.TABLE_OPERATOR);
+        dba.execSQL("delete from " + RapipayDB.TABLE_FOOTER);
+        dba.execSQL("delete from " + RapipayDB.TABLE_TRANSFERLIST);
+        dba.execSQL("delete from " + RapipayDB.TABLE_PAYERPAYEE);
+        if (!type.equalsIgnoreCase("")) {
+            dba.execSQL("delete from " + RapipayDB.TABLE_NAME);
+            dba.execSQL("delete from " + RapipayDB.TABLE_KYC_PERSONAL);
+            dba.execSQL("delete from " + RapipayDB.TABLE_KYC_ADDRESS);
+            dba.execSQL("delete from " + RapipayDB.TABLE_KYC_BUISNESS);
+            dba.execSQL("delete from " + RapipayDB.TABLE_KYC_VERIFICATION);
         }
     }
 }

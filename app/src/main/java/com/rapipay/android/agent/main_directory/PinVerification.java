@@ -406,13 +406,6 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
 //        }
 //        return directory.getAbsolutePath();
 //    }
-
-    private Bitmap base64Convert(String encodedImage) {
-        byte[] decodedString = Base64.decode(encodedImage, Base64.DEFAULT);
-        Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-        return decodedByte;
-    }
-
     private void initializeTransAdapter(ArrayList<HeaderePozo> list) {
         LinearLayoutManager layoutManager = new LinearLayoutManager(PinVerification.this, LinearLayoutManager.HORIZONTAL, false);
         recycler_view.setLayoutManager(layoutManager);

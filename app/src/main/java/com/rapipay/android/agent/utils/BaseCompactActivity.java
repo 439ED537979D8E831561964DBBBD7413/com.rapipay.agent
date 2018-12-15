@@ -13,6 +13,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
@@ -31,6 +32,7 @@ import android.support.v7.widget.AppCompatButton;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -52,6 +54,8 @@ import org.xmlpull.v1.XmlPullParserFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
@@ -68,6 +72,7 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 import com.rapipay.android.agent.Database.RapipayDB;
 import com.rapipay.android.agent.Model.BeneficiaryDetailsPozo;
 import com.rapipay.android.agent.Model.HeaderePozo;
+import com.rapipay.android.agent.Model.ImagePozo;
 import com.rapipay.android.agent.Model.RapiPayPozo;
 import com.rapipay.android.agent.Model.VersionPozo;
 import com.rapipay.android.agent.R;
@@ -103,7 +108,7 @@ public class BaseCompactActivity extends AppCompatActivity {
     protected String mCameraPhotoPath = null;
     protected static final String TAG = MainActivity.class.getSimpleName();
     protected ArrayList<String> listPath = new ArrayList<>();
-    protected String TYPE="";
+    protected String TYPE = "";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -116,7 +121,7 @@ public class BaseCompactActivity extends AppCompatActivity {
             list = db.getDetails();
     }
 
-//    private void align_text_center() {
+    //    private void align_text_center() {
 //        ActionBar ab = getSupportActionBar();
 //        ab.setBackgroundDrawable(getResources().getDrawable(R.drawable.splash_screen));
 //        TextView tv = new TextView(getApplicationContext());
@@ -131,6 +136,23 @@ public class BaseCompactActivity extends AppCompatActivity {
 //        ab.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
 //        ab.setCustomView(tv);
 //    }
+    protected void loadImageFromStorage(String name, ImageView view, String path) {
+
+        try {
+            File f = new File(path, name);
+            Bitmap b = BitmapFactory.decodeStream(new FileInputStream(f));
+            view.setImageBitmap(b);
+            view.setVisibility(View.VISIBLE);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+    }
+    protected Bitmap base64Convert(String encodedImage) {
+        byte[] decodedString = Base64.decode(encodedImage, Base64.DEFAULT);
+        Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+        return decodedByte;
+    }
 
     protected String saveToInternalStorage(Bitmap bitmapImage, String name) {
         ContextWrapper cw = new ContextWrapper(getApplicationContext());
@@ -139,7 +161,7 @@ public class BaseCompactActivity extends AppCompatActivity {
         FileOutputStream fos = null;
         try {
             fos = new FileOutputStream(mypath);
-            bitmapImage.compress(Bitmap.CompressFormat.JPEG, 50, fos);
+            bitmapImage.compress(Bitmap.CompressFormat.JPEG, 100, fos);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -215,8 +237,14 @@ public class BaseCompactActivity extends AppCompatActivity {
         dba.execSQL("delete from " + RapipayDB.TABLE_FOOTER);
         dba.execSQL("delete from " + RapipayDB.TABLE_TRANSFERLIST);
         dba.execSQL("delete from " + RapipayDB.TABLE_PAYERPAYEE);
-        if (!type.equalsIgnoreCase(""))
+        if (!type.equalsIgnoreCase("")) {
             dba.execSQL("delete from " + RapipayDB.TABLE_NAME);
+            dba.execSQL("delete from " + RapipayDB.TABLE_KYC_PERSONAL);
+            dba.execSQL("delete from " + RapipayDB.TABLE_KYC_ADDRESS);
+            dba.execSQL("delete from " + RapipayDB.TABLE_KYC_BUISNESS);
+            dba.execSQL("delete from " + RapipayDB.TABLE_KYC_VERIFICATION);
+            dba.execSQL("delete from " + RapipayDB.TABLE_IMAGES);
+        }
     }
 
     protected AlertDialog.Builder dialog;
@@ -269,6 +297,8 @@ public class BaseCompactActivity extends AppCompatActivity {
                 else if (type.equalsIgnoreCase("LOGOUT")) {
                     return_Page();
                 } else if (type.equalsIgnoreCase("TERMCONDITION")) {
+                    anInterface.okClicked(type, ob);
+                }else if (type.equalsIgnoreCase("KYCLAYOUTS")) {
                     anInterface.okClicked(type, ob);
                 } else
                     anInterface.okClicked(type, ob);
@@ -578,6 +608,7 @@ public class BaseCompactActivity extends AppCompatActivity {
                     PERMISSIONS_REQUEST_READ_PHONE_STATE);
         }
     }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
@@ -724,6 +755,12 @@ public class BaseCompactActivity extends AppCompatActivity {
         dialog = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
         View alertLayout = inflater.inflate(R.layout.cashout_receipt, null);
+        ImageView receipt_logo = (ImageView)alertLayout.findViewById(R.id.receipt_logo);
+        String condition = "where " + RapipayDB.IMAGE_NAME + "='invoiceLogo.jpg'";
+        ArrayList<ImagePozo> imagePozoArrayList = db.getImageDetails(condition);
+        if(imagePozoArrayList.size()!=0){
+            loadImageFromStorage(imagePozoArrayList.get(0).getImageName(),receipt_logo,imagePozoArrayList.get(0).getImagePath());
+        }
         main_layout = (LinearLayout) alertLayout.findViewById(R.id.main_layout);
         main_layout.setDrawingCacheEnabled(true);
         main_layout.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
@@ -861,7 +898,12 @@ public class BaseCompactActivity extends AppCompatActivity {
         dialog = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
         View alertLayout = inflater.inflate(R.layout.receipt_layout_new, null);
-
+        ImageView receipt_logo = (ImageView)alertLayout.findViewById(R.id.receipt_logo);
+        String condition = "where " + RapipayDB.IMAGE_NAME + "='invoiceLogo.jpg'";
+        ArrayList<ImagePozo> imagePozoArrayList = db.getImageDetails(condition);
+        if(imagePozoArrayList.size()!=0){
+            loadImageFromStorage(imagePozoArrayList.get(0).getImageName(),receipt_logo,imagePozoArrayList.get(0).getImagePath());
+        }
         main_layout = (LinearLayout) alertLayout.findViewById(R.id.main_layout);
 
         main_layout.setDrawingCacheEnabled(true);
@@ -1181,6 +1223,7 @@ public class BaseCompactActivity extends AppCompatActivity {
                     Toast.makeText(BaseCompactActivity.this, "Your Session got expired", Toast.LENGTH_SHORT).show();
                 }
         }
+
         public void onFinish() {
         }
     };

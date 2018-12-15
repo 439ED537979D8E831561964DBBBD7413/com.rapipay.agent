@@ -42,6 +42,14 @@
                 android:layout_marginBottom="5dp"
                 android:layout_marginTop="5dp"
                 android:spinnerMode="dropdown"/>
+            <TextView
+                android:id="@+id/documentype"
+                style="@style/Widget.AppCompat.Spinner.Underlined"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:layout_marginTop="5dp"
+                android:visibility="gone"/>
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
@@ -96,7 +104,7 @@
                     android:layout_weight="400"
                     android:background="@drawable/border_button"
                     android:onClick="onClick"
-                    android:text="Mannual"
+                    android:text="Manual"
                     android:textColor="@color/white"
                     android:textSize="12dp" />
             </LinearLayout>
@@ -173,11 +181,13 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/address_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="3dp"
                 android:orientation="horizontal"
-                android:weightSum="800">
+                android:weightSum="800"
+                android:visibility="gone">
 
                 <TextView
                     android:id="@+id/address"
@@ -208,7 +218,8 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="3dp"
                 android:orientation="horizontal"
-                android:weightSum="800">
+                android:weightSum="800"
+                android:visibility="gone">
 
                 <TextView
                     android:id="@+id/business_detail"
@@ -238,7 +249,8 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="3dp"
                 android:orientation="horizontal"
-                android:weightSum="800">
+                android:weightSum="800"
+                android:visibility="gone">
 
                 <TextView
                     android:id="@+id/verification_detail"

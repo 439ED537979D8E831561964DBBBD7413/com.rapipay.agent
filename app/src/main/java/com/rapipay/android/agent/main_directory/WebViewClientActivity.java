@@ -539,13 +539,11 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
                 intent = new Intent(WebViewClientActivity.this, WalletDetailsActivity.class);
                 intent.putExtra("mobileNo", mobileNo);
                 intent.putExtra("type", "internal");
-                startActivity(intent);
             } else {
                 intent = new Intent(WebViewClientActivity.this, MainActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 //                                intent.putExtra("type", "Outside");
                 //                                intent.putExtra("mobileNo", "");
-                startActivity(intent);
             }
 //            intent = new Intent(WebViewClientActivity.this, WalletDetailsActivity.class);
 //            intent.putExtra("mobileNo", mobileNo);

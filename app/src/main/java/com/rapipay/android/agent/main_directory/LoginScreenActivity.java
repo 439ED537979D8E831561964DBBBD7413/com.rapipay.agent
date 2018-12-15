@@ -17,12 +17,14 @@ import android.support.v7.widget.AppCompatButton;
 import android.telephony.TelephonyManager;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 //import com.crashlytics.android.Crashlytics;
+import com.rapipay.android.agent.BuildConfig;
 import com.rapipay.android.agent.Model.VersionPozo;
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.interfaces.CustomInterface;
@@ -44,6 +46,7 @@ public class LoginScreenActivity extends BaseCompactActivity implements View.OnC
     TextInputEditText input_password;
     public static final int REQUEST_ID_MULTIPLE_PERMISSIONS = 1;
     AppCompatButton btn_login;
+    ImageView image_app;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +57,11 @@ public class LoginScreenActivity extends BaseCompactActivity implements View.OnC
     }
 
     private void initialize() {
+        image_app = (ImageView)findViewById(R.id.image_app);
+        if(BuildConfig.APPTYPE==1)
+            image_app.setImageDrawable(getResources().getDrawable(R.drawable.ic_launcher));
+        if(BuildConfig.APPTYPE==2)
+            image_app.setImageDrawable(getResources().getDrawable(R.drawable.rapipay_parter));
         findViewById(R.id.back_click).setVisibility(View.GONE);
         input_password = (TextInputEditText) findViewById(R.id.input_password);
         input_user = (EditText) findViewById(R.id.input_user);

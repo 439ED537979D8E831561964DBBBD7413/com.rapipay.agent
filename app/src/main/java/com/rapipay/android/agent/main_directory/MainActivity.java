@@ -40,8 +40,11 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import com.google.android.gms.vision.text.Text;
+import com.rapipay.android.agent.Database.RapipayDB;
 import com.rapipay.android.agent.Model.BankDetailsPozo;
 import com.rapipay.android.agent.Model.HeaderePozo;
+import com.rapipay.android.agent.Model.ImagePozo;
+import com.rapipay.android.agent.Model.NewKYCPozo;
 import com.rapipay.android.agent.Model.RapiPayPozo;
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.fragments.ChangeMobileFragment;
@@ -60,12 +63,8 @@ import com.rapipay.android.agent.utils.WebConfig;
 
 public class MainActivity extends BaseCompactActivity
         implements NavigationView.OnNavigationItemSelectedListener, RequestHandler, CustomInterface, View.OnClickListener {
-    String regId = "";
-    public static String _val = "";
-    private static String _type = "";
-    static Boolean _internet;
+
     public static ImageView ivHeaderPhoto;
-    TextView footettext;
     NavigationView navigationView;
     private static final int CAMERA_REQUEST = 1888;
     private int SELECT_FILE = 1;
@@ -75,6 +74,7 @@ public class MainActivity extends BaseCompactActivity
     DrawerLayout drawer;
     String data, term = null;
     TextView tv;
+    ImageView back_click;
 
     public static ArrayList<HeaderePozo> pozoArrayList;
 
@@ -88,7 +88,7 @@ public class MainActivity extends BaseCompactActivity
     }
 
     private void url() {
-        new AsyncPostMethod(WebConfig.NETWORKTRANSFER_URL, getDashBoard("GET_NODE_HEADER_DATA").toString(), headerData, MainActivity.this).execute();
+        new AsyncPostMethod(WebConfig.COMMONAPI, getDashBoard("GET_NODE_HEADER_DATA").toString(), headerData, MainActivity.this).execute();
     }
 
     private void loadUrl() {
@@ -130,6 +130,12 @@ public class MainActivity extends BaseCompactActivity
     private void initialization() {
         reset = (ImageView) findViewById(R.id.reset);
         reset.setOnClickListener(this);
+        back_click = (ImageView)findViewById(R.id.back_click);
+        String condition = "where " + RapipayDB.IMAGE_NAME + "='invoiceLogo.jpg'";
+        ArrayList<ImagePozo> imagePozoArrayList = db.getImageDetails(condition);
+        if(imagePozoArrayList.size()!=0){
+            loadImageFromStorage(imagePozoArrayList.get(0).getImageName(),back_click,imagePozoArrayList.get(0).getImagePath());
+        }
         tv = (TextView) this.findViewById(R.id.mywidget);
         tv.setSelected(true);
         reset.setColorFilter(getResources().getColor(R.color.colorPrimaryDark));
@@ -169,18 +175,6 @@ public class MainActivity extends BaseCompactActivity
                 selectImage();
             }
         });
-    }
-
-    private void loadImageFromStorage(String name, ImageView view, String path) {
-
-        try {
-            File f = new File(path, name);
-            Bitmap b = BitmapFactory.decodeStream(new FileInputStream(f));
-            view.setImageBitmap(b);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-
     }
 
     @Override
@@ -382,8 +376,8 @@ public class MainActivity extends BaseCompactActivity
         try {
             for (int i = 0; i < array.length(); i++) {
                 JSONObject object = array.getJSONObject(i);
-                if (!object.getString("headerValue").equalsIgnoreCase("Notice") &&!object.getString("headerValue").equalsIgnoreCase("DOWNLOAD_MASTER_DATA") && !object.getString("headerValue").equalsIgnoreCase("TnC") && !object.getString("headerValue").equalsIgnoreCase("TCLINK") && !object.getString("headerValue").equalsIgnoreCase("Parent Mobile") && !object.getString("headerValue").equalsIgnoreCase("TOBECREATE"))
-                    pozoArrayList.add(new HeaderePozo(object.getString("headerValue"), object.getString("headerData"), object.getString("headerId")));
+                if (object.getString("displayFlag").equalsIgnoreCase("D"))
+                    pozoArrayList.add(new HeaderePozo(object.getString("headerValue"), object.getString("headerData"), object.getString("headerId"),object.getString("displayFlag")));
                 else if (object.getString("headerValue").equalsIgnoreCase("Notice")){
                     tv.setText(object.getString("headerData"));
                     tv.setVisibility(View.VISIBLE);

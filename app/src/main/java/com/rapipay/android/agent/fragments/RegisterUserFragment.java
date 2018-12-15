@@ -189,7 +189,7 @@ public class RegisterUserFragment extends Fragment implements RequestHandler, Vi
                 try {
                     String requiredValue = data.getStringExtra("Key");
                     ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                    bitmap_trans.compress(Bitmap.CompressFormat.PNG, 50, byteArrayOutputStream);
+                    bitmap_trans.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
                     byte[] byteArray = byteArrayOutputStream.toByteArray();
                     byteBase64 = Base64.encodeToString(byteArray, Base64.DEFAULT);
                     jsonObj = XML.toJSONObject(requiredValue);

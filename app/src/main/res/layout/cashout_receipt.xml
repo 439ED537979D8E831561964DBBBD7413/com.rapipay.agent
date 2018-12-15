@@ -9,7 +9,6 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-
         <LinearLayout
             android:id="@+id/main_layout"
             android:layout_width="match_parent"
@@ -18,10 +17,10 @@
             android:orientation="vertical">
 
             <ImageView
+                android:id="@+id/receipt_logo"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
-                android:layout_gravity="center"
-                android:src="@drawable/ic_launcher" />
+                android:layout_gravity="center"/>
 
             <TextView
                 android:id="@+id/agent_name"
