@@ -40,12 +40,12 @@ public class ImageUtils {
         ArrayList<ImagePozo> list = new ArrayList<>();
 
         list.clear();
-        list.add(new ImagePozo(1, "Prepaid Mobile Recharge", R.drawable.mobile));
-        list.add(new ImagePozo(2, "Postpaid Mobile", R.drawable.mobile));
-        list.add(new ImagePozo(3, "DTH Recharge", R.drawable.dthnew));
-        list.add(new ImagePozo(4, "Utility Bill Payment", R.drawable.utility));
+        list.add(new ImagePozo(1, "Mobile Recharge", R.drawable.mobile));
+//        list.add(new ImagePozo(2, "Postpaid Mobile", R.drawable.mobile));
+        list.add(new ImagePozo(2, "DTH Recharge", R.drawable.dthnew));
+//        list.add(new ImagePozo(4, "Utility Bill Payment", R.drawable.utility));
 //        list.add(new ImagePozo(5,"Telephone", R.drawable.telephone));
-        list.add(new ImagePozo(5, "Recharge History", R.drawable.history));
+        list.add(new ImagePozo(3, "Recharge History", R.drawable.history));
         return list;
     }
 

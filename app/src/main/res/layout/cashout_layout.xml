@@ -35,23 +35,39 @@
                 android:textColor="@color/white"
                 android:visibility="gone" />
             <!--  Email Label -->
-            <android.support.design.widget.TextInputLayout
-                android:id="@+id/mobile_top"
+            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:layout_marginTop="8dp"
-                android:layout_weight="700">
+                android:orientation="horizontal"
+                android:padding="5dp"
+                android:weightSum="800">
 
-                <EditText
-                    android:id="@+id/input_mobile"
-                    android:layout_width="match_parent"
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/mobile_top"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:hint="@string/p_mobile"
-                    android:inputType="number"
-                    android:maxLength="10"
-                    android:textSize="16dp" />
-            </android.support.design.widget.TextInputLayout>
+                    android:layout_weight="650">
+
+                    <EditText
+                        android:id="@+id/input_mobile"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/p_mobile"
+                        android:inputType="number"
+                        android:maxLength="10"
+                        android:textSize="16dp" />
+                </android.support.design.widget.TextInputLayout>
+
+                <ImageView
+                    android:id="@+id/btn_contact"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_weight="150"
+                    android:clickable="true"
+                    android:onClick="onClick"
+                    android:src="@drawable/contactsicon"
+                    android:textColor="@color/white" />
+            </LinearLayout>
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
@@ -78,45 +94,50 @@
                 android:layout_marginTop="5dp"
                 android:spinnerMode="dropdown"
                 android:visibility="gone" />
+
             <LinearLayout
-                android:orientation="horizontal" android:layout_width="match_parent"
+                android:id="@+id/inflate_main"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:weightSum="800"
+                android:orientation="horizontal"
                 android:visibility="gone"
-                android:id="@+id/inflate_main">
+                android:weightSum="800">
 
                 <TextView
-                    android:layout_weight="277"
+                    android:id="@+id/amount"
                     android:layout_width="0dp"
-                    android:text="EMI AMOUNT"
                     android:layout_height="wrap_content"
-                    android:id="@+id/amount"/>
-                <TextView
                     android:layout_weight="277"
-                    android:layout_width="0dp"
-                    android:text="EMI PERCENT"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/percentage"/>
+                    android:text="EMI AMOUNT" />
+
                 <TextView
+                    android:id="@+id/percentage"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="277"
+                    android:text="EMI PERCENT" />
+
+                <TextView
+                    android:id="@+id/tenure"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
                     android:layout_weight="276"
-                    android:layout_width="0dp"
-                    android:text="EMI TENURE"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/tenure"/>
+                    android:text="EMI TENURE" />
 
             </LinearLayout>
+
             <LinearLayout
+                android:id="@+id/inflate_tenureee"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:visibility="gone"
-                android:id="@+id/inflate_tenureee">
+                android:visibility="gone">
+
                 <ListView
                     android:id="@+id/lv_imflate"
                     android:layout_width="match_parent"
                     android:layout_height="160dp"
-                    android:listSelector="@android:color/darker_gray"
-                    />
+                    android:listSelector="@android:color/darker_gray" />
             </LinearLayout>
 
 
@@ -131,6 +152,7 @@
                 android:textColor="@color/white"
                 android:textSize="14dp"
                 android:visibility="gone" />
+
             <android.support.v7.widget.AppCompatButton
                 android:id="@+id/getdetails"
                 android:layout_width="match_parent"

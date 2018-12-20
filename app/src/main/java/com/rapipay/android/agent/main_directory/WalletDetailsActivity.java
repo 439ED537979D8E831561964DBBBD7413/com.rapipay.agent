@@ -27,6 +27,7 @@ import com.rapipay.android.agent.Model.BeneficiaryDetailsPozo;
 import com.rapipay.android.agent.Model.LastTransactionPozo;
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.adapter.WalletBeneficiaryAdapter;
+import com.rapipay.android.agent.fragments.RegisterUserFragment;
 import com.rapipay.android.agent.interfaces.ClickListener;
 import com.rapipay.android.agent.interfaces.CustomInterface;
 import com.rapipay.android.agent.interfaces.RequestHandler;
@@ -411,7 +412,6 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
                             customDialog_Common("KYCLAYOUTL", object,null,"","","Cannot generate receipt now please try later!");
                         }
                     }
-
                 }
 //                    customDialog_Common("KYCLAYOUT", object, null, "Fund Transfer Detail", null, object.getString("output"));
 //                    customDialog(object.getString("output"), object.getString("serviceType"));

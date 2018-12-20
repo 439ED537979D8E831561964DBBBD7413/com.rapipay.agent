@@ -162,14 +162,20 @@ public class PinActivity extends BaseCompactActivity implements View.OnClickList
 
     private void insertImages(String imageName,JSONObject object){
         try{
-            String insertSQL = "INSERT INTO " + RapipayDB.TABLE_IMAGES + "\n" +
-                    "(" + RapipayDB.IMAGE_NAME + "," + RapipayDB.IMAGE_PATH_WL  + ")\n" +
-                    "VALUES \n" +
-                    "( ?, ?);";
             SQLiteDatabase dba = db.getWritableDatabase();
+            ContentValues values = new ContentValues();
             String wlimageName = imageName+".jpg";
-            String path = saveToInternalStorage(base64Convert(object.getString(imageName)), wlimageName);
-            dba.execSQL(insertSQL, new String[]{wlimageName, path});
+            values.put(RapipayDB.IMAGE_PATH_WL, byteConvert(object.getString(imageName)));
+            values.put(RapipayDB.IMAGE_NAME, wlimageName);
+            dba.insert(RapipayDB.TABLE_IMAGES, null, values);
+//            String insertSQL = "INSERT INTO " + RapipayDB.TABLE_IMAGES + "\n" +
+//                    "(" + RapipayDB.IMAGE_NAME + "," + RapipayDB.IMAGE_PATH_WL  + ")\n" +
+//                    "VALUES \n" +
+//                    "( ?, ?);";
+//
+//
+////            String path = saveToInternalStorage(base64Convert(object.getString(imageName)), wlimageName);
+//            dba.execSQL(insertSQL, new String[]{wlimageName, byteConvert(object.getString(imageName))});
         }catch (Exception e){
             e.printStackTrace();
         }

@@ -20,7 +20,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:gravity="center"
-        android:textSize="10dp"
+        android:textSize="9dp"
         android:inputType="textMultiLine"
         android:singleLine="false"
         android:maxLines="2"

@@ -153,6 +153,16 @@ public class BaseCompactActivity extends AppCompatActivity {
         Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
         return decodedByte;
     }
+    protected void byteConvert(ImageView imageViews,byte[] decodedString) {
+        Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+        imageViews.setImageBitmap(decodedByte);
+    }
+
+    protected byte[] byteConvert(String encodedImage) {
+        return Base64.decode(encodedImage, Base64.DEFAULT);
+//        Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+//        return decodedByte;
+    }
 
     protected String saveToInternalStorage(Bitmap bitmapImage, String name) {
         ContextWrapper cw = new ContextWrapper(getApplicationContext());
@@ -229,6 +239,10 @@ public class BaseCompactActivity extends AppCompatActivity {
     }
 
     protected void deleteTables(String type) {
+        localStorage.setActivityState(LocalStorage.ROUTESTATE,"0");
+        localStorage.setActivityState(LocalStorage.EMI,"0");
+        localStorage.setActivityState(LocalStorage.LOGOUT,"0");
+        localStorage.setActivityState(LocalStorage.IMAGEPATH,"0");
         SQLiteDatabase dba = db.getWritableDatabase();
         dba.execSQL("delete from " + RapipayDB.TABLE_BANK);
         dba.execSQL("delete from " + RapipayDB.TABLE_PAYMENT);
@@ -239,6 +253,7 @@ public class BaseCompactActivity extends AppCompatActivity {
         dba.execSQL("delete from " + RapipayDB.TABLE_PAYERPAYEE);
         if (!type.equalsIgnoreCase("")) {
             dba.execSQL("delete from " + RapipayDB.TABLE_NAME);
+            dba.execSQL("delete from " + RapipayDB.TABLE_MASTER);
             dba.execSQL("delete from " + RapipayDB.TABLE_KYC_PERSONAL);
             dba.execSQL("delete from " + RapipayDB.TABLE_KYC_ADDRESS);
             dba.execSQL("delete from " + RapipayDB.TABLE_KYC_BUISNESS);
@@ -759,7 +774,7 @@ public class BaseCompactActivity extends AppCompatActivity {
         String condition = "where " + RapipayDB.IMAGE_NAME + "='invoiceLogo.jpg'";
         ArrayList<ImagePozo> imagePozoArrayList = db.getImageDetails(condition);
         if(imagePozoArrayList.size()!=0){
-            loadImageFromStorage(imagePozoArrayList.get(0).getImageName(),receipt_logo,imagePozoArrayList.get(0).getImagePath());
+            byteConvert(receipt_logo,imagePozoArrayList.get(0).getImagePath());
         }
         main_layout = (LinearLayout) alertLayout.findViewById(R.id.main_layout);
         main_layout.setDrawingCacheEnabled(true);
@@ -902,7 +917,7 @@ public class BaseCompactActivity extends AppCompatActivity {
         String condition = "where " + RapipayDB.IMAGE_NAME + "='invoiceLogo.jpg'";
         ArrayList<ImagePozo> imagePozoArrayList = db.getImageDetails(condition);
         if(imagePozoArrayList.size()!=0){
-            loadImageFromStorage(imagePozoArrayList.get(0).getImageName(),receipt_logo,imagePozoArrayList.get(0).getImagePath());
+            byteConvert(receipt_logo,imagePozoArrayList.get(0).getImagePath());
         }
         main_layout = (LinearLayout) alertLayout.findViewById(R.id.main_layout);
 

@@ -24,6 +24,7 @@ import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Spinner;
@@ -95,7 +96,7 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
     String typeput;
     private Location mylocation;
     private GoogleApiClient googleApiClient;
-    private final static int REQUEST_CHECK_SETTINGS_GPS = 0x1;
+    private final static int REQUEST_CHECK_SETTINGS_GPS = 0x5;
     private final static int REQUEST_ID_MULTIPLE_PERMISSIONS = 0x2;
     String tid = "", mid = "", orderID = "";
     private BluetoothAdapter btAdapter;
@@ -110,6 +111,7 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
     private CustomProgessDialog progessDialog;
     private ListView lv_imflate;
     private AcquirerEmiDetailsVO vo = null;
+    private ImageView btn_contact;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -317,9 +319,7 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                 {
                 }
             }
-        }
-
-        ;
+        };
     }
 
     private void clear() {
@@ -336,6 +336,7 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
     private void initialize() {
         validator = new AccountValidator(getApplicationContext());
         heading = (TextView) findViewById(R.id.toolbar_title);
+        btn_contact = (ImageView) findViewById(R.id.btn_contact);
         if (balance != null)
             heading.setText(typeput + " (Balance : Rs." + balance + ")");
         else
@@ -421,6 +422,9 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+            case R.id.btn_contact:
+                loadIMEI();
+                break;
             case R.id.btn_fund:
               /*  break;
             case R.id.reciept_details:
@@ -783,6 +787,9 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                         break;
                 }
                 break;
+            case CONTACT_PICKER_RESULT:
+                contactRead(data, input_mobile);
+                break;
         }
     }
 
@@ -819,7 +826,7 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
             ArrayList<String> devices = new ArrayList<>();
             boolean isPosPaired = false;
             for (BluetoothDevice device : pairedDevices) {
-                if (device.getName().startsWith("C")) {
+                if (device.getName().startsWith("C-ME30S")) {
                     isPosPaired = true;
                     String bluetoothName = device.getName();
                     String bluetoothAddress = device.getAddress();

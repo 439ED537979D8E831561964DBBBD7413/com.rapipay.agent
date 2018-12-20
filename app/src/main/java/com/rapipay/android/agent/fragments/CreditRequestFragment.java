@@ -413,96 +413,8 @@ public class CreditRequestFragment extends Fragment implements RequestHandler, V
             dialog.show();
         }
     };
-//    private void picDate() {
-//        months=null;dayss=null;
-//        rv.findViewById(R.id.date).setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                // custom dialog
-//                final Dialog dialog = new Dialog(getActivity());
-//                dialog.setContentView(R.layout.datepickerview);
-//                dialog.setTitle("");
-//
-//                DatePicker datePicker = (DatePicker) dialog.findViewById(R.id.datePicker1);
-//                Calendar calendar = Calendar.getInstance();
-//                calendar.setTimeInMillis(System.currentTimeMillis());
-//                selectedDate = calendar.get(Calendar.DAY_OF_MONTH);
-//                selectedMonth = calendar.get(Calendar.MONTH);
-//                selectedYear = calendar.get(Calendar.YEAR);
-//                datePicker.init(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH), new DatePicker.OnDateChangedListener() {
-//
-//                    @Override
-//                    public void onDateChanged(DatePicker datePicker, int year, int month, int dayOfMonth) {
-//                        Log.e("Date", "Year=" + year + " Month=" + (month + 1) + " day=" + dayOfMonth);
-//                        if(String.valueOf(month+1).length()==1)
-//                            months = "0"+ String.valueOf(month+1);
-//                        else
-//                            months = String.valueOf(month+1);
-//                        if(String.valueOf(dayOfMonth).length()==1)
-//                            dayss = "0"+String.valueOf(dayOfMonth);
-//                        else
-//                            dayss = String.valueOf(dayOfMonth);
-//                        if (selectedDate == dayOfMonth && selectedMonth == month && selectedYear == year) {
-//                            date_text.setText(dayss + "/" + months + "/" + year);
-//                            dialog.dismiss();
-//                        } else {
-//
-//                            if (selectedDate != dayOfMonth) {
-//                                date_text.setText(dayss + "/" + months + "/" + year);
-//                                dialog.dismiss();
-//                            } else {
-//                                if (selectedMonth != month) {
-//                                    date_text.setText(dayss + "/" + months + "/" + year);
-//                                    dialog.dismiss();
-//                                }
-//                            }
-//                        }
-//                        selectedDate = dayOfMonth;
-//                        selectedMonth = (month);
-//                        selectedYear = year;
-//                    }
-//                });
-//                dialog.show();
-//            }
-//        });
-//    }
-//
-//    private void calender() {
-//        dateFormatter = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
-//        Calendar newCalendar = Calendar.getInstance();
-//        pickerDialog = new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
-//            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-//                Calendar newDate = Calendar.getInstance();
-//                newDate.set(year, monthOfYear, dayOfMonth);
-//                date_text.setText(dateFormatter.format(newDate.getTime()));
-//            }
-//        }, newCalendar.get(Calendar.YEAR), newCalendar.get(Calendar.MONTH), newCalendar.get(Calendar.DAY_OF_MONTH));
-//        pickerDialog.show();
-//    }
-
-
     private void selectImage() {
-//        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//        startActivityForResult(takePictureIntent, CAMERA_REQUEST);
-//        Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-//        Intent contentSelectionIntent = new Intent(Intent.ACTION_GET_CONTENT);
-//        contentSelectionIntent.addCategory(Intent.CATEGORY_OPENABLE);
-//        contentSelectionIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-//        contentSelectionIntent.setType("image/*");
-//        Intent[] intentArray;
-//        if (takePictureIntent != null) {
-//            intentArray = new Intent[]{takePictureIntent, intent};
-//        } else {
-//            intentArray = new Intent[2];
-//        }
-//        Intent chooserIntent = new Intent(Intent.ACTION_CHOOSER);
-//        chooserIntent.putExtra(Intent.EXTRA_INTENT, contentSelectionIntent);
-//        chooserIntent.putExtra(Intent.EXTRA_TITLE, "Image Chooser");
-//        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray);
-//
-//        startActivityForResult(Intent.createChooser(chooserIntent, "Select images"), SELECT_FILE);
-
-        final CharSequence[] items = {"Capture Image", "Cancel"};
+        final CharSequence[] items = {"Capture Image","Choose from Gallery", "Cancel"};
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(getActivity());
         builder.setIcon(R.drawable.camera);
         builder.setTitle("Add Photo!");
@@ -513,10 +425,10 @@ public class CreditRequestFragment extends Fragment implements RequestHandler, V
                     Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                     startActivityForResult(cameraIntent, CAMERA_REQUEST);
 
-//                } else if (items[item].equals("Choose from Gallery")) {
-//                    Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-//                    intent.setType("image/*");
-//                    startActivityForResult(Intent.createChooser(intent, "Select File"), SELECT_FILE);
+                } else if (items[item].equals("Choose from Gallery")) {
+                    Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    intent.setType("image/*");
+                    startActivityForResult(Intent.createChooser(intent, "Select File"), SELECT_FILE);
 
                 } else if (items[item].equals("Cancel")) {
                     dialog.dismiss();
@@ -618,13 +530,11 @@ public class CreditRequestFragment extends Fragment implements RequestHandler, V
     }
 
     public String getBytesFromBitmap(Bitmap bitmap) {
-        String imageEncoded;
         if (bitmap != null) {
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
             byte[] b = stream.toByteArray();
-            imageEncoded = Base64.encodeToString(b, Base64.DEFAULT);
-            return imageEncoded;
+            return Base64.encodeToString(b, Base64.DEFAULT);
         }
         return null;
     }

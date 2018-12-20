@@ -6,7 +6,10 @@ import android.text.InputFilter;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -26,10 +29,11 @@ import com.rapipay.android.agent.utils.WebConfig;
 public class ReChargeActivity extends BaseCompactActivity implements View.OnClickListener, RequestHandler, CustomInterface {
 
     TextView input_amount, input_number;
-
     TextView select_operator;
     String operator_clicked, serviceType = "";
     ImageView btn_contact;
+    RadioGroup radioGroup;
+    RadioButton prepaid, postpaid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +43,7 @@ public class ReChargeActivity extends BaseCompactActivity implements View.OnClic
     }
 
     private void initialize() {
+        radioGroup = (RadioGroup) findViewById(R.id.myRadioGroup);
         heading = (TextView) findViewById(R.id.toolbar_title);
         operator_clicked = getIntent().getStringExtra("OPERATOR");
         input_amount = (EditText) findViewById(R.id.input_amount);
@@ -58,35 +63,38 @@ public class ReChargeActivity extends BaseCompactActivity implements View.OnClic
         } else if (operator_clicked.equalsIgnoreCase("POST")) {
             serviceType = "MOBILE_BILL_PAYMENT";
             heading.setText("POSTPAID BILL PAYMENT");
+        } else {
+            radioGroup.setVisibility(View.VISIBLE);
+            heading.setText("MOBILE RECHARGE");
         }
         select_operator = (TextView) findViewById(R.id.select_operator);
         select_operator.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String condition = "where " + RapipayDB.COLOMN_OPERATORVALUE + "='" + operator_clicked + "'";
-                ArrayList<String> list_operator = db.getOperatorDetail(condition);
-                customSpinner(select_operator, "Select Operator", list_operator);
+                if (operator_clicked.equalsIgnoreCase("PRE") || operator_clicked.equalsIgnoreCase("POST") || operator_clicked.equalsIgnoreCase("DTH")) {
+                    String condition = "where " + RapipayDB.COLOMN_OPERATORVALUE + "='" + operator_clicked + "'";
+                    ArrayList<String> list_operator = db.getOperatorDetail(condition);
+                    customSpinner(select_operator, "Select Operator", list_operator);
+                } else
+                    Toast.makeText(ReChargeActivity.this, "Please select recharge mode", Toast.LENGTH_SHORT).show();
             }
         });
-//        String condition = "where " + RapipayDB.COLOMN_OPERATORVALUE + "='" + operator_clicked + "'";
-//        list_operator = db.getOperatorDetail(condition);
-//        if (list_operator.size() != 0) {
-//            ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
-//                    android.R.layout.simple_spinner_item, list_operator);
-//            dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//            select_operator.setAdapter(dataAdapter);
-//        }
-//        select_operator.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-//            @Override
-//            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-//                operator = list_operator.get(position);
-//            }
-//
-//            @Override
-//            public void onNothingSelected(AdapterView<?> parent) {
-//
-//            }
-//        });
+
+        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                // find which radio button is selected
+                if (checkedId == R.id.prepaid) {
+                    serviceType = "MOBILE_RECHARGE";
+                    operator_clicked = "PRE";
+                } else if (checkedId == R.id.postpaid) {
+                    serviceType = "MOBILE_BILL_PAYMENT";
+                    operator_clicked = "POST";
+                }
+            }
+        });
+        prepaid = (RadioButton) findViewById(R.id.prepaid);
+        postpaid = (RadioButton) findViewById(R.id.postpaid);
     }
 
     @Override
@@ -111,7 +119,7 @@ public class ReChargeActivity extends BaseCompactActivity implements View.OnClic
                         select_operator.setError("Please enter mandatory field");
                     else
                         new AsyncPostMethod(WebConfig.RECHARGE_URL, reCharge_request().toString(), headerData, ReChargeActivity.this).execute();
-                } else if (operator_clicked.equalsIgnoreCase("PRE") || operator_clicked.equalsIgnoreCase("POST")) {
+                } else if (operator_clicked.equalsIgnoreCase("PRE") || operator_clicked.equalsIgnoreCase("POST") || operator_clicked.equalsIgnoreCase("MOBILE")) {
                     if (!ImageUtils.commonNumber(input_number.getText().toString(), 10)) {
                         input_number.setError("Please enter valid mobile number");
                         input_number.requestFocus();
@@ -164,9 +172,7 @@ public class ReChargeActivity extends BaseCompactActivity implements View.OnClic
                             e.printStackTrace();
                             customDialog_Common("KYCLAYOUTS", null, null, "PREPAID RECHARGE", "", "Cannot generate receipt now please try later!", ReChargeActivity.this);
                         }
-//                    customDialog_Common("KYCLAYOUTS", object, null, "PREPAID RECHARGE", null, object.getString("responseMessage"), ReChargeActivity.this);
-//                    customDialog(object.getString("responseMessage"));
-                }else if (object.getString("serviceType").equalsIgnoreCase("DTH_RECHARGE")) {
+                } else if (object.getString("serviceType").equalsIgnoreCase("DTH_RECHARGE")) {
                     if (object.has("getTxnReceiptDataList"))
                         try {
                             JSONArray array = object.getJSONArray("getTxnReceiptDataList");
@@ -175,9 +181,7 @@ public class ReChargeActivity extends BaseCompactActivity implements View.OnClic
                             e.printStackTrace();
                             customDialog_Common("KYCLAYOUTS", null, null, "DTH RECHARGE", "", "Cannot generate receipt now please try later!", ReChargeActivity.this);
                         }
-//                    customDialog_Common("KYCLAYOUTS", object, null, "DTH RECHARGE", null, object.getString("responseMessage"), ReChargeActivity.this);
-//                    customDialog(object.getString("responseMessage"));
-                }else if (object.getString("serviceType").equalsIgnoreCase("MOBILE_BILL_PAYMENT")) {
+                } else if (object.getString("serviceType").equalsIgnoreCase("MOBILE_BILL_PAYMENT")) {
                     if (object.has("getTxnReceiptDataList"))
                         try {
                             JSONArray array = object.getJSONArray("getTxnReceiptDataList");
@@ -186,37 +190,21 @@ public class ReChargeActivity extends BaseCompactActivity implements View.OnClic
                             e.printStackTrace();
                             customDialog_Common("KYCLAYOUTS", null, null, "POSTPAID BILL PAYMENT", "", "Cannot generate receipt now please try later!", ReChargeActivity.this);
                         }
-//                    customDialog_Common("KYCLAYOUTS", object, null, "POSTPAID BILL PAYMENT", null, object.getString("responseMessage"), ReChargeActivity.this);
-//                    customDialog(object.getString("responseMessage"));
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
-//    private void customDialog(String msg) {
-//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//        builder.setTitle(R.string.app_name);
-//        //Setting message manually and performing action on button click
-//        builder.setMessage(msg)
-//                .setCancelable(false)
-//                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-//                    public void onClick(DialogInterface dialog, int id) {
-//                        clear();
-//                        dialog.dismiss();
-//                    }
-//                });
-//        //Creating dialog box
-//        AlertDialog alert = builder.create();
-//        alert.show();
-//    }
-
     private void clear() {
         input_amount.setText("");
         input_number.setText("");
         input_number.requestFocus();
         select_operator.setText("Select Operator");
+        prepaid.setChecked(false);
+        postpaid.setChecked(false);
+        if (operator_clicked.equalsIgnoreCase("PRE") || operator_clicked.equalsIgnoreCase("POST"))
+            operator_clicked = "MOBILE";
     }
 
     @Override

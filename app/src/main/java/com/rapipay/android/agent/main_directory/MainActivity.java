@@ -134,7 +134,7 @@ public class MainActivity extends BaseCompactActivity
         String condition = "where " + RapipayDB.IMAGE_NAME + "='invoiceLogo.jpg'";
         ArrayList<ImagePozo> imagePozoArrayList = db.getImageDetails(condition);
         if(imagePozoArrayList.size()!=0){
-            loadImageFromStorage(imagePozoArrayList.get(0).getImageName(),back_click,imagePozoArrayList.get(0).getImagePath());
+            byteConvert(back_click,imagePozoArrayList.get(0).getImagePath());
         }
         tv = (TextView) this.findViewById(R.id.mywidget);
         tv.setSelected(true);

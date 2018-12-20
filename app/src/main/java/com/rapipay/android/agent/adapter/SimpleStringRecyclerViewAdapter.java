@@ -1,6 +1,8 @@
 package com.rapipay.android.agent.adapter;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,11 +14,12 @@ import java.util.ArrayList;
 
 import me.grantland.widget.AutofitTextView;
 import com.rapipay.android.agent.Model.ImagePozo;
+import com.rapipay.android.agent.Model.MasterPozo;
 import com.rapipay.android.agent.R;
 
 public class SimpleStringRecyclerViewAdapter extends RecyclerView.Adapter<SimpleStringRecyclerViewAdapter.ViewHolder> {
 
-    private ArrayList<ImagePozo> mValues;
+    private ArrayList<MasterPozo> mValues;
     private RecyclerView mRecyclerView;
     private Context context;
     private String type;
@@ -36,7 +39,7 @@ public class SimpleStringRecyclerViewAdapter extends RecyclerView.Adapter<Simple
         }
     }
 
-    public SimpleStringRecyclerViewAdapter(Context context, RecyclerView recyclerView, ArrayList<ImagePozo> items, String type) {
+    public SimpleStringRecyclerViewAdapter(Context context, RecyclerView recyclerView, ArrayList<MasterPozo> items, String type) {
         mValues = items;
         mRecyclerView = recyclerView;
         this.context = context;
@@ -60,8 +63,8 @@ public class SimpleStringRecyclerViewAdapter extends RecyclerView.Adapter<Simple
             } else {
                 layoutParams.height = 800;
             }*/
-        holder.mImageView.setImageDrawable(context.getResources().getDrawable(mValues.get(position).getImageUrl()));
-        holder.recycler_text.setText(mValues.get(position).getImageName());
+        holder.mImageView.setImageBitmap(byteConvert(mValues.get(position).getIcon()));
+        holder.recycler_text.setText(mValues.get(position).getServiceTypeName());
         if (type.equalsIgnoreCase("first"))
             holder.recycler_text.setTextColor(context.getResources().getColor(R.color.white));
         holder.mLayoutItem.setOnClickListener(new View.OnClickListener() {
@@ -75,6 +78,9 @@ public class SimpleStringRecyclerViewAdapter extends RecyclerView.Adapter<Simple
             }
         });
 
+    }
+    protected Bitmap byteConvert(byte[] decodedString) {
+        return BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
     }
 
     @Override

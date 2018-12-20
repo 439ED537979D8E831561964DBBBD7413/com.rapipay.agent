@@ -56,7 +56,7 @@ public class SlidingImage_Adapter extends PagerAdapter {
         final ImageView imageView = (ImageView) imageLayout
                 .findViewById(R.id.image);
 
-        loadImageFromStorage(IMAGES.get(position).getHeaderValue(),imageView,IMAGES.get(position).getPath());
+        byteConvert(imageView,IMAGES.get(position).getImagePath());
 //        imageView.setImageResource(IMAGES.get(position));
 //        scaleImage(imageView);
 
@@ -64,20 +64,24 @@ public class SlidingImage_Adapter extends PagerAdapter {
 
         return imageLayout;
     }
-    private void loadImageFromStorage(String name, ImageView view, String path)
-    {
-
-        try {
-            File f=new File(path, name);
-            Bitmap b = BitmapFactory.decodeStream(new FileInputStream(f));
-            view.setImageBitmap(b);
-        }
-        catch (FileNotFoundException e)
-        {
-            e.printStackTrace();
-        }
-
+    protected void byteConvert(ImageView imageViews,byte[] decodedString) {
+        Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+        imageViews.setImageBitmap(decodedByte);
     }
+//    private void loadImageFromStorage(String name, ImageView view, String path)
+//    {
+//
+//        try {
+//            File f=new File(path, name);
+//            Bitmap b = BitmapFactory.decodeStream(new FileInputStream(f));
+//            view.setImageBitmap(b);
+//        }
+//        catch (FileNotFoundException e)
+//        {
+//            e.printStackTrace();
+//        }
+//
+//    }
     @Override
     public boolean isViewFromObject(View view, Object object) {
         return view.equals(object);

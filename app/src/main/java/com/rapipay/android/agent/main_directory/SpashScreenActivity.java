@@ -37,21 +37,17 @@ public class SpashScreenActivity extends BaseCompactActivity {
         String condition = "where " + RapipayDB.IMAGE_NAME + "='loginLogo.jpg'";
         ArrayList<ImagePozo> imagePozoArrayList = db.getImageDetails(condition);
         if(imagePozoArrayList.size()!=0){
-            loadImageFromStorage(imagePozoArrayList.get(0).getImageName(),imageView,imagePozoArrayList.get(0).getImagePath());
-        }else
-            imageView.setImageDrawable(getResources().getDrawable(R.drawable.ic_launcher));
+            byteConvert(imageView,imagePozoArrayList.get(0).getImagePath());
+        }else {
+            if (BuildConfig.APPTYPE == 1)
+                imageView.setImageDrawable(getResources().getDrawable(R.drawable.ic_launcher));
+            if (BuildConfig.APPTYPE == 2)
+                imageView.setImageDrawable(getResources().getDrawable(R.drawable.rapipay_parter));
+        }
     }
 
     private void route() {
         new RouteClass(this, null, null, localStorage, null);
-//        ArrayList<RapiPayPozo> list = db.getDetails();
-//        if (list.size() != 0) {
-//            Intent intent = new Intent(this, PinVerification.class);
-//            startActivity(intent);
-//        } else {
-//            Intent intent = new Intent(this, LoginScreenActivity.class);
-//            startActivity(intent);
-//        }
         finish();
     }
 

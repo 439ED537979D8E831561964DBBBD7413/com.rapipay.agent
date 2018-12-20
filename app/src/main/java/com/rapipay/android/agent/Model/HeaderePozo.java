@@ -6,6 +6,21 @@ public class HeaderePozo {
     String headerID;
     String path;
     String timeStamp;
+    byte[] imagePath;
+    public byte[] getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(byte[] imagePath) {
+        this.imagePath = imagePath;
+    }
+
+    public HeaderePozo(String headerValue, String headerData, String headerID, byte[] imagePath) {
+        this.headerValue = headerValue;
+        this.headerData = headerData;
+        this.headerID = headerID;
+        this.imagePath = imagePath;
+    }
 
     public HeaderePozo(){}
 

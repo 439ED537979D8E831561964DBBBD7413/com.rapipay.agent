@@ -167,5 +167,7 @@
     <string name="decline">Decline</string>
     <string name="dialogue_message">Hello, %1$s! You have new messages.</string>
     <string name="prompt_getadteerror">Error in geting data,try again...</string>
+    <string name="prepaid">PrePaid</string>
+    <string name="postpaid">PostPaid</string>
 
 </resources>

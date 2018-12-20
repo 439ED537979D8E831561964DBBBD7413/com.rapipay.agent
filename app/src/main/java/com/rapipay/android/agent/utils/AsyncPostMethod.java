@@ -80,7 +80,7 @@ public class AsyncPostMethod extends AsyncTask<String, String, String> {
                 } else if (!s.equalsIgnoreCase("false")) {
                     JSONObject object = new JSONObject(s);
                     if (object.has("responseCode")) {
-                        if (object.getString("responseCode").equalsIgnoreCase("200") || object.getString("responseCode").equalsIgnoreCase("300") || object.getString("responseCode").equalsIgnoreCase("101") || object.getString("responseCode").equalsIgnoreCase("75077") || object.getString("responseCode").equalsIgnoreCase("75115") || object.getString("responseCode").equalsIgnoreCase("75062") || object.getString("responseCode").equalsIgnoreCase("75061") || object.getString("responseCode").equalsIgnoreCase("75063")) {
+                        if (object.getString("responseCode").equalsIgnoreCase("200") || object.getString("responseCode").equalsIgnoreCase("300") || object.getString("responseCode").equalsIgnoreCase("101") || object.getString("responseCode").equalsIgnoreCase("75077") || object.getString("responseCode").equalsIgnoreCase("75115") || object.getString("responseCode").equalsIgnoreCase("75062") || object.getString("responseCode").equalsIgnoreCase("75061") || object.getString("responseCode").equalsIgnoreCase("75063") || object.getString("responseCode").equalsIgnoreCase("60116")) {
                             handler.chechStatus(object);
                             if (object.has("apiCommonResposne")) {
                                 JSONObject object1 = object.getJSONObject("apiCommonResposne");
