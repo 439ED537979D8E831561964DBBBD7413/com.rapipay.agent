@@ -11,14 +11,12 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.Base64;
-import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.XML;
@@ -82,24 +80,6 @@ public class RegisterUserActivity extends BaseCompactActivity implements Request
         scan_check=0;
         if (!mobileNo.isEmpty())
             input_number.setText(mobileNo);
-//        if (list_state.size() != 0) {
-//            ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
-//                    android.R.layout.simple_spinner_item, list_state);
-//            dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//            select_state.setAdapter(dataAdapter);
-//        }
-//        select_state.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-//            @Override
-//            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-//                if (position != 0)
-//                    state = list_state.get(position);
-//            }
-//
-//            @Override
-//            public void onNothingSelected(AdapterView<?> parent) {
-//
-//            }
-//        });
     }
 
     @Override
@@ -272,31 +252,12 @@ public class RegisterUserActivity extends BaseCompactActivity implements Request
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-//                    customDialog_Common("KYCLAYOUTS", object, null, "User Registration", null, object.getString("responseMessage"), RegisterUserActivity.this);
-//                    customDialog(object.getString("responseMessage"));
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-//
-//    private void customDialog(String msg) {
-//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//        builder.setTitle(R.string.app_name);
-//        //Setting message manually and performing action on button click
-//        builder.setMessage(msg)
-//                .setCancelable(false)
-//                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-//                    public void onClick(DialogInterface dialog, int id) {
-//                        clear();
-//                        dialog.dismiss();
-//                    }
-//                });
-//        //Creating dialog box
-//        AlertDialog alert = builder.create();
-//        alert.show();
-//    }
 
     private void clear() {
         input_number.setText("");

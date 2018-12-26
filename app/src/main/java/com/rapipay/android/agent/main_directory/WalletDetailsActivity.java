@@ -24,10 +24,8 @@ import java.util.ArrayList;
 
 import com.rapipay.android.agent.Database.RapipayDB;
 import com.rapipay.android.agent.Model.BeneficiaryDetailsPozo;
-import com.rapipay.android.agent.Model.LastTransactionPozo;
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.adapter.WalletBeneficiaryAdapter;
-import com.rapipay.android.agent.fragments.RegisterUserFragment;
 import com.rapipay.android.agent.interfaces.ClickListener;
 import com.rapipay.android.agent.interfaces.CustomInterface;
 import com.rapipay.android.agent.interfaces.RequestHandler;
@@ -42,15 +40,14 @@ import com.rapipay.android.agent.utils.WebConfig;
 public class WalletDetailsActivity extends BaseCompactActivity implements View.OnClickListener, RequestHandler, CustomInterface {
 
     EditText input_account, input_mobile, input_otp, input_ben_name;
-    TextView input_name;
+    TextView input_name,spinner;
     AppCompatButton btn_otpsubmit;
     LinearLayout sender_layout, otp_layout, fundlayout, beneficiary_layout, last_tran_layout;
-    String otpRefId, fund_transferId, ifsc_code;
+    String otpRefId, ifsc_code;
     TextView bank_select;
     ImageView btn_sender, btn_search;
     RecyclerView beneficiary_details, trans_details;
     ArrayList<BeneficiaryDetailsPozo> beneficiaryDetailsPozoslist;
-    ArrayList<LastTransactionPozo> transactionPozoArrayList;
     TextView text_ben;
     String customerId;
     int benePosition;
@@ -127,7 +124,6 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
             @Override
             public void onClick(View view, int position) {
                 benePosition = position;
-//                customPopUp(beneficiaryDetailsPozoslist.get(position));
                 customDialog_Common("BENLAYOUT", null, beneficiaryDetailsPozoslist.get(position), "RapiPay", null, null);
             }
 
@@ -157,29 +153,6 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
             }
         });
     }
-
-//    private void customPopUp(final BeneficiaryDetailsPozo pozo) {
-//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//        builder.setTitle(R.string.app_name);
-//        builder.setCancelable(true)
-//                .setNegativeButton("Delete Beneficiary", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        new AsyncPostMethod(WebConfig.WALLETTRANSFER_URL, delete_Benef(pozo).toString(), headerData, WalletDetailsActivity.this).execute();
-//                        dialog.dismiss();
-//                    }
-//                })
-//                .setPositiveButton("Fund Transfer", new DialogInterface.OnClickListener() {
-//                    public void onClick(DialogInterface dialog, int id) {
-//                        customFund_Transfer(pozo);
-//
-//                        dialog.dismiss();
-//                    }
-//                });
-//        //Creating dialog box
-//        AlertDialog alert = builder.create();
-//        alert.show();
-//    }
 
     public JSONObject fund_transfer(BeneficiaryDetailsPozo pozo, String type, String amount) {
         tsLong = System.currentTimeMillis() / 1000;
@@ -342,9 +315,8 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
             if (object.getString("serviceType").equalsIgnoreCase("GET_WALLET_STATUS")) {
                 if (object.getString("responseCode").equalsIgnoreCase("75061")) {
                     customDialog_Common("KYCLAYOUT", object, null, "KYC Registration", null, object.getString("responseMsg") + "\n" + "Proceed for KYC ?");
-//                    confirmDialog(object.getString("responseMsg") + "\n" + "Do you want to continue for KYC", object.getString("responseCode"));
+
                 } else if (object.getString("responseCode").equalsIgnoreCase("75063")) {
-//                    confirmDialog(object.getString("responseMsg"), object.getString("responseCode"));
                     customDialog_Common("KYCLAYOUT", object, null, "Mobile Number Status", null, object.getString("responseMsg"));
                 } else if (object.getString("responseCode").equalsIgnoreCase("200")) {
                     if (object.has("otpId")) {
@@ -384,25 +356,19 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
             } else if (object.getString("serviceType").equalsIgnoreCase("Verify_Account")) {
                 if (object.getString("responseCode").equalsIgnoreCase("200"))
                     customDialog_Common("VerifyLayout", object, null, "Verify Account Details", input_name.getText().toString(), null);
-//                    customDialog("Account No :- " + object.getString("accountNo"), object.getString("serviceType"));
             } else if (object.getString("serviceType").equalsIgnoreCase("ADD_PAYEE")) {
                 if (object.getString("responseCode").equalsIgnoreCase("200") && object.has("otpId"))
-//                    customDialog_Ben(object.getString("otpId"));
                     customDialog_Common("OTPLAYOUT", object, null, "Add Payee OTP", null, null);
                 else
                     customDialog_Common("KYCLAYOUTL", object, null, "Payee Detail", null, object.getString("output"));
-//                    customDialog(object.getString("output"), object.getString("serviceType"));
             } else if (object.getString("serviceType").equalsIgnoreCase("DELETE_PAYEE")) {
                 if (object.getString("responseCode").equalsIgnoreCase("200"))
                     customDialog_Common("KYCLAYOUTLAY", object, null, "Payee Detail", null, object.getString("output"));
-//                    customDialog(object.getString("output"), object.getString("serviceType"));
             } else if (object.getString("serviceType").equalsIgnoreCase("FUND_TRANSFER")) {
                 if (object.getString("responseCode").equalsIgnoreCase("200") && object.has("otpId"))
                     customDialog_Common("OTPLAYOUT", object, null, "Fund Transfer OTP", null, null);
-//                    customDialog_Ben(object.getString("otpId"));
                 else {
                     localStorage.setActivityState(LocalStorage.ROUTESTATE, "UPDATE");
-//                    customDialog_Common("KYCLAYOUT", object, null, "Mobile Number Status", null,object.getString("output"));
                     if (object.has("getTxnReceiptDataList")) {
                         try {
                             JSONArray array = object.getJSONArray("getTxnReceiptDataList");
@@ -413,44 +379,15 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
                         }
                     }
                 }
-//                    customDialog_Common("KYCLAYOUT", object, null, "Fund Transfer Detail", null, object.getString("output"));
-//                    customDialog(object.getString("output"), object.getString("serviceType"));
             } else if (object.getString("serviceType").equalsIgnoreCase("GET_SERVICE_FEE")) {
                 if (object.getString("responseCode").equalsIgnoreCase("200"))
                     customDialog_Common("Fund Transfer Confirmation", object, beneficiaryDetailsPozoslist.get(benePosition), "Confirm Money Transfer?", input_mobile.getText().toString(), null);
-//                    customService(pozo,object.getString("chargeServiceFee"),object.getString("cgst"),object.getString("igst"),object.getString("sgst"));
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
 
     }
-
-//    private void confirmDialog(String msg, final String code) {
-//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//        builder.setTitle(R.string.app_name);
-//        //Setting message manually and performing action on button click
-//        builder.setMessage(msg)
-//                .setCancelable(false)
-//                .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        dialog.dismiss();
-//                    }
-//                })
-//                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-//                    public void onClick(DialogInterface dialog, int id) {
-//                        if (code.equalsIgnoreCase("75061"))
-//                            callKYC();
-////                        else if (code.equalsIgnoreCase("75063"))
-////
-//                        dialog.dismiss();
-//                    }
-//                });
-//        //Creating dialog box
-//        AlertDialog alert = builder.create();
-//        alert.show();
-//    }
 
     private void callKYC() {
         Intent intent = new Intent(WalletDetailsActivity.this, CustomerKYCActivity.class);
@@ -569,65 +506,12 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
         adapter = new WalletBeneficiaryAdapter(this, beneficiary_details, list);
         beneficiary_details.setAdapter(adapter);
     }
-//
-//    private void customDialog(String msg, final String serviceType) {
-//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//        builder.setTitle(R.string.app_name);
-//        //Setting message manually and performing action on button click
-//        builder.setMessage(msg)
-//                .setCancelable(false)
-//                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-//                    public void onClick(DialogInterface dialog, int id) {
-//                        if (serviceType.equalsIgnoreCase("ADD_PAYEE")) {
-//                            clear();
-//                            new AsyncPostMethod(WebConfig.WALLETTRANSFER_URL, getSender_Validate().toString(), headerData, WalletDetailsActivity.this).execute();
-//                        } else if (serviceType.equalsIgnoreCase("DELETE_PAYEE")) {
-//                            beneficiaryDetailsPozoslist.remove(benePosition);
-//                            adapter.notifyDataSetChanged();
-//                        }
-//                        hideKeyboard(WalletDetailsActivity.this);
-//                        dialog.dismiss();
-//                    }
-//                });
-//        //Creating dialog box
-//        AlertDialog alert = builder.create();
-//        alert.show();
-//    }
 
     private void clear() {
         input_account.setText("");
         input_ben_name.setText("");
         bank_select.setText("Select Bank");
     }
-
-    //    private void customDialog_Ben(final String otpRefId) {
-//        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-//        LayoutInflater inflater = getLayoutInflater();
-//        View alertLayout = inflater.inflate(R.layout.custom_otp_layout, null);
-//        final TextView text = (TextView) alertLayout.findViewById(R.id.input_amount_ben);
-//        dialog.setView(alertLayout);
-//        dialog.setTitle(getResources().getString(R.string.app_name));
-//
-//        dialog.setCancelable(false);
-//        dialog.setPositiveButton("Done", new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialog, int which) {
-//                if (!text.getText().toString().isEmpty()) {
-//                    hideKeyboard(WalletDetailsActivity.this);
-//                    new AsyncPostMethod(WebConfig.WALLETTRANSFER_URL, processOtp(text.getText().toString(), otpRefId).toString(), headerData, WalletDetailsActivity.this).execute();
-//                    dialog.dismiss();
-//                }
-//            }
-//        });
-//        dialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialog, int which) {
-//                dialog.dismiss();
-//            }
-//        });
-//        dialog.show();
-//    }
-    TextView spinner;
 
     private void customFund_Transfer(final BeneficiaryDetailsPozo pozo, String title) {
         AlertDialog.Builder dialog = new AlertDialog.Builder(this);
@@ -776,7 +660,6 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
                             }
                         } else if (type.equalsIgnoreCase("BENLAYOUT")) {
                             customFund_Transfer((BeneficiaryDetailsPozo) ob, "RapiPay");
-//                            customDialog_Common("FUNDTRANSFER", null, (BeneficiaryDetailsPozo)ob, "RapiPay", null,null);
                         } else if (type.equalsIgnoreCase("Fund Transfer Confirmation"))
 //                            if (spinner.getText().toString().equalsIgnoreCase("Select Transfer Type"))
 //                                spinner.setError("Please select transfer type.");
