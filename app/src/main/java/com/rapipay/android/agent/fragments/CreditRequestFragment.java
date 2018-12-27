@@ -21,7 +21,6 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.CursorLoader;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatButton;
@@ -54,6 +53,7 @@ import java.util.Date;
 import java.util.Locale;
 
 import me.grantland.widget.AutofitTextView;
+
 import com.rapipay.android.agent.Model.PaymentModePozo;
 import com.rapipay.android.agent.Model.RapiPayPozo;
 import com.rapipay.android.agent.R;
@@ -63,13 +63,14 @@ import com.rapipay.android.agent.interfaces.CustomInterface;
 import com.rapipay.android.agent.interfaces.RequestHandler;
 import com.rapipay.android.agent.utils.AsyncPostMethod;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
+import com.rapipay.android.agent.utils.BaseFragment;
 import com.rapipay.android.agent.utils.GenerateChecksum;
 import com.rapipay.android.agent.utils.ImageUtils;
 import com.rapipay.android.agent.utils.WebConfig;
 
 import static android.app.Activity.RESULT_OK;
 
-public class CreditRequestFragment extends Fragment implements RequestHandler, View.OnClickListener, CustomInterface {
+public class CreditRequestFragment extends BaseFragment implements RequestHandler, View.OnClickListener, CustomInterface {
     final private static int PERMISSIONS_REQUEST_READ_PHONE_STATE = 0;
     Spinner select_mode;
     TextView bank_select;
@@ -93,7 +94,10 @@ public class CreditRequestFragment extends Fragment implements RequestHandler, V
         rv = (View) inflater.inflate(R.layout.credit_request_layout, container, false);
         initialize(rv);
         headerData = (WebConfig.BASIC_USERID + ":" + WebConfig.BASIC_PASSWORD);
-        list = BaseCompactActivity.db.getDetails();
+        if (BaseCompactActivity.db != null && BaseCompactActivity.db.getDetails_Rapi())
+            list = BaseCompactActivity.db.getDetails();
+        else
+            dbNull(CreditRequestFragment.this);
         return rv;
     }
 
@@ -147,7 +151,7 @@ public class CreditRequestFragment extends Fragment implements RequestHandler, V
                 if (position != 0)
                     paymode = list_payment.get(position).getPaymentMode();
                 else
-                    paymode="";
+                    paymode = "";
             }
 
             @Override
@@ -178,6 +182,8 @@ public class CreditRequestFragment extends Fragment implements RequestHandler, V
 
     @Override
     public void okClicked(String type, Object ob) {
+        if (type.equalsIgnoreCase("SESSIONEXPIRE"))
+            jumpPage();
         clear();
     }
 
@@ -190,7 +196,7 @@ public class CreditRequestFragment extends Fragment implements RequestHandler, V
 
     private void customDialog_Ben(String msg, String title) {
         AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
-        LayoutInflater inflater = getLayoutInflater();
+        LayoutInflater inflater = getActivity().getLayoutInflater();
         View alertLayout = inflater.inflate(R.layout.custom_layout_common, null);
         AppCompatButton btn_cancel = (AppCompatButton) alertLayout.findViewById(R.id.btn_cancel);
         btn_cancel.setVisibility(View.GONE);
@@ -217,23 +223,6 @@ public class CreditRequestFragment extends Fragment implements RequestHandler, V
         });
         alertDialog = dialog.show();
     }
-
-//    private void customDialog(String msg) {
-//        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-//        builder.setTitle(R.string.app_name);
-//        //Setting message manually and performing action on button click
-//        builder.setMessage(msg)
-//                .setCancelable(false)
-//                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-//                    public void onClick(DialogInterface dialog, int id) {
-//                        clear();
-//                        dialog.dismiss();
-//                    }
-//                });
-//        //Creating dialog box
-//        AlertDialog alert = builder.create();
-//        alert.show();
-//    }
 
     private void clear() {
         input_transid.setText("");
@@ -347,15 +336,15 @@ public class CreditRequestFragment extends Fragment implements RequestHandler, V
                     input_transid.requestFocus();
                 } else if (bank_select.getText().toString().equalsIgnoreCase("Select Bank"))
                     bank_select.setError("Please enter valid data");
-                else if(paymode.isEmpty())
+                else if (paymode.isEmpty())
                     Toast.makeText(getActivity(), "Please select payment mode.", Toast.LENGTH_SHORT).show();
-                else if(image.getText().toString().isEmpty()) {
+                else if (image.getText().toString().isEmpty()) {
                     image.setError("Please Select Image");
                     image.requestFocus();
-                }else if(date1_text.getText().toString().isEmpty()) {
+                } else if (date1_text.getText().toString().isEmpty()) {
                     date1_text.setError("Please select date");
                     date1_text.requestFocus();
-                }else if (!paymode.isEmpty() && !filePath.isEmpty() && !imageBase64.isEmpty())
+                } else if (!paymode.isEmpty() && !filePath.isEmpty() && !imageBase64.isEmpty())
                     new AsyncPostMethod(WebConfig.CRNF, credit_request().toString(), headerData, CreditRequestFragment.this, getActivity()).execute();
                 else
                     Toast.makeText(getActivity(), "Please select mandatory fields", Toast.LENGTH_SHORT).show();
@@ -413,8 +402,9 @@ public class CreditRequestFragment extends Fragment implements RequestHandler, V
             dialog.show();
         }
     };
+
     private void selectImage() {
-        final CharSequence[] items = {"Capture Image","Choose from Gallery", "Cancel"};
+        final CharSequence[] items = {"Capture Image", "Choose from Gallery", "Cancel"};
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(getActivity());
         builder.setIcon(R.drawable.camera);
         builder.setTitle("Add Photo!");
@@ -437,6 +427,7 @@ public class CreditRequestFragment extends Fragment implements RequestHandler, V
         });
         builder.show();
     }
+
     private Bitmap addWaterMark(Bitmap src) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
         String currentDateandTime = sdf.format(new Date());
@@ -451,7 +442,7 @@ public class CreditRequestFragment extends Fragment implements RequestHandler, V
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_OVER)); // Text Overlapping Pattern
         Bitmap waterMark = BitmapFactory.decodeResource(getResources(), R.drawable.rapipay);
 //        canvas.drawBitmap(waterMark, 0, 0, paint);
-        canvas.drawText(currentDateandTime, w/4, h-10, paint);
+        canvas.drawText(currentDateandTime, w / 4, h - 10, paint);
 
         return result;
     }
@@ -499,7 +490,7 @@ public class CreditRequestFragment extends Fragment implements RequestHandler, V
         Long tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         try {
-            String remark="";
+            String remark = "";
             if (input_remark.getText().toString().isEmpty())
                 remark = "";
             else if (!ImageUtils.commonRegex(input_remark.getText().toString(), 250, "0-9 ?/,._-"))
@@ -552,7 +543,7 @@ public class CreditRequestFragment extends Fragment implements RequestHandler, V
 
         spinner_list = list_spinner;
         dialog = new AlertDialog.Builder(getActivity());
-        LayoutInflater inflater = getLayoutInflater();
+        LayoutInflater inflater = getActivity().getLayoutInflater();
         View alertLayout = inflater.inflate(R.layout.custom_spinner_layout, null);
         TextView text = (TextView) alertLayout.findViewById(R.id.spinner_title);
         final EditText search = (EditText) alertLayout.findViewById(R.id.input_search);

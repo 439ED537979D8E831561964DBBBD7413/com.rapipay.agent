@@ -80,6 +80,7 @@ import com.rapipay.android.agent.adapter.BottomAdapter;
 import com.rapipay.android.agent.adapter.CustomSpinnerAdapter;
 import com.rapipay.android.agent.interfaces.CustomInterface;
 import com.rapipay.android.agent.interfaces.VersionListener;
+import com.rapipay.android.agent.main_directory.LoginScreenActivity;
 import com.rapipay.android.agent.main_directory.MainActivity;
 import com.rapipay.android.agent.main_directory.PinVerification;
 
@@ -113,6 +114,7 @@ public class BaseCompactActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        db = new RapipayDB(this);
         tsLong = System.currentTimeMillis() / 1000;
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         localStorage = LocalStorage.getInstance(this);
@@ -156,6 +158,7 @@ public class BaseCompactActivity extends AppCompatActivity {
     protected void byteConvert(ImageView imageViews,byte[] decodedString) {
         Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
         imageViews.setImageBitmap(decodedByte);
+        imageViews.setVisibility(View.VISIBLE);
     }
 
     protected byte[] byteConvert(String encodedImage) {
@@ -261,7 +264,15 @@ public class BaseCompactActivity extends AppCompatActivity {
             dba.execSQL("delete from " + RapipayDB.TABLE_IMAGES);
         }
     }
-
+    protected void jumpPage(){
+        Intent intent = new Intent(BaseCompactActivity.this, LoginScreenActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        deleteTables("ALL");
+    }
+    protected void dbNull(CustomInterface customInterface) {
+        customDialog_Common("SESSIONEXPIRE", null, null, "Session Expired", null, "Your current session will get expired.", customInterface);
+    }
     protected AlertDialog.Builder dialog;
     protected AlertDialog alertDialog, newdialog;
     CustomInterface anInterface;
@@ -287,7 +298,7 @@ public class BaseCompactActivity extends AppCompatActivity {
         try {
             if (type.equalsIgnoreCase("KYCLAYOUT") || type.equalsIgnoreCase("PENDINGREFUND") || type.equalsIgnoreCase("REFUNDTXN") || type.equalsIgnoreCase("SESSIONEXPIRRED") || type.equalsIgnoreCase("PENDINGLAYOUT")) {
                 customView(alertLayout, output);
-            } else if (type.equalsIgnoreCase("KYCLAYOUTS") || type.equalsIgnoreCase("KYCLAYOUTSS") || type.equalsIgnoreCase("LOGOUT")) {
+            } else if (type.equalsIgnoreCase("KYCLAYOUTS") || type.equalsIgnoreCase("KYCLAYOUTSS") || type.equalsIgnoreCase("LOGOUT") || type.equalsIgnoreCase("SESSIONEXPIRE")) {
                 btn_cancel.setVisibility(View.GONE);
                 customView(alertLayout, output);
             } else if (type.equalsIgnoreCase("TERMCONDITION")) {

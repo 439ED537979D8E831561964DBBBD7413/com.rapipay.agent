@@ -22,7 +22,6 @@ import android.webkit.WebViewClient;
 import android.widget.TextView;
 
 import com.rapipay.android.agent.Database.RapipayDB;
-import com.rapipay.android.agent.Model.NewKYCPozo;
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.interfaces.CustomInterface;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
@@ -32,7 +31,6 @@ import org.json.JSONObject;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -56,7 +54,6 @@ public class WebViewVerify extends BaseCompactActivity implements CustomInterfac
         mobileNo = getIntent().getStringExtra("mobileNo");
         documentType = getIntent().getStringExtra("documentType");
         documentID = getIntent().getStringExtra("documentID");
-//        String formData = getIntent().getStringExtra("formData");
         web = (WebView) findViewById(R.id.webview01);
         WebSettings webSettings = web.getSettings();
         webSettings.setAppCacheEnabled(true);
@@ -77,7 +74,6 @@ public class WebViewVerify extends BaseCompactActivity implements CustomInterfac
         }
         if (KYCFormActivity.formData != null)
             web.loadDataWithBaseURL("", KYCFormActivity.formData, "text/html", "UTF-8", "");
-        //        web.postUrl(WebConfig.UAT, EncodingUtils.getBytes(getJson_Validate(mobileNo,"A",parentId,sessionKey).toString(), "BASE64"));
     }
 
     public class myWebClient extends WebViewClient {

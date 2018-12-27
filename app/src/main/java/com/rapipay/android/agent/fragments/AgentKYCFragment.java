@@ -26,7 +26,6 @@ import com.rapipay.android.agent.Model.RapiPayPozo;
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.interfaces.RequestHandler;
 import com.rapipay.android.agent.main_directory.BarcodeActivity;
-import com.rapipay.android.agent.main_directory.CustomerKYCActivity;
 import com.rapipay.android.agent.main_directory.KYCFormActivity;
 import com.rapipay.android.agent.utils.AsyncPostMethod;
 import com.rapipay.android.agent.utils.BaseCompactActivity;

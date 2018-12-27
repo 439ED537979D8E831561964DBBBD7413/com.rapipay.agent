@@ -21,19 +21,22 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 import me.grantland.widget.AutofitTextView;
+
 import com.rapipay.android.agent.Model.CreditHistoryPozo;
 import com.rapipay.android.agent.Model.RapiPayPozo;
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.adapter.CreditHistoryAdapter;
 import com.rapipay.android.agent.interfaces.ClickListener;
+import com.rapipay.android.agent.interfaces.CustomInterface;
 import com.rapipay.android.agent.interfaces.RequestHandler;
 import com.rapipay.android.agent.utils.AsyncPostMethod;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
+import com.rapipay.android.agent.utils.BaseFragment;
 import com.rapipay.android.agent.utils.GenerateChecksum;
 import com.rapipay.android.agent.utils.RecyclerTouchListener;
 import com.rapipay.android.agent.utils.WebConfig;
 
-public class CreditTransFragment extends Fragment implements RequestHandler, View.OnClickListener {
+public class CreditTransFragment extends BaseFragment implements RequestHandler, View.OnClickListener, CustomInterface {
 
     AutofitTextView date1_text, date2_text;
     RecyclerView trans_details;
@@ -52,7 +55,10 @@ public class CreditTransFragment extends Fragment implements RequestHandler, Vie
         rv = (View) inflater.inflate(R.layout.credit_fragment_alyout, container, false);
         initialize(rv);
         headerData = (WebConfig.BASIC_USERID + ":" + WebConfig.BASIC_PASSWORD);
-        list = BaseCompactActivity.db.getDetails();
+        if (BaseCompactActivity.db != null && BaseCompactActivity.db.getDetails_Rapi())
+            list = BaseCompactActivity.db.getDetails();
+        else
+            dbNull(CreditTransFragment.this);
         return rv;
     }
 
@@ -143,9 +149,6 @@ public class CreditTransFragment extends Fragment implements RequestHandler, Vie
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-//            case R.id.date:
-//                calender();
-//                break;
             case R.id.btn_fund:
                 if (date2_text.getText().toString().isEmpty()) {
                     date2_text.setError("Please enter valid data");
@@ -153,7 +156,7 @@ public class CreditTransFragment extends Fragment implements RequestHandler, Vie
                 } else if (date1_text.getText().toString().isEmpty()) {
                     date1_text.setError("Please enter valid data");
                     date1_text.requestFocus();
-                }else 
+                } else
                     new AsyncPostMethod(WebConfig.CommonReport, channel_request().toString(), headerData, CreditTransFragment.this, getActivity()).execute();
                 break;
         }
@@ -208,71 +211,6 @@ public class CreditTransFragment extends Fragment implements RequestHandler, Vie
             dialog.show();
         }
     };
-//    private void picDate() {
-//        months=null;dayss=null;
-//        rv.findViewById(R.id.date).setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                // custom dialog
-//                final Dialog dialog = new Dialog(getActivity());
-//                dialog.setContentView(R.layout.datepickerview);
-//                dialog.setTitle("");
-//
-//                DatePicker datePicker = (DatePicker) dialog.findViewById(R.id.datePicker1);
-//                Calendar calendar = Calendar.getInstance();
-//                calendar.setTimeInMillis(System.currentTimeMillis());
-//                selectedDate = calendar.get(Calendar.DAY_OF_MONTH);
-//                selectedMonth = calendar.get(Calendar.MONTH);
-//                selectedYear = calendar.get(Calendar.YEAR);
-//                datePicker.init(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH), new DatePicker.OnDateChangedListener() {
-//
-//                    @Override
-//                    public void onDateChanged(DatePicker datePicker, int year, int month, int dayOfMonth) {
-//                        Log.e("Date", "Year=" + year + " Month=" + (month + 1) + " day=" + dayOfMonth);
-//                        if(String.valueOf(month+1).length()==1)
-//                            months = "0"+ String.valueOf(month+1);
-//                        else
-//                            months = String.valueOf(month+1);
-//                        if(String.valueOf(dayOfMonth).length()==1)
-//                            dayss = "0"+String.valueOf(dayOfMonth);
-//                        else
-//                            dayss = String.valueOf(dayOfMonth);
-//                        if (selectedDate == dayOfMonth && selectedMonth == month && selectedYear == year) {
-//                            date_text.setText(dayss + "/" + months + "/" + year);
-//                            dialog.dismiss();
-//                        } else {
-//
-//                            if (selectedDate != dayOfMonth) {
-//                                date_text.setText(dayss + "/" + months + "/" + year);
-//                                dialog.dismiss();
-//                            } else {
-//                                if (selectedMonth != month) {
-//                                    date_text.setText(dayss + "/" + months + "/" + year);
-//                                    dialog.dismiss();
-//                                }
-//                            }
-//                        }
-//                        selectedDate = dayOfMonth;
-//                        selectedMonth = (month);
-//                        selectedYear = year;
-//                    }
-//                });
-//                dialog.show();
-//            }
-//        });
-//    }
-//    private void calender() {
-//        dateFormatter = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-//        Calendar newCalendar = Calendar.getInstance();
-//        pickerDialog = new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
-//            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-//                Calendar newDate = Calendar.getInstance();
-//                newDate.set(year, monthOfYear, dayOfMonth);
-//                date_text.setText(dateFormatter.format(newDate.getTime()));
-//            }
-//        }, newCalendar.get(Calendar.YEAR), newCalendar.get(Calendar.MONTH), newCalendar.get(Calendar.DAY_OF_MONTH));
-//        pickerDialog.show();
-//    }
 
     public JSONObject channel_request() {
         Long tsLong = System.currentTimeMillis() / 1000;
@@ -332,6 +270,17 @@ public class CreditTransFragment extends Fragment implements RequestHandler, Vie
 
     @Override
     public void chechStat(String object) {
+
+    }
+
+    @Override
+    public void okClicked(String type, Object ob) {
+        if (type.equalsIgnoreCase("SESSIONEXPIRE"))
+            jumpPage();
+    }
+
+    @Override
+    public void cancelClicked(String type, Object ob) {
 
     }
 }

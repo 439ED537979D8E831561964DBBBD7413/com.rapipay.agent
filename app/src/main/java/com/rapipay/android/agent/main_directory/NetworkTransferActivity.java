@@ -3,8 +3,6 @@ package com.rapipay.android.agent.main_directory;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
@@ -21,18 +19,16 @@ import java.util.ArrayList;
 import com.rapipay.android.agent.Model.NetworkManagePozo;
 import com.rapipay.android.agent.Model.NetworkTransferPozo;
 import com.rapipay.android.agent.R;
-import com.rapipay.android.agent.adapter.ChannelListAdapter;
 import com.rapipay.android.agent.adapter.NetworkTransferAdapter;
-import com.rapipay.android.agent.interfaces.ClickListener;
 import com.rapipay.android.agent.interfaces.CustomInterface;
 import com.rapipay.android.agent.interfaces.RequestHandler;
 import com.rapipay.android.agent.utils.AsyncPostMethod;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
 import com.rapipay.android.agent.utils.GenerateChecksum;
-import com.rapipay.android.agent.utils.RecyclerTouchListener;
 import com.rapipay.android.agent.utils.WebConfig;
 
-public class NetworkTransferActivity extends BaseCompactActivity implements RequestHandler, View.OnClickListener, CustomInterface {
+public class
+NetworkTransferActivity extends BaseCompactActivity implements RequestHandler, View.OnClickListener, CustomInterface {
 
     private int first = 1, last = 25;
     private boolean isLoading;
@@ -51,12 +47,15 @@ public class NetworkTransferActivity extends BaseCompactActivity implements Requ
         setContentView(R.layout.network_transfer_layout);
         initialize();
         clickedId = getIntent().getStringExtra("CLICKED");
-        loadApi();
+        if (db != null && db.getDetails_Rapi())
+            loadApi();
+        else
+            dbNull(NetworkTransferActivity.this);
     }
 
     private void loadApi() {
         logList.add(new NetworkManagePozo(list.get(0).getMobilno(), list.get(0).getMobilno()));
-        new AsyncPostMethod(WebConfig.CommonReport, getNetwork_Validate("GET_MY_NODE_DETAILS", list.get(0).getMobilno(),first, last).toString(), headerData, NetworkTransferActivity.this).execute();
+        new AsyncPostMethod(WebConfig.CommonReport, getNetwork_Validate("GET_MY_NODE_DETAILS", list.get(0).getMobilno(), first, last).toString(), headerData, NetworkTransferActivity.this).execute();
     }
 
     private void initialize() {
@@ -94,7 +93,7 @@ public class NetworkTransferActivity extends BaseCompactActivity implements Requ
                 if (totalItemCount != 0 && totalItemCount == last && lastInScreen == totalItemCount && !isLoading) {
                     first = last + 1;
                     last += 25;
-                    new AsyncPostMethod(WebConfig.CommonReport, getNetwork_Validate("GET_MY_NODE_DETAILS", list.get(0).getMobilno(),first, last).toString(), headerData, NetworkTransferActivity.this).execute();
+                    new AsyncPostMethod(WebConfig.CommonReport, getNetwork_Validate("GET_MY_NODE_DETAILS", list.get(0).getMobilno(), first, last).toString(), headerData, NetworkTransferActivity.this).execute();
                     isLoading = true;
                 }
             }
@@ -172,9 +171,8 @@ public class NetworkTransferActivity extends BaseCompactActivity implements Requ
     }
 
     private void initializeTransAdapter(ArrayList<NetworkTransferPozo> list) {
-
         if (first == 1) {
-            adapter = new NetworkTransferAdapter(NetworkTransferActivity.this,list);
+            adapter = new NetworkTransferAdapter(NetworkTransferActivity.this, list);
             trans_details.setAdapter(adapter);
         } else {
             adapter.addAll(list);
@@ -186,7 +184,7 @@ public class NetworkTransferActivity extends BaseCompactActivity implements Requ
 //        trans_details.setAdapter(new NetworkTransferAdapter(this, trans_details, list));
     }
 
-    public JSONObject getNetwork_Validate(String servicetype, String mobileNo,int fromIndex, int toIndex) {
+    public JSONObject getNetwork_Validate(String servicetype, String mobileNo, int fromIndex, int toIndex) {
         tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         try {
@@ -213,41 +211,6 @@ public class NetworkTransferActivity extends BaseCompactActivity implements Requ
         finish();
     }
 
-//    private void customDialog_Ben(final NetworkTransferPozo pozo) {
-//        AutofitTextView btn_p_bank, btn_name, p_transid;
-//        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-//        LayoutInflater inflater = getLayoutInflater();
-//        View alertLayout = inflater.inflate(R.layout.custom_popup_network, null);
-//        btn_name = (AutofitTextView) alertLayout.findViewById(R.id.btn_name);
-//        p_transid = (AutofitTextView) alertLayout.findViewById(R.id.btn_p_transid);
-//        btn_p_bank = (AutofitTextView) alertLayout.findViewById(R.id.btn_p_bank);
-//        btn_name.setText("( " + pozo.getCompanyName() + " )");
-//        p_transid.setText(pozo.getAgentName() + " - " + pozo.getMobileNo());
-//        btn_p_bank.setText(pozo.getAgentBalance());
-//        final TextView text = (TextView) alertLayout.findViewById(R.id.input_amount_ben);
-//        dialog.setView(alertLayout);
-//        dialog.setTitle(getResources().getString(R.string.app_name));
-//
-//        dialog.setCancelable(false);
-//        dialog.setPositiveButton("Network Transfer", new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialog, int which) {
-//                if (!text.getText().toString().isEmpty()) {
-//                    hideKeyboard(NetworkTransferActivity.this);
-//                    confirmDialog("Sure you want to Transfer?", text, pozo);
-//                    dialog.dismiss();
-//                }
-//            }
-//        });
-//        dialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialog, int which) {
-//                dialog.dismiss();
-//            }
-//        });
-//        dialog.show();
-//    }
-
     public JSONObject getNetwork_Transfer(String receiverId, String txnAmount) {
         tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
@@ -269,70 +232,6 @@ public class NetworkTransferActivity extends BaseCompactActivity implements Requ
         return jsonObject;
     }
 
-//    private void customDialog(String msg) {
-//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//        builder.setTitle(R.string.app_name);
-//        //Setting message manually and performing action on button click
-//        builder.setMessage(msg)
-//                .setCancelable(false)
-//                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-//                    public void onClick(DialogInterface dialog, int id) {
-//                        loadApi();
-//                        dialog.dismiss();
-//                    }
-//                });
-//        //Creating dialog box
-//        AlertDialog alert = builder.create();
-//        alert.show();
-//    }
-//
-//    private void confirmDialog(String msg, final TextView text, final NetworkTransferPozo pozo) {
-//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//        builder.setTitle(R.string.app_name);
-//        //Setting message manually and performing action on button click
-//        builder.setMessage(msg)
-//                .setCancelable(false)
-//                .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//
-//                    }
-//                })
-//                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-//                    public void onClick(DialogInterface dialog, int id) {
-//                        new AsyncPostMethod(WebConfig.NETWORKTRANSFER_URL, getNetwork_Transfer(pozo.getMobileNo(), text.getText().toString()).toString(), headerData, NetworkTransferActivity.this).execute();
-//                        dialog.dismiss();
-//                    }
-//                });
-//        //Creating dialog box
-//        AlertDialog alert = builder.create();
-//        alert.show();
-//    }
-//
-//
-//    private void customPopUp(final NetworkTransferPozo pozo) {
-//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//        builder.setTitle(R.string.app_name);
-//        //Setting message manually and performing action on button click
-//        builder.setCancelable(true)
-//                .setNegativeButton("Network Setting", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        reDirect_Activity(pozo);
-//                        dialog.dismiss();
-//                    }
-//                })
-//                .setPositiveButton("Network User", new DialogInterface.OnClickListener() {
-//                    public void onClick(DialogInterface dialog, int id) {
-//                        new AsyncPostMethod(WebConfig.NETWORKTRANSFER_URL, getNetwork_Validate("GET_MY_NODE_DETAILS", pozo.getMobileNo()).toString(), headerData, NetworkTransferActivity.this).execute();
-//                        dialog.dismiss();
-//                    }
-//                });
-//        //Creating dialog box
-//        AlertDialog alert = builder.create();
-//        alert.show();
-//    }
-
     private void reDirect_Activity(NetworkTransferPozo pozo) {
         Intent intent = new Intent(NetworkTransferActivity.this, UserSettingDetails.class);
         intent.putExtra("OBJECT", pozo);
@@ -348,7 +247,7 @@ public class NetworkTransferActivity extends BaseCompactActivity implements Requ
                 break;
             case R.id.back_clicked:
                 if (logList.size() != 0) {
-                    new AsyncPostMethod(WebConfig.CommonReport, getNetwork_Validate("GET_MY_NODE_DETAILS", logList.get(logList.size() - 2).getBackMaintain(),first,last).toString(), headerData, NetworkTransferActivity.this).execute();
+                    new AsyncPostMethod(WebConfig.CommonReport, getNetwork_Validate("GET_MY_NODE_DETAILS", logList.get(logList.size() - 2).getBackMaintain(), first, last).toString(), headerData, NetworkTransferActivity.this).execute();
                     logList.remove(logList.size() - 1);
                     if (logList.size() == 1)
                         back_click.setVisibility(View.GONE);
@@ -366,6 +265,8 @@ public class NetworkTransferActivity extends BaseCompactActivity implements Requ
     public void okClicked(String type, Object ob) {
         if (type.equalsIgnoreCase("NETWORKLAYOUT"))
             reDirect_Activity((NetworkTransferPozo) ob);
+        else  if (type.equalsIgnoreCase("SESSIONEXPIRE"))
+            jumpPage();
     }
 
     @Override
@@ -373,7 +274,7 @@ public class NetworkTransferActivity extends BaseCompactActivity implements Requ
         if (type.equalsIgnoreCase("NETWORKLAYOUT")) {
             NetworkTransferPozo pozo = (NetworkTransferPozo) ob;
             back_click.setVisibility(View.VISIBLE);
-            new AsyncPostMethod(WebConfig.CommonReport, getNetwork_Validate("GET_MY_NODE_DETAILS", pozo.getMobileNo(),first,last).toString(), headerData, NetworkTransferActivity.this).execute();
+            new AsyncPostMethod(WebConfig.CommonReport, getNetwork_Validate("GET_MY_NODE_DETAILS", pozo.getMobileNo(), first, last).toString(), headerData, NetworkTransferActivity.this).execute();
         }
     }
 }

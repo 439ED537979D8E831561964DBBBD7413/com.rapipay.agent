@@ -1,7 +1,6 @@
 package com.rapipay.android.agent.main_directory;
 
 import android.content.ContentValues;
-import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.os.Bundle;
@@ -58,11 +57,14 @@ public class PinActivity extends BaseCompactActivity implements View.OnClickList
         sessionRefNo = getIntent().getStringExtra("sessionRefNo");
         sessionKey = getIntent().getStringExtra("sessionKey");
         TextView userid = (TextView) findViewById(R.id.userid);
-        userid.setText("Agent RMN : "+agentId);
+        userid.setText("Agent RMN : " + agentId);
         pinView = (PinEntryEditText) findViewById(R.id.pinView);
         confirmpinView = (PinEntryEditText) findViewById(R.id.confirmpinView);
         otppinView = (PinEntryEditText) findViewById(R.id.otppinView);
-        flag_rapi = db.getDetails_Rapi();
+        if (db != null)
+            flag_rapi = db.getDetails_Rapi();
+        else
+            dbNull(PinActivity.this);
         SmsReceiver.bindListener(new SmsListener() {
             @Override
             public void messageReceived(String messageText) {
@@ -117,7 +119,7 @@ public class PinActivity extends BaseCompactActivity implements View.OnClickList
         try {
             if (object.getString("responseCode").equalsIgnoreCase("200")) {
                 if (object.getString("serviceType").equalsIgnoreCase("ProcessHandsetRegistration")) {
-                    if (flag_rapi == false) {
+                    if (!flag_rapi) {
                         String insertSQL = "INSERT INTO " + RapipayDB.TABLE_NAME + "\n" +
                                 "(" + RapipayDB.COLOMN_SESSION + "," + RapipayDB.COLOMN_APIKEY + "," + RapipayDB.COLOMN_IMEI + "," + RapipayDB.COLOMN_MOBILENO + "," + RapipayDB.COLOMN_PRTXNID + "," + RapipayDB.COLOMN_SESSIONREFNO + "," + RapipayDB.COLOMN_AGENTNAME + ")\n" +
                                 "VALUES \n" +
@@ -142,17 +144,16 @@ public class PinActivity extends BaseCompactActivity implements View.OnClickList
                         new AsyncPostMethod(WebConfig.NETWORKTRANSFER_URL, acknowledge().toString(), headerData, PinActivity.this).execute();
                 } else if (object.getString("serviceType").equalsIgnoreCase("UPDATE_DOWNLAOD_DATA_STATUS")) {
                     new AsyncPostMethod(WebConfig.LOGIN_URL, getWLDetails().toString(), headerData, PinActivity.this).execute();
-//                    customDialog_Common("KYCLAYOUTS", null, null, "Pin Registration", null, "Pin Registration Successful, Do you want to proceed ?", PinActivity.this);
-//                    customDialog();
-                }else if (object.getString("serviceType").equalsIgnoreCase("WL_DOMAIN_DETAILS")) {
-                    if(object.has("invoiceLogo"))
-                        insertImages("invoiceLogo",object);
-                    if(object.has("loginLogo"))
-                        insertImages("loginLogo",object);
-                    if(object.has("leftLogo"))
-                        insertImages("leftLogo",object);
+
+                } else if (object.getString("serviceType").equalsIgnoreCase("WL_DOMAIN_DETAILS")) {
+                    if (object.has("invoiceLogo"))
+                        insertImages("invoiceLogo", object);
+                    if (object.has("loginLogo"))
+                        insertImages("loginLogo", object);
+                    if (object.has("leftLogo"))
+                        insertImages("leftLogo", object);
                     customDialog_Common("KYCLAYOUTS", null, null, "Pin Registration", null, "Pin Registration Successful, Do you want to proceed ?", PinActivity.this);
-//                    customDialog();
+
                 }
             }
         } catch (Exception e) {
@@ -160,11 +161,11 @@ public class PinActivity extends BaseCompactActivity implements View.OnClickList
         }
     }
 
-    private void insertImages(String imageName,JSONObject object){
-        try{
+    private void insertImages(String imageName, JSONObject object) {
+        try {
             SQLiteDatabase dba = db.getWritableDatabase();
             ContentValues values = new ContentValues();
-            String wlimageName = imageName+".jpg";
+            String wlimageName = imageName + ".jpg";
             values.put(RapipayDB.IMAGE_PATH_WL, byteConvert(object.getString(imageName)));
             values.put(RapipayDB.IMAGE_NAME, wlimageName);
             dba.insert(RapipayDB.TABLE_IMAGES, null, values);
@@ -176,7 +177,7 @@ public class PinActivity extends BaseCompactActivity implements View.OnClickList
 //
 ////            String path = saveToInternalStorage(base64Convert(object.getString(imageName)), wlimageName);
 //            dba.execSQL(insertSQL, new String[]{wlimageName, byteConvert(object.getString(imageName))});
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -204,6 +205,7 @@ public class PinActivity extends BaseCompactActivity implements View.OnClickList
         }
         return jsonObject;
     }
+
     public JSONObject getWLDetails() {
         tsLong = System.currentTimeMillis() / 1000;
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -266,13 +268,10 @@ public class PinActivity extends BaseCompactActivity implements View.OnClickList
 
     @Override
     public void okClicked(String type, Object ob) {
-        if (type.equalsIgnoreCase("SESSIONEXPIRRED")) {
-            Intent intent = new Intent(this, LoginScreenActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            deleteTables("forgot");
-        } else if (type.equalsIgnoreCase("KYCLAYOUTS")) {
-            localStorage.setActivityState(LocalStorage.ROUTESTATE,"PINVERIFIED");
+        if (type.equalsIgnoreCase("SESSIONEXPIRRED") || type.equalsIgnoreCase("SESSIONEXPIRE"))
+            jumpPage();
+        else if (type.equalsIgnoreCase("KYCLAYOUTS")) {
+            localStorage.setActivityState(LocalStorage.ROUTESTATE, "PINVERIFIED");
             new RouteClass(PinActivity.this, null, null, localStorage, "KYCLAYOUTS");
         }
         finish();

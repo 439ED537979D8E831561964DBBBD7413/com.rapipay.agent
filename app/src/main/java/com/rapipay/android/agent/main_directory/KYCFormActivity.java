@@ -1,10 +1,10 @@
 package com.rapipay.android.agent.main_directory;
 
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -32,14 +32,10 @@ import org.json.JSONObject;
 
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 
 import me.grantland.widget.AutofitTextView;
 
@@ -172,8 +168,8 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
                     input_email.setText(newKYCList_Personal.get(0).getEMAILID());
                     input_comp.setText(newKYCList_Personal.get(0).getCOMPANY_NAME());
                     date1_text.setText(newKYCList_Personal.get(0).getDOB());
-                    if (!newKYCList_Personal.get(0).getPASSPORT_PHOTO().equalsIgnoreCase("")) {
-                        loadImageFromStorage(newKYCList_Personal.get(0).getIMAGE_NAME(), (ImageView) findViewById(R.id.passportphotoimage), newKYCList_Personal.get(0).getPASSPORT_PHOTO());
+                    if (newKYCList_Personal.get(0).getPASSPORT_PHOTO()!=null) {
+                        byteConvert((ImageView) findViewById(R.id.passportphotoimage), newKYCList_Personal.get(0).getPASSPORT_PHOTO());
                         findViewById(R.id.passportphoto).setVisibility(View.GONE);
                         if (!kycMapImage.has("passportPhoto"))
                             kycMapImage.put("passportPhoto", getBase64(getBitmap((ImageView) findViewById(R.id.passportphotoimage))));
@@ -206,14 +202,14 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
                     city_name.setText(newKYCList_Address.get(0).getCITY());
                     select_state.setText(newKYCList_Address.get(0).getSTATE());
                     pin_code.setText(newKYCList_Address.get(0).getPINCODE());
-                    if (!newKYCList_Address.get(0).getDOCUMENTFRONT_PHOTO().equalsIgnoreCase("")) {
-                        loadImageFromStorage(newKYCList_Address.get(0).getDOCUMENTFRONT_IMAGENAME(), (ImageView) findViewById(R.id.documentfrontimage), newKYCList_Address.get(0).getDOCUMENTFRONT_PHOTO());
+                    if (newKYCList_Address.get(0).getDOCUMENTFRONT_PHOTO()!=null) {
+                        byteConvert((ImageView) findViewById(R.id.documentfrontimage), newKYCList_Address.get(0).getDOCUMENTFRONT_PHOTO());
                         findViewById(R.id.documentfront).setVisibility(View.GONE);
                         if (!kycMapImage.has("uploadFront"))
                             kycMapImage.put("uploadFront", getBase64(getBitmap((ImageView) findViewById(R.id.documentfrontimage))));
                     }
-                    if (!newKYCList_Address.get(0).getDOCUMENTBACK_PHOTO().equalsIgnoreCase("")) {
-                        loadImageFromStorage(newKYCList_Address.get(0).getDOCUMENTBACK_IMAGENAME(), (ImageView) findViewById(R.id.documentbackimage), newKYCList_Address.get(0).getDOCUMENTBACK_PHOTO());
+                    if (newKYCList_Address.get(0).getDOCUMENTBACK_PHOTO()!=null) {
+                        byteConvert((ImageView) findViewById(R.id.documentbackimage), newKYCList_Address.get(0).getDOCUMENTBACK_PHOTO());
                         findViewById(R.id.documentback).setVisibility(View.GONE);
                         if (!kycMapImage.has("uploadBack"))
                             kycMapImage.put("uploadBack", getBase64(getBitmap((ImageView) findViewById(R.id.documentbackimage))));
@@ -267,14 +263,14 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
                 String condition = "where " + RapipayDB.MOBILENO + "='" + mobileNo + "'" + " AND " + RapipayDB.DOCUMENTTYPE + "='" + documentType + "'" + " AND " + RapipayDB.DOCUMENTID + "='" + documentID + "'";
                 ArrayList<NewKYCPozo> newKYCList_Verify = db.getKYCDetails_VERIFY(condition);
                 if (newKYCList_Verify.size() != 0) {
-                    if (!newKYCList_Verify.get(0).getSELF_PHOTO().equalsIgnoreCase("")) {
-                        loadImageFromStorage(newKYCList_Verify.get(0).getSELF_PHOTO_IMAGENAME(), (ImageView) findViewById(R.id.selfphoto), newKYCList_Verify.get(0).getSELF_PHOTO());
+                    if (newKYCList_Verify.get(0).getSELF_PHOTO()!=null) {
+                        byteConvert( (ImageView) findViewById(R.id.selfphoto), newKYCList_Verify.get(0).getSELF_PHOTO());
                         findViewById(R.id.self_photo).setVisibility(View.GONE);
                         if (!kycMapImage.has("selfPhoto"))
                             kycMapImage.put("selfPhoto", getBase64(getBitmap((ImageView) findViewById(R.id.selfphoto))));
                     }
-                    if (!newKYCList_Verify.get(0).getSIGN_PHOTO().equalsIgnoreCase("")) {
-                        loadImageFromStorage(newKYCList_Verify.get(0).getSIGN_PHOTO_IMAGENAME(), (ImageView) findViewById(R.id.signphoto), newKYCList_Verify.get(0).getSIGN_PHOTO());
+                    if (newKYCList_Verify.get(0).getSIGN_PHOTO()!=null) {
+                        byteConvert( (ImageView) findViewById(R.id.signphoto), newKYCList_Verify.get(0).getSIGN_PHOTO());
                         findViewById(R.id.sign_photo).setVisibility(View.GONE);
                         if (!kycMapImage.has("signPhoto"))
                             kycMapImage.put("signPhoto", getBase64(getBitmap((ImageView) findViewById(R.id.signphoto))));
@@ -294,14 +290,14 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
                 if (newKYCList_Business.size() != 0) {
                     pan_no.setText(newKYCList_Business.get(0).getPANNUMBER());
                     gsin_no.setText(newKYCList_Business.get(0).getGSTINNUMBER());
-                    if (!newKYCList_Business.get(0).getPAN_PHOTO().equalsIgnoreCase("")) {
-                        loadImageFromStorage(newKYCList_Business.get(0).getPAN_PHOTO_IMAGENAME(), (ImageView) findViewById(R.id.panphoto), newKYCList_Business.get(0).getPAN_PHOTO());
+                    if (newKYCList_Business.get(0).getPAN_PHOTO()!=null) {
+                        byteConvert( (ImageView) findViewById(R.id.panphoto), newKYCList_Business.get(0).getPAN_PHOTO());
                         findViewById(R.id.pan_photo).setVisibility(View.GONE);
                         if (!kycMapImage.has("pancardImg"))
                             kycMapImage.put("pancardImg", getBase64(getBitmap((ImageView) findViewById(R.id.panphoto))));
                     }
-                    if (!newKYCList_Business.get(0).getSHOP_PHOTO().equalsIgnoreCase("")) {
-                        loadImageFromStorage(newKYCList_Business.get(0).getSHOP_PHOTO_IMAGENAME(), (ImageView) findViewById(R.id.shopphoto), newKYCList_Business.get(0).getSHOP_PHOTO());
+                    if (newKYCList_Business.get(0).getSHOP_PHOTO()!=null) {
+                        byteConvert((ImageView) findViewById(R.id.shopphoto), newKYCList_Business.get(0).getSHOP_PHOTO());
                         findViewById(R.id.shop_photo).setVisibility(View.GONE);
                         if (!kycMapImage.has("shopPhoto"))
                             kycMapImage.put("shopPhoto", getBase64(getBitmap((ImageView) findViewById(R.id.shopphoto))));
@@ -327,6 +323,7 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
         }
 
     }
+
     @Override
     public void onClick(View v) {
         try {
@@ -517,7 +514,6 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
                     "\t\t<form name=\"validatekyc\" id=\"validatekyc\" method=\"POST\" action=\"" + WebConfig.EKYC_FORWARD_POST + "\">\n" +
                     "\t\t\t<input name=\"requestedData\" value=\"" + getDataBase64(jsonObject.toString()) + "\" type=\"hidden\"/>\n" +
                     "\t\t\t<input name=\"documentsListData\" value=\"" + getDataBase64(kycMapImage.toString()) + "\" type=\"hidden\"/>\n" +
-                    "\t\t\t<input type=\"submit\"/>\n" +
                     "\t\t</form>\n" +
                     "\t\t<script language=\"JavaScript\" type=\"text/javascript\">\n" +
                     "\t\t\t\t\tdocument.getElementById(\"validatekyc\").submit();\n" +
@@ -876,18 +872,35 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
     private void insertPersonal(JSONObject mapValue, JSONObject mapPhoto, String name, String documentID, String documentType, String customerType) {
         customProgessDialog = new CustomProgessDialog(KYCFormActivity.this);
         SQLiteDatabase dba = db.getWritableDatabase();
-        String path = "";
         try {
-            String insertSQL = "INSERT INTO " + RapipayDB.TABLE_KYC_PERSONAL + "\n" +
-                    "(" + RapipayDB.MOBILENO + "," + RapipayDB.USER_NAME + "," + RapipayDB.DOB + "," + RapipayDB.EMAILID + "," + RapipayDB.COMPANY_NAME + "," + RapipayDB.IMAGE_NAME + ","
-                    + RapipayDB.PASSPORT_PHOTO + "," + RapipayDB.PERSONAL_CLICKED + "," + RapipayDB.DOCUMENTTYPE + "," + RapipayDB.DOCUMENTID + ")\n" +
-                    "VALUES \n" +
-                    "( ?, ?, ?,?,?, ?, ?,?,?,?);";
+//            String insertSQL = "INSERT INTO " + RapipayDB.TABLE_KYC_PERSONAL + "\n" +
+//                    "(" + RapipayDB.MOBILENO + "," + RapipayDB.USER_NAME + "," + RapipayDB.DOB + "," + RapipayDB.EMAILID + "," + RapipayDB.COMPANY_NAME + "," + RapipayDB.IMAGE_NAME + ","
+//                    + RapipayDB.PASSPORT_PHOTO + "," + RapipayDB.PERSONAL_CLICKED + "," + RapipayDB.DOCUMENTTYPE + "," + RapipayDB.DOCUMENTID + ")\n" +
+//                    "VALUES \n" +
+//                    "( ?, ?, ?,?,?, ?, ?,?,?,?);";
+//
+//            String imageName = "passportPhoto_" + mapValue.getString("mobileNo") + ".jpg";
+//            if (mapPhoto.has("passportPhoto"))
+//                path = saveToInternalStorage(base64Convert(mapPhoto.getString("passportPhoto")), imageName);
+//            dba.execSQL(insertSQL, new String[]{mapValue.getString("mobileNo"), name, mapValue.getString("dob"), mapValue.getString("email"), mapValue.getString("companyName"), imageName, path, "true", documentType, documentID});
 
+
+            ContentValues values = new ContentValues();
             String imageName = "passportPhoto_" + mapValue.getString("mobileNo") + ".jpg";
+            values.put(RapipayDB.MOBILENO, mapValue.getString("mobileNo"));
+            values.put(RapipayDB.USER_NAME, name);
+            values.put(RapipayDB.DOB, mapValue.getString("dob"));
+            values.put(RapipayDB.EMAILID, mapValue.getString("email"));
+            values.put(RapipayDB.COMPANY_NAME, mapValue.getString("companyName"));
+            values.put(RapipayDB.IMAGE_NAME, imageName);
+            values.put(RapipayDB.PERSONAL_CLICKED, "true");
+            values.put(RapipayDB.DOCUMENTTYPE, documentType);
+            values.put(RapipayDB.DOCUMENTID, documentID);
             if (mapPhoto.has("passportPhoto"))
-                path = saveToInternalStorage(base64Convert(mapPhoto.getString("passportPhoto")), imageName);
-            dba.execSQL(insertSQL, new String[]{mapValue.getString("mobileNo"), name, mapValue.getString("dob"), mapValue.getString("email"), mapValue.getString("companyName"), imageName, path, "true", documentType, documentID});
+                values.put(RapipayDB.PASSPORT_PHOTO, byteConvert(mapPhoto.getString("passportPhoto")));
+            else
+                values.put(RapipayDB.PASSPORT_PHOTO, "");
+            dba.insert(RapipayDB.TABLE_KYC_PERSONAL, null, values);
             customProgessDialog.hide_progress();
         } catch (Exception e) {
             e.printStackTrace();
@@ -898,17 +911,33 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
         customProgessDialog = new CustomProgessDialog(KYCFormActivity.this);
         SQLiteDatabase dba = db.getWritableDatabase();
         try {
-            String insertSQL = "INSERT INTO " + RapipayDB.TABLE_KYC_ADDRESS + "\n" +
-                    "(" + RapipayDB.MOBILENO + "," + RapipayDB.ADDRESS + "," + RapipayDB.CITY + "," + RapipayDB.STATE + "," + RapipayDB.PINCODE + "," + RapipayDB.DOCUMENTFRONT_IMAGENAME + "," + RapipayDB.DOCUMENTBACK_IMAGENAME + ","
-                    + RapipayDB.DOCUMENTFRONT_PHOTO + "," + RapipayDB.DOCUMENTBACK_PHOTO + "," + RapipayDB.ADDRESS_CLICKED + "," + RapipayDB.DOCUMENTTYPE + "," + RapipayDB.DOCUMENTID + ")\n" +
-                    "VALUES \n" +
-                    "(?,?,?,?,?,?,?,?,?,?,?,?);";
+//            String insertSQL = "INSERT INTO " + RapipayDB.TABLE_KYC_ADDRESS + "\n" +
+//                    "(" + RapipayDB.MOBILENO + "," + RapipayDB.ADDRESS + "," + RapipayDB.CITY + "," + RapipayDB.STATE + "," + RapipayDB.PINCODE + "," + RapipayDB.DOCUMENTFRONT_IMAGENAME + "," + RapipayDB.DOCUMENTBACK_IMAGENAME + ","
+//                    + RapipayDB.DOCUMENTFRONT_PHOTO + "," + RapipayDB.DOCUMENTBACK_PHOTO + "," + RapipayDB.ADDRESS_CLICKED + "," + RapipayDB.DOCUMENTTYPE + "," + RapipayDB.DOCUMENTID + ")\n" +
+//                    "VALUES \n" +
+//                    "(?,?,?,?,?,?,?,?,?,?,?,?);";
 
             String frontimageName = "frontPhoto_" + mobileNo + ".jpg";
             String backimageName = "backPhoto_" + mobileNo + ".jpg";
-            String pathFront = saveToInternalStorage(base64Convert(mapPhoto.getString("uploadFront")), frontimageName);
-            String pathBack = saveToInternalStorage(base64Convert(mapPhoto.getString("uploadBack")), backimageName);
-            dba.execSQL(insertSQL, new String[]{mobileNo, mapValue.getString("address"), mapValue.getString("city"), mapValue.getString("state"), mapValue.getString("pinCode"), frontimageName, backimageName, pathFront, pathBack, "true", documentType, documentID});
+//            String pathFront = saveToInternalStorage(base64Convert(mapPhoto.getString("uploadFront")), frontimageName);
+//            String pathBack = saveToInternalStorage(base64Convert(mapPhoto.getString("uploadBack")), backimageName);
+//            dba.execSQL(insertSQL, new String[]{mobileNo, mapValue.getString("address"), mapValue.getString("city"), mapValue.getString("state"), mapValue.getString("pinCode"), frontimageName, backimageName, pathFront, pathBack, "true", documentType, documentID});
+
+            ContentValues values = new ContentValues();
+            values.put(RapipayDB.MOBILENO, mobileNo);
+            values.put(RapipayDB.ADDRESS, mapValue.getString("address"));
+            values.put(RapipayDB.CITY, mapValue.getString("city"));
+            values.put(RapipayDB.STATE, mapValue.getString("state"));
+            values.put(RapipayDB.PINCODE, mapValue.getString("pinCode"));
+            values.put(RapipayDB.DOCUMENTFRONT_IMAGENAME, frontimageName);
+            values.put(RapipayDB.DOCUMENTBACK_IMAGENAME, backimageName);
+            values.put(RapipayDB.ADDRESS_CLICKED, "true");
+            values.put(RapipayDB.DOCUMENTTYPE, documentType);
+            values.put(RapipayDB.DOCUMENTID, documentID);
+            values.put(RapipayDB.DOCUMENTFRONT_PHOTO, byteConvert(mapPhoto.getString("uploadFront")));
+            values.put(RapipayDB.DOCUMENTBACK_PHOTO, byteConvert(mapPhoto.getString("uploadBack")));
+            dba.insert(RapipayDB.TABLE_KYC_ADDRESS, null, values);
+
             customProgessDialog.hide_progress();
         } catch (Exception e) {
             e.printStackTrace();
@@ -923,21 +952,41 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
     private void insertBuisness(JSONObject mapValue, JSONObject mapPhoto, String documentID, String documentType, String customerType) {
         customProgessDialog = new CustomProgessDialog(KYCFormActivity.this);
         SQLiteDatabase dba = db.getWritableDatabase();
-        String pathPan = "", pathShop = "";
+//        String pathPan = "", pathShop = "";
         try {
-            String insertSQL = "INSERT INTO " + RapipayDB.TABLE_KYC_BUISNESS + "\n" +
-                    "(" + RapipayDB.MOBILENO + "," + RapipayDB.PANNUMBER + "," + RapipayDB.GSTINNUMBER + "," + RapipayDB.PAN_PHOTO_IMAGENAME + "," + RapipayDB.SHOP_PHOTO_IMAGENAME + ","
-                    + RapipayDB.PAN_PHOTO + "," + RapipayDB.SHOP_PHOTO + "," + RapipayDB.BUISNESS_CLICKED + "," + RapipayDB.DOCUMENTTYPE + "," + RapipayDB.DOCUMENTID + ")\n" +
-                    "VALUES \n" +
-                    "(?,?,?,?,?,?,?,?,?,?);";
+//            String insertSQL = "INSERT INTO " + RapipayDB.TABLE_KYC_BUISNESS + "\n" +
+//                    "(" + RapipayDB.MOBILENO + "," + RapipayDB.PANNUMBER + "," + RapipayDB.GSTINNUMBER + "," + RapipayDB.PAN_PHOTO_IMAGENAME + "," + RapipayDB.SHOP_PHOTO_IMAGENAME + ","
+//                    + RapipayDB.PAN_PHOTO + "," + RapipayDB.SHOP_PHOTO + "," + RapipayDB.BUISNESS_CLICKED + "," + RapipayDB.DOCUMENTTYPE + "," + RapipayDB.DOCUMENTID + ")\n" +
+//                    "VALUES \n" +
+//                    "(?,?,?,?,?,?,?,?,?,?);";
 
             String panimageName = "panPhoto_" + mobileNo + ".jpg";
             String shopimageName = "shopPhoto_" + mobileNo + ".jpg";
+//            if (mapPhoto.has("pancardImg"))
+//                pathPan = saveToInternalStorage(base64Convert(mapPhoto.getString("pancardImg")), panimageName);
+//            if (mapPhoto.has("shopPhoto"))
+//                pathShop = saveToInternalStorage(base64Convert(mapPhoto.getString("shopPhoto")), shopimageName);
+//            dba.execSQL(insertSQL, new String[]{mobileNo, mapValue.getString("panNo"), mapValue.getString("gstIN"), panimageName, shopimageName, pathPan, pathShop, "true", documentType, documentID});
+
+            ContentValues values = new ContentValues();
+            values.put(RapipayDB.MOBILENO, mobileNo);
+            values.put(RapipayDB.PANNUMBER,mapValue.getString("panNo"));
+            values.put(RapipayDB.GSTINNUMBER, mapValue.getString("gstIN"));
+            values.put(RapipayDB.PAN_PHOTO_IMAGENAME, panimageName);
+            values.put(RapipayDB.SHOP_PHOTO_IMAGENAME, shopimageName);
+            values.put(RapipayDB.BUISNESS_CLICKED, "true");
+            values.put(RapipayDB.DOCUMENTTYPE, documentType);
+            values.put(RapipayDB.DOCUMENTID, documentID);
             if (mapPhoto.has("pancardImg"))
-                pathPan = saveToInternalStorage(base64Convert(mapPhoto.getString("pancardImg")), panimageName);
+                values.put(RapipayDB.PAN_PHOTO, byteConvert(mapPhoto.getString("pancardImg")));
+            else
+                values.put(RapipayDB.PAN_PHOTO, "");
             if (mapPhoto.has("shopPhoto"))
-                pathShop = saveToInternalStorage(base64Convert(mapPhoto.getString("shopPhoto")), shopimageName);
-            dba.execSQL(insertSQL, new String[]{mobileNo, mapValue.getString("panNo"), mapValue.getString("gstIN"), panimageName, shopimageName, pathPan, pathShop, "true", documentType, documentID});
+                values.put(RapipayDB.SHOP_PHOTO, byteConvert(mapPhoto.getString("shopPhoto")));
+            else
+                values.put(RapipayDB.SHOP_PHOTO, "");
+            dba.insert(RapipayDB.TABLE_KYC_BUISNESS, null, values);
+
             customProgessDialog.hide_progress();
         } catch (Exception e) {
             e.printStackTrace();
@@ -947,21 +996,39 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
     private void insertVerify(JSONObject mapValue, JSONObject mapPhoto, String documentID, String documentType, String customerType) {
         customProgessDialog = new CustomProgessDialog(KYCFormActivity.this);
         SQLiteDatabase dba = db.getWritableDatabase();
-        String pathSelf = "", pathSign = "";
+//        String pathSelf = "", pathSign = "";
         try {
-            String insertSQL = "INSERT INTO " + RapipayDB.TABLE_KYC_VERIFICATION + "\n" +
-                    "(" + RapipayDB.MOBILENO + "," + RapipayDB.SELF_PHOTO_IMAGENAME + "," + RapipayDB.SIGN_PHOTO_IMAGENAME + "," + RapipayDB.SELF_PHOTO + "," + RapipayDB.SIGN_PHOTO +
-                    "," + RapipayDB.VERIFY_CLICKED + "," + RapipayDB.DOCUMENTTYPE + "," + RapipayDB.DOCUMENTID + ")\n" +
-                    "VALUES \n" +
-                    "(?,?,?,?,?,?,?,?);";
+//            String insertSQL = "INSERT INTO " + RapipayDB.TABLE_KYC_VERIFICATION + "\n" +
+//                    "(" + RapipayDB.MOBILENO + "," + RapipayDB.SELF_PHOTO_IMAGENAME + "," + RapipayDB.SIGN_PHOTO_IMAGENAME + "," + RapipayDB.SELF_PHOTO + "," + RapipayDB.SIGN_PHOTO +
+//                    "," + RapipayDB.VERIFY_CLICKED + "," + RapipayDB.DOCUMENTTYPE + "," + RapipayDB.DOCUMENTID + ")\n" +
+//                    "VALUES \n" +
+//                    "(?,?,?,?,?,?,?,?);";
 
             String selfimageName = "selfPhoto_" + mobileNo + ".jpg";
             String signimageName = "signPhoto_" + mobileNo + ".jpg";
+//            if (mapPhoto.has("selfPhoto"))
+//                pathSelf = saveToInternalStorage(base64Convert(mapPhoto.getString("selfPhoto")), selfimageName);
+//            if (mapPhoto.has("signPhoto"))
+//                pathSign = saveToInternalStorage(base64Convert(mapPhoto.getString("signPhoto")), signimageName);
+//            dba.execSQL(insertSQL, new String[]{mobileNo, selfimageName, signimageName, pathSelf, pathSign, "true", documentType, documentID});
+
+            ContentValues values = new ContentValues();
+            values.put(RapipayDB.MOBILENO, mobileNo);
+            values.put(RapipayDB.SELF_PHOTO_IMAGENAME, selfimageName);
+            values.put(RapipayDB.SIGN_PHOTO_IMAGENAME, signimageName);
+            values.put(RapipayDB.VERIFY_CLICKED, "true");
+            values.put(RapipayDB.DOCUMENTTYPE, documentType);
+            values.put(RapipayDB.DOCUMENTID, documentID);
             if (mapPhoto.has("selfPhoto"))
-                pathSelf = saveToInternalStorage(base64Convert(mapPhoto.getString("selfPhoto")), selfimageName);
+                values.put(RapipayDB.SELF_PHOTO, byteConvert(mapPhoto.getString("selfPhoto")));
+            else
+                values.put(RapipayDB.SELF_PHOTO, "");
             if (mapPhoto.has("signPhoto"))
-                pathSign = saveToInternalStorage(base64Convert(mapPhoto.getString("signPhoto")), signimageName);
-            dba.execSQL(insertSQL, new String[]{mobileNo, selfimageName, signimageName, pathSelf, pathSign, "true", documentType, documentID});
+                values.put(RapipayDB.SIGN_PHOTO, byteConvert(mapPhoto.getString("signPhoto")));
+            else
+                values.put(RapipayDB.SIGN_PHOTO, "");
+            dba.insert(RapipayDB.TABLE_KYC_VERIFICATION, null, values);
+
             customProgessDialog.hide_progress();
         } catch (Exception e) {
             e.printStackTrace();

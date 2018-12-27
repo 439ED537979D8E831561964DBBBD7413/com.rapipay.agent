@@ -1,6 +1,7 @@
 package com.rapipay.android.agent.fragments;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -34,16 +35,19 @@ import com.rapipay.android.agent.Model.NetworkTransferPozo;
 import com.rapipay.android.agent.Model.RapiPayPozo;
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.adapter.NetworkAdapter;
+import com.rapipay.android.agent.interfaces.CustomInterface;
 import com.rapipay.android.agent.interfaces.RequestHandler;
+import com.rapipay.android.agent.main_directory.LoginScreenActivity;
 import com.rapipay.android.agent.main_directory.MainActivity;
 import com.rapipay.android.agent.utils.AsyncPostMethod;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
+import com.rapipay.android.agent.utils.BaseFragment;
 import com.rapipay.android.agent.utils.GenerateChecksum;
 import com.rapipay.android.agent.utils.ImageUtils;
 import com.rapipay.android.agent.utils.LocalStorage;
 import com.rapipay.android.agent.utils.WebConfig;
 
-public class NetworkTransFragment extends Fragment implements RequestHandler {
+public class NetworkTransFragment extends BaseFragment implements RequestHandler,CustomInterface {
 
     private int first = 1, last = 25;
     private boolean isLoading;
@@ -65,16 +69,31 @@ public class NetworkTransFragment extends Fragment implements RequestHandler {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         rv = (View) inflater.inflate(R.layout.network_fragment_layout, container, false);
+        localStorage = LocalStorage.getInstance(getActivity());
         initialize(rv);
         headerData = (WebConfig.BASIC_USERID + ":" + WebConfig.BASIC_PASSWORD);
-        list = BaseCompactActivity.db.getDetails();
-        loadApi();
+        if (BaseCompactActivity.db != null && BaseCompactActivity.db.getDetails_Rapi()) {
+            list = BaseCompactActivity.db.getDetails();
+            loadApi();
+        }else
+            dbNull(NetworkTransFragment.this);
         return rv;
     }
 
     private void loadApi() {
         logList.add(new NetworkManagePozo(list.get(0).getMobilno(), list.get(0).getMobilno()));
         new AsyncPostMethod(WebConfig.CommonReport, getNetwork_Validate("GET_MY_NODE_DETAILS", list.get(0).getMobilno(), first, last).toString(), headerData, NetworkTransFragment.this, getActivity()).execute();
+    }
+
+    @Override
+    public void okClicked(String type, Object ob) {
+        if (type.equalsIgnoreCase("SESSIONEXPIRE"))
+            jumpPage();
+    }
+
+    @Override
+    public void cancelClicked(String type, Object ob) {
+
     }
 
     private void initialize(View rv) {
@@ -235,7 +254,7 @@ public class NetworkTransFragment extends Fragment implements RequestHandler {
     private void customDialog_Ben(final NetworkTransferPozo pozo, String msg, final String type, String amount, String title) {
         AutofitTextView btn_p_bank, btn_name, p_transid;
         AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
-        LayoutInflater inflater = getLayoutInflater();
+        LayoutInflater inflater = getActivity().getLayoutInflater();
         View alertLayout = inflater.inflate(R.layout.custom_layout_common, null);
         AppCompatButton btn_cancel = (AppCompatButton) alertLayout.findViewById(R.id.btn_cancel);
         AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
@@ -310,7 +329,7 @@ public class NetworkTransFragment extends Fragment implements RequestHandler {
 
     private void customDialogConfirm(final NetworkTransferPozo pozo, String msg, final String type, final String amount, String title) {
         AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
-        LayoutInflater inflater = getLayoutInflater();
+        LayoutInflater inflater = getActivity().getLayoutInflater();
         View alertLayout = inflater.inflate(R.layout.custom_layout_common, null);
         AppCompatButton btn_cancel = (AppCompatButton) alertLayout.findViewById(R.id.btn_cancel);
         AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
@@ -448,6 +467,16 @@ public class NetworkTransFragment extends Fragment implements RequestHandler {
             e.printStackTrace();
         }
         return null;
+    }
+
+    protected void jumpPage(){
+        Intent intent = new Intent(getActivity(), LoginScreenActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        deleteTables("ALL");
+    }
+    protected void dbNull(CustomInterface customInterface) {
+        customDialog_Common("SESSIONEXPIRE", null, null, "Session Expired", null, "Your current session will get expired.", customInterface);
     }
 }
 

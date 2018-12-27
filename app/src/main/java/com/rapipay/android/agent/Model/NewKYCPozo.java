@@ -9,7 +9,7 @@ public class NewKYCPozo implements Serializable {
     public String DOB;
     public String EMAILID;
     public String COMPANY_NAME;
-    public String PASSPORT_PHOTO;
+    public byte[] PASSPORT_PHOTO;
     public String PERSONAL_CLICKED;
     public String ADDRESS;
     public String CITY;
@@ -20,21 +20,77 @@ public class NewKYCPozo implements Serializable {
     public String DOCUMENTFRONT_IMAGENAME;
     public String DOCUMENTBACK_IMAGENAME;
     public String ADDRESS_CLICKED;
-    public String DOCUMENTFRONT_PHOTO;
-    public String DOCUMENTBACK_PHOTO;
+    public byte[] DOCUMENTFRONT_PHOTO;
+    public byte[] DOCUMENTBACK_PHOTO;
     public String PANNUMBER;
-    public String PAN_PHOTO;
+    public byte[] PAN_PHOTO;
     public String GSTINNUMBER;
     public String PAN_PHOTO_IMAGENAME;
     public String BUISNESS_CLICKED;
-    public String SHOP_PHOTO;
+    public byte[] SHOP_PHOTO;
     public String SHOP_PHOTO_IMAGENAME;
-    public String SELF_PHOTO;
-    public String SIGN_PHOTO;
+    public byte[] SELF_PHOTO;
+    public byte[] SIGN_PHOTO;
     public String SELF_PHOTO_IMAGENAME;
     public String SIGN_PHOTO_IMAGENAME;
     public String VERIFY_CLICKED;
     public String IMAGE_NAME;
+
+    public byte[] getDOCUMENTFRONT_PHOTO() {
+        return DOCUMENTFRONT_PHOTO;
+    }
+
+    public void setDOCUMENTFRONT_PHOTO(byte[] DOCUMENTFRONT_PHOTO) {
+        this.DOCUMENTFRONT_PHOTO = DOCUMENTFRONT_PHOTO;
+    }
+
+    public byte[] getDOCUMENTBACK_PHOTO() {
+        return DOCUMENTBACK_PHOTO;
+    }
+
+    public void setDOCUMENTBACK_PHOTO(byte[] DOCUMENTBACK_PHOTO) {
+        this.DOCUMENTBACK_PHOTO = DOCUMENTBACK_PHOTO;
+    }
+
+    public byte[] getPAN_PHOTO() {
+        return PAN_PHOTO;
+    }
+
+    public void setPAN_PHOTO(byte[] PAN_PHOTO) {
+        this.PAN_PHOTO = PAN_PHOTO;
+    }
+
+    public byte[] getSHOP_PHOTO() {
+        return SHOP_PHOTO;
+    }
+
+    public void setSHOP_PHOTO(byte[] SHOP_PHOTO) {
+        this.SHOP_PHOTO = SHOP_PHOTO;
+    }
+
+    public byte[] getSELF_PHOTO() {
+        return SELF_PHOTO;
+    }
+
+    public void setSELF_PHOTO(byte[] SELF_PHOTO) {
+        this.SELF_PHOTO = SELF_PHOTO;
+    }
+
+    public byte[] getSIGN_PHOTO() {
+        return SIGN_PHOTO;
+    }
+
+    public void setSIGN_PHOTO(byte[] SIGN_PHOTO) {
+        this.SIGN_PHOTO = SIGN_PHOTO;
+    }
+
+    public byte[] getPASSPORT_PHOTO() {
+        return PASSPORT_PHOTO;
+    }
+
+    public void setPASSPORT_PHOTO(byte[] PASSPORT_PHOTO) {
+        this.PASSPORT_PHOTO = PASSPORT_PHOTO;
+    }
 
     public String getPAN_PHOTO_IMAGENAME() {
         return PAN_PHOTO_IMAGENAME;
@@ -43,15 +99,6 @@ public class NewKYCPozo implements Serializable {
     public void setPAN_PHOTO_IMAGENAME(String PAN_PHOTO_IMAGENAME) {
         this.PAN_PHOTO_IMAGENAME = PAN_PHOTO_IMAGENAME;
     }
-
-    public String getSHOP_PHOTO() {
-        return SHOP_PHOTO;
-    }
-
-    public void setSHOP_PHOTO(String SHOP_PHOTO) {
-        this.SHOP_PHOTO = SHOP_PHOTO;
-    }
-
     public String getSHOP_PHOTO_IMAGENAME() {
         return SHOP_PHOTO_IMAGENAME;
     }
@@ -140,14 +187,6 @@ public class NewKYCPozo implements Serializable {
         this.COMPANY_NAME = COMPANY_NAME;
     }
 
-    public String getPASSPORT_PHOTO() {
-        return PASSPORT_PHOTO;
-    }
-
-    public void setPASSPORT_PHOTO(String PASSPORT_PHOTO) {
-        this.PASSPORT_PHOTO = PASSPORT_PHOTO;
-    }
-
     public String getPERSONAL_CLICKED() {
         return PERSONAL_CLICKED;
     }
@@ -211,37 +250,12 @@ public class NewKYCPozo implements Serializable {
     public void setADDRESS_CLICKED(String ADDRESS_CLICKED) {
         this.ADDRESS_CLICKED = ADDRESS_CLICKED;
     }
-
-    public String getDOCUMENTFRONT_PHOTO() {
-        return DOCUMENTFRONT_PHOTO;
-    }
-
-    public void setDOCUMENTFRONT_PHOTO(String DOCUMENTFRONT_PHOTO) {
-        this.DOCUMENTFRONT_PHOTO = DOCUMENTFRONT_PHOTO;
-    }
-
-    public String getDOCUMENTBACK_PHOTO() {
-        return DOCUMENTBACK_PHOTO;
-    }
-
-    public void setDOCUMENTBACK_PHOTO(String DOCUMENTBACK_PHOTO) {
-        this.DOCUMENTBACK_PHOTO = DOCUMENTBACK_PHOTO;
-    }
-
     public String getPANNUMBER() {
         return PANNUMBER;
     }
 
     public void setPANNUMBER(String PANNUMBER) {
         this.PANNUMBER = PANNUMBER;
-    }
-
-    public String getPAN_PHOTO() {
-        return PAN_PHOTO;
-    }
-
-    public void setPAN_PHOTO(String PAN_PHOTO) {
-        this.PAN_PHOTO = PAN_PHOTO;
     }
 
     public String getGSTINNUMBER() {
@@ -259,23 +273,6 @@ public class NewKYCPozo implements Serializable {
     public void setBUISNESS_CLICKED(String BUISNESS_CLICKED) {
         this.BUISNESS_CLICKED = BUISNESS_CLICKED;
     }
-
-    public String getSELF_PHOTO() {
-        return SELF_PHOTO;
-    }
-
-    public void setSELF_PHOTO(String SELF_PHOTO) {
-        this.SELF_PHOTO = SELF_PHOTO;
-    }
-
-    public String getSIGN_PHOTO() {
-        return SIGN_PHOTO;
-    }
-
-    public void setSIGN_PHOTO(String SIGN_PHOTO) {
-        this.SIGN_PHOTO = SIGN_PHOTO;
-    }
-
     public String getVERIFY_CLICKED() {
         return VERIFY_CLICKED;
     }

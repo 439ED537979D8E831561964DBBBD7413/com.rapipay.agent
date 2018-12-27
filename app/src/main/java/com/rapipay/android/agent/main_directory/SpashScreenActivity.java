@@ -1,5 +1,6 @@
 package com.rapipay.android.agent.main_directory;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.widget.ImageView;
@@ -8,20 +9,21 @@ import com.rapipay.android.agent.BuildConfig;
 import com.rapipay.android.agent.Database.RapipayDB;
 import com.rapipay.android.agent.Model.ImagePozo;
 import com.rapipay.android.agent.R;
+import com.rapipay.android.agent.interfaces.CustomInterface;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
 import com.rapipay.android.agent.utils.LocalStorage;
 import com.rapipay.android.agent.utils.RouteClass;
 
 import java.util.ArrayList;
 
-public class SpashScreenActivity extends BaseCompactActivity {
+public class SpashScreenActivity extends BaseCompactActivity implements CustomInterface {
 
     ImageView imageView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
-        db = new RapipayDB(this);
+
 //        if (BuildConfig.ROLL.equalsIgnoreCase("Branch2"))
         localStorage.setActivityState(LocalStorage.LOGOUT, "0");
         initialization();
@@ -35,14 +37,15 @@ public class SpashScreenActivity extends BaseCompactActivity {
     private void initialization(){
         imageView = (ImageView)findViewById(R.id.imageView);
         String condition = "where " + RapipayDB.IMAGE_NAME + "='loginLogo.jpg'";
-        ArrayList<ImagePozo> imagePozoArrayList = db.getImageDetails(condition);
-        if(imagePozoArrayList.size()!=0){
-            byteConvert(imageView,imagePozoArrayList.get(0).getImagePath());
+        if(db!=null) {
+            ArrayList<ImagePozo> imagePozoArrayList = db.getImageDetails(condition);
+            if (imagePozoArrayList.size() != 0) {
+                byteConvert(imageView, imagePozoArrayList.get(0).getImagePath());
+            } else {
+                route_path(false);
+            }
         }else {
-            if (BuildConfig.APPTYPE == 1)
-                imageView.setImageDrawable(getResources().getDrawable(R.drawable.ic_launcher));
-            if (BuildConfig.APPTYPE == 2)
-                imageView.setImageDrawable(getResources().getDrawable(R.drawable.rapipay_parter));
+            route_path(true);
         }
     }
 
@@ -51,4 +54,24 @@ public class SpashScreenActivity extends BaseCompactActivity {
         finish();
     }
 
+    private void route_path(boolean flag) {
+        if (BuildConfig.APPTYPE == 1)
+            imageView.setImageDrawable(getResources().getDrawable(R.drawable.ic_launcher));
+        if (BuildConfig.APPTYPE == 2)
+            imageView.setImageDrawable(getResources().getDrawable(R.drawable.rapipay_parter));
+        if(flag) {
+            dbNull(SpashScreenActivity.this);
+        }
+    }
+
+    @Override
+    public void okClicked(String type, Object ob) {
+        if(type.equalsIgnoreCase("SESSIONEXPIRE"))
+            jumpPage();
+    }
+
+    @Override
+    public void cancelClicked(String type, Object ob) {
+
+    }
 }

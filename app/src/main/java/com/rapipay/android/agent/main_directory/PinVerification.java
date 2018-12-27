@@ -5,8 +5,6 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -17,14 +15,12 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Base64;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import com.rapipay.android.agent.Model.VersionPozo;
 import com.rapipay.android.agent.interfaces.VersionListener;
-import com.rapipay.android.agent.utils.ChangeTask;
 import com.rapipay.android.agent.utils.LocalStorage;
 import com.viewpagerindicator.CirclePageIndicator;
 
@@ -72,8 +68,12 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
         setContentView(R.layout.pinverification_layout);
         localStorage.setActivityState(LocalStorage.LOGOUT, "0");
         initialize();
-        loadApi();
-        loadMaster();
+        if (db != null && db.getDetails_Rapi()) {
+            loadApi();
+            loadMaster();
+        } else
+            dbNull(PinVerification.this);
+
     }
 
     private void loadApi() {
@@ -280,7 +280,9 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
             Intent webIntent = new Intent(Intent.ACTION_VIEW,
                     Uri.parse("https://play.google.com/store/apps/details?id=" + getPackageName()));
             startActivity(webIntent);
-        } else {
+        } else if (type.equalsIgnoreCase("SESSIONEXPIRE"))
+            jumpPage();
+        else {
             deleteTables("forgot");
             new RouteClass(PinVerification.this, null, "", localStorage, "0");
         }

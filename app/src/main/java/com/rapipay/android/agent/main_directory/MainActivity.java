@@ -31,7 +31,6 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -39,12 +38,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-import com.google.android.gms.vision.text.Text;
 import com.rapipay.android.agent.Database.RapipayDB;
 import com.rapipay.android.agent.Model.BankDetailsPozo;
 import com.rapipay.android.agent.Model.HeaderePozo;
 import com.rapipay.android.agent.Model.ImagePozo;
-import com.rapipay.android.agent.Model.NewKYCPozo;
 import com.rapipay.android.agent.Model.RapiPayPozo;
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.fragments.ChangeMobileFragment;
@@ -82,9 +79,18 @@ public class MainActivity extends BaseCompactActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        list = db.getDetails();
         initialization();
-        loadUrl();
+        if (db != null && db.getDetails_Rapi()) {
+            String condition = "where " + RapipayDB.IMAGE_NAME + "='invoiceLogo.jpg'";
+            ArrayList<ImagePozo> imagePozoArrayList = db.getImageDetails(condition);
+            if (imagePozoArrayList.size() != 0) {
+                byteConvert(back_click, imagePozoArrayList.get(0).getImagePath());
+            }
+            list = db.getDetails();
+            loadUrl();
+        } else {
+            dbNull(MainActivity.this);
+        }
     }
 
     private void url() {
@@ -130,12 +136,8 @@ public class MainActivity extends BaseCompactActivity
     private void initialization() {
         reset = (ImageView) findViewById(R.id.reset);
         reset.setOnClickListener(this);
-        back_click = (ImageView)findViewById(R.id.back_click);
-        String condition = "where " + RapipayDB.IMAGE_NAME + "='invoiceLogo.jpg'";
-        ArrayList<ImagePozo> imagePozoArrayList = db.getImageDetails(condition);
-        if(imagePozoArrayList.size()!=0){
-            byteConvert(back_click,imagePozoArrayList.get(0).getImagePath());
-        }
+        back_click = (ImageView) findViewById(R.id.back_click);
+
         tv = (TextView) this.findViewById(R.id.mywidget);
         tv.setSelected(true);
         reset.setColorFilter(getResources().getColor(R.color.colorPrimaryDark));
@@ -317,7 +319,7 @@ public class MainActivity extends BaseCompactActivity
         } else if (id == R.id.profile) {
             reset.setVisibility(View.GONE);
             fragment = new ProfileFragment();
-        }else if (id == R.id.nav_Cmobile) {
+        } else if (id == R.id.nav_Cmobile) {
             reset.setVisibility(View.GONE);
             fragment = new ChangeMobileFragment();
         } else if (fragment == null)
@@ -377,28 +379,27 @@ public class MainActivity extends BaseCompactActivity
             for (int i = 0; i < array.length(); i++) {
                 JSONObject object = array.getJSONObject(i);
                 if (object.getString("displayFlag").equalsIgnoreCase("D"))
-                    pozoArrayList.add(new HeaderePozo(object.getString("headerValue"), object.getString("headerData"), object.getString("headerId"),object.getString("displayFlag")));
-                else if (object.getString("headerValue").equalsIgnoreCase("Notice")){
+                    pozoArrayList.add(new HeaderePozo(object.getString("headerValue"), object.getString("headerData"), object.getString("headerId"), object.getString("displayFlag")));
+                else if (object.getString("headerValue").equalsIgnoreCase("Notice")) {
                     tv.setText(object.getString("headerData"));
                     tv.setVisibility(View.VISIBLE);
-                }
-                else {
-                if (object.getString("headerValue").equalsIgnoreCase("TnC")) {
-                    term = object.getString("headerData");
-                    if (object.getString("headerData").equalsIgnoreCase("Y")) {
-                        JSONObject object1 = array.getJSONObject(i + 1);
-                        if (object1.getString("headerValue").equalsIgnoreCase("TCLINK")) {
-                            new AsyncPostMethod(object1.getString("headerData"), "", "", MainActivity.this).execute();
+                } else {
+                    if (object.getString("headerValue").equalsIgnoreCase("TnC")) {
+                        term = object.getString("headerData");
+                        if (object.getString("headerData").equalsIgnoreCase("Y")) {
+                            JSONObject object1 = array.getJSONObject(i + 1);
+                            if (object1.getString("headerValue").equalsIgnoreCase("TCLINK")) {
+                                new AsyncPostMethod(object1.getString("headerData"), "", "", MainActivity.this).execute();
+                            }
                         }
                     }
-                }
-                if (object.getString("headerValue").equalsIgnoreCase("DOWNLOAD_MASTER_DATA")) {
-                    data = object.getString("headerData");
-                    if (object.getString("headerData").equalsIgnoreCase("Y")) {
-                        deleteTables("");
-                        callMasterDetails();
+                    if (object.getString("headerValue").equalsIgnoreCase("DOWNLOAD_MASTER_DATA")) {
+                        data = object.getString("headerData");
+                        if (object.getString("headerData").equalsIgnoreCase("Y")) {
+                            deleteTables("");
+                            callMasterDetails();
+                        }
                     }
-                }
                 }
             }
             for (int j = 0; j < pozoArrayList.size(); j++) {
@@ -506,7 +507,9 @@ public class MainActivity extends BaseCompactActivity
         super.onBackPressed();
         if (type.equalsIgnoreCase("TERMCONDITION")) {
             new AsyncPostMethod(WebConfig.NETWORKTRANSFER_URL, acknowledge(data, term).toString(), headerData, MainActivity.this).execute();
-        } else
+        } else if (type.equalsIgnoreCase("SESSIONEXPIRE"))
+            jumpPage();
+        else
             finish();
     }
 
