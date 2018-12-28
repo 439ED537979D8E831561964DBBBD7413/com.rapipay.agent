@@ -98,7 +98,14 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
         input_name = (TextView) findViewById(R.id.name);
         input_address = (TextView) findViewById(R.id.address_name);
         city_name = (TextView) findViewById(R.id.city_name);
-        select_state = (TextView) findViewById(R.id.state_name);
+        select_state = (TextView) findViewById(R.id.select_state);
+        select_state.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ArrayList<String> list_state = db.getState_Details();
+                customSpinner(select_state, "Select State", list_state);
+            }
+        });
         pan_no = (TextView) findViewById(R.id.pan_no);
         gsin_no = (TextView) findViewById(R.id.gsin_no);
         date1_text = (AutofitTextView) findViewById(R.id.date);
