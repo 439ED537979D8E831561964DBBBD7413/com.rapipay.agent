@@ -262,6 +262,7 @@ public class AgentKYCFragment extends Fragment implements RequestHandler, View.O
             spinner.setVisibility(View.GONE);
             sub_btn.setVisibility(View.GONE);
             scan_data.setVisibility(View.GONE);
+            mobile_no.setEnabled(false);
             kyc_layout_bottom.setVisibility(View.VISIBLE);
             newKYCList_Address = BaseCompactActivity.db.getKYCDetails_Address(condition);
             if (newKYCList_Address.size() != 0) {
@@ -330,6 +331,7 @@ public class AgentKYCFragment extends Fragment implements RequestHandler, View.O
                             TextView documentype = (TextView) rv.findViewById(R.id.documentype);
                             documentype.setVisibility(View.VISIBLE);
                             documentype.setEnabled(false);
+                            mobile_no.setEnabled(false);
                             documentype.setText(newKYCList_Personal.get(0).getDOCUMENTTYPE());
                             spinner.setVisibility(View.GONE);
                             sub_btn.setVisibility(View.GONE);

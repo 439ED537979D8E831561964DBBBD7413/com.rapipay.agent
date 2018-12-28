@@ -304,6 +304,7 @@ public class CustomerKYCActivity extends BaseCompactActivity implements RequestH
                             TextView documentype = (TextView) findViewById(R.id.documentype);
                             documentype.setVisibility(View.VISIBLE);
                             documentype.setEnabled(false);
+                            mobile_no.setEnabled(false);
                             documentype.setText(newKYCList_Personal.get(0).getDOCUMENTTYPE());
                             spinner.setVisibility(View.GONE);
                             sub_btn.setVisibility(View.GONE);
@@ -351,6 +352,7 @@ public class CustomerKYCActivity extends BaseCompactActivity implements RequestH
             TextView documentype = (TextView) findViewById(R.id.documentype);
             documentype.setVisibility(View.VISIBLE);
             documentype.setEnabled(false);
+            mobile_no.setEnabled(false);
             documentype.setText(newKYCList_Personal.get(0).getDOCUMENTTYPE());
             spinner.setVisibility(View.GONE);
             sub_btn.setVisibility(View.GONE);
