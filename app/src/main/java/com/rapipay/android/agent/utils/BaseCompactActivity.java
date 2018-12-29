@@ -68,6 +68,8 @@ import java.util.Locale;
 
 import me.grantland.widget.AutofitTextView;
 
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.rapipay.android.agent.Database.RapipayDB;
 import com.rapipay.android.agent.Model.BeneficiaryDetailsPozo;
@@ -85,6 +87,7 @@ import com.rapipay.android.agent.main_directory.MainActivity;
 import com.rapipay.android.agent.main_directory.PinVerification;
 
 public class BaseCompactActivity extends AppCompatActivity {
+    protected GoogleApiClient googleApiClient;
     protected String imei;
     protected ArrayList<VersionPozo> versionPozoArrayList;
     protected AutofitTextView date2_text, date1_text;
@@ -150,12 +153,14 @@ public class BaseCompactActivity extends AppCompatActivity {
         }
 
     }
+
     protected Bitmap base64Convert(String encodedImage) {
         byte[] decodedString = Base64.decode(encodedImage, Base64.DEFAULT);
         Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
         return decodedByte;
     }
-    protected void byteConvert(ImageView imageViews,byte[] decodedString) {
+
+    protected void byteConvert(ImageView imageViews, byte[] decodedString) {
         Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
         imageViews.setImageBitmap(decodedByte);
         imageViews.setVisibility(View.VISIBLE);
@@ -242,10 +247,10 @@ public class BaseCompactActivity extends AppCompatActivity {
     }
 
     protected void deleteTables(String type) {
-        localStorage.setActivityState(LocalStorage.ROUTESTATE,"0");
-        localStorage.setActivityState(LocalStorage.EMI,"0");
-        localStorage.setActivityState(LocalStorage.LOGOUT,"0");
-        localStorage.setActivityState(LocalStorage.IMAGEPATH,"0");
+        localStorage.setActivityState(LocalStorage.ROUTESTATE, "0");
+        localStorage.setActivityState(LocalStorage.EMI, "0");
+        localStorage.setActivityState(LocalStorage.LOGOUT, "0");
+        localStorage.setActivityState(LocalStorage.IMAGEPATH, "0");
         SQLiteDatabase dba = db.getWritableDatabase();
         dba.execSQL("delete from " + RapipayDB.TABLE_BANK);
         dba.execSQL("delete from " + RapipayDB.TABLE_PAYMENT);
@@ -264,15 +269,18 @@ public class BaseCompactActivity extends AppCompatActivity {
             dba.execSQL("delete from " + RapipayDB.TABLE_IMAGES);
         }
     }
-    protected void jumpPage(){
+
+    protected void jumpPage() {
         Intent intent = new Intent(BaseCompactActivity.this, LoginScreenActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         deleteTables("ALL");
     }
+
     protected void dbNull(CustomInterface customInterface) {
         customDialog_Common("SESSIONEXPIRE", null, null, "Session Expired", null, "Your current session will get expired.", customInterface);
     }
+
     protected AlertDialog.Builder dialog;
     protected AlertDialog alertDialog, newdialog;
     CustomInterface anInterface;
@@ -324,7 +332,7 @@ public class BaseCompactActivity extends AppCompatActivity {
                     return_Page();
                 } else if (type.equalsIgnoreCase("TERMCONDITION")) {
                     anInterface.okClicked(type, ob);
-                }else if (type.equalsIgnoreCase("KYCLAYOUTS")) {
+                } else if (type.equalsIgnoreCase("KYCLAYOUTS")) {
                     anInterface.okClicked(type, ob);
                 } else
                     anInterface.okClicked(type, ob);
@@ -781,11 +789,11 @@ public class BaseCompactActivity extends AppCompatActivity {
         dialog = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
         View alertLayout = inflater.inflate(R.layout.cashout_receipt, null);
-        ImageView receipt_logo = (ImageView)alertLayout.findViewById(R.id.receipt_logo);
+        ImageView receipt_logo = (ImageView) alertLayout.findViewById(R.id.receipt_logo);
         String condition = "where " + RapipayDB.IMAGE_NAME + "='invoiceLogo.jpg'";
         ArrayList<ImagePozo> imagePozoArrayList = db.getImageDetails(condition);
-        if(imagePozoArrayList.size()!=0){
-            byteConvert(receipt_logo,imagePozoArrayList.get(0).getImagePath());
+        if (imagePozoArrayList.size() != 0) {
+            byteConvert(receipt_logo, imagePozoArrayList.get(0).getImagePath());
         }
         main_layout = (LinearLayout) alertLayout.findViewById(R.id.main_layout);
         main_layout.setDrawingCacheEnabled(true);
@@ -924,11 +932,11 @@ public class BaseCompactActivity extends AppCompatActivity {
         dialog = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
         View alertLayout = inflater.inflate(R.layout.receipt_layout_new, null);
-        ImageView receipt_logo = (ImageView)alertLayout.findViewById(R.id.receipt_logo);
+        ImageView receipt_logo = (ImageView) alertLayout.findViewById(R.id.receipt_logo);
         String condition = "where " + RapipayDB.IMAGE_NAME + "='invoiceLogo.jpg'";
         ArrayList<ImagePozo> imagePozoArrayList = db.getImageDetails(condition);
-        if(imagePozoArrayList.size()!=0){
-            byteConvert(receipt_logo,imagePozoArrayList.get(0).getImagePath());
+        if (imagePozoArrayList.size() != 0) {
+            byteConvert(receipt_logo, imagePozoArrayList.get(0).getImagePath());
         }
         main_layout = (LinearLayout) alertLayout.findViewById(R.id.main_layout);
 
@@ -1446,4 +1454,5 @@ public class BaseCompactActivity extends AppCompatActivity {
                 }
             }
     }
+
 }

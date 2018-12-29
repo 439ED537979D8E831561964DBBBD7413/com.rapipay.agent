@@ -95,7 +95,6 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
     AccountValidator validator;
     String typeput;
     private Location mylocation;
-    private GoogleApiClient googleApiClient;
     private final static int REQUEST_CHECK_SETTINGS_GPS = 0x5;
     private final static int REQUEST_ID_MULTIPLE_PERMISSIONS = 0x2;
     String tid = "", mid = "", orderID = "";
@@ -379,44 +378,6 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
             lv_imflate.setAdapter(new EMITenureAdapter(arrayList, this));
             inflate_tenureee.addView(lv_imflate);
         }
-//            inflate_tenureee.removeAllViews();
-//            LayoutInflater inflater = getLayoutInflater();
-//            for (int i = 0; i < arrayList.size(); i++) {
-//                View view = inflater.inflate(R.layout.tenure_layout, null);
-//                TextView amount = (TextView) view.findViewById(R.id.amount);
-//                TextView percentage = (TextView) view.findViewById(R.id.percentage);
-//                TextView tenure = (TextView) view.findViewById(R.id.tenure);
-//                CheckBox check_list = (CheckBox) view.findViewById(R.id.check_list);
-//                check_list.setId(i);
-//                check_list.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-//                    @Override
-//                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-//                        CheckBox box = (CheckBox) buttonView;
-//                        LinearLayout linearLayout = (LinearLayout) box.getParent().getParent();
-//                        int count = linearLayout.getChildCount();
-//                        for (int i = 0; i < count; i++) {
-//                            LinearLayout layout = (LinearLayout) linearLayout.getChildAt(i);
-//                            CheckBox boxs = (CheckBox) layout.getChildAt(3);
-//                            if (box.getId() == boxs.getId()) {
-//                                if (!box.isChecked()) {
-//                                    box.setChecked(isChecked);
-//                                    arrayList.get(box.getId()).setIsflag(true);
-//                                }
-//                            } else if (box.getId() != boxs.getId()) {
-//                                if (boxs.isChecked()) {
-//                                    boxs.setChecked(false);
-//                                    arrayList.get(boxs.getId()).setIsflag(false);
-//                                }
-//                            }
-//                        }
-//                    }
-//                });
-//                amount.setText(String.valueOf(arrayList.get(i).getAmount()));
-//                percentage.setText(String.valueOf(arrayList.get(i).getPercent()));
-//                tenure.setText(String.valueOf(arrayList.get(i).getTenure()));
-//                inflate_tenureee.addView(view);
-//            }
-//        }
     }
 
     @Override
@@ -749,7 +710,7 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
         }
     }
 
-    private void checkPermissions() {
+    protected void checkPermissions() {
         int permissionLocation = ContextCompat.checkSelfPermission(CashOutClass.this,
                 android.Manifest.permission.ACCESS_FINE_LOCATION);
         List<String> listPermissionsNeeded = new ArrayList<>();
@@ -762,7 +723,6 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
         } else {
             getMyLocation();
         }
-
     }
 
     @Override

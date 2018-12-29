@@ -1,16 +1,22 @@
 package com.rapipay.android.agent.main_directory;
 
+import android.Manifest;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentSender;
+import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatButton;
 import android.util.Base64;
@@ -20,6 +26,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResult;
+import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.rapipay.android.agent.Database.RapipayDB;
 import com.rapipay.android.agent.Model.NewKYCPozo;
 import com.rapipay.android.agent.R;
@@ -38,10 +55,13 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import me.grantland.widget.AutofitTextView;
 
-public class KYCFormActivity extends BaseCompactActivity implements RequestHandler, View.OnClickListener {
+public class KYCFormActivity extends BaseCompactActivity implements RequestHandler, View.OnClickListener, GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener,
+        LocationListener {
 
     public static String formData = null;
     String type, button, mobileNo, persons, scandata = null, documentType = null, documentID = null, customerType;
@@ -69,11 +89,15 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
     private JSONObject kycMapImage = new JSONObject();
     private CustomProgessDialog customProgessDialog;
     private String clicked = "";
+    private Location mylocation;
+    private final static int REQUEST_CHECK_SETTINGS_GPS = 0x5;
+    private final static int REQUEST_ID_MULTIPLE_PERMISSIONS = 0x2;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.kyc_personal_detail);
+        setUpGClient();
         initialize();
         loadCamera();
     }
@@ -516,6 +540,8 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
             jsonObject.put("kycType", kycType);
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
+            jsonObject.put("latitude", String.valueOf(mylocation.getLatitude()));
+            jsonObject.put("langitude", String.valueOf(mylocation.getLongitude()));
             jsonObject.put("listdata", kycMapData.toString());
             jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
             form = "<html>\n" +
@@ -549,12 +575,12 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
         if (persons.equalsIgnoreCase("outside")) {
             if (selfphoto.getDrawable() == null) {
                 TextView self_photo = (TextView) findViewById(R.id.self_photo);
-                self_photo.setError("Please enter valid data");
+                self_photo.setError("Please upload valid live image");
                 self_photo.requestFocus();
                 return false;
             } else if (signphoto.getDrawable() == null) {
                 TextView sign_photo = (TextView) findViewById(R.id.sign_photo);
-                sign_photo.setError("Please enter valid data");
+                sign_photo.setError("Please upload valid agent sign image");
                 sign_photo.requestFocus();
                 return false;
             } else
@@ -562,7 +588,7 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
         } else if (persons.equalsIgnoreCase("internal")) {
             if (selfphoto.getDrawable() == null) {
                 TextView self_photo = (TextView) findViewById(R.id.self_photo);
-                self_photo.setError("Please enter valid data");
+                self_photo.setError("Please upload valid live image");
                 self_photo.requestFocus();
                 return false;
             } else
@@ -573,29 +599,29 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
 
     private Boolean personalValidation() {
         if (!ImageUtils.commonNumber(input_number.getText().toString(), 10)) {
-            input_number.setError("Please enter valid data");
+            input_number.setError("Please enter valid mobile number");
             input_number.requestFocus();
             return false;
         } else if (!ImageUtils.commonRegex(input_name.getText().toString(), 150, ". ")) {
-            input_name.setError("Please enter valid data");
+            input_name.setError("Please enter valid name");
             input_name.requestFocus();
             return false;
         } else if (date1_text.getText().toString().isEmpty()) {
-            date1_text.setError("Please enter valid data");
+            date1_text.setError("Please enter valid date");
             date1_text.requestFocus();
             return false;
         } else if (passportphotoimage.getDrawable() == null) {
             TextView self_photo = (TextView) findViewById(R.id.passportphoto);
-            self_photo.setError("Please enter valid data");
+            self_photo.setError("Please upload valid passport size image");
             self_photo.requestFocus();
             return false;
         } else if (persons.equalsIgnoreCase("outside")) {
             if (!Patterns.EMAIL_ADDRESS.matcher(input_email.getText().toString()).matches()) {
-                input_email.setError("Please enter valid data");
+                input_email.setError("Please enter valid email address");
                 input_email.requestFocus();
                 return false;
             } else if (!ImageUtils.commonRegex(input_comp.getText().toString(), 150, "0-9 .&")) {
-                input_comp.setError("Please enter valid data");
+                input_comp.setError("Please enter valid company name");
                 input_comp.requestFocus();
                 return false;
             } else
@@ -606,34 +632,34 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
     }
 
     private Boolean addressValidation() {
-        if (input_address.getText().toString().isEmpty()) {
-            input_address.setError("Please enter valid data");
+        if (!ImageUtils.commonAddress(city_name.getText().toString())) {
+            input_address.setError("Please enter valid address");
             input_address.requestFocus();
             return false;
-        } else if (city_name.getText().toString().isEmpty()) {
-            city_name.setError("Please enter valid data");
+        } else if (!ImageUtils.commonRegex(city_name.getText().toString(), 150, ". ")) {
+            city_name.setError("Please enter valid city");
             city_name.requestFocus();
             return false;
-        } else if (select_state.getText().toString().isEmpty()) {
-            select_state.setError("Please enter valid data");
+        } else if (select_state.getText().toString().equalsIgnoreCase("Select State")) {
+            select_state.setError("Please enter valid state");
             select_state.requestFocus();
             return false;
-        } else if (pin_code.getText().toString().isEmpty()) {
-            pin_code.setError("Please enter valid data");
+        } else if (pin_code.getText().toString().isEmpty()|| pin_code.getText().toString().length()!=6) {
+            pin_code.setError("Please enter valid pincode");
             pin_code.requestFocus();
             return false;
         } else if (document_id.getText().toString().isEmpty()) {
-            document_id.setError("Please enter valid data");
+            document_id.setError("Please enter valid DocumentID");
             document_id.requestFocus();
             return false;
         } else if (documentfrontimage.getDrawable() == null) {
             TextView documentfront = (TextView) findViewById(R.id.documentfront);
-            documentfront.setError("Please enter valid data");
+            documentfront.setError("Please upload valid document front side image");
             documentfront.requestFocus();
             return false;
         } else if (documentbackimage.getDrawable() == null) {
             TextView documentfront = (TextView) findViewById(R.id.documentback);
-            documentfront.setError("Please enter valid data");
+            documentfront.setError("Please upload valid document back side image");
             documentfront.requestFocus();
             return false;
         } else
@@ -643,17 +669,17 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
     private Boolean buisnessValidation() {
         if (persons.equalsIgnoreCase("outside")) {
             if (!pan_no.getText().toString().matches("^[A-Za-z]{5}[0-9]{4}[A-Za-z]{1}$")) {
-                pan_no.setError("Please enter valid data");
+                pan_no.setError("Please enter valid pancard number");
                 pan_no.requestFocus();
                 return false;
             } else if (panphoto.getDrawable() == null) {
                 TextView pan_photo = (TextView) findViewById(R.id.pan_photo);
-                pan_photo.setError("Please enter valid data");
+                pan_photo.setError("Please upload valid pancard image");
                 pan_photo.requestFocus();
                 return false;
             } else if (shopPhoto.getDrawable() == null) {
                 TextView shop_photo = (TextView) findViewById(R.id.shop_photo);
-                shop_photo.setError("Please enter valid data");
+                shop_photo.setError("Please upload valid data");
                 shop_photo.requestFocus();
                 return false;
             } else
@@ -661,13 +687,13 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
         } else if (persons.equalsIgnoreCase("internal")) {
             if (pan_no.getText().length() != 0) {
                 if (!pan_no.getText().toString().matches("^[A-Za-z]{5}[0-9]{4}[A-Za-z]{1}$")) {
-                    pan_no.setError("Please enter valid data");
+                    pan_no.setError("Please upload valid pancard number");
                     pan_no.requestFocus();
                     return false;
                 } else if (pan_no.getText().toString().matches("^[A-Za-z]{5}[0-9]{4}[A-Za-z]{1}$")) {
                     if (panphoto.getDrawable() == null) {
                         TextView pan_photo = (TextView) findViewById(R.id.pan_photo);
-                        pan_photo.setError("Please enter valid data");
+                        pan_photo.setError("Please upload valid pancard image");
                         pan_photo.requestFocus();
                         return false;
                     } else
@@ -913,18 +939,6 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
         customProgessDialog = new CustomProgessDialog(KYCFormActivity.this);
         SQLiteDatabase dba = db.getWritableDatabase();
         try {
-//            String insertSQL = "INSERT INTO " + RapipayDB.TABLE_KYC_PERSONAL + "\n" +
-//                    "(" + RapipayDB.MOBILENO + "," + RapipayDB.USER_NAME + "," + RapipayDB.DOB + "," + RapipayDB.EMAILID + "," + RapipayDB.COMPANY_NAME + "," + RapipayDB.IMAGE_NAME + ","
-//                    + RapipayDB.PASSPORT_PHOTO + "," + RapipayDB.PERSONAL_CLICKED + "," + RapipayDB.DOCUMENTTYPE + "," + RapipayDB.DOCUMENTID + ")\n" +
-//                    "VALUES \n" +
-//                    "( ?, ?, ?,?,?, ?, ?,?,?,?);";
-//
-//            String imageName = "passportPhoto_" + mapValue.getString("mobileNo") + ".jpg";
-//            if (mapPhoto.has("passportPhoto"))
-//                path = saveToInternalStorage(base64Convert(mapPhoto.getString("passportPhoto")), imageName);
-//            dba.execSQL(insertSQL, new String[]{mapValue.getString("mobileNo"), name, mapValue.getString("dob"), mapValue.getString("email"), mapValue.getString("companyName"), imageName, path, "true", documentType, documentID});
-
-
             ContentValues values = new ContentValues();
             String imageName = "passportPhoto_" + mapValue.getString("mobileNo") + ".jpg";
             values.put(RapipayDB.MOBILENO, mapValue.getString("mobileNo"));
@@ -951,17 +965,9 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
         customProgessDialog = new CustomProgessDialog(KYCFormActivity.this);
         SQLiteDatabase dba = db.getWritableDatabase();
         try {
-//            String insertSQL = "INSERT INTO " + RapipayDB.TABLE_KYC_ADDRESS + "\n" +
-//                    "(" + RapipayDB.MOBILENO + "," + RapipayDB.ADDRESS + "," + RapipayDB.CITY + "," + RapipayDB.STATE + "," + RapipayDB.PINCODE + "," + RapipayDB.DOCUMENTFRONT_IMAGENAME + "," + RapipayDB.DOCUMENTBACK_IMAGENAME + ","
-//                    + RapipayDB.DOCUMENTFRONT_PHOTO + "," + RapipayDB.DOCUMENTBACK_PHOTO + "," + RapipayDB.ADDRESS_CLICKED + "," + RapipayDB.DOCUMENTTYPE + "," + RapipayDB.DOCUMENTID + ")\n" +
-//                    "VALUES \n" +
-//                    "(?,?,?,?,?,?,?,?,?,?,?,?);";
 
             String frontimageName = "frontPhoto_" + mobileNo + ".jpg";
             String backimageName = "backPhoto_" + mobileNo + ".jpg";
-//            String pathFront = saveToInternalStorage(base64Convert(mapPhoto.getString("uploadFront")), frontimageName);
-//            String pathBack = saveToInternalStorage(base64Convert(mapPhoto.getString("uploadBack")), backimageName);
-//            dba.execSQL(insertSQL, new String[]{mobileNo, mapValue.getString("address"), mapValue.getString("city"), mapValue.getString("state"), mapValue.getString("pinCode"), frontimageName, backimageName, pathFront, pathBack, "true", documentType, documentID});
 
             ContentValues values = new ContentValues();
             values.put(RapipayDB.MOBILENO, mobileNo);
@@ -994,19 +1000,8 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
         SQLiteDatabase dba = db.getWritableDatabase();
 //        String pathPan = "", pathShop = "";
         try {
-//            String insertSQL = "INSERT INTO " + RapipayDB.TABLE_KYC_BUISNESS + "\n" +
-//                    "(" + RapipayDB.MOBILENO + "," + RapipayDB.PANNUMBER + "," + RapipayDB.GSTINNUMBER + "," + RapipayDB.PAN_PHOTO_IMAGENAME + "," + RapipayDB.SHOP_PHOTO_IMAGENAME + ","
-//                    + RapipayDB.PAN_PHOTO + "," + RapipayDB.SHOP_PHOTO + "," + RapipayDB.BUISNESS_CLICKED + "," + RapipayDB.DOCUMENTTYPE + "," + RapipayDB.DOCUMENTID + ")\n" +
-//                    "VALUES \n" +
-//                    "(?,?,?,?,?,?,?,?,?,?);";
-
             String panimageName = "panPhoto_" + mobileNo + ".jpg";
             String shopimageName = "shopPhoto_" + mobileNo + ".jpg";
-//            if (mapPhoto.has("pancardImg"))
-//                pathPan = saveToInternalStorage(base64Convert(mapPhoto.getString("pancardImg")), panimageName);
-//            if (mapPhoto.has("shopPhoto"))
-//                pathShop = saveToInternalStorage(base64Convert(mapPhoto.getString("shopPhoto")), shopimageName);
-//            dba.execSQL(insertSQL, new String[]{mobileNo, mapValue.getString("panNo"), mapValue.getString("gstIN"), panimageName, shopimageName, pathPan, pathShop, "true", documentType, documentID});
 
             ContentValues values = new ContentValues();
             values.put(RapipayDB.MOBILENO, mobileNo);
@@ -1038,20 +1033,9 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
         SQLiteDatabase dba = db.getWritableDatabase();
 //        String pathSelf = "", pathSign = "";
         try {
-//            String insertSQL = "INSERT INTO " + RapipayDB.TABLE_KYC_VERIFICATION + "\n" +
-//                    "(" + RapipayDB.MOBILENO + "," + RapipayDB.SELF_PHOTO_IMAGENAME + "," + RapipayDB.SIGN_PHOTO_IMAGENAME + "," + RapipayDB.SELF_PHOTO + "," + RapipayDB.SIGN_PHOTO +
-//                    "," + RapipayDB.VERIFY_CLICKED + "," + RapipayDB.DOCUMENTTYPE + "," + RapipayDB.DOCUMENTID + ")\n" +
-//                    "VALUES \n" +
-//                    "(?,?,?,?,?,?,?,?);";
 
             String selfimageName = "selfPhoto_" + mobileNo + ".jpg";
             String signimageName = "signPhoto_" + mobileNo + ".jpg";
-//            if (mapPhoto.has("selfPhoto"))
-//                pathSelf = saveToInternalStorage(base64Convert(mapPhoto.getString("selfPhoto")), selfimageName);
-//            if (mapPhoto.has("signPhoto"))
-//                pathSign = saveToInternalStorage(base64Convert(mapPhoto.getString("signPhoto")), signimageName);
-//            dba.execSQL(insertSQL, new String[]{mobileNo, selfimageName, signimageName, pathSelf, pathSign, "true", documentType, documentID});
-
             ContentValues values = new ContentValues();
             values.put(RapipayDB.MOBILENO, mobileNo);
             values.put(RapipayDB.SELF_PHOTO_IMAGENAME, selfimageName);
@@ -1074,4 +1058,126 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
             e.printStackTrace();
         }
     }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        mylocation = location;
+        if (mylocation != null) {
+//            bluetooth();
+        }
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        checkPermissions();
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        //Do whatever you need
+        //You can display a message here
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        //You can display a message here
+    }
+
+    private void getMyLocation() {
+        if (googleApiClient != null) {
+            if (googleApiClient.isConnected()) {
+                int permissionLocation = ContextCompat.checkSelfPermission(KYCFormActivity.this,
+                        Manifest.permission.ACCESS_FINE_LOCATION);
+                if (permissionLocation == PackageManager.PERMISSION_GRANTED) {
+                    mylocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+                    LocationRequest locationRequest = new LocationRequest();
+                    locationRequest.setInterval(3000);
+                    locationRequest.setFastestInterval(3000);
+                    locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+                    LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
+                            .addLocationRequest(locationRequest);
+                    builder.setAlwaysShow(true);
+                    LocationServices.FusedLocationApi
+                            .requestLocationUpdates(googleApiClient, locationRequest, this);
+                    PendingResult<LocationSettingsResult> result =
+                            LocationServices.SettingsApi
+                                    .checkLocationSettings(googleApiClient, builder.build());
+                    result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
+
+                        @Override
+                        public void onResult(LocationSettingsResult result) {
+                            final Status status = result.getStatus();
+                            switch (status.getStatusCode()) {
+                                case LocationSettingsStatusCodes.SUCCESS:
+                                    // All location settings are satisfied.
+                                    // You can initialize location requests here.
+                                    int permissionLocation = ContextCompat
+                                            .checkSelfPermission(KYCFormActivity.this,
+                                                    Manifest.permission.ACCESS_FINE_LOCATION);
+                                    if (permissionLocation == PackageManager.PERMISSION_GRANTED) {
+                                        mylocation = LocationServices.FusedLocationApi
+                                                .getLastLocation(googleApiClient);
+                                    }
+                                    break;
+                                case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                                    // Location settings are not satisfied.
+                                    // But could be fixed by showing the user a dialog.
+                                    try {
+                                        // Show the dialog by calling startResolutionForResult(),
+                                        // and check the result in onActivityResult().
+                                        // Ask to turn on GPS automatically
+                                        status.startResolutionForResult(KYCFormActivity.this,
+                                                REQUEST_CHECK_SETTINGS_GPS);
+                                    } catch (IntentSender.SendIntentException e) {
+                                        // Ignore the error.
+                                    }
+                                    break;
+                                case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                                    // Location settings are not satisfied.
+                                    // However, we have no way
+                                    // to fix the
+                                    // settings so we won't show the dialog.
+                                    // finish();
+                                    break;
+                            }
+                        }
+                    });
+                }
+            }
+        }
+    }
+
+    protected void checkPermissions() {
+        int permissionLocation = ContextCompat.checkSelfPermission(KYCFormActivity.this,
+                android.Manifest.permission.ACCESS_FINE_LOCATION);
+        List<String> listPermissionsNeeded = new ArrayList<>();
+        if (permissionLocation != PackageManager.PERMISSION_GRANTED) {
+            listPermissionsNeeded.add(android.Manifest.permission.ACCESS_FINE_LOCATION);
+            if (!listPermissionsNeeded.isEmpty()) {
+                ActivityCompat.requestPermissions(this,
+                        listPermissionsNeeded.toArray(new String[listPermissionsNeeded.size()]), REQUEST_ID_MULTIPLE_PERMISSIONS);
+            }
+        } else {
+            getMyLocation();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        int permissionLocation = ContextCompat.checkSelfPermission(KYCFormActivity.this,
+                Manifest.permission.ACCESS_FINE_LOCATION);
+        if (permissionLocation == PackageManager.PERMISSION_GRANTED) {
+            getMyLocation();
+        }
+    }
+    private synchronized void setUpGClient() {
+        googleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this, 0, this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+        googleApiClient.connect();
+    }
+
 }

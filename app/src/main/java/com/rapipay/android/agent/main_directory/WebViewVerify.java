@@ -273,7 +273,7 @@ public class WebViewVerify extends BaseCompactActivity implements CustomInterfac
     public void okClicked(String type, Object ob) {
         if (type.equalsIgnoreCase("KYCLAYOUTS")) {
             String condition = "where " + RapipayDB.MOBILENO + "='" + mobileNo + "'" + " AND " + RapipayDB.DOCUMENTTYPE + "='" + documentType + "'" + " AND " + RapipayDB.DOCUMENTID + "='" + documentID + "'";
-            db.deleteRow(condition);
+            db.deleteRow(mobileNo);
             setBack_click(this);
             finish();
         }

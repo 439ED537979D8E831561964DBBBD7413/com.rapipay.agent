@@ -81,6 +81,14 @@ public class ImageUtils {
             return false;
     }
 
+//    public static boolean validateDocumentID(String value) {
+//        String regex = "^[a-zA-Z0-9"+Scchar+"]{1,"+20+"}$";
+//        if (value.matches(regex))
+//            return true;
+//        else
+//            return false;
+//    }
+
     public static boolean commonAccount(String value, int start, int end) {
         String regex = "^\\d{"+start+","+end+"}$";
         if (value.matches(regex))
