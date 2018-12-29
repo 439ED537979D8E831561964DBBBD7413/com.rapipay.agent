@@ -173,20 +173,16 @@
                         android:textSize="16sp" />
                 </android.support.design.widget.TextInputLayout>
 
-                <android.support.design.widget.TextInputLayout
+                <TextView
+                    android:id="@+id/select_state"
+                    style="@style/Widget.AppCompat.Spinner.Underlined"
                     android:layout_width="match_parent"
+                    android:background="@drawable/border_view"
+                    android:padding="10dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="5dp"
-                    android:layout_marginTop="5dp">
-
-                    <EditText
-                        android:id="@+id/state_name"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="State"
-                        android:inputType="text"
-                        android:textSize="16sp" />
-                </android.support.design.widget.TextInputLayout>
+                    android:layout_margin="5dp"
+                    android:spinnerMode="dropdown"
+                    android:text="Select State" />
 
                 <android.support.design.widget.TextInputLayout
                     android:layout_width="match_parent"
