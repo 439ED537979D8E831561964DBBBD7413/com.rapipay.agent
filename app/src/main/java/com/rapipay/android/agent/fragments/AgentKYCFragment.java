@@ -182,18 +182,22 @@ public class AgentKYCFragment extends Fragment implements RequestHandler, View.O
                 intent.putExtra("button", "address");
                 intent.putExtra("customerType", customerType);
                 intent.putExtra("mobileNo", mobile_no.getText().toString());
-                if (newKYCList_Address != null && newKYCList_Address.size() != 0) {
-                    intent.putExtra("localAddress", "true");
-                    if (newKYCList_Buisness != null && newKYCList_Buisness.size() != 0) {
-                        intent.putExtra("localBusiness", "true");
-                        if (newKYCList_Verify != null && newKYCList_Verify.size() != 0)
-                            intent.putExtra("localVerify", "true");
-                        else
-                            intent.putExtra("localVerify", "false");
-                    }else
-                        intent.putExtra("localBusiness", "false");
-                }else
-                    intent.putExtra("localAddress", "false");
+                if (newKYCList_Personal != null && newKYCList_Personal.size() != 0) {
+                    intent.putExtra("localPersonal", "true");
+                    if (newKYCList_Address != null && newKYCList_Address.size() != 0) {
+                        intent.putExtra("localAddress", "true");
+                        if (newKYCList_Buisness != null && newKYCList_Buisness.size() != 0) {
+                            intent.putExtra("localBusiness", "true");
+                            if (newKYCList_Verify != null && newKYCList_Verify.size() != 0)
+                                intent.putExtra("localVerify", "true");
+                            else
+                                intent.putExtra("localVerify", "false");
+                        } else
+                            intent.putExtra("localBusiness", "false");
+                    } else
+                        intent.putExtra("localAddress", "false");
+                } else
+                    intent.putExtra("localPersonal", "false");
                 if (jsonObject != null) {
                     intent.putExtra("scandata", jsonObject.toString());
                 }
@@ -210,14 +214,22 @@ public class AgentKYCFragment extends Fragment implements RequestHandler, View.O
                 intent.putExtra("mobileNo", mobile_no.getText().toString());
                 intent.putExtra("documentType", spinner_value);
                 intent.putExtra("documentID", documentid.getText().toString());
-                if (newKYCList_Buisness != null && newKYCList_Buisness.size() != 0) {
-                    intent.putExtra("localBusiness", "true");
-                    if (newKYCList_Verify != null && newKYCList_Verify.size() != 0)
-                        intent.putExtra("localVerify", "true");
-                    else
-                        intent.putExtra("localVerify", "false");
-                }else
-                    intent.putExtra("localBusiness", "false");
+                if (newKYCList_Personal != null && newKYCList_Personal.size() != 0) {
+                    intent.putExtra("localPersonal", "true");
+                    if (newKYCList_Address != null && newKYCList_Address.size() != 0) {
+                        intent.putExtra("localAddress", "true");
+                        if (newKYCList_Buisness != null && newKYCList_Buisness.size() != 0) {
+                            intent.putExtra("localBusiness", "true");
+                            if (newKYCList_Verify != null && newKYCList_Verify.size() != 0)
+                                intent.putExtra("localVerify", "true");
+                            else
+                                intent.putExtra("localVerify", "false");
+                        } else
+                            intent.putExtra("localBusiness", "false");
+                    } else
+                        intent.putExtra("localAddress", "false");
+                } else
+                    intent.putExtra("localPersonal", "false");
                 startActivityForResult(intent, 2);
                 break;
             case R.id.verification_btn:
@@ -232,10 +244,22 @@ public class AgentKYCFragment extends Fragment implements RequestHandler, View.O
                 intent.putExtra("localPersonal", "true");
                 intent.putExtra("localAddress", "true");
                 intent.putExtra("localBusiness", "true");
-                if (newKYCList_Verify != null && newKYCList_Verify.size() != 0)
-                    intent.putExtra("localVerify", "true");
-                else
-                    intent.putExtra("localVerify", "false");
+                if (newKYCList_Personal != null && newKYCList_Personal.size() != 0) {
+                    intent.putExtra("localPersonal", "true");
+                    if (newKYCList_Address != null && newKYCList_Address.size() != 0) {
+                        intent.putExtra("localAddress", "true");
+                        if (newKYCList_Buisness != null && newKYCList_Buisness.size() != 0) {
+                            intent.putExtra("localBusiness", "true");
+                            if (newKYCList_Verify != null && newKYCList_Verify.size() != 0)
+                                intent.putExtra("localVerify", "true");
+                            else
+                                intent.putExtra("localVerify", "false");
+                        } else
+                            intent.putExtra("localBusiness", "false");
+                    } else
+                        intent.putExtra("localAddress", "false");
+                } else
+                    intent.putExtra("localPersonal", "false");
                 startActivityForResult(intent, 2);
                 break;
         }
@@ -283,9 +307,16 @@ public class AgentKYCFragment extends Fragment implements RequestHandler, View.O
             } else
                 rv.findViewById(R.id.address_layout).setVisibility(View.VISIBLE);
         }else {
-            scan_data.setVisibility(View.VISIBLE);
-            sub_btn.setVisibility(View.GONE);
+            scan_data.setVisibility(View.GONE);
+            sub_btn.setVisibility(View.VISIBLE);
             kyc_layout_bottom.setVisibility(View.GONE);
+            rv.findViewById(R.id.adrs_btn).setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
+            rv.findViewById(R.id.business_btn).setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
+            rv.findViewById(R.id.verification_btn).setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
+            rv.findViewById(R.id.prsnl_btn).setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
+            rv.findViewById(R.id.address_layout).setVisibility(View.GONE);
+            rv.findViewById(R.id.buisness_layout).setVisibility(View.GONE);
+            rv.findViewById(R.id.verification_button).setVisibility(View.GONE);
         }
     }
     public void hideKeyboard(Activity activity) {
@@ -363,6 +394,13 @@ public class AgentKYCFragment extends Fragment implements RequestHandler, View.O
                             scan_data.setVisibility(View.VISIBLE);
                             sub_btn.setVisibility(View.GONE);
                             kyc_layout_bottom.setVisibility(View.GONE);
+                            rv.findViewById(R.id.adrs_btn).setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
+                            rv.findViewById(R.id.business_btn).setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
+                            rv.findViewById(R.id.verification_btn).setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
+                            rv.findViewById(R.id.prsnl_btn).setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
+                            rv.findViewById(R.id.address_layout).setVisibility(View.GONE);
+                            rv.findViewById(R.id.buisness_layout).setVisibility(View.GONE);
+                            rv.findViewById(R.id.verification_button).setVisibility(View.GONE);
                         }
                         hideKeyboard(getActivity());
 

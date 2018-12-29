@@ -7,10 +7,10 @@ android {
 //        applicationId "com.rapipay.android.agent"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 14
-        versionName "0.14"
-        buildConfigField "int", "APPTYPE", "2"
-        buildConfigField "String", "USERTYPE", "\"Other\""
+        versionCode 15
+        versionName "0.15"
+        buildConfigField "int", "APPTYPE", "1"
+        buildConfigField "String", "USERTYPE", "\"RapiPay\""
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -31,7 +31,7 @@ android {
     productFlavors {
         Partner {
             flavorDimensions "default"
-            resValue "string", "app_name", "Rapid Payment"
+            resValue "string", "app_name", "Rapid Payments"
             buildConfigField("String", "ROLL", "\"Partner\"")
             applicationId "com.rapipay.android.partner"
         }

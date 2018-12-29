@@ -54,7 +54,7 @@ public class CustomerKYCActivity extends BaseCompactActivity implements RequestH
     String[] items = new String[]{"Select Document Type", "Aadhar Card", "Voter Id Card", "Driving License", "Passport"};
     String spinner_value = "", TYPE, mobileNo, customerType;
     String type = "MANUAL";
-    private ArrayList<NewKYCPozo> newKYCList_Personal = null,newKYCList_Address=null,newKYCList_Buisness=null,newKYCList_Verify=null;
+    private ArrayList<NewKYCPozo> newKYCList_Personal = null, newKYCList_Address = null, newKYCList_Buisness = null, newKYCList_Verify = null;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -170,11 +170,11 @@ public class CustomerKYCActivity extends BaseCompactActivity implements RequestH
                                 intent.putExtra("localVerify", "true");
                             else
                                 intent.putExtra("localVerify", "false");
-                        }else
+                        } else
                             intent.putExtra("localBusiness", "false");
-                    }else
+                    } else
                         intent.putExtra("localAddress", "false");
-                }else
+                } else
                     intent.putExtra("localPersonal", "false");
                 intent.putExtra("mobileNo", mobile_no.getText().toString());
                 if (jsonObject != null) {
@@ -191,18 +191,22 @@ public class CustomerKYCActivity extends BaseCompactActivity implements RequestH
                 intent.putExtra("button", "address");
                 intent.putExtra("customerType", customerType);
                 intent.putExtra("mobileNo", mobile_no.getText().toString());
-                if (newKYCList_Address != null && newKYCList_Address.size() != 0) {
-                    intent.putExtra("localAddress", "true");
-                    if (newKYCList_Buisness != null && newKYCList_Buisness.size() != 0) {
-                        intent.putExtra("localBusiness", "true");
-                        if (newKYCList_Verify != null && newKYCList_Verify.size() != 0)
-                            intent.putExtra("localVerify", "true");
-                        else
-                            intent.putExtra("localVerify", "false");
-                    }else
-                        intent.putExtra("localBusiness", "false");
-                }else
-                    intent.putExtra("localAddress", "false");
+                if (newKYCList_Personal != null && newKYCList_Personal.size() != 0) {
+                    intent.putExtra("localPersonal", "true");
+                    if (newKYCList_Address != null && newKYCList_Address.size() != 0) {
+                        intent.putExtra("localAddress", "true");
+                        if (newKYCList_Buisness != null && newKYCList_Buisness.size() != 0) {
+                            intent.putExtra("localBusiness", "true");
+                            if (newKYCList_Verify != null && newKYCList_Verify.size() != 0)
+                                intent.putExtra("localVerify", "true");
+                            else
+                                intent.putExtra("localVerify", "false");
+                        } else
+                            intent.putExtra("localBusiness", "false");
+                    } else
+                        intent.putExtra("localAddress", "false");
+                } else
+                    intent.putExtra("localPersonal", "false");
                 if (jsonObject != null) {
                     intent.putExtra("scandata", jsonObject.toString());
                 }
@@ -219,14 +223,22 @@ public class CustomerKYCActivity extends BaseCompactActivity implements RequestH
                 intent.putExtra("mobileNo", mobile_no.getText().toString());
                 intent.putExtra("documentType", spinner_value);
                 intent.putExtra("documentID", documentid.getText().toString());
-                if (newKYCList_Buisness != null && newKYCList_Buisness.size() != 0) {
-                    intent.putExtra("localBusiness", "true");
-                    if (newKYCList_Verify != null && newKYCList_Verify.size() != 0)
-                        intent.putExtra("localVerify", "true");
-                    else
-                        intent.putExtra("localVerify", "false");
-                }else
-                    intent.putExtra("localBusiness", "false");
+                if (newKYCList_Personal != null && newKYCList_Personal.size() != 0) {
+                    intent.putExtra("localPersonal", "true");
+                    if (newKYCList_Address != null && newKYCList_Address.size() != 0) {
+                        intent.putExtra("localAddress", "true");
+                        if (newKYCList_Buisness != null && newKYCList_Buisness.size() != 0) {
+                            intent.putExtra("localBusiness", "true");
+                            if (newKYCList_Verify != null && newKYCList_Verify.size() != 0)
+                                intent.putExtra("localVerify", "true");
+                            else
+                                intent.putExtra("localVerify", "false");
+                        } else
+                            intent.putExtra("localBusiness", "false");
+                    } else
+                        intent.putExtra("localAddress", "false");
+                } else
+                    intent.putExtra("localPersonal", "false");
                 startActivityForResult(intent, 2);
                 break;
             case R.id.verification_btn:
@@ -241,10 +253,22 @@ public class CustomerKYCActivity extends BaseCompactActivity implements RequestH
                 intent.putExtra("localPersonal", "true");
                 intent.putExtra("localAddress", "true");
                 intent.putExtra("localBusiness", "true");
-                if (newKYCList_Verify != null && newKYCList_Verify.size() != 0)
-                    intent.putExtra("localVerify", "true");
-                else
-                    intent.putExtra("localVerify", "false");
+                if (newKYCList_Personal != null && newKYCList_Personal.size() != 0) {
+                    intent.putExtra("localPersonal", "true");
+                    if (newKYCList_Address != null && newKYCList_Address.size() != 0) {
+                        intent.putExtra("localAddress", "true");
+                        if (newKYCList_Buisness != null && newKYCList_Buisness.size() != 0) {
+                            intent.putExtra("localBusiness", "true");
+                            if (newKYCList_Verify != null && newKYCList_Verify.size() != 0)
+                                intent.putExtra("localVerify", "true");
+                            else
+                                intent.putExtra("localVerify", "false");
+                        } else
+                            intent.putExtra("localBusiness", "false");
+                    } else
+                        intent.putExtra("localAddress", "false");
+                } else
+                    intent.putExtra("localPersonal", "false");
                 startActivityForResult(intent, 2);
                 break;
         }
@@ -332,6 +356,13 @@ public class CustomerKYCActivity extends BaseCompactActivity implements RequestH
                             scan_data.setVisibility(View.VISIBLE);
                             sub_btn.setVisibility(View.GONE);
                             kyc_layout_bottom.setVisibility(View.GONE);
+                            findViewById(R.id.adrs_btn).setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
+                            findViewById(R.id.business_btn).setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
+                            findViewById(R.id.verification_btn).setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
+                            findViewById(R.id.prsnl_btn).setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
+                            findViewById(R.id.address_layout).setVisibility(View.GONE);
+                            findViewById(R.id.buisness_layout).setVisibility(View.GONE);
+                            findViewById(R.id.verification_button).setVisibility(View.GONE);
                         }
                         hideKeyboard(CustomerKYCActivity.this);
 
@@ -343,7 +374,7 @@ public class CustomerKYCActivity extends BaseCompactActivity implements RequestH
         }
     }
 
-    private void resumeCall(){
+    private void resumeCall() {
         String condition = "where " + RapipayDB.MOBILENO + "='" + mobileNo + "'" + " AND " + RapipayDB.DOCUMENTTYPE + "='" + spinner_value + "'" + " AND " + RapipayDB.DOCUMENTID + "='" + documentid.getText().toString() + "'";
         newKYCList_Personal = db.getKYCDetails_Personal(condition);
         if (newKYCList_Personal != null && newKYCList_Personal.size() != 0) {
@@ -377,12 +408,20 @@ public class CustomerKYCActivity extends BaseCompactActivity implements RequestH
                     findViewById(R.id.buisness_layout).setVisibility(View.VISIBLE);
             } else
                 findViewById(R.id.address_layout).setVisibility(View.VISIBLE);
-        }else {
+        } else {
             scan_data.setVisibility(View.VISIBLE);
             sub_btn.setVisibility(View.GONE);
             kyc_layout_bottom.setVisibility(View.GONE);
+            findViewById(R.id.adrs_btn).setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
+            findViewById(R.id.business_btn).setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
+            findViewById(R.id.verification_btn).setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
+            findViewById(R.id.prsnl_btn).setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
+            findViewById(R.id.address_layout).setVisibility(View.GONE);
+            findViewById(R.id.buisness_layout).setVisibility(View.GONE);
+            findViewById(R.id.verification_button).setVisibility(View.GONE);
         }
     }
+
     @Override
     public void chechStat(String object) {
 

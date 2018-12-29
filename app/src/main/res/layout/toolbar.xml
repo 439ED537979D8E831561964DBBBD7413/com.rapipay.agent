@@ -58,4 +58,15 @@
         android:scaleType="fitStart"
         android:src="@drawable/reset"
         android:visibility="gone" />
+
+    <ImageView
+        android:id="@+id/delete_all"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="right|center"
+        android:layout_marginRight="5dp"
+        android:onClick="onClick"
+        android:scaleType="fitStart"
+        android:src="@drawable/delete"
+        android:visibility="gone" />
 </android.support.v7.widget.Toolbar>
