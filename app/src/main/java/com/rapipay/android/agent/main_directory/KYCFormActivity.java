@@ -65,7 +65,7 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
 
     public static String formData = null;
     String type, button, mobileNo, persons, scandata = null, documentType = null, documentID = null, customerType;
-    ImageView back_click;
+    ImageView back_click,delete_all;
     TextView input_name, input_number, input_address, input_email, input_comp, select_state, gsin_no, pan_no, city_name, pin_code, document_id;
     ImageView documentfrontimage, documentbackimage, panphoto, selfphoto, shopPhoto, signphoto, passportphotoimage;
     AppCompatButton documentback, documentfront;
@@ -179,6 +179,7 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
         documentback = (AppCompatButton) findViewById(R.id.documentback);
         documentback.setText("Upload " + documentType + " back");
         date1_text.setOnClickListener(toDateClicked);
+        delete_all = (ImageView)findViewById(R.id.delete_all);
         fillPersonal();
         fillAddress();
         fillBusiness();
@@ -211,6 +212,7 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
                     input_email.setEnabled(false);
                     input_comp.setEnabled(false);
                     date1_text.setEnabled(false);
+                    delete_all.setVisibility(View.VISIBLE);
                     mapPersonalData(newKYCList_Personal);
                 }
             }
@@ -251,6 +253,7 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
                     city_name.setEnabled(false);
                     select_state.setEnabled(false);
                     pin_code.setEnabled(false);
+                    delete_all.setVisibility(View.VISIBLE);
                     mapAddressData(newKYCList_Address);
                 }
             }
@@ -308,6 +311,7 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
                         if (!kycMapImage.has("signPhoto"))
                             kycMapImage.put("signPhoto", getBase64(getBitmap((ImageView) findViewById(R.id.signphoto))));
                     }
+                    delete_all.setVisibility(View.VISIBLE);
                 }
             }
         } catch (Exception e) {
@@ -337,6 +341,7 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
                     }
                     pan_no.setEnabled(false);
                     gsin_no.setEnabled(false);
+                    delete_all.setVisibility(View.VISIBLE);
                     mapBusinessData(newKYCList_Business);
                 }
             }
@@ -354,13 +359,21 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
 
+    private void clearVerify(){
+        db.deleteRow(mobileNo,"");
+        finish();
     }
 
     @Override
     public void onClick(View v) {
         try {
             switch (v.getId()) {
+                case R.id.delete_all:
+                    db.deleteRow(mobileNo,"verify");
+                    clearVerify();
+                    break;
                 case R.id.back_click:
                     finish();
                     break;

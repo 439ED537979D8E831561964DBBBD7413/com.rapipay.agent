@@ -282,6 +282,10 @@ public class AgentKYCFragment extends Fragment implements RequestHandler, View.O
                     rv.findViewById(R.id.buisness_layout).setVisibility(View.VISIBLE);
             } else
                 rv.findViewById(R.id.address_layout).setVisibility(View.VISIBLE);
+        }else {
+            scan_data.setVisibility(View.VISIBLE);
+            sub_btn.setVisibility(View.GONE);
+            kyc_layout_bottom.setVisibility(View.GONE);
         }
     }
     public void hideKeyboard(Activity activity) {
@@ -358,6 +362,7 @@ public class AgentKYCFragment extends Fragment implements RequestHandler, View.O
                         } else {
                             scan_data.setVisibility(View.VISIBLE);
                             sub_btn.setVisibility(View.GONE);
+                            kyc_layout_bottom.setVisibility(View.GONE);
                         }
                         hideKeyboard(getActivity());
 

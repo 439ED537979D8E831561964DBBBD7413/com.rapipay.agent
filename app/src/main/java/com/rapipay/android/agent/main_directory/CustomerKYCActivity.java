@@ -331,6 +331,7 @@ public class CustomerKYCActivity extends BaseCompactActivity implements RequestH
                         } else {
                             scan_data.setVisibility(View.VISIBLE);
                             sub_btn.setVisibility(View.GONE);
+                            kyc_layout_bottom.setVisibility(View.GONE);
                         }
                         hideKeyboard(CustomerKYCActivity.this);
 
@@ -376,6 +377,10 @@ public class CustomerKYCActivity extends BaseCompactActivity implements RequestH
                     findViewById(R.id.buisness_layout).setVisibility(View.VISIBLE);
             } else
                 findViewById(R.id.address_layout).setVisibility(View.VISIBLE);
+        }else {
+            scan_data.setVisibility(View.VISIBLE);
+            sub_btn.setVisibility(View.GONE);
+            kyc_layout_bottom.setVisibility(View.GONE);
         }
     }
     @Override

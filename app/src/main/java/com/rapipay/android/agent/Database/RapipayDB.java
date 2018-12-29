@@ -120,6 +120,7 @@ public class RapipayDB extends SQLiteOpenHelper {
         db.execSQL("create table IF NOT EXISTS " + TABLE_IMAGES + " ( " + IMAGE_NAME + " VARCHAR(30) , " + IMAGE_PATH_WL + " BLOB DEFAULT NULL);");
         db.execSQL("create table IF NOT EXISTS " + TABLE_MASTER + " ( " + COLOMN_FRONTID + " VARCHAR(10) , " + COLOMN_SERVICETYPENAME + " VARCHAR(50) , " + COLOMN_DISPLAYNAME + " VARCHAR(50) , " + COLOMN_DISPLAYTYPE + " VARCHAR(50), " + COLOMN_ICON + " BLOB DEFAULT NULL, " + COLOMN_ORDER + " VARCHAR(50), " + IMAGE_TIME_STAMP + " VARCHAR(50));");
     }
+
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 //        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
@@ -130,7 +131,7 @@ public class RapipayDB extends SQLiteOpenHelper {
 //        db.execSQL("DROP TABLE IF EXISTS " + TABLE_TRANSFERLIST);
 //        db.execSQL("DROP TABLE IF EXISTS " + TABLE_PAYERPAYEE);
 //        db.execSQL("DROP TABLE IF EXISTS " + TABLE_FOOTER);
-        if(newVersion>oldVersion){
+        if (newVersion > oldVersion) {
 //            db.execSQL("DROP TABLE IF EXISTS " + TABLE_KYC_PERSONAL);
 //            db.execSQL("DROP TABLE IF EXISTS " + TABLE_KYC_ADDRESS);
 //            db.execSQL("DROP TABLE IF EXISTS " + TABLE_KYC_BUISNESS);
@@ -170,36 +171,40 @@ public class RapipayDB extends SQLiteOpenHelper {
         }
         return list;
     }
+
     boolean flag = false;
+
     public boolean getDetails_Rapi() {
         String selectQuery = "SELECT  * FROM " + TABLE_NAME;
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
         if (cursor.moveToFirst()) {
             flag = true;
-        }else {
+        } else {
             flag = false;
         }
         return flag;
     }
+
     public boolean getDetailsFooter() {
         String selectQuery = "SELECT  * FROM " + TABLE_FOOTER;
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
         if (cursor.moveToFirst()) {
             flag = true;
-        }else {
+        } else {
             flag = false;
         }
         return flag;
     }
+
     public boolean getDetails_Bank() {
         String selectQuery = "SELECT  * FROM " + TABLE_BANK;
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
         if (cursor.moveToFirst()) {
             flag = true;
-        }else {
+        } else {
             flag = false;
         }
         return flag;
@@ -245,6 +250,7 @@ public class RapipayDB extends SQLiteOpenHelper {
         }
         return list;
     }
+
     public ArrayList<ImagePozo> getImageDetails(String condition) {
         ArrayList<ImagePozo> list = new ArrayList<ImagePozo>();
         String selectQuery = "SELECT  * FROM " + TABLE_IMAGES + " " + condition;
@@ -260,17 +266,28 @@ public class RapipayDB extends SQLiteOpenHelper {
         }
         return list;
     }
-    public void deleteRow(String mobileNo)
-    {
+
+    public void deleteRow(String mobileNo, String condition) {
         SQLiteDatabase db = this.getWritableDatabase();
-        String whereClause = RapipayDB.MOBILENO+"=?";
+        String whereClause = RapipayDB.MOBILENO + "=?";
         String whereArgs[] = {mobileNo};
-        db.delete(TABLE_KYC_PERSONAL, whereClause, whereArgs);
-        db.delete(TABLE_KYC_ADDRESS, whereClause, whereArgs);
-        db.delete(TABLE_KYC_BUISNESS, whereClause, whereArgs);
-        db.delete(TABLE_KYC_VERIFICATION, whereClause, whereArgs);
+        if (condition.equalsIgnoreCase("personal"))
+            db.delete(TABLE_KYC_PERSONAL, whereClause, whereArgs);
+        else if (condition.equalsIgnoreCase("address"))
+            db.delete(TABLE_KYC_ADDRESS, whereClause, whereArgs);
+        else if (condition.equalsIgnoreCase("business"))
+            db.delete(TABLE_KYC_BUISNESS, whereClause, whereArgs);
+        else if (condition.equalsIgnoreCase("verify"))
+            db.delete(TABLE_KYC_VERIFICATION, whereClause, whereArgs);
+        else {
+            db.delete(TABLE_KYC_PERSONAL, whereClause, whereArgs);
+            db.delete(TABLE_KYC_ADDRESS, whereClause, whereArgs);
+            db.delete(TABLE_KYC_BUISNESS, whereClause, whereArgs);
+            db.delete(TABLE_KYC_VERIFICATION, whereClause, whereArgs);
+        }
         db.close();
     }
+
     public ArrayList<NewKYCPozo> getKYCDetails_Address(String condition) {
         ArrayList<NewKYCPozo> list = new ArrayList<NewKYCPozo>();
         String selectQuery = "SELECT  * FROM " + TABLE_KYC_ADDRESS + " " + condition;
@@ -296,6 +313,7 @@ public class RapipayDB extends SQLiteOpenHelper {
         }
         return list;
     }
+
     public ArrayList<NewKYCPozo> getKYCDetails_BUISNESS(String condition) {
         ArrayList<NewKYCPozo> list = new ArrayList<NewKYCPozo>();
         String selectQuery = "SELECT  * FROM " + TABLE_KYC_BUISNESS + " " + condition;
@@ -319,6 +337,7 @@ public class RapipayDB extends SQLiteOpenHelper {
         }
         return list;
     }
+
     public ArrayList<NewKYCPozo> getKYCDetails_VERIFY(String condition) {
         ArrayList<NewKYCPozo> list = new ArrayList<NewKYCPozo>();
         String selectQuery = "SELECT  * FROM " + TABLE_KYC_VERIFICATION + " " + condition;
@@ -354,6 +373,7 @@ public class RapipayDB extends SQLiteOpenHelper {
         }
         return list;
     }
+
     public ArrayList<String> geBankIFSC(String condition) {
         ArrayList<String> list = new ArrayList<String>();
         String selectQuery = "SELECT  * FROM " + TABLE_BANK + " " + condition;
@@ -383,7 +403,7 @@ public class RapipayDB extends SQLiteOpenHelper {
 
     public ArrayList<PaymentModePozo> getPaymenttDetails() {
         ArrayList<PaymentModePozo> list = new ArrayList<PaymentModePozo>();
-        list.add(new PaymentModePozo("","Select Payment Mode"));
+        list.add(new PaymentModePozo("", "Select Payment Mode"));
         String selectQuery = "SELECT  * FROM " + TABLE_PAYMENT;
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
@@ -401,7 +421,7 @@ public class RapipayDB extends SQLiteOpenHelper {
     public ArrayList<String> getTransferDetails(String condition) {
         ArrayList<String> list = new ArrayList<String>();
         list.add("Select Transfer Type");
-        String selectQuery = "SELECT  * FROM " + TABLE_TRANSFERLIST  + " " + condition;
+        String selectQuery = "SELECT  * FROM " + TABLE_TRANSFERLIST + " " + condition;
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
         if (cursor.moveToFirst()) {
@@ -415,7 +435,7 @@ public class RapipayDB extends SQLiteOpenHelper {
     public ArrayList<String> getOperatorDetail(String condition) {
         ArrayList<String> list = new ArrayList<String>();
         list.add("Select Operator");
-        String selectQuery = "SELECT  * FROM " + TABLE_OPERATOR  + " " + condition;
+        String selectQuery = "SELECT  * FROM " + TABLE_OPERATOR + " " + condition;
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
         if (cursor.moveToFirst()) {
@@ -446,7 +466,7 @@ public class RapipayDB extends SQLiteOpenHelper {
 
     public ArrayList<HeaderePozo> getFooterDetail(String condition) {
         ArrayList<HeaderePozo> list = new ArrayList<HeaderePozo>();
-        String selectQuery = "SELECT  * FROM " + TABLE_FOOTER  + " " + condition;
+        String selectQuery = "SELECT  * FROM " + TABLE_FOOTER + " " + condition;
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
         if (cursor.moveToFirst()) {
@@ -465,7 +485,7 @@ public class RapipayDB extends SQLiteOpenHelper {
 
     public ArrayList<MasterPozo> getMasterDetail(String condition) {
         ArrayList<MasterPozo> list = new ArrayList<MasterPozo>();
-        String selectQuery = "SELECT  * FROM " + TABLE_MASTER  + " " + condition;
+        String selectQuery = "SELECT  * FROM " + TABLE_MASTER + " " + condition;
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
         if (cursor.moveToFirst()) {
