@@ -99,7 +99,7 @@ public class PendingKyc extends Fragment implements RequestHandler {
     }
 
     private void loadApi() {
-        new AsyncPostMethod(WebConfig.EKYC, request_user().toString(), headerData, PendingKyc.this, getActivity()).execute();
+        new AsyncPostMethod(WebConfig.EKYC_FORWARD, request_user().toString(), headerData, PendingKyc.this, getActivity()).execute();
     }
 
     public JSONObject request_user() {

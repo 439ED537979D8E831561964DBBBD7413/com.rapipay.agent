@@ -409,8 +409,8 @@ public class CustomerKYCActivity extends BaseCompactActivity implements RequestH
             } else
                 findViewById(R.id.address_layout).setVisibility(View.VISIBLE);
         } else {
-            scan_data.setVisibility(View.VISIBLE);
-            sub_btn.setVisibility(View.GONE);
+            scan_data.setVisibility(View.GONE);
+            sub_btn.setVisibility(View.VISIBLE);
             kyc_layout_bottom.setVisibility(View.GONE);
             findViewById(R.id.adrs_btn).setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
             findViewById(R.id.business_btn).setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));

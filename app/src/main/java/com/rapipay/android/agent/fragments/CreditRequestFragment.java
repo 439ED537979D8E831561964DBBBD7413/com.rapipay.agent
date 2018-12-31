@@ -3,6 +3,7 @@ package com.rapipay.android.agent.fragments;
 import android.Manifest;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -46,6 +47,9 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -344,7 +348,7 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
                 } else if (date1_text.getText().toString().isEmpty()) {
                     date1_text.setError("Please select date");
                     date1_text.requestFocus();
-                } else if (!paymode.isEmpty() && !filePath.isEmpty() && !imageBase64.isEmpty())
+                } else if ((!paymode.isEmpty() && !imageBase64.isEmpty()) || !filePath.isEmpty())
                     new AsyncPostMethod(WebConfig.CRNF, credit_request().toString(), headerData, CreditRequestFragment.this, getActivity()).execute();
                 else
                     Toast.makeText(getActivity(), "Please select mandatory fields", Toast.LENGTH_SHORT).show();
@@ -402,6 +406,7 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
             dialog.show();
         }
     };
+    Uri imageUri;
 
     private void selectImage() {
         final CharSequence[] items = {"Capture Image", "Choose from Gallery", "Cancel"};
@@ -412,8 +417,16 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
             @Override
             public void onClick(DialogInterface dialog, int item) {
                 if (items[item].equals("Capture Image")) {
-                    Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    startActivityForResult(cameraIntent, CAMERA_REQUEST);
+                    ContentValues values = new ContentValues();
+                    values.put(MediaStore.Images.Media.TITLE, "New Picture");
+                    values.put(MediaStore.Images.Media.DESCRIPTION, "From your Camera");
+                    imageUri = getActivity().getContentResolver().insert(
+                            MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+                    startActivityForResult(intent, CAMERA_REQUEST);
+//                    Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+//                    startActivityForResult(cameraIntent, CAMERA_REQUEST);
 
                 } else if (items[item].equals("Choose from Gallery")) {
                     Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
@@ -446,21 +459,56 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
 
         return result;
     }
+    private void setPic(String mCurrentPhotoPath) {
+        // Get the dimensions of the View
+        int targetW = image.getWidth();
+        int targetH = image.getHeight();
 
+        // Get the dimensions of the bitmap
+        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+        bmOptions.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
+        int photoW = bmOptions.outWidth;
+        int photoH = bmOptions.outHeight;
+
+        // Determine how much to scale down the image
+        int scaleFactor = Math.min(photoW/targetW, photoH/targetH);
+
+        // Decode the image file into a Bitmap sized to fill the View
+        bmOptions.inJustDecodeBounds = false;
+        bmOptions.inSampleSize = scaleFactor;
+        bmOptions.inPurgeable = true;
+
+        Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
+        imageBase64 = getBytesFromBitmap(addWaterMark(bitmap));
+//        mImageView.setImageBitmap(bitmap);
+    }
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        imageBase64="";
+        image.setText("");
         if (resultCode == RESULT_OK) {
             if (requestCode == CAMERA_REQUEST) {
-                Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
-                imageBase64 = getBytesFromBitmap(addWaterMark(thumbnail));
-                SimpleDateFormat formatter = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
-                Date now = new Date();
-                File destination = new File(Environment.getExternalStorageDirectory(),
-                        formatter.format(now) + ".jpg");
-                filePath = destination.toString();
-                String[] splits = filePath.split("\\/");
-                image.setText(splits[4]);
-                image.setError(null);
+                try {
+                    Bitmap thumbnails = MediaStore.Images.Media.getBitmap(
+                            getActivity().getContentResolver(), imageUri);
+                    String imageurl = getRealPathFromURI(imageUri);
+                    String[] splits = imageurl.split("\\/");
+                    setPic(imageurl);
+                    image.setText(splits[5]);
+                    image.setError(null);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+//                Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
+//                imageBase64 = getBytesFromBitmap(addWaterMark(thumbnail));
+//                SimpleDateFormat formatter = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
+//                Date now = new Date();
+//                File destination = new File(Environment.getExternalStorageDirectory(),
+//                        formatter.format(now) + ".jpg");
+//                filePath = destination.toString();
+//                String[] splits = filePath.split("\\/");
+
             } else if (requestCode == SELECT_FILE) {
                 Uri uri = data.getData();
                 Bitmap thumbnail = null;
@@ -484,6 +532,15 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
                 image.setError(null);
             }
         }
+    }
+
+    public String getRealPathFromURI(Uri contentUri) {
+        String[] proj = {MediaStore.Images.Media.DATA};
+        Cursor cursor = getActivity().getContentResolver().query(contentUri, proj, null, null, null);
+        int column_index = cursor
+                .getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        return cursor.getString(column_index);
     }
 
     public JSONObject credit_request() {
