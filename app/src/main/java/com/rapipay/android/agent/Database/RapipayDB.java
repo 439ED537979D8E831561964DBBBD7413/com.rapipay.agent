@@ -17,7 +17,7 @@ import com.rapipay.android.agent.Model.RapiPayPozo;
 
 public class RapipayDB extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 17;
+    private static final int DATABASE_VERSION = 22;
     public static final String DATABASE_NAME = "RapiPay.db";
     public static final String TABLE_NAME = "RapiPayDefault";
     public static final String COLOMN_SESSION = "session";
@@ -65,6 +65,7 @@ public class RapipayDB extends SQLiteOpenHelper {
     public static final String COLOMN_OPERATORDATA = "operatorsData";
     public static final String COLOMN_PATH = "path";
     public static final String IMAGE_TIME_STAMP = "timeStamp";
+    public static final String SCANTYPE = "scantype";
 
     public static final String MOBILENO = "mobileno";
     public static final String USER_NAME = "username";
@@ -81,6 +82,8 @@ public class RapipayDB extends SQLiteOpenHelper {
     public static final String DOCUMENTID = "documentID";
     public static final String DOCUMENTTYPE = "documentType";
     public static final String DOCUMENTFRONT_IMAGENAME = "frontimage";
+    public static final String SCANIMAGE = "scanImagename";
+    public static final String SCANIMAGEPATH = "scanImagePath";
     public static final String DOCUMENTBACK_IMAGENAME = "backimage";
     public static final String ADDRESS_CLICKED = "addressclicked";
     public static final String DOCUMENTFRONT_PHOTO = "frontPhoto";
@@ -113,10 +116,10 @@ public class RapipayDB extends SQLiteOpenHelper {
         db.execSQL("create table IF NOT EXISTS " + TABLE_TRANSFERLIST + " ( " + COLOMN_OPERATORID + " VARCHAR(10) , " + COLOMN_OPERATORVALUE + " VARCHAR(50) , " + COLOMN_OPERATORDATA + " VARCHAR(50));");
         db.execSQL("create table IF NOT EXISTS " + TABLE_PAYERPAYEE + " ( " + COLOMN_OPERATORID + " VARCHAR(10) , " + COLOMN_OPERATORVALUE + " VARCHAR(50) , " + COLOMN_OPERATORDATA + " VARCHAR(50));");
         db.execSQL("create table IF NOT EXISTS " + TABLE_FOOTER + " ( " + COLOMN_OPERATORID + " VARCHAR(10) , " + COLOMN_OPERATORVALUE + " VARCHAR(50) , " + COLOMN_OPERATORDATA + " VARCHAR(50), " + COLOMN_PATH + " BLOB DEFAULT NULL, " + IMAGE_TIME_STAMP + " VARCHAR(50));");
-        db.execSQL("create table IF NOT EXISTS " + TABLE_KYC_PERSONAL + " ( " + MOBILENO + " VARCHAR(10) , " + USER_NAME + " VARCHAR(100) , " + DOB + " VARCHAR(12), " + EMAILID + " VARCHAR(70), " + COMPANY_NAME + " VARCHAR(50), " + PASSPORT_PHOTO + " BLOB DEFAULT NULL, " + PERSONAL_CLICKED + " VARCHAR(10), " + DOCUMENTTYPE + " VARCHAR(20), " + DOCUMENTID + " VARCHAR(15), " + IMAGE_NAME + " VARCHAR(30));");
-        db.execSQL("create table IF NOT EXISTS " + TABLE_KYC_ADDRESS + " ( " + MOBILENO + " VARCHAR(10) , " + ADDRESS + " VARCHAR(100) , " + CITY + " VARCHAR(20), " + STATE + " VARCHAR(20), " + PINCODE + " VARCHAR(10), " + DOCUMENTFRONT_IMAGENAME + " VARCHAR(30), " + DOCUMENTBACK_IMAGENAME + " VARCHAR(30), " + ADDRESS_CLICKED + " VARCHAR(10), " + DOCUMENTFRONT_PHOTO + " BLOB DEFAULT NULL, " + DOCUMENTBACK_PHOTO + " BLOB DEFAULT NULL, " + DOCUMENTTYPE + " VARCHAR(20), " + DOCUMENTID + " VARCHAR(15));");
-        db.execSQL("create table IF NOT EXISTS " + TABLE_KYC_BUISNESS + " ( " + MOBILENO + " VARCHAR(10) , " + PANNUMBER + " VARCHAR(20) , " + GSTINNUMBER + " VARCHAR(20), " + PAN_PHOTO_IMAGENAME + " VARCHAR(30), " + SHOP_PHOTO_IMAGENAME + " VARCHAR(100), " + BUISNESS_CLICKED + " VARCHAR(10), " + PAN_PHOTO + " BLOB DEFAULT NULL, " + SHOP_PHOTO + " BLOB DEFAULT NULL, " + DOCUMENTTYPE + " VARCHAR(20), " + DOCUMENTID + " VARCHAR(15));");
-        db.execSQL("create table IF NOT EXISTS " + TABLE_KYC_VERIFICATION + " ( " + MOBILENO + " VARCHAR(10) , " + SELF_PHOTO_IMAGENAME + " VARCHAR(100), " + SIGN_PHOTO_IMAGENAME + " VARCHAR(100), " + VERIFY_CLICKED + " VARCHAR(10), " + SELF_PHOTO + " BLOB DEFAULT NULL, " + SIGN_PHOTO + " BLOB DEFAULT NULL, " + DOCUMENTTYPE + " VARCHAR(20), " + DOCUMENTID + " VARCHAR(15));");
+        db.execSQL("create table IF NOT EXISTS " + TABLE_KYC_PERSONAL + " ( " + MOBILENO + " VARCHAR(10) , " + USER_NAME + " VARCHAR(100) , " + DOB + " VARCHAR(12), " + EMAILID + " VARCHAR(70), " + COMPANY_NAME + " VARCHAR(50), " + PASSPORT_PHOTO + " BLOB DEFAULT NULL, " + SCANIMAGE + " VARCHAR(30), " + SCANIMAGEPATH + " VARCHAR(30), " + PERSONAL_CLICKED + " VARCHAR(10), " + DOCUMENTTYPE + " VARCHAR(20), " + DOCUMENTID + " VARCHAR(15), " + IMAGE_NAME + " VARCHAR(30),"+ SCANTYPE +" VARCHAR(10));");
+        db.execSQL("create table IF NOT EXISTS " + TABLE_KYC_ADDRESS + " ( " + MOBILENO + " VARCHAR(10) , " + ADDRESS + " VARCHAR(100) , " + CITY + " VARCHAR(20), " + STATE + " VARCHAR(20), " + PINCODE + " VARCHAR(10), " + DOCUMENTFRONT_IMAGENAME + " VARCHAR(30), " + DOCUMENTBACK_IMAGENAME + " VARCHAR(30), " + ADDRESS_CLICKED + " VARCHAR(10), " + DOCUMENTFRONT_PHOTO + " BLOB DEFAULT NULL, " + DOCUMENTBACK_PHOTO + " VARCHAR(50), " + DOCUMENTTYPE + " VARCHAR(20), " + DOCUMENTID + " VARCHAR(15));");
+        db.execSQL("create table IF NOT EXISTS " + TABLE_KYC_BUISNESS + " ( " + MOBILENO + " VARCHAR(10) , " + PANNUMBER + " VARCHAR(20) , " + GSTINNUMBER + " VARCHAR(20), " + PAN_PHOTO_IMAGENAME + " VARCHAR(30), " + SHOP_PHOTO_IMAGENAME + " VARCHAR(100), " + BUISNESS_CLICKED + " VARCHAR(10), " + PAN_PHOTO + " BLOB DEFAULT NULL, " + SHOP_PHOTO + " VARCHAR(30), " + DOCUMENTTYPE + " VARCHAR(20), " + DOCUMENTID + " VARCHAR(15));");
+        db.execSQL("create table IF NOT EXISTS " + TABLE_KYC_VERIFICATION + " ( " + MOBILENO + " VARCHAR(10) , " + SELF_PHOTO_IMAGENAME + " VARCHAR(100), " + SIGN_PHOTO_IMAGENAME + " VARCHAR(100), " + VERIFY_CLICKED + " VARCHAR(10), " + SELF_PHOTO + " BLOB DEFAULT NULL, " + SIGN_PHOTO + " VARCHAR(30), " + DOCUMENTTYPE + " VARCHAR(20), " + DOCUMENTID + " VARCHAR(15));");
         db.execSQL("create table IF NOT EXISTS " + TABLE_IMAGES + " ( " + IMAGE_NAME + " VARCHAR(30) , " + IMAGE_PATH_WL + " BLOB DEFAULT NULL);");
         db.execSQL("create table IF NOT EXISTS " + TABLE_MASTER + " ( " + COLOMN_FRONTID + " VARCHAR(10) , " + COLOMN_SERVICETYPENAME + " VARCHAR(50) , " + COLOMN_DISPLAYNAME + " VARCHAR(50) , " + COLOMN_DISPLAYTYPE + " VARCHAR(50), " + COLOMN_ICON + " BLOB DEFAULT NULL, " + COLOMN_ORDER + " VARCHAR(50), " + IMAGE_TIME_STAMP + " VARCHAR(50));");
     }
@@ -132,18 +135,18 @@ public class RapipayDB extends SQLiteOpenHelper {
 //        db.execSQL("DROP TABLE IF EXISTS " + TABLE_PAYERPAYEE);
 //        db.execSQL("DROP TABLE IF EXISTS " + TABLE_FOOTER);
         if (newVersion > oldVersion) {
-//            db.execSQL("DROP TABLE IF EXISTS " + TABLE_KYC_PERSONAL);
-//            db.execSQL("DROP TABLE IF EXISTS " + TABLE_KYC_ADDRESS);
-//            db.execSQL("DROP TABLE IF EXISTS " + TABLE_KYC_BUISNESS);
-//            db.execSQL("DROP TABLE IF EXISTS " + TABLE_KYC_VERIFICATION);
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_KYC_PERSONAL);
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_KYC_ADDRESS);
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_KYC_BUISNESS);
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_KYC_VERIFICATION);
 //            db.execSQL("DROP TABLE IF EXISTS " + TABLE_IMAGES);
-            db.execSQL("DROP TABLE IF EXISTS " + TABLE_FOOTER);
+//            db.execSQL("DROP TABLE IF EXISTS " + TABLE_FOOTER);
             db.execSQL("create table IF NOT EXISTS " + TABLE_MASTER + " ( " + COLOMN_FRONTID + " VARCHAR(10) , " + COLOMN_SERVICETYPENAME + " VARCHAR(50) , " + COLOMN_DISPLAYNAME + " VARCHAR(50) , " + COLOMN_DISPLAYTYPE + " VARCHAR(50), " + COLOMN_ICON + " BLOB DEFAULT NULL, " + COLOMN_ORDER + " VARCHAR(50), " + IMAGE_TIME_STAMP + " VARCHAR(50));");
             db.execSQL("create table IF NOT EXISTS " + TABLE_FOOTER + " ( " + COLOMN_OPERATORID + " VARCHAR(10) , " + COLOMN_OPERATORVALUE + " VARCHAR(50) , " + COLOMN_OPERATORDATA + " VARCHAR(50), " + COLOMN_PATH + " BLOB DEFAULT NULL, " + IMAGE_TIME_STAMP + " VARCHAR(50));");
-            db.execSQL("create table IF NOT EXISTS " + TABLE_KYC_PERSONAL + " ( " + MOBILENO + " VARCHAR(10) , " + USER_NAME + " VARCHAR(100) , " + DOB + " VARCHAR(12), " + EMAILID + " VARCHAR(70), " + COMPANY_NAME + " VARCHAR(50), " + PASSPORT_PHOTO + " BLOB DEFAULT NULL, " + PERSONAL_CLICKED + " VARCHAR(10), " + DOCUMENTTYPE + " VARCHAR(20), " + DOCUMENTID + " VARCHAR(15), " + IMAGE_NAME + " VARCHAR(30));");
-            db.execSQL("create table IF NOT EXISTS " + TABLE_KYC_ADDRESS + " ( " + MOBILENO + " VARCHAR(10) , " + ADDRESS + " VARCHAR(100) , " + CITY + " VARCHAR(20), " + STATE + " VARCHAR(20), " + PINCODE + " VARCHAR(10), " + DOCUMENTFRONT_IMAGENAME + " VARCHAR(30), " + DOCUMENTBACK_IMAGENAME + " VARCHAR(30), " + ADDRESS_CLICKED + " VARCHAR(10), " + DOCUMENTFRONT_PHOTO + " BLOB DEFAULT NULL, " + DOCUMENTBACK_PHOTO + " BLOB DEFAULT NULL, " + DOCUMENTTYPE + " VARCHAR(20), " + DOCUMENTID + " VARCHAR(15));");
-            db.execSQL("create table IF NOT EXISTS " + TABLE_KYC_BUISNESS + " ( " + MOBILENO + " VARCHAR(10) , " + PANNUMBER + " VARCHAR(20) , " + GSTINNUMBER + " VARCHAR(20), " + PAN_PHOTO_IMAGENAME + " VARCHAR(30), " + SHOP_PHOTO_IMAGENAME + " VARCHAR(100), " + BUISNESS_CLICKED + " VARCHAR(10), " + PAN_PHOTO + " BLOB DEFAULT NULL, " + SHOP_PHOTO + " BLOB DEFAULT NULL, " + DOCUMENTTYPE + " VARCHAR(20), " + DOCUMENTID + " VARCHAR(15));");
-            db.execSQL("create table IF NOT EXISTS " + TABLE_KYC_VERIFICATION + " ( " + MOBILENO + " VARCHAR(10) , " + SELF_PHOTO_IMAGENAME + " VARCHAR(100), " + SIGN_PHOTO_IMAGENAME + " VARCHAR(100), " + VERIFY_CLICKED + " VARCHAR(10), " + SELF_PHOTO + " BLOB DEFAULT NULL, " + SIGN_PHOTO + " BLOB DEFAULT NULL, " + DOCUMENTTYPE + " VARCHAR(20), " + DOCUMENTID + " VARCHAR(15));");
+            db.execSQL("create table IF NOT EXISTS " + TABLE_KYC_PERSONAL + " ( " + MOBILENO + " VARCHAR(10) , " + USER_NAME + " VARCHAR(100) , " + DOB + " VARCHAR(12), " + EMAILID + " VARCHAR(70), " + COMPANY_NAME + " VARCHAR(50), " + PASSPORT_PHOTO + " BLOB DEFAULT NULL, " + SCANIMAGE + " VARCHAR(30), " + SCANIMAGEPATH + " VARCHAR(30), " + PERSONAL_CLICKED + " VARCHAR(10), " + DOCUMENTTYPE + " VARCHAR(20), " + DOCUMENTID + " VARCHAR(15), " + IMAGE_NAME + " VARCHAR(30),"+ SCANTYPE +" VARCHAR(10));");
+            db.execSQL("create table IF NOT EXISTS " + TABLE_KYC_ADDRESS + " ( " + MOBILENO + " VARCHAR(10) , " + ADDRESS + " VARCHAR(100) , " + CITY + " VARCHAR(20), " + STATE + " VARCHAR(20), " + PINCODE + " VARCHAR(10), " + DOCUMENTFRONT_IMAGENAME + " VARCHAR(30), " + DOCUMENTBACK_IMAGENAME + " VARCHAR(30), " + ADDRESS_CLICKED + " VARCHAR(10), " + DOCUMENTFRONT_PHOTO + " BLOB DEFAULT NULL, " + DOCUMENTBACK_PHOTO + " VARCHAR(50), " + DOCUMENTTYPE + " VARCHAR(20), " + DOCUMENTID + " VARCHAR(15));");
+            db.execSQL("create table IF NOT EXISTS " + TABLE_KYC_BUISNESS + " ( " + MOBILENO + " VARCHAR(10) , " + PANNUMBER + " VARCHAR(20) , " + GSTINNUMBER + " VARCHAR(20), " + PAN_PHOTO_IMAGENAME + " VARCHAR(30), " + SHOP_PHOTO_IMAGENAME + " VARCHAR(100), " + BUISNESS_CLICKED + " VARCHAR(10), " + PAN_PHOTO + " BLOB DEFAULT NULL, " + SHOP_PHOTO + " VARCHAR(30), " + DOCUMENTTYPE + " VARCHAR(20), " + DOCUMENTID + " VARCHAR(15));");
+            db.execSQL("create table IF NOT EXISTS " + TABLE_KYC_VERIFICATION + " ( " + MOBILENO + " VARCHAR(10) , " + SELF_PHOTO_IMAGENAME + " VARCHAR(100), " + SIGN_PHOTO_IMAGENAME + " VARCHAR(100), " + VERIFY_CLICKED + " VARCHAR(10), " + SELF_PHOTO + " BLOB DEFAULT NULL, " + SIGN_PHOTO + " VARCHAR(30), " + DOCUMENTTYPE + " VARCHAR(20), " + DOCUMENTID + " VARCHAR(15));");
             db.execSQL("create table IF NOT EXISTS " + TABLE_IMAGES + " ( " + IMAGE_NAME + " VARCHAR(30) , " + IMAGE_PATH_WL + " BLOB DEFAULT NULL);");
         }
 //        onCreate(db);
@@ -232,7 +235,7 @@ public class RapipayDB extends SQLiteOpenHelper {
         String selectQuery = "SELECT  * FROM " + TABLE_KYC_PERSONAL + " " + condition;
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
-        if (cursor.moveToFirst()) {
+        if (cursor.moveToFirst()&& cursor.getCount() > 0) {
             do {
                 NewKYCPozo payPozo = new NewKYCPozo();
                 payPozo.setMOBILENO(cursor.getString(0));
@@ -241,10 +244,13 @@ public class RapipayDB extends SQLiteOpenHelper {
                 payPozo.setEMAILID(cursor.getString(3));
                 payPozo.setCOMPANY_NAME(cursor.getString(4));
                 payPozo.setPASSPORT_PHOTO(cursor.getBlob(5));
-                payPozo.setPERSONAL_CLICKED(cursor.getString(6));
-                payPozo.setDOCUMENTTYPE(cursor.getString(7));
-                payPozo.setDOCUMENTID(cursor.getString(8));
-                payPozo.setIMAGE_NAME(cursor.getString(9));
+                payPozo.setSCANIMAGENAME(cursor.getString(6));
+                payPozo.setSCANIMAGEPATH(cursor.getString(7));
+                payPozo.setPERSONAL_CLICKED(cursor.getString(8));
+                payPozo.setDOCUMENTTYPE(cursor.getString(9));
+                payPozo.setDOCUMENTID(cursor.getString(10));
+                payPozo.setIMAGE_NAME(cursor.getString(11));
+                payPozo.setSCANTYPE(cursor.getString(12));
                 list.add(payPozo);
             } while (cursor.moveToNext());
         }
@@ -293,7 +299,7 @@ public class RapipayDB extends SQLiteOpenHelper {
         String selectQuery = "SELECT  * FROM " + TABLE_KYC_ADDRESS + " " + condition;
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
-        if (cursor.moveToFirst()) {
+        if (cursor.moveToFirst()&& cursor.getCount() > 0) {
             do {
                 NewKYCPozo payPozo = new NewKYCPozo();
                 payPozo.setMOBILENO(cursor.getString(0));
@@ -305,7 +311,7 @@ public class RapipayDB extends SQLiteOpenHelper {
                 payPozo.setDOCUMENTBACK_IMAGENAME(cursor.getString(6));
                 payPozo.setADDRESS_CLICKED(cursor.getString(7));
                 payPozo.setDOCUMENTFRONT_PHOTO(cursor.getBlob(8));
-                payPozo.setDOCUMENTBACK_PHOTO(cursor.getBlob(9));
+                payPozo.setDOCUMENTBACK_PHOTO(cursor.getString(9));
                 payPozo.setDOCUMENTTYPE(cursor.getString(10));
                 payPozo.setDOCUMENTID(cursor.getString(11));
                 list.add(payPozo);
@@ -319,7 +325,7 @@ public class RapipayDB extends SQLiteOpenHelper {
         String selectQuery = "SELECT  * FROM " + TABLE_KYC_BUISNESS + " " + condition;
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
-        if (cursor.moveToFirst()) {
+        if (cursor.moveToFirst()&& cursor.getCount() > 0) {
             do {
                 NewKYCPozo payPozo = new NewKYCPozo();
                 payPozo.setMOBILENO(cursor.getString(0));
@@ -329,7 +335,7 @@ public class RapipayDB extends SQLiteOpenHelper {
                 payPozo.setSHOP_PHOTO_IMAGENAME(cursor.getString(4));
                 payPozo.setBUISNESS_CLICKED(cursor.getString(5));
                 payPozo.setPAN_PHOTO(cursor.getBlob(6));
-                payPozo.setSHOP_PHOTO(cursor.getBlob(7));
+                payPozo.setSHOP_PHOTO(cursor.getString(7));
                 payPozo.setDOCUMENTTYPE(cursor.getString(8));
                 payPozo.setDOCUMENTID(cursor.getString(9));
                 list.add(payPozo);
@@ -343,7 +349,7 @@ public class RapipayDB extends SQLiteOpenHelper {
         String selectQuery = "SELECT  * FROM " + TABLE_KYC_VERIFICATION + " " + condition;
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
-        if (cursor.moveToFirst()) {
+        if (cursor.moveToFirst() && cursor.getCount() > 0) {
             do {
                 NewKYCPozo payPozo = new NewKYCPozo();
                 payPozo.setMOBILENO(cursor.getString(0));
@@ -351,7 +357,7 @@ public class RapipayDB extends SQLiteOpenHelper {
                 payPozo.setSIGN_PHOTO_IMAGENAME(cursor.getString(2));
                 payPozo.setVERIFY_CLICKED(cursor.getString(3));
                 payPozo.setSELF_PHOTO(cursor.getBlob(4));
-                payPozo.setSIGN_PHOTO(cursor.getBlob(5));
+                payPozo.setSIGN_PHOTO(cursor.getString(5));
                 payPozo.setDOCUMENTTYPE(cursor.getString(6));
                 payPozo.setDOCUMENTID(cursor.getString(7));
                 list.add(payPozo);

@@ -67,7 +67,7 @@ public class ImageUtils {
     }
 
     public static boolean commonAddress(String value) {
-        String regex = "^[A-Za-z0-9]+(([\\/,. -][A-Za-z0-9 ])?[A-Za-z0-9 ]*)*$";
+        String regex = "^[a-zA-Z0-9\\\\s ()&#_',./-]*$";
         if (value.matches(regex))
             return true;
         else

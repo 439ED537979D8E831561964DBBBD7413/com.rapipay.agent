@@ -24,6 +24,8 @@ public class BaseFragment extends Fragment {
     protected AlertDialog.Builder dialog;
     protected AlertDialog alertDialog, newdialog;
     CustomInterface anInterface;
+    protected  boolean scan = false;
+    protected  String TYPE,customerType;
 
     @Nullable
     @Override

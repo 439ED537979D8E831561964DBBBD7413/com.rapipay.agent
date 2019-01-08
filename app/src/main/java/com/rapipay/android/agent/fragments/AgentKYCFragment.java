@@ -2,12 +2,13 @@ package com.rapipay.android.agent.fragments;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.AppCompatButton;
 import android.text.InputFilter;
 import android.text.InputType;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +30,7 @@ import com.rapipay.android.agent.main_directory.BarcodeActivity;
 import com.rapipay.android.agent.main_directory.KYCFormActivity;
 import com.rapipay.android.agent.utils.AsyncPostMethod;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
+import com.rapipay.android.agent.utils.BaseFragment;
 import com.rapipay.android.agent.utils.GenerateChecksum;
 import com.rapipay.android.agent.utils.ImageUtils;
 import com.rapipay.android.agent.utils.WebConfig;
@@ -37,24 +39,29 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.XML;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 
 import static android.app.Activity.RESULT_OK;
 
-public class AgentKYCFragment extends Fragment implements RequestHandler, View.OnClickListener {
+public class AgentKYCFragment extends BaseFragment implements RequestHandler, View.OnClickListener {
     JSONObject jsonObject = null;
     protected ArrayList<RapiPayPozo> list;
+    public static Bitmap bitmap_trans = null;
+    public static String byteBase64;
     protected Long tsLong;
     EditText mobile_no, documentid;
     private LinearLayout kyc_layout_bottom, scan_data;
     AppCompatButton sub_btn;
     Spinner spinner;
     String[] items = new String[]{"Select Document Type", "Aadhar Card", "Voter Id Card", "Driving License", "Passport"};
-    String spinner_value = "", TYPE, customerType;
+    String spinner_value = "";
     String type = "MANUAL";
-    private ArrayList<NewKYCPozo> newKYCList_Personal = null,newKYCList_Address=null,newKYCList_Buisness=null,newKYCList_Verify=null;
+    private ArrayList<NewKYCPozo> newKYCList_Personal = null, newKYCList_Address = null, newKYCList_Buisness = null, newKYCList_Verify = null;
     protected String headerData = (WebConfig.BASIC_USERID + ":" + WebConfig.BASIC_PASSWORD);
-    private  View rv=null;
+    private View rv = null;
+
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
@@ -68,6 +75,8 @@ public class AgentKYCFragment extends Fragment implements RequestHandler, View.O
     }
 
     public void initialize(View rv) {
+        bitmap_trans = null;
+        byteBase64 = "";
         mobile_no = (EditText) rv.findViewById(R.id.mobile_no);
         documentid = (EditText) rv.findViewById(R.id.documentid);
         kyc_layout_bottom = (LinearLayout) rv.findViewById(R.id.kyc_layout_bottom);
@@ -91,8 +100,17 @@ public class AgentKYCFragment extends Fragment implements RequestHandler, View.O
                     InputFilter[] filterArray = new InputFilter[1];
                     filterArray[0] = new InputFilter.LengthFilter(12);
                     documentid.setFilters(filterArray);
-                } else
+                } else if (position == 2) {
                     documentid.setInputType(InputType.TYPE_CLASS_TEXT);
+                    InputFilter[] filterArray = new InputFilter[1];
+                    filterArray[0] = new InputFilter.LengthFilter(10);
+                    documentid.setFilters(filterArray);
+                } else{
+                    documentid.setInputType(InputType.TYPE_CLASS_TEXT);
+                    InputFilter[] filterArray = new InputFilter[1];
+                    filterArray[0] = new InputFilter.LengthFilter(20);
+                    documentid.setFilters(filterArray);
+                }
             }
 
             @Override
@@ -120,11 +138,17 @@ public class AgentKYCFragment extends Fragment implements RequestHandler, View.O
                     mobile_no.requestFocus();
                 } else if (spinner_value.isEmpty())
                     Toast.makeText(getActivity(), "Please Select document type", Toast.LENGTH_SHORT).show();
-                else if (documentid.getText().toString().isEmpty()) {
+                else if (spinner_value.equalsIgnoreCase("Aadhar Card") && (documentid.getText().toString().isEmpty() || documentid.getText().toString().length() != 12)) {
+                        documentid.setError("Please enter valid data");
+                        documentid.requestFocus();
+                } else if (spinner_value.equalsIgnoreCase("Voter Id Card") && (documentid.getText().toString().isEmpty() || documentid.getText().toString().length() != 10)) {
+                        documentid.setError("Please enter valid data");
+                        documentid.requestFocus();
+                } else if (documentid.getText().toString().isEmpty()) {
                     documentid.setError("Please enter valid data");
                     documentid.requestFocus();
                 } else
-                    new AsyncPostMethod(WebConfig.EKYC_FORWARD, request_user(customerType).toString(), headerData,AgentKYCFragment.this, getActivity()).execute();
+                    new AsyncPostMethod(WebConfig.EKYC_FORWARD, request_user(customerType).toString(), headerData, AgentKYCFragment.this, getActivity()).execute();
                 break;
             case R.id.scan_btn:
                 type = "SCAN";
@@ -142,10 +166,12 @@ public class AgentKYCFragment extends Fragment implements RequestHandler, View.O
                 documentid.setEnabled(false);
                 spinner.setEnabled(false);
                 spinner.setClickable(false);
+                scan_data.setVisibility(View.GONE);
                 jsonObject = null;
                 kyc_layout_bottom.setVisibility(View.VISIBLE);
                 break;
             case R.id.prsnl_btn:
+                scan = false;
                 intent = new Intent(getActivity(), KYCFormActivity.class);
                 intent.putExtra("type", type);
                 intent.putExtra("persons", TYPE);
@@ -161,11 +187,11 @@ public class AgentKYCFragment extends Fragment implements RequestHandler, View.O
                                 intent.putExtra("localVerify", "true");
                             else
                                 intent.putExtra("localVerify", "false");
-                        }else
+                        } else
                             intent.putExtra("localBusiness", "false");
-                    }else
+                    } else
                         intent.putExtra("localAddress", "false");
-                }else
+                } else
                     intent.putExtra("localPersonal", "false");
                 intent.putExtra("mobileNo", mobile_no.getText().toString());
                 if (jsonObject != null) {
@@ -268,11 +294,13 @@ public class AgentKYCFragment extends Fragment implements RequestHandler, View.O
     @Override
     public void onResume() {
         super.onResume();
-        resumeCall();
+        if (!scan) {
+            resumeCall();
+        }
     }
 
 
-    private void resumeCall(){
+    private void resumeCall() {
         String condition = "where " + RapipayDB.MOBILENO + "='" + mobile_no.getText().toString() + "'" + " AND " + RapipayDB.DOCUMENTTYPE + "='" + spinner_value + "'" + " AND " + RapipayDB.DOCUMENTID + "='" + documentid.getText().toString() + "'";
         newKYCList_Personal = BaseCompactActivity.db.getKYCDetails_Personal(condition);
         if (newKYCList_Personal != null && newKYCList_Personal.size() != 0) {
@@ -306,7 +334,7 @@ public class AgentKYCFragment extends Fragment implements RequestHandler, View.O
                     rv.findViewById(R.id.buisness_layout).setVisibility(View.VISIBLE);
             } else
                 rv.findViewById(R.id.address_layout).setVisibility(View.VISIBLE);
-        }else {
+        } else {
             scan_data.setVisibility(View.GONE);
             sub_btn.setVisibility(View.VISIBLE);
             kyc_layout_bottom.setVisibility(View.GONE);
@@ -319,6 +347,7 @@ public class AgentKYCFragment extends Fragment implements RequestHandler, View.O
             rv.findViewById(R.id.verification_button).setVisibility(View.GONE);
         }
     }
+
     public void hideKeyboard(Activity activity) {
         InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
         //Find the currently focused view, so we can grab the correct window token from it.
@@ -351,6 +380,7 @@ public class AgentKYCFragment extends Fragment implements RequestHandler, View.O
         }
         return jsonObject;
     }
+
     @Override
     public void chechStatus(JSONObject object) {
         try {
@@ -392,6 +422,8 @@ public class AgentKYCFragment extends Fragment implements RequestHandler, View.O
                                 rv.findViewById(R.id.address_layout).setVisibility(View.VISIBLE);
                         } else {
                             scan_data.setVisibility(View.VISIBLE);
+                            if (spinner_value.equalsIgnoreCase("Aadhar Card"))
+                                rv.findViewById(R.id.scan_btn).setVisibility(View.VISIBLE);
                             sub_btn.setVisibility(View.GONE);
                             kyc_layout_bottom.setVisibility(View.GONE);
                             rv.findViewById(R.id.adrs_btn).setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
@@ -401,9 +433,11 @@ public class AgentKYCFragment extends Fragment implements RequestHandler, View.O
                             rv.findViewById(R.id.address_layout).setVisibility(View.GONE);
                             rv.findViewById(R.id.buisness_layout).setVisibility(View.GONE);
                             rv.findViewById(R.id.verification_button).setVisibility(View.GONE);
+                            documentid.setEnabled(false);
+                            spinner.setEnabled(false);
+                            spinner.setClickable(false);
                         }
                         hideKeyboard(getActivity());
-
                     }
                 }
             }
@@ -425,13 +459,15 @@ public class AgentKYCFragment extends Fragment implements RequestHandler, View.O
                 JSONObject jsonObj = null;
                 try {
                     String requiredValue = data.getStringExtra("Key");
-//                    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-//                    bitmap_trans.compress(Bitmap.CompressFormat.PNG, 50, byteArrayOutputStream);
-//                    byte[] byteArray = byteArrayOutputStream.toByteArray();
-//                    byteBase64 = Base64.encodeToString(byteArray, Base64.DEFAULT);
+                    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                    bitmap_trans.compress(Bitmap.CompressFormat.PNG, 50, byteArrayOutputStream);
+                    byte[] byteArray = byteArrayOutputStream.toByteArray();
+                    byteBase64 = Base64.encodeToString(byteArray, Base64.DEFAULT);
                     jsonObj = XML.toJSONObject(requiredValue);
                     jsonObject = jsonObj.getJSONObject("PrintLetterBarcodeData");
+                    scan_data.setVisibility(View.GONE);
                     kyc_layout_bottom.setVisibility(View.VISIBLE);
+                    scan = true;
 //                    parseJson(jsonObject);
                 } catch (JSONException e) {
                     e.printStackTrace();

@@ -1,6 +1,8 @@
 package com.rapipay.android.agent.main_directory;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.ClipData;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -21,13 +23,13 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.TextView;
 
-import com.rapipay.android.agent.Database.RapipayDB;
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.interfaces.CustomInterface;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
 
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -38,8 +40,9 @@ import java.util.Set;
 public class WebViewVerify extends BaseCompactActivity implements CustomInterface, View.OnClickListener {
     WebView web;
     private ValueCallback<Uri[]> mUploadMessage;
-    private String TYPE,mobileNo,documentType,documentID;
-
+    private String mobileNo, formData;
+    private static final int INPUT_FILE_REQUEST_CODE = 1;
+    private long size = 0;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,8 +55,6 @@ public class WebViewVerify extends BaseCompactActivity implements CustomInterfac
         heading.setText("KYC Registration");
         TYPE = getIntent().getStringExtra("persons");
         mobileNo = getIntent().getStringExtra("mobileNo");
-        documentType = getIntent().getStringExtra("documentType");
-        documentID = getIntent().getStringExtra("documentID");
         web = (WebView) findViewById(R.id.webview01);
         WebSettings webSettings = web.getSettings();
         webSettings.setAppCacheEnabled(true);
@@ -72,8 +73,16 @@ public class WebViewVerify extends BaseCompactActivity implements CustomInterfac
         if (Build.VERSION.SDK_INT >= 19) {
             web.setLayerType(View.LAYER_TYPE_HARDWARE, null);
         }
-        if (KYCFormActivity.formData != null)
-            web.loadDataWithBaseURL("", KYCFormActivity.formData, "text/html", "UTF-8", "");
+        if (TYPE.equalsIgnoreCase("pending")) {
+            formData = getIntent().getStringExtra("formData");
+            if (formData != null)
+                web.loadDataWithBaseURL("", formData, "text/html", "UTF-8", "");
+        }else {
+            if (KYCFormActivity.formData != null)
+                web.loadDataWithBaseURL("", KYCFormActivity.formData, "text/html", "UTF-8", "");
+        }
+//        if (KYCFormActivity.formData != null)
+//            web.loadDataWithBaseURL("", KYCFormActivity.formData, "text/html", "UTF-8", "");
     }
 
     public class myWebClient extends WebViewClient {
@@ -169,7 +178,7 @@ public class WebViewVerify extends BaseCompactActivity implements CustomInterfac
                         e.printStackTrace();
                     }
                 }
-            }else {
+            } else {
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                 startActivity(browserIntent);
             }
@@ -268,12 +277,68 @@ public class WebViewVerify extends BaseCompactActivity implements CustomInterfac
 
         }
     }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode != INPUT_FILE_REQUEST_CODE || mUploadMessage == null) {
+            super.onActivityResult(requestCode, resultCode, data);
+            return;
+        }
+        if (resultCode == 0) {
+            mUploadMessage.onReceiveValue(null);
+            mUploadMessage = null;
+            return;
+        }
+        try {
+            String file_path = mCameraPhotoPath.replace("file:", "");
+            listPath.add(file_path);
+            File file = new File(file_path);
+            size = file.length();
 
+        } catch (Exception e) {
+            Log.e("Error!", "Error while opening image file" + e.getLocalizedMessage());
+        }
+
+        if (data != null || mCameraPhotoPath != null) {
+            Integer count = 1;
+            ClipData images = null;
+            try {
+                images = data.getClipData();
+            } catch (Exception e) {
+                Log.e("Error!", e.getLocalizedMessage());
+            }
+
+            if (images == null && data != null && data.getDataString() != null) {
+                count = data.getDataString().length();
+            } else if (images != null) {
+                count = images.getItemCount();
+            }
+            Uri[] results = new Uri[count];
+            // Check that the response is a good one
+            if (resultCode == Activity.RESULT_OK) {
+                if (size != 0) {
+                    // If there is not data, then we may have taken a photo
+                    if (mCameraPhotoPath != null) {
+                        results = new Uri[]{Uri.parse(mCameraPhotoPath)};
+                    }
+                } else if (data.getClipData() == null) {
+                    results = new Uri[]{Uri.parse(data.getDataString())};
+                } else {
+
+                    for (int i = 0; i < images.getItemCount(); i++) {
+                        results[i] = images.getItemAt(i).getUri();
+                    }
+                }
+            }
+
+            mUploadMessage.onReceiveValue(results);
+            mUploadMessage = null;
+        }
+    }
     @Override
     public void okClicked(String type, Object ob) {
         if (type.equalsIgnoreCase("KYCLAYOUTS")) {
-            String condition = "where " + RapipayDB.MOBILENO + "='" + mobileNo + "'" + " AND " + RapipayDB.DOCUMENTTYPE + "='" + documentType + "'" + " AND " + RapipayDB.DOCUMENTID + "='" + documentID + "'";
-            db.deleteRow(mobileNo,"");
+//            String condition = "where " + RapipayDB.MOBILENO + "='" + mobileNo + "'" + " AND " + RapipayDB.DOCUMENTTYPE + "='" + documentType + "'" + " AND " + RapipayDB.DOCUMENTID + "='" + documentID + "'";
+            db.deleteRow(mobileNo, "");
             setBack_click(this);
             finish();
         }

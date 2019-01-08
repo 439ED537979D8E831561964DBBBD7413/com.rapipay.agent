@@ -11,6 +11,7 @@ import android.text.Editable;
 import android.text.InputFilter;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.util.Base64;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
@@ -38,6 +39,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.XML;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -48,6 +50,8 @@ public class CustomerKYCActivity extends BaseCompactActivity implements RequestH
     protected ArrayList<RapiPayPozo> list;
     protected Long tsLong;
     EditText mobile_no, documentid;
+    public static Bitmap bitmap_trans = null;
+    public static String byteBase64;
     private LinearLayout kyc_layout_bottom, scan_data;
     AppCompatButton sub_btn;
     Spinner spinner;
@@ -55,7 +59,7 @@ public class CustomerKYCActivity extends BaseCompactActivity implements RequestH
     String spinner_value = "", TYPE, mobileNo, customerType;
     String type = "MANUAL";
     private ArrayList<NewKYCPozo> newKYCList_Personal = null, newKYCList_Address = null, newKYCList_Buisness = null, newKYCList_Verify = null;
-
+    private boolean scan = false;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,6 +73,8 @@ public class CustomerKYCActivity extends BaseCompactActivity implements RequestH
     }
 
     public void initialize() {
+        bitmap_trans = null;
+        byteBase64 = "";
         heading = (TextView) findViewById(R.id.toolbar_title);
         heading.setText("Customer KYC");
         mobile_no = (EditText) findViewById(R.id.mobile_no);
@@ -96,8 +102,17 @@ public class CustomerKYCActivity extends BaseCompactActivity implements RequestH
                     InputFilter[] filterArray = new InputFilter[1];
                     filterArray[0] = new InputFilter.LengthFilter(12);
                     documentid.setFilters(filterArray);
-                } else
+                } else if (position == 2) {
                     documentid.setInputType(InputType.TYPE_CLASS_TEXT);
+                    InputFilter[] filterArray = new InputFilter[1];
+                    filterArray[0] = new InputFilter.LengthFilter(10);
+                    documentid.setFilters(filterArray);
+                } else{
+                    documentid.setInputType(InputType.TYPE_CLASS_TEXT);
+                    InputFilter[] filterArray = new InputFilter[1];
+                    filterArray[0] = new InputFilter.LengthFilter(20);
+                    documentid.setFilters(filterArray);
+                }
             }
 
             @Override
@@ -129,7 +144,13 @@ public class CustomerKYCActivity extends BaseCompactActivity implements RequestH
                     mobile_no.requestFocus();
                 } else if (spinner_value.isEmpty())
                     Toast.makeText(CustomerKYCActivity.this, "Please Select document type", Toast.LENGTH_SHORT).show();
-                else if (documentid.getText().toString().isEmpty()) {
+                else if (spinner_value.equalsIgnoreCase("Aadhar Card") && (documentid.getText().toString().isEmpty() || documentid.getText().toString().length() != 12)) {
+                    documentid.setError("Please enter valid data");
+                    documentid.requestFocus();
+                } else if (spinner_value.equalsIgnoreCase("Voter Id Card") && (documentid.getText().toString().isEmpty() || documentid.getText().toString().length() != 10)) {
+                    documentid.setError("Please enter valid data");
+                    documentid.requestFocus();
+                } else if (documentid.getText().toString().isEmpty()) {
                     documentid.setError("Please enter valid data");
                     documentid.requestFocus();
                 } else
@@ -151,10 +172,12 @@ public class CustomerKYCActivity extends BaseCompactActivity implements RequestH
                 documentid.setEnabled(false);
                 spinner.setEnabled(false);
                 spinner.setClickable(false);
+                scan_data.setVisibility(View.GONE);
                 jsonObject = null;
                 kyc_layout_bottom.setVisibility(View.VISIBLE);
                 break;
             case R.id.prsnl_btn:
+                scan=false;
                 intent = new Intent(CustomerKYCActivity.this, KYCFormActivity.class);
                 intent.putExtra("type", type);
                 intent.putExtra("persons", TYPE);
@@ -277,7 +300,9 @@ public class CustomerKYCActivity extends BaseCompactActivity implements RequestH
     @Override
     protected void onResume() {
         super.onResume();
-        resumeCall();
+        if(!scan) {
+            resumeCall();
+        }
     }
 
     public void hideKeyboard(Activity activity) {
@@ -354,6 +379,8 @@ public class CustomerKYCActivity extends BaseCompactActivity implements RequestH
                                 findViewById(R.id.address_layout).setVisibility(View.VISIBLE);
                         } else {
                             scan_data.setVisibility(View.VISIBLE);
+                            if(spinner_value.equalsIgnoreCase("Aadhar Card"))
+                                findViewById(R.id.scan_btn).setVisibility(View.VISIBLE);
                             sub_btn.setVisibility(View.GONE);
                             kyc_layout_bottom.setVisibility(View.GONE);
                             findViewById(R.id.adrs_btn).setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
@@ -363,6 +390,9 @@ public class CustomerKYCActivity extends BaseCompactActivity implements RequestH
                             findViewById(R.id.address_layout).setVisibility(View.GONE);
                             findViewById(R.id.buisness_layout).setVisibility(View.GONE);
                             findViewById(R.id.verification_button).setVisibility(View.GONE);
+                            documentid.setEnabled(false);
+                            spinner.setEnabled(false);
+                            spinner.setClickable(false);
                         }
                         hideKeyboard(CustomerKYCActivity.this);
 
@@ -435,13 +465,15 @@ public class CustomerKYCActivity extends BaseCompactActivity implements RequestH
                 JSONObject jsonObj = null;
                 try {
                     String requiredValue = data.getStringExtra("Key");
-//                    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-//                    bitmap_trans.compress(Bitmap.CompressFormat.PNG, 50, byteArrayOutputStream);
-//                    byte[] byteArray = byteArrayOutputStream.toByteArray();
-//                    byteBase64 = Base64.encodeToString(byteArray, Base64.DEFAULT);
+                    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                    bitmap_trans.compress(Bitmap.CompressFormat.PNG, 50, byteArrayOutputStream);
+                    byte[] byteArray = byteArrayOutputStream.toByteArray();
+                    byteBase64 = Base64.encodeToString(byteArray, Base64.DEFAULT);
                     jsonObj = XML.toJSONObject(requiredValue);
                     jsonObject = jsonObj.getJSONObject("PrintLetterBarcodeData");
+                    scan_data.setVisibility(View.GONE);
                     kyc_layout_bottom.setVisibility(View.VISIBLE);
+                    scan = true;
 //                    parseJson(jsonObject);
                 } catch (JSONException e) {
                     e.printStackTrace();

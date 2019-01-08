@@ -28,7 +28,7 @@
         <me.grantland.widget.AutofitTextView
             android:id="@+id/date"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_gravity="center"
             android:layout_margin="0dp"
             android:layout_marginTop="8dp"
@@ -36,7 +36,6 @@
             android:gravity="center"
             android:hint="@string/p_date2for"
             android:maxLines="1"
-            android:padding="1dp"
             android:singleLine="true"
             android:textSize="12sp"
             autofit:minTextSize="8sp" />

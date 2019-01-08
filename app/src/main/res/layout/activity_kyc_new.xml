@@ -94,7 +94,8 @@
                     android:clickable="true"
                     android:text="Scan"
                     android:textColor="@color/white"
-                    android:textSize="12dp" />
+                    android:textSize="12dp"
+                    android:visibility="gone"/>
 
                 <android.support.v7.widget.AppCompatButton
                     android:id="@+id/manual_btn"

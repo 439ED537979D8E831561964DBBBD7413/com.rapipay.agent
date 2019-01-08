@@ -12,17 +12,15 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import com.rapipay.android.agent.Model.NetworkHistoryPozo;
 import com.rapipay.android.agent.Model.PendingKYCPozo;
 import com.rapipay.android.agent.Model.RapiPayPozo;
 import com.rapipay.android.agent.R;
-import com.rapipay.android.agent.adapter.NetworkHistoryAdapter;
 import com.rapipay.android.agent.adapter.PendingKYCAdapter;
 import com.rapipay.android.agent.interfaces.RequestHandler;
-import com.rapipay.android.agent.main_directory.RegisterUserActivity;
-import com.rapipay.android.agent.main_directory.WebViewClientActivity;
+import com.rapipay.android.agent.main_directory.WebViewVerify;
 import com.rapipay.android.agent.utils.AsyncPostMethod;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
+import com.rapipay.android.agent.utils.BaseFragment;
 import com.rapipay.android.agent.utils.GenerateChecksum;
 import com.rapipay.android.agent.utils.WebConfig;
 
@@ -31,7 +29,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class PendingKyc extends Fragment implements RequestHandler {
+public class PendingKyc extends BaseFragment implements RequestHandler {
 
     protected String headerData = (WebConfig.BASIC_USERID + ":" + WebConfig.BASIC_PASSWORD);
     protected Long tsLong;
@@ -42,12 +40,15 @@ public class PendingKyc extends Fragment implements RequestHandler {
     private boolean isLoading;
     ArrayList<PendingKYCPozo> transactionPozoArrayList;
 
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View rv = (View) inflater.inflate(R.layout.pending_kyc_layout, container, false);
         if (BaseCompactActivity.db != null && BaseCompactActivity.db.getDetails_Rapi())
             list = BaseCompactActivity.db.getDetails();
+        TYPE = getActivity().getIntent().getStringExtra("type");
+        customerType = getActivity().getIntent().getStringExtra("customerType");
         initialize(rv);
         loadApi();
         return rv;
@@ -78,18 +79,25 @@ public class PendingKyc extends Fragment implements RequestHandler {
                 PendingKYCPozo pendingKYCPozo = transactionPozoArrayList.get(position);
                 if (pendingKYCPozo.getIsKycSubmitted().equalsIgnoreCase("N") && pendingKYCPozo.getStatusAction().equalsIgnoreCase("PENDING")) {
                     try {
-                        Intent intent = new Intent(getActivity(), WebViewClientActivity.class);
+                        String formData = getsession_ValidateKyc(customerType, pendingKYCPozo);
+                        Intent intent = new Intent(getActivity(), WebViewVerify.class);
+                        intent.putExtra("persons", "pending");
                         intent.putExtra("mobileNo", pendingKYCPozo.getMobileNo());
-                        String base64 = pendingKYCPozo.getFullName() + "~" + pendingKYCPozo.getEmailId() + "~" + pendingKYCPozo.getCompanyName() + "~" + pendingKYCPozo.getFullAddress() + "~" + pendingKYCPozo.getStateName() + "~" + "1";
-                        byte[] bytes = base64.getBytes("utf-8");
-                        String imageEncoded = Base64.encodeToString(bytes, Base64.DEFAULT);
-                        intent.putExtra("base64", imageEncoded);
-                        intent.putExtra("parentId", list.get(0).getMobilno());
-                        intent.putExtra("sessionKey", list.get(0).getPinsession());
-                        intent.putExtra("sessionRefNo", list.get(0).getAftersessionRefNo());
-                        intent.putExtra("nodeAgent", list.get(0).getMobilno());
-                        intent.putExtra("type", "pending");
+                        intent.putExtra("formData", formData);
+//                        intent.putExtra("documentID", documentID);
                         startActivity(intent);
+//                        Intent intent = new Intent(getActivity(), WebViewClientActivity.class);
+//                        intent.putExtra("mobileNo", pendingKYCPozo.getMobileNo());
+//                        String base64 = pendingKYCPozo.getFullName() + "~" + pendingKYCPozo.getEmailId() + "~" + pendingKYCPozo.getCompanyName() + "~" + pendingKYCPozo.getFullAddress() + "~" + pendingKYCPozo.getStateName() + "~" + "1";
+//                        byte[] bytes = base64.getBytes("utf-8");
+//                        String imageEncoded = Base64.encodeToString(bytes, Base64.DEFAULT);
+//                        intent.putExtra("base64", imageEncoded);
+//                        intent.putExtra("parentId", list.get(0).getMobilno());
+//                        intent.putExtra("sessionKey", list.get(0).getPinsession());
+//                        intent.putExtra("sessionRefNo", list.get(0).getAftersessionRefNo());
+//                        intent.putExtra("nodeAgent", list.get(0).getMobilno());
+//                        intent.putExtra("type", "pending");
+//                        startActivity(intent);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -98,8 +106,55 @@ public class PendingKyc extends Fragment implements RequestHandler {
         });
     }
 
+    public String getsession_ValidateKyc(String kycType, PendingKYCPozo pendingKYCPozo) {
+        JSONObject kycMapData = new JSONObject();
+        tsLong = System.currentTimeMillis() / 1000;
+        JSONObject jsonObject = new JSONObject();
+        String form = null;
+        try {
+            kycMapData.put("mobileNo", pendingKYCPozo.getMobileNo());
+            jsonObject.put("serviceType", "KYC_PROCESS");
+            jsonObject.put("reKYC", "");
+            jsonObject.put("agentId", list.get(0).getMobilno());
+            jsonObject.put("txnRef", "VKP" + tsLong.toString());
+            jsonObject.put("requestType", "EKYC_CHANNEL");
+            jsonObject.put("typeMobileWeb", "mobile");
+            jsonObject.put("kycType", kycType);
+            jsonObject.put("nodeAgentId", list.get(0).getMobilno());
+            jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
+            jsonObject.put("isreKYC", "Y");
+            jsonObject.put("isAuto", "1");
+            jsonObject.put("isEditable", "Y");
+            jsonObject.put("listdata", kycMapData.toString());
+            jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
+            form = "<html>\n" +
+                    "\t<body>\n" +
+                    "\t\t<form name=\"validatekyc\" id=\"validatekyc\" method=\"POST\" action=\"" + WebConfig.EKYC_FORWARD_POST + "\">\n" +
+                    "\t\t\t<input name=\"requestedData\" value=\"" + getDataBase64(jsonObject.toString()) + "\" type=\"hidden\"/>\n" +
+                    "\t\t\t<input type=\"submit\"/>\n" +
+                    "\t\t</form>\n" +
+                    "\t\t<script language=\"JavaScript\" type=\"text/javascript\">\n" +
+                    "\t\t\t\t\tdocument.getElementById(\"validatekyc\").submit();\n" +
+                    "\t\t</script>\n" +
+                    "\t</body>\n" +
+                    "</html>";
+            return form;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     private void loadApi() {
         new AsyncPostMethod(WebConfig.EKYC_FORWARD, request_user().toString(), headerData, PendingKyc.this, getActivity()).execute();
+    }
+
+    private String getDataBase64(String data) {
+        try {
+            return Base64.encodeToString(data.getBytes("utf-8"), Base64.DEFAULT);
+        } catch (Exception e) {
+            return "";
+        }
     }
 
     public JSONObject request_user() {
@@ -126,13 +181,13 @@ public class PendingKyc extends Fragment implements RequestHandler {
         try {
             if (object.getString("responseCode").equalsIgnoreCase("200")) {
 //                if (object.getString("serviceType").equalsIgnoreCase("PENDING_AGENT_KYC")) {
-                    try {
-                        if (object.has("agentKycPendingList")) {
-                            insertLastTransDetails(object.getJSONArray("agentKycPendingList"));
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                try {
+                    if (object.has("agentKycPendingList")) {
+                        insertLastTransDetails(object.getJSONArray("agentKycPendingList"));
                     }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 //                }
             }
         } catch (Exception e) {

@@ -532,6 +532,59 @@ public class BaseCompactActivity extends AppCompatActivity {
             dialog.show();
         }
     };
+    protected View.OnClickListener checkDateClicked = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            final Dialog dialog = new Dialog(BaseCompactActivity.this);
+            dialog.setContentView(R.layout.datepickerview);
+            dialog.setTitle("");
+
+            DatePicker datePicker = (DatePicker) dialog.findViewById(R.id.datePicker1);
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(System.currentTimeMillis());
+            selectedDate = calendar.get(Calendar.DAY_OF_MONTH);
+            selectedMonth = calendar.get(Calendar.MONTH);
+            selectedYear = calendar.get(Calendar.YEAR);
+            datePicker.init(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH), new DatePicker.OnDateChangedListener() {
+
+                @Override
+                public void onDateChanged(DatePicker datePicker, int year, int month, int dayOfMonth) {
+                    Log.e("Date", "Year=" + year + " Month=" + (month + 1) + " day=" + dayOfMonth);
+                    if (String.valueOf(month + 1).length() == 1)
+                        months = "0" + String.valueOf(month + 1);
+                    else
+                        months = String.valueOf(month + 1);
+                    if (String.valueOf(dayOfMonth).length() == 1)
+                        dayss = "0" + String.valueOf(dayOfMonth);
+                    else
+                        dayss = String.valueOf(dayOfMonth);
+//                    if (selectedDate == dayOfMonth && selectedMonth == month ) {
+//                        date1_text.setText(year + "-" + months + "-" + dayss);
+//                        dialog.dismiss();
+//                    } else {
+                        if (dayOfMonth <= selectedDate  && (month+1) <= (selectedMonth+1) && year==selectedYear) {
+                            date1_text.setText(year + "-" + months + "-" + dayss);
+                            dialog.dismiss();
+                        }else if (year<selectedYear) {
+                            date1_text.setText(year + "-" + months + "-" + dayss);
+                            dialog.dismiss();
+                        }else {
+                            date1_text.setText("");
+                            Toast.makeText(BaseCompactActivity.this,"Future date selection are not allowed",Toast.LENGTH_SHORT).show();
+//                            date1_text.setText(year + "-" + months + "-" + dayss);
+                                dialog.dismiss();
+//                            }
+                        }
+//                    }
+                    date1_text.setError(null);
+                    selectedDate = dayOfMonth;
+                    selectedMonth = (month);
+                    selectedYear = year;
+                }
+            });
+            dialog.show();
+        }
+    };
     protected View.OnClickListener fromDateClicked = new View.OnClickListener() {
         @Override
         public void onClick(View v) {

@@ -33,6 +33,7 @@ import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
 import com.rapipay.android.agent.Model.VersionPozo;
 import com.rapipay.android.agent.R;
+import com.rapipay.android.agent.fragments.AgentKYCFragment;
 import com.rapipay.android.agent.fragments.RegisterUserFragment;
 import com.rapipay.android.agent.interfaces.VersionListener;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
@@ -167,9 +168,9 @@ public class BarcodeActivity extends BaseCompactActivity implements VersionListe
                                         public void onPictureTaken(byte[] bytes) {
                                             Bitmap decodedByte = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
                                             if (TYPE.equalsIgnoreCase("outside"))
-                                                RegisterUserFragment.bitmap_trans = getResizedBitmap(decodedByte, 600);
+                                                AgentKYCFragment.bitmap_trans = getResizedBitmap(decodedByte, 600);
                                             else
-                                                RegisterUserActivity.bitmap_trans = getResizedBitmap(decodedByte, 600);
+                                                CustomerKYCActivity.bitmap_trans = getResizedBitmap(decodedByte, 600);
                                             setResult(RESULT_OK, intent);
                                             finish();
                                         }

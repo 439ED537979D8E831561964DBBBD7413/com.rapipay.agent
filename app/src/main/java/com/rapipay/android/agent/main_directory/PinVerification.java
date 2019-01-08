@@ -70,7 +70,7 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
         initialize();
         if (db != null && db.getDetails_Rapi()) {
             loadApi();
-            loadMaster();
+//            loadMaster();
         } else
             dbNull(PinVerification.this);
 

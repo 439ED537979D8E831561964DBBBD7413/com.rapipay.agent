@@ -21,20 +21,47 @@ public class NewKYCPozo implements Serializable {
     public String DOCUMENTBACK_IMAGENAME;
     public String ADDRESS_CLICKED;
     public byte[] DOCUMENTFRONT_PHOTO;
-    public byte[] DOCUMENTBACK_PHOTO;
+    public String DOCUMENTBACK_PHOTO;
     public String PANNUMBER;
     public byte[] PAN_PHOTO;
     public String GSTINNUMBER;
     public String PAN_PHOTO_IMAGENAME;
     public String BUISNESS_CLICKED;
-    public byte[] SHOP_PHOTO;
+    public String SHOP_PHOTO;
     public String SHOP_PHOTO_IMAGENAME;
     public byte[] SELF_PHOTO;
-    public byte[] SIGN_PHOTO;
+    public String SIGN_PHOTO;
     public String SELF_PHOTO_IMAGENAME;
     public String SIGN_PHOTO_IMAGENAME;
     public String VERIFY_CLICKED;
     public String IMAGE_NAME;
+    public String SCANIMAGENAME;
+    public String SCANIMAGEPATH;
+    public String SCANTYPE;
+
+    public String getSCANTYPE() {
+        return SCANTYPE;
+    }
+
+    public void setSCANTYPE(String SCANTYPE) {
+        this.SCANTYPE = SCANTYPE;
+    }
+
+    public String getSCANIMAGENAME() {
+        return SCANIMAGENAME;
+    }
+
+    public void setSCANIMAGENAME(String SCANIMAGENAME) {
+        this.SCANIMAGENAME = SCANIMAGENAME;
+    }
+
+    public String getSCANIMAGEPATH() {
+        return SCANIMAGEPATH;
+    }
+
+    public void setSCANIMAGEPATH(String SCANIMAGEPATH) {
+        this.SCANIMAGEPATH = SCANIMAGEPATH;
+    }
 
     public byte[] getDOCUMENTFRONT_PHOTO() {
         return DOCUMENTFRONT_PHOTO;
@@ -44,11 +71,11 @@ public class NewKYCPozo implements Serializable {
         this.DOCUMENTFRONT_PHOTO = DOCUMENTFRONT_PHOTO;
     }
 
-    public byte[] getDOCUMENTBACK_PHOTO() {
+    public String getDOCUMENTBACK_PHOTO() {
         return DOCUMENTBACK_PHOTO;
     }
 
-    public void setDOCUMENTBACK_PHOTO(byte[] DOCUMENTBACK_PHOTO) {
+    public void setDOCUMENTBACK_PHOTO(String DOCUMENTBACK_PHOTO) {
         this.DOCUMENTBACK_PHOTO = DOCUMENTBACK_PHOTO;
     }
 
@@ -60,11 +87,11 @@ public class NewKYCPozo implements Serializable {
         this.PAN_PHOTO = PAN_PHOTO;
     }
 
-    public byte[] getSHOP_PHOTO() {
+    public String getSHOP_PHOTO() {
         return SHOP_PHOTO;
     }
 
-    public void setSHOP_PHOTO(byte[] SHOP_PHOTO) {
+    public void setSHOP_PHOTO(String SHOP_PHOTO) {
         this.SHOP_PHOTO = SHOP_PHOTO;
     }
 
@@ -76,11 +103,11 @@ public class NewKYCPozo implements Serializable {
         this.SELF_PHOTO = SELF_PHOTO;
     }
 
-    public byte[] getSIGN_PHOTO() {
+    public String getSIGN_PHOTO() {
         return SIGN_PHOTO;
     }
 
-    public void setSIGN_PHOTO(byte[] SIGN_PHOTO) {
+    public void setSIGN_PHOTO(String SIGN_PHOTO) {
         this.SIGN_PHOTO = SIGN_PHOTO;
     }
 
