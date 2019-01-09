@@ -6,7 +6,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -18,12 +17,10 @@ import android.telephony.TelephonyManager;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-//import com.crashlytics.android.Crashlytics;
 import com.rapipay.android.agent.BuildConfig;
 import com.rapipay.android.agent.Model.VersionPozo;
 import com.rapipay.android.agent.R;
@@ -44,7 +41,6 @@ public class LoginScreenActivity extends BaseCompactActivity implements View.OnC
     final private static int PERMISSIONS_REQUEST_READ_PHONE_STATE = 0;
     EditText input_user;
     TextInputEditText input_password;
-    public static final int REQUEST_ID_MULTIPLE_PERMISSIONS = 1;
     AppCompatButton btn_login;
     ImageView image_app;
 
@@ -57,10 +53,10 @@ public class LoginScreenActivity extends BaseCompactActivity implements View.OnC
     }
 
     private void initialize() {
-        image_app = (ImageView)findViewById(R.id.image_app);
-        if(BuildConfig.APPTYPE==1)
+        image_app = (ImageView) findViewById(R.id.image_app);
+        if (BuildConfig.APPTYPE == 1)
             image_app.setImageDrawable(getResources().getDrawable(R.drawable.ic_launcher));
-        if(BuildConfig.APPTYPE==2)
+        if (BuildConfig.APPTYPE == 2)
             image_app.setImageDrawable(getResources().getDrawable(R.drawable.rapipay_parter));
         findViewById(R.id.back_click).setVisibility(View.GONE);
         input_password = (TextInputEditText) findViewById(R.id.input_password);
@@ -91,15 +87,10 @@ public class LoginScreenActivity extends BaseCompactActivity implements View.OnC
 
 
     public void loadIMEI() {
-        // Check if the READ_PHONE_STATE permission is already available.
         if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_PHONE_STATE)
                 != PackageManager.PERMISSION_GRANTED) {
-            // READ_PHONE_STATE permission has not been granted.
-//            checkAndRequestPermissions();
             requestReadPhoneStatePermission();
         } else {
-
-            // READ_PHONE_STATE permission is already been granted.
             doPermissionGrantedStuffs();
         }
     }
@@ -111,34 +102,24 @@ public class LoginScreenActivity extends BaseCompactActivity implements View.OnC
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     ActivityCompat.requestPermissions(LoginScreenActivity.this,
-                            new String[]{Manifest.permission.READ_PHONE_STATE, Manifest.permission.READ_SMS, Manifest.permission.SEND_SMS, Manifest.permission.RECEIVE_SMS, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE},
+                            new String[]{Manifest.permission.READ_PHONE_STATE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE},
                             PERMISSIONS_REQUEST_READ_PHONE_STATE);
                     doPermissionGrantedStuffs();
                 }
             });
-
         } else {
-            // READ_PHONE_STATE permission has not been granted yet. Request it directly.
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE, Manifest.permission.READ_SMS, Manifest.permission.SEND_SMS, Manifest.permission.RECEIVE_SMS, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE},
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE},
                     PERMISSIONS_REQUEST_READ_PHONE_STATE);
         }
     }
 
-    /**
-     * Callback received when a permissions request has been completed.
-     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
 
         if (requestCode == PERMISSIONS_REQUEST_READ_PHONE_STATE) {
-            // Received permission result for READ_PHONE_STATE permission.est.");
-            // Check if the only required permission has been granted
-            if (grantResults.length == 6 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED && grantResults[2] == PackageManager.PERMISSION_GRANTED
-                    && grantResults[3] == PackageManager.PERMISSION_GRANTED && grantResults[4] == PackageManager.PERMISSION_GRANTED && grantResults[5] == PackageManager.PERMISSION_GRANTED) {
-                // READ_PHONE_STATE permission has been granted, proceed with displaying IMEI Number
+            if (grantResults.length == 3 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED && grantResults[2] == PackageManager.PERMISSION_GRANTED) {
                 doPermissionGrantedStuffs();
-
             } else {
                 alertPerm(getString(R.string.permissions_not_granted_read_phone_state), new DialogInterface.OnClickListener() {
                     @Override
@@ -146,7 +127,6 @@ public class LoginScreenActivity extends BaseCompactActivity implements View.OnC
                         loadIMEI();
                     }
                 });
-
             }
         }
     }
@@ -165,7 +145,7 @@ public class LoginScreenActivity extends BaseCompactActivity implements View.OnC
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
             TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
             imei = telephonyManager.getDeviceId();
-            localStorage.setActivityState(LocalStorage.EMI,imei);
+            localStorage.setActivityState(LocalStorage.EMI, imei);
         }
     }
 
@@ -179,9 +159,6 @@ public class LoginScreenActivity extends BaseCompactActivity implements View.OnC
                     input_password.setError("Please enter mandatory field");
                 else
                     loadVersion(imei);
-
-//                    Crashlytics.getInstance().crash();
-
                 break;
         }
     }
@@ -194,58 +171,17 @@ public class LoginScreenActivity extends BaseCompactActivity implements View.OnC
                     JSONArray array = object.getJSONArray("headerList");
                     versionDetails(array, LoginScreenActivity.this);
                 }
-            }else if (object.getString("responseCode").equalsIgnoreCase("200")) {
-                new RouteClass(this, object, input_user.getText().toString(), localStorage, "PINENTERED");//
-//                Intent intent = new Intent(LoginScreenActivity.this, PinActivity.class);
-//                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//                intent.putExtra("agentId", input_user.getText().toString());
-//                intent.putExtra("regTxnRefId", object.getString("txnRefId"));
-//                intent.putExtra("imeiNo", object.getString("imeiNo"));
-//                intent.putExtra("otpRefId", object.getString("otpRefId"));
-//                intent.putExtra("sessionRefNo", object.getString("sessionRefNo"));
-//                intent.putExtra("sessionKey", object.getString("sessionKey"));
-//                startActivity(intent);
-//            } else if (object.getString("responseCode").equalsIgnoreCase("75059")) {
-//                if (object.getString("kycType").equalsIgnoreCase("2")) {
-//                    new RouteClass(this, object, input_user.getText().toString(), localStorage, "KYCENTERED");
-////                    Intent intent = new Intent(this, WebViewClientActivity.class);
-////                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-////                    intent.putExtra("mobileNo", input_user.getText().toString());
-////                    intent.putExtra("parentId", object.getString("parentID"));
-////                    intent.putExtra("sessionKey", object.getString("sessionKey"));
-////                    intent.putExtra("sessionRefNo", object.getString("sessionRefNo"));
-////                    startActivity(intent);
-//                } else if (object.getString("kycType").equalsIgnoreCase("1")) {
-//                    //Manual KYC
-//                } else
-//                    Toast.makeText(this, "KYC Mode is not Available", Toast.LENGTH_SHORT).show();
+            } else if (object.getString("responseCode").equalsIgnoreCase("200")) {
+                new RouteClass(this, object, input_user.getText().toString(), localStorage, "PINENTERED");
             } else if (object.getString("responseCode").equalsIgnoreCase("75115")) {
                 customDialog_Common("KYCLAYOUTS", null, null, "RapiPay Login Failed", null, object.getString("responseMessage"), LoginScreenActivity.this);
-//                customDialog(object.getString("responseMessage"));
             } else if (object.getString("responseCode").equalsIgnoreCase("75115")) {
                 customDialog_Common("KYCLAYOUTS", null, null, "RapiPay Login Failed", null, object.getString("responseMessage"), LoginScreenActivity.this);
-//                customDialog(object.getString("responseMessage"));
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
-//    private void customDialog(String msg) {
-//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//        builder.setTitle(R.string.app_name);
-//        //Setting message manually and performing action on button click
-//        builder.setMessage(msg)
-//                .setCancelable(false)
-//                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-//                    public void onClick(DialogInterface dialog, int id) {
-//                        dialog.dismiss();
-//                    }
-//                });
-//        //Creating dialog box
-//        AlertDialog alert = builder.create();
-//        alert.show();
-//    }
 
     @Override
     public void chechStat(String object) {

@@ -14,28 +14,28 @@ public class SmsReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Bundle data  = intent.getExtras();
-
-        Object[] pdus = (Object[]) data.get("pdus");
-
-        for(int i=0;i<pdus.length;i++){
-            SmsMessage smsMessage = SmsMessage.createFromPdu((byte[]) pdus[i]);
-
-            String sender = smsMessage.getDisplayOriginatingAddress();
-            //You must check here if the sender is your provider and not another one with same text.
-            if(sender.contains("RapiPY")) {
-                try {
-                    String messageBody = smsMessage.getMessageBody();
-                    if(messageBody.contains("HandSet")) {
-                        String splitss[] = messageBody.split("\\.");
-                        //Pass on the text to our listener.
-                        mListener.messageReceived(splitss[1]);
-                    }
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
-            }
-        }
+//        Bundle data  = intent.getExtras();
+//
+//        Object[] pdus = (Object[]) data.get("pdus");
+//
+//        for(int i=0;i<pdus.length;i++){
+//            SmsMessage smsMessage = SmsMessage.createFromPdu((byte[]) pdus[i]);
+//
+//            String sender = smsMessage.getDisplayOriginatingAddress();
+//            //You must check here if the sender is your provider and not another one with same text.
+//            if(sender.contains("RapiPY")) {
+//                try {
+//                    String messageBody = smsMessage.getMessageBody();
+//                    if(messageBody.contains("HandSet")) {
+//                        String splitss[] = messageBody.split("\\.");
+//                        //Pass on the text to our listener.
+//                        mListener.messageReceived(splitss[1]);
+//                    }
+//                }catch (Exception e){
+//                    e.printStackTrace();
+//                }
+//            }
+//        }
 
     }
 

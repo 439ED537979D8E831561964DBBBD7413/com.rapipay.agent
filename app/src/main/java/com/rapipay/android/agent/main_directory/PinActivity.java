@@ -18,10 +18,8 @@ import java.util.Date;
 import com.rapipay.android.agent.BuildConfig;
 import com.rapipay.android.agent.Database.RapipayDB;
 import com.rapipay.android.agent.R;
-import com.rapipay.android.agent.adapter.SmsReceiver;
 import com.rapipay.android.agent.interfaces.CustomInterface;
 import com.rapipay.android.agent.interfaces.RequestHandler;
-import com.rapipay.android.agent.interfaces.SmsListener;
 import com.rapipay.android.agent.utils.AsyncPostMethod;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
 import com.rapipay.android.agent.utils.GenerateChecksum;
@@ -65,14 +63,6 @@ public class PinActivity extends BaseCompactActivity implements View.OnClickList
             flag_rapi = db.getDetails_Rapi();
         else
             dbNull(PinActivity.this);
-        SmsReceiver.bindListener(new SmsListener() {
-            @Override
-            public void messageReceived(String messageText) {
-                otppinView.setText(messageText);
-//                Log.d("Text",messageText);
-//                Toast.makeText(PinActivity.this,"Message: "+messageText,Toast.LENGTH_LONG).show();
-            }
-        });
     }
 
     public JSONObject getJson_Validate() {
@@ -169,14 +159,6 @@ public class PinActivity extends BaseCompactActivity implements View.OnClickList
             values.put(RapipayDB.IMAGE_PATH_WL, byteConvert(object.getString(imageName)));
             values.put(RapipayDB.IMAGE_NAME, wlimageName);
             dba.insert(RapipayDB.TABLE_IMAGES, null, values);
-//            String insertSQL = "INSERT INTO " + RapipayDB.TABLE_IMAGES + "\n" +
-//                    "(" + RapipayDB.IMAGE_NAME + "," + RapipayDB.IMAGE_PATH_WL  + ")\n" +
-//                    "VALUES \n" +
-//                    "( ?, ?);";
-//
-//
-////            String path = saveToInternalStorage(base64Convert(object.getString(imageName)), wlimageName);
-//            dba.execSQL(insertSQL, new String[]{wlimageName, byteConvert(object.getString(imageName))});
         } catch (Exception e) {
             e.printStackTrace();
         }
