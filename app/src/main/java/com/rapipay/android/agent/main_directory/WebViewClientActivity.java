@@ -289,7 +289,7 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
             jsonObject.put("agentId", parentId);
             jsonObject.put("typeMobileWeb", "mobile");
             jsonObject.put("tokenId", tokenId);
-            jsonObject.put("txnRef", "VKP" + tsLong.toString());
+            jsonObject.put("txnRef", tsLong.toString());
             jsonObject.put("orgTxnRef", orgTxnRef);
             jsonObject.put("nodeAgentId", nodeAgent);
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
@@ -308,7 +308,7 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
                         "\t\t\t<input name=\"sessionRefNo\" value=\"" + list.get(0).getAftersessionRefNo() + "\" type=\"hidden\"/>\n" +
                         "\t\t\t<input name=\"nodeAgentId\" value=\"" + nodeAgent + "\" type=\"hidden\"/>\n" +
                         "\t\t\t<input name=\"tokenId\" value=\"" + tokenId + "\" type=\"hidden\"/>\n" +
-                        "\t\t\t<input name=\"txnRef\" value=\"" + "VKP" + tsLong.toString() + "\" type=\"hidden\"/>\n" +
+                        "\t\t\t<input name=\"txnRef\" value=\"" + tsLong.toString() + "\" type=\"hidden\"/>\n" +
                         "\t\t\t<input name=\"orgTxnRef\" value=\"" + orgTxnRef + "\" type=\"hidden\"/>\n" +
                         "\t\t\t<input name=\"kycData\" value=\"" + base64image + "\" type=\"hidden\"/>\n" +
                         "\t\t\t<input name=\"kycImage\" value=\"" + RegisterUserFragment.byteBase64 + "\" type=\"hidden\"/>\n" +
@@ -331,7 +331,7 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
                         "\t\t\t<input name=\"sessionRefNo\" value=\"" + list.get(0).getAftersessionRefNo() + "\" type=\"hidden\"/>\n" +
                         "\t\t\t<input name=\"nodeAgentId\" value=\"" + nodeAgent + "\" type=\"hidden\"/>\n" +
                         "\t\t\t<input name=\"tokenId\" value=\"" + tokenId + "\" type=\"hidden\"/>\n" +
-                        "\t\t\t<input name=\"txnRef\" value=\"" + "VKP" + tsLong.toString() + "\" type=\"hidden\"/>\n" +
+                        "\t\t\t<input name=\"txnRef\" value=\"" + tsLong.toString() + "\" type=\"hidden\"/>\n" +
                         "\t\t\t<input name=\"orgTxnRef\" value=\"" + orgTxnRef + "\" type=\"hidden\"/>\n" +
                         "\t\t\t<input name=\"kycData\" value=\"" + base64image + "\" type=\"hidden\"/>\n" +
                         "\t\t\t<input name=\"kycImage\" value=\"" + RegisterUserActivity.byteBase64 + "\" type=\"hidden\"/>\n" +

@@ -87,7 +87,7 @@ public class DailyCommissionActivity extends BaseCompactActivity implements Requ
             jsonObject.put("serviceType", "MY_COMMISION_REPORT");
             jsonObject.put("requestType", "REPORT_CHANNEL");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("transactionID", "MCR"+tsLong.toString());
+            jsonObject.put("transactionID", tsLong.toString());
             jsonObject.put("commisionType", type);
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());

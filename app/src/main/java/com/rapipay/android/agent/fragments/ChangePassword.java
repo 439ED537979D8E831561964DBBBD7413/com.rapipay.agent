@@ -86,7 +86,7 @@ public class ChangePassword extends Fragment implements RequestHandler, View.OnC
                 jsonObject.put("serviceType", "CHANGE_PASSWORD");
                 jsonObject.put("requestType", "handset_CHannel");
                 jsonObject.put("typeMobileWeb", "mobile");
-                jsonObject.put("txnRefId", "CP" + tsLong.toString());
+                jsonObject.put("txnRefId", tsLong.toString());
                 jsonObject.put("agentId", list.get(0).getMobilno());
                 jsonObject.put("nodeAgentId", list.get(0).getMobilno());
                 jsonObject.put("oldPassword", otppinView.getText().toString());

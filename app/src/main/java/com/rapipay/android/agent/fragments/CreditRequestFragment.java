@@ -129,26 +129,8 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
             }
         });
         list_payment = BaseCompactActivity.db.getPaymenttDetails();
-//        if (list_bank.size() != 0) {
-//            ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(getActivity(),
-//                    android.R.layout.simple_spinner_item, list_bank);
-//            dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//            bank_select.setAdapter(dataAdapter);
-//        }
         if (list_payment.size() != 0)
             select_mode.setAdapter(new PaymentAdapter(getActivity(), list_payment));
-//        bank_select.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-//            @Override
-//            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-//                if (position != 0)
-//                    bankName = list_bank.get(position);
-//            }
-//
-//            @Override
-//            public void onNothingSelected(AdapterView<?> parent) {
-//
-//            }
-//        });
         select_mode.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -175,7 +157,6 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
         try {
             if (object.getString("responseCode").equalsIgnoreCase("200")) {
                 if (object.getString("serviceType").equalsIgnoreCase("CREDIT_FUND_REQUEST")) {
-//                    customDialog(object.getString("responseMessage"));
                     customDialog_Ben(object.getString("responseMessage"), "CREDIT FUND REQUEST");
                 }
             }
@@ -500,15 +481,6 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-//                Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
-//                imageBase64 = getBytesFromBitmap(addWaterMark(thumbnail));
-//                SimpleDateFormat formatter = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
-//                Date now = new Date();
-//                File destination = new File(Environment.getExternalStorageDirectory(),
-//                        formatter.format(now) + ".jpg");
-//                filePath = destination.toString();
-//                String[] splits = filePath.split("\\/");
-
             } else if (requestCode == SELECT_FILE) {
                 Uri uri = data.getData();
                 Bitmap thumbnail = null;
@@ -555,7 +527,7 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
             jsonObject.put("serviceType", "CREDIT_FUND_REQUEST");
             jsonObject.put("requestType", "BC_CHANNEL");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("transactionID", "CFR" + tsLong.toString());
+            jsonObject.put("transactionID", tsLong.toString());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("agentID", list.get(0).getMobilno());
             jsonObject.put("parentID", list.get(0).getMobilno());

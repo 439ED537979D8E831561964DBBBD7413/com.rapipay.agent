@@ -17,7 +17,7 @@ import com.rapipay.android.agent.Model.RapiPayPozo;
 
 public class RapipayDB extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 22;
+    private static final int DATABASE_VERSION = 23;
     public static final String DATABASE_NAME = "RapiPay.db";
     public static final String TABLE_NAME = "RapiPayDefault";
     public static final String COLOMN_SESSION = "session";
@@ -43,6 +43,8 @@ public class RapipayDB extends SQLiteOpenHelper {
     public static final String TABLE_MASTER = "Masters";
     public static final String TABLE_FOOTER = "Footer";
     public static final String TABLE_IMAGES = "WLIMAGES";
+    public static final String TABLE_NEPAL_PAYMENTMOODE = "NepalPaymentMode";
+    public static final String TABLE_NEPAL_BANK = "NepalBank";
     public static final String TABLE_KYC_PERSONAL = "KYCListPersonal";
     public static final String TABLE_KYC_ADDRESS = "KYCListAddress";
     public static final String TABLE_KYC_BUISNESS = "KYCListBuisness";
@@ -52,6 +54,8 @@ public class RapipayDB extends SQLiteOpenHelper {
     public static final String TABLE_BANK = "BankDetails";
     public static final String TABLE_PAYMENT = "PaymentDetails";
     public static final String TABLE_STATE = "StateDetails";
+    public static final String COLOMN_PAYMENT_MODETYPE = "modeType";
+    public static final String COLOMN_PAYMENT_MODENAME = "modeName";
     public static final String COLOMN__BANK_NAME = "bankName";
     public static final String COLOMN_IFSC = "ifscCode";
     public static final String COLOMN_CREDITBANK = "creditbank";
@@ -66,7 +70,7 @@ public class RapipayDB extends SQLiteOpenHelper {
     public static final String COLOMN_PATH = "path";
     public static final String IMAGE_TIME_STAMP = "timeStamp";
     public static final String SCANTYPE = "scantype";
-
+    public static final String COLOMN_BANK_CODE = "bankCode";
     public static final String MOBILENO = "mobileno";
     public static final String USER_NAME = "username";
     public static final String DOB = "dob";
@@ -122,6 +126,8 @@ public class RapipayDB extends SQLiteOpenHelper {
         db.execSQL("create table IF NOT EXISTS " + TABLE_KYC_VERIFICATION + " ( " + MOBILENO + " VARCHAR(10) , " + SELF_PHOTO_IMAGENAME + " VARCHAR(100), " + SIGN_PHOTO_IMAGENAME + " VARCHAR(100), " + VERIFY_CLICKED + " VARCHAR(10), " + SELF_PHOTO + " BLOB DEFAULT NULL, " + SIGN_PHOTO + " VARCHAR(30), " + DOCUMENTTYPE + " VARCHAR(20), " + DOCUMENTID + " VARCHAR(15));");
         db.execSQL("create table IF NOT EXISTS " + TABLE_IMAGES + " ( " + IMAGE_NAME + " VARCHAR(30) , " + IMAGE_PATH_WL + " BLOB DEFAULT NULL);");
         db.execSQL("create table IF NOT EXISTS " + TABLE_MASTER + " ( " + COLOMN_FRONTID + " VARCHAR(10) , " + COLOMN_SERVICETYPENAME + " VARCHAR(50) , " + COLOMN_DISPLAYNAME + " VARCHAR(50) , " + COLOMN_DISPLAYTYPE + " VARCHAR(50), " + COLOMN_ICON + " BLOB DEFAULT NULL, " + COLOMN_ORDER + " VARCHAR(50), " + IMAGE_TIME_STAMP + " VARCHAR(50));");
+        db.execSQL("create table IF NOT EXISTS " + TABLE_NEPAL_PAYMENTMOODE + " ( " + COLOMN_PAYMENT_MODETYPE + " VARCHAR(10) , " + COLOMN_PAYMENT_MODENAME + " VARCHAR(50));");
+        db.execSQL("create table IF NOT EXISTS " + TABLE_NEPAL_BANK + " ( " + COLOMN_BANK_CODE + " VARCHAR(10) , " + COLOMN__BANK_NAME + " VARCHAR(50));");
     }
 
     @Override
@@ -139,8 +145,11 @@ public class RapipayDB extends SQLiteOpenHelper {
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_KYC_ADDRESS);
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_KYC_BUISNESS);
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_KYC_VERIFICATION);
-//            db.execSQL("DROP TABLE IF EXISTS " + TABLE_IMAGES);
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_NEPAL_PAYMENTMOODE);
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_NEPAL_BANK);
 //            db.execSQL("DROP TABLE IF EXISTS " + TABLE_FOOTER);
+            db.execSQL("create table IF NOT EXISTS " + TABLE_NEPAL_PAYMENTMOODE + " ( " + COLOMN_PAYMENT_MODETYPE + " VARCHAR(10) , " + COLOMN_PAYMENT_MODENAME + " VARCHAR(50));");
+            db.execSQL("create table IF NOT EXISTS " + TABLE_NEPAL_BANK + " ( " + COLOMN_BANK_CODE + " VARCHAR(10) , " + COLOMN__BANK_NAME + " VARCHAR(50));");
             db.execSQL("create table IF NOT EXISTS " + TABLE_MASTER + " ( " + COLOMN_FRONTID + " VARCHAR(10) , " + COLOMN_SERVICETYPENAME + " VARCHAR(50) , " + COLOMN_DISPLAYNAME + " VARCHAR(50) , " + COLOMN_DISPLAYTYPE + " VARCHAR(50), " + COLOMN_ICON + " BLOB DEFAULT NULL, " + COLOMN_ORDER + " VARCHAR(50), " + IMAGE_TIME_STAMP + " VARCHAR(50));");
             db.execSQL("create table IF NOT EXISTS " + TABLE_FOOTER + " ( " + COLOMN_OPERATORID + " VARCHAR(10) , " + COLOMN_OPERATORVALUE + " VARCHAR(50) , " + COLOMN_OPERATORDATA + " VARCHAR(50), " + COLOMN_PATH + " BLOB DEFAULT NULL, " + IMAGE_TIME_STAMP + " VARCHAR(50));");
             db.execSQL("create table IF NOT EXISTS " + TABLE_KYC_PERSONAL + " ( " + MOBILENO + " VARCHAR(10) , " + USER_NAME + " VARCHAR(100) , " + DOB + " VARCHAR(12), " + EMAILID + " VARCHAR(70), " + COMPANY_NAME + " VARCHAR(50), " + PASSPORT_PHOTO + " BLOB DEFAULT NULL, " + SCANIMAGE + " VARCHAR(30), " + SCANIMAGEPATH + " VARCHAR(30), " + PERSONAL_CLICKED + " VARCHAR(10), " + DOCUMENTTYPE + " VARCHAR(20), " + DOCUMENTID + " VARCHAR(15), " + IMAGE_NAME + " VARCHAR(30),"+ SCANTYPE +" VARCHAR(10));");
@@ -542,6 +551,42 @@ public class RapipayDB extends SQLiteOpenHelper {
 //                payPozo.setHeaderValue(cursor.getString(1));
 //                payPozo.setHeaderData(cursor.getString(2));
                 list.add(cursor.getString(2));
+            } while (cursor.moveToNext());
+        }
+        return list;
+    }
+
+    public ArrayList<PaymentModePozo> getPaymentModeNepal() {
+        ArrayList<PaymentModePozo> list = new ArrayList<PaymentModePozo>();
+        list.add(new PaymentModePozo("0","Select Payment Type"));
+        String selectQuery = "SELECT  * FROM " + TABLE_NEPAL_PAYMENTMOODE;
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        if (cursor.moveToFirst()) {
+            do {
+                PaymentModePozo payPozo = new PaymentModePozo();
+                payPozo.setTypeID(cursor.getString(0));
+                payPozo.setPaymentMode(cursor.getString(1));
+//                payPozo.setHeaderData(cursor.getString(2));
+                list.add(payPozo);
+            } while (cursor.moveToNext());
+        }
+        return list;
+    }
+
+    public ArrayList<PaymentModePozo> getBankNepal() {
+        ArrayList<PaymentModePozo> list = new ArrayList<PaymentModePozo>();
+        list.add(new PaymentModePozo("0","Select Bank"));
+        String selectQuery = "SELECT  * FROM " + TABLE_NEPAL_BANK;
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        if (cursor.moveToFirst()) {
+            do {
+                PaymentModePozo payPozo = new PaymentModePozo();
+                payPozo.setTypeID(cursor.getString(0));
+                payPozo.setPaymentMode(cursor.getString(1));
+//                payPozo.setHeaderData(cursor.getString(2));
+                list.add(payPozo);
             } while (cursor.moveToNext());
         }
         return list;

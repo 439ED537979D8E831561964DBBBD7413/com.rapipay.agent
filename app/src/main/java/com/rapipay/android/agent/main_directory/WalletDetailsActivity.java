@@ -41,7 +41,7 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
 
     EditText input_account, input_mobile, input_otp, input_ben_name;
     TextView input_name,spinner;
-    AppCompatButton btn_otpsubmit;
+    AppCompatButton btn_otpsubmit,btn_payee;
     LinearLayout sender_layout, otp_layout, fundlayout, beneficiary_layout, last_tran_layout;
     String otpRefId, ifsc_code;
     TextView bank_select;
@@ -93,6 +93,8 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
         fundlayout = (LinearLayout) findViewById(R.id.fundlayout);
         beneficiary_layout = (LinearLayout) findViewById(R.id.beneficiary_layout);
         beneficiary_details = (RecyclerView) findViewById(R.id.beneficiary_details);
+        btn_payee = (AppCompatButton)findViewById(R.id.btn_payee);
+        btn_payee.setOnClickListener(this);
 //last tranction
         last_tran_layout = (LinearLayout) findViewById(R.id.last_tran_layout);
         trans_details = (RecyclerView) findViewById(R.id.trans_details);
@@ -161,7 +163,7 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
             jsonObject.put("serviceType", "FUND_TRANSFER");
             jsonObject.put("requestType", "DMT_Channel");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("txnRef", "FT" + tsLong.toString());
+            jsonObject.put("txnRef", tsLong.toString());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("agentId", list.get(0).getMobilno());
             jsonObject.put("customerId", customerId);
@@ -185,7 +187,7 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
             jsonObject.put("serviceType", "DELETE_PAYEE");
             jsonObject.put("requestType", "DMT_Channel");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("txnRef", "DP" + tsLong.toString());
+            jsonObject.put("txnRef", tsLong.toString());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("agentId", list.get(0).getMobilno());
             jsonObject.put("customerId", customerId);
@@ -288,7 +290,7 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
             jsonObject.put("serviceType", "Verify_Account");
             jsonObject.put("requestType", "BC_CHANNEL");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("transactionID", "VA" + tsLong.toString());
+            jsonObject.put("transactionID", tsLong.toString());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("senderName", input_name.getText().toString());
             jsonObject.put("IFSC", ifsc_code);
@@ -409,7 +411,7 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
                 jsonObject.put("serviceType", "GET_WALLET_STATUS");
                 jsonObject.put("requestType", "DMT_Channel");
                 jsonObject.put("typeMobileWeb", "mobile");
-                jsonObject.put("txnRef", "GWS" + tsLong.toString());
+                jsonObject.put("txnRef", tsLong.toString());
                 jsonObject.put("nodeAgentId", list.get(0).getMobilno());
                 jsonObject.put("agentId", list.get(0).getMobilno());
                 jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
@@ -434,7 +436,7 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
             jsonObject.put("serviceType", "PROCESS_OTP");
             jsonObject.put("requestType", "DMT_CHANNEL");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("txnRef", "POTP" + tsLong.toString());
+            jsonObject.put("txnRef", tsLong.toString());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("agentId", list.get(0).getMobilno());
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
@@ -457,7 +459,7 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
             jsonObject.put("serviceType", "ADD_PAYEE");
             jsonObject.put("requestType", "DMT_CHANNEL");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("txnRef", "AP" + tsLong.toString());
+            jsonObject.put("txnRef", tsLong.toString());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("agentId", list.get(0).getMobilno());
             jsonObject.put("beneficiaryName", input_ben_name.getText().toString());
@@ -568,7 +570,7 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
             jsonObject.put("serviceType", "GET_SERVICE_FEE");
             jsonObject.put("requestType", "BC_CHANNEL");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("transactionID", "GSF" + tsLong.toString());
+            jsonObject.put("transactionID", tsLong.toString());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("agentID", list.get(0).getMobilno());
             jsonObject.put("subType", "Fund_Transfer");

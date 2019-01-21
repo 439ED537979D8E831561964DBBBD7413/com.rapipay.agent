@@ -76,7 +76,7 @@ public class ChangePinFragment extends Fragment implements RequestHandler, View.
                 jsonObject.put("serviceType", "ChangePin");
                 jsonObject.put("requestType", "handset_CHannel");
                 jsonObject.put("typeMobileWeb", "mobile");
-                jsonObject.put("txnRefId", "CPI" + tsLong.toString());
+                jsonObject.put("txnRefId", tsLong.toString());
                 jsonObject.put("agentId", list.get(0).getMobilno());
                 jsonObject.put("nodeAgentId", list.get(0).getMobilno());
                 jsonObject.put("oldPin", otppinView.getText().toString());

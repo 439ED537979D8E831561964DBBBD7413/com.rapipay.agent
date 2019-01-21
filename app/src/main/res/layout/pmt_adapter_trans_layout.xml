@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:elevation="10dp"
+    android:layout_margin="5dp"
+    app:cardBackgroundColor="@color/white">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_margin="3sp"
+            android:weightSum="800">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="300"
+                android:inputType="text"
+                android:text="AccountNo"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/accountNo"
+                android:layout_width="0dp"
+                android:layout_marginLeft="5dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="500"
+                android:onClick="onClick"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:inputType="textMultiLine"
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_margin="3sp"
+            android:weightSum="800">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="300"
+                android:inputType="text"
+                android:text="Request Amountt"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/requestAmt"
+                android:layout_width="0dp"
+                android:layout_marginLeft="5dp"
+                android:inputType="textMultiLine"
+                android:layout_height="wrap_content"
+                android:layout_weight="500"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:onClick="onClick"
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_margin="3sp"
+            android:weightSum="800">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="300"
+                android:inputType="text"
+                android:text="User TxnId"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/userTxnId"
+                android:layout_marginLeft="5dp"
+                android:layout_width="0dp"
+                android:inputType="textMultiLine"
+                android:layout_height="wrap_content"
+                android:layout_weight="500"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:onClick="onClick"
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="12sp" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_margin="3sp"
+            android:weightSum="800">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="300"
+                android:inputType="text"
+                android:text="Service Provider TXNID"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/serviceProviderTXNID"
+                android:layout_width="0dp"
+                android:layout_marginLeft="5dp"
+                android:inputType="textMultiLine"
+                android:layout_height="wrap_content"
+                android:layout_weight="500"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:onClick="onClick"
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="12sp" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_margin="3sp"
+            android:weightSum="800">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="300"
+                android:inputType="text"
+                android:text="Beneficiary Name"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/beneficiaryName"
+                android:layout_width="0dp"
+                android:inputType="textMultiLine"
+                android:layout_marginLeft="5dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="500"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:onClick="onClick"
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_margin="3sp"
+            android:weightSum="800">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="300"
+                android:inputType="text"
+                android:text="Bank Details"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/bankName"
+                android:layout_width="0dp"
+                android:inputType="textMultiLine"
+                android:layout_marginLeft="5dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="500"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:onClick="onClick"
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_margin="3sp"
+            android:weightSum="800">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="300"
+                android:inputType="text"
+                android:text="Txn DateTime"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/txnDateTime"
+                android:layout_width="0dp"
+                android:inputType="textMultiLine"
+                android:layout_marginLeft="5dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="500"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:onClick="onClick"
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_margin="3sp"
+            android:weightSum="800">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="300"
+                android:inputType="text"
+                android:text="Txn Status"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/txnStatus"
+                android:layout_width="0dp"
+                android:inputType="textMultiLine"
+                android:layout_marginLeft="5dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="500"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:onClick="onClick"
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+</android.support.v7.widget.CardView>

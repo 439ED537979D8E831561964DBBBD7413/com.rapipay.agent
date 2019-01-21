@@ -98,7 +98,7 @@ public class ChannelHistoryActivity extends BaseCompactActivity implements View.
             jsonObject.put("serviceType", "Get_Txn_Recipt");
             jsonObject.put("requestType", "DMT_CHANNEL");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("txnRef", "GTRt" + tsLong.toString());
+            jsonObject.put("txnRef", tsLong.toString());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("agentId", list.get(0).getMobilno());
             jsonObject.put("orgTxnRef", pozo.getOrgTxnid());
@@ -139,7 +139,7 @@ public class ChannelHistoryActivity extends BaseCompactActivity implements View.
             jsonObject.put("serviceType", "GET_CHANNEL_TXN_HISTORY");
             jsonObject.put("requestType", "REPORT_CHANNEL");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("transactionID", "GCTHY" + tsLong.toString());
+            jsonObject.put("transactionID", tsLong.toString());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("fromTxnDate", date2_text.getText().toString());
             jsonObject.put("toTxnDate", date1_text.getText().toString());
@@ -161,7 +161,7 @@ public class ChannelHistoryActivity extends BaseCompactActivity implements View.
 //            jsonObject.put("serviceType", "Get_Txn_Recipt");
 //            jsonObject.put("requestType", pozo.getTransferType());
 //            jsonObject.put("typeMobileWeb", "mobile");
-//            jsonObject.put("txnRef", "GTR" + tsLong.toString());
+//            jsonObject.put("txnRef", tsLong.toString());
 //            jsonObject.put("nodeAgentId", list.get(0).getMobilno());
 //            jsonObject.put("agentId", list.get(0).getMobilno());
 //            jsonObject.put("txnDate", pozo.getDate_id());

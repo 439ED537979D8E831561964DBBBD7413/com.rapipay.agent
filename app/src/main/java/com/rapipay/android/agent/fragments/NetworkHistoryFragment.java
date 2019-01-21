@@ -249,7 +249,7 @@ public class NetworkHistoryFragment extends BaseFragment implements RequestHandl
             jsonObject.put("serviceType", "C2C_CREDIT_HISTORY_REPORT");
             jsonObject.put("requestType", "BC_CHANNEL");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("transactionID", "CCHR" + tsLong.toString());
+            jsonObject.put("transactionID", tsLong.toString());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("fromDate", date2_text.getText().toString());
             jsonObject.put("toDate", date1_text.getText().toString());

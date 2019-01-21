@@ -132,6 +132,14 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:visibility="gone">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:text="Select below option for EMI"
+                    android:textSize="14dp"
+                    android:textColor="@color/colorPrimaryDark"/>
 
                 <ListView
                     android:id="@+id/lv_imflate"

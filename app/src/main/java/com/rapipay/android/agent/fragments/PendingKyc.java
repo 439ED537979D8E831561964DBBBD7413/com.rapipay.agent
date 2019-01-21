@@ -77,7 +77,7 @@ public class PendingKyc extends BaseFragment implements RequestHandler {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 PendingKYCPozo pendingKYCPozo = transactionPozoArrayList.get(position);
-                if (pendingKYCPozo.getIsKycSubmitted().equalsIgnoreCase("N") && pendingKYCPozo.getStatusAction().equalsIgnoreCase("PENDING")) {
+                if (pendingKYCPozo.getIsKycSubmitted().equalsIgnoreCase("N") && pendingKYCPozo.getStatusAction().equalsIgnoreCase("DENIED")) {
                     try {
                         String formData = getsession_ValidateKyc(customerType, pendingKYCPozo);
                         Intent intent = new Intent(getActivity(), WebViewVerify.class);
@@ -116,7 +116,7 @@ public class PendingKyc extends BaseFragment implements RequestHandler {
             jsonObject.put("serviceType", "KYC_PROCESS");
             jsonObject.put("reKYC", "");
             jsonObject.put("agentId", list.get(0).getMobilno());
-            jsonObject.put("txnRef", "VKP" + tsLong.toString());
+            jsonObject.put("txnRef", tsLong.toString());
             jsonObject.put("requestType", "EKYC_CHANNEL");
             jsonObject.put("typeMobileWeb", "mobile");
             jsonObject.put("kycType", kycType);
@@ -164,7 +164,7 @@ public class PendingKyc extends BaseFragment implements RequestHandler {
             jsonObject.put("serviceType", "PENDING_AGENT_KYC");
             jsonObject.put("requestType", "EKYC_Channel");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("txnRef", "PGK" + tsLong.toString());
+            jsonObject.put("txnRef", tsLong.toString());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("agentId", list.get(0).getMobilno());
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());

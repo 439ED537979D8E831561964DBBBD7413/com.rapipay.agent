@@ -366,7 +366,7 @@ public class AgentKYCFragment extends BaseFragment implements RequestHandler, Vi
             jsonObject.put("serviceType", "VALIDATE_KYC_DETAILS");
             jsonObject.put("requestType", "EKYC_CHANNEL");
             jsonObject.put("agentId", list.get(0).getMobilno());
-            jsonObject.put("txnRef", "VKD" + tsLong.toString());
+            jsonObject.put("txnRef", tsLong.toString());
             jsonObject.put("typeMobileWeb", "mobile");
             jsonObject.put("mobileNo", mobile_no.getText().toString());
             jsonObject.put("documentType", spinner_value);

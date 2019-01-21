@@ -75,7 +75,7 @@ public class ProfileFragment extends Fragment implements RequestHandler, View.On
                 jsonObject.put("serviceType", "GET_USER_PROFILE_DETAILS");
                 jsonObject.put("requestType", "handset_CHannel");
                 jsonObject.put("typeMobileWeb", "mobile");
-                jsonObject.put("txnRefId", "CP" + tsLong.toString());
+                jsonObject.put("txnRefId", tsLong.toString());
                 jsonObject.put("agentId", list.get(0).getMobilno());
                 jsonObject.put("nodeAgentId", list.get(0).getMobilno());
                 jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
@@ -246,7 +246,7 @@ public class ProfileFragment extends Fragment implements RequestHandler, View.On
                 jsonObject.put("serviceType", "UPDATE_USER_PROFILE_DETAILS");
                 jsonObject.put("requestType", "handset_CHannel");
                 jsonObject.put("typeMobileWeb", "mobile");
-                jsonObject.put("txnRefId", "GUPD" + tsLong.toString());
+                jsonObject.put("txnRefId", tsLong.toString());
                 jsonObject.put("agentId", list.get(0).getMobilno());
                 jsonObject.put("nodeAgentId", list.get(0).getMobilno());
                 for (String key : listMap.keySet()) {

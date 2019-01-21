@@ -69,7 +69,7 @@ public class MPOSRegistration extends BaseCompactActivity implements RequestHand
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
             jsonObject.put("responseUrl", "");
-            jsonObject.put("trnasactionId", "GFD" + tsLong.toString());
+            jsonObject.put("trnasactionId", tsLong.toString());
             form = "<html>\n" +
                     "\t<body>\n" +
                     "\t\t<form name=\"mposRegister\" id=\"mposRegister\" method=\"POST\" action=\"" + WebConfig.MPOSREG + "" + "\">\n" +
@@ -81,7 +81,7 @@ public class MPOSRegistration extends BaseCompactActivity implements RequestHand
                     "\t\t\t<input name=\"nodeAgentId\" value=\"" + list.get(0).getMobilno() + "\" type=\"hidden\"/>\n" +
                     "\t\t\t<input name=\"sessionRefNo\" value=\"" + list.get(0).getAftersessionRefNo() + "\" type=\"hidden\"/>\n" +
                     "\t\t\t<input name=\"responseUrl\" value=\"" + "" + "\" type=\"hidden\"/>\n" +
-                    "\t\t\t<input name=\"trnasactionId\" value=\"" + "GFD" + tsLong.toString() + "\" type=\"hidden\"/>\n" +
+                    "\t\t\t<input name=\"trnasactionId\" value=\"" + tsLong.toString() + "\" type=\"hidden\"/>\n" +
                     "\t\t\t<input name=\"checkSum\" value=\"" + GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()) + "\" type=\"hidden\"/>\n" +
                     "\t\t\t<input type=\"submit\"/>\n" +
                     "\t\t</form>\n" +

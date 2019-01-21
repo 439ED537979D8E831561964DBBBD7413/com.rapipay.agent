@@ -3,21 +3,17 @@ package com.rapipay.android.agent.main_directory;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.AppCompatButton;
-import android.text.Editable;
 import android.text.InputFilter;
 import android.text.InputType;
-import android.text.TextWatcher;
 import android.util.Base64;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -25,9 +21,7 @@ import android.widget.Toast;
 
 import com.rapipay.android.agent.Database.RapipayDB;
 import com.rapipay.android.agent.Model.NewKYCPozo;
-import com.rapipay.android.agent.Model.RapiPayPozo;
 import com.rapipay.android.agent.R;
-import com.rapipay.android.agent.fragments.AgentKYCFragment;
 import com.rapipay.android.agent.interfaces.RequestHandler;
 import com.rapipay.android.agent.utils.AsyncPostMethod;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
@@ -40,14 +34,10 @@ import org.json.JSONObject;
 import org.json.XML;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 public class CustomerKYCActivity extends BaseCompactActivity implements RequestHandler, View.OnClickListener {
     JSONObject jsonObject = null;
-    protected ArrayList<RapiPayPozo> list;
     protected Long tsLong;
     EditText mobile_no, documentid;
     public static Bitmap bitmap_trans = null;
@@ -64,8 +54,8 @@ public class CustomerKYCActivity extends BaseCompactActivity implements RequestH
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.customer_kyc_layout);
-        if (BaseCompactActivity.db != null && BaseCompactActivity.db.getDetails_Rapi())
-            list = BaseCompactActivity.db.getDetails();
+//        if (BaseCompactActivity.db != null && BaseCompactActivity.db.getDetails_Rapi())
+//            list = BaseCompactActivity.db.getDetails();
         TYPE = getIntent().getStringExtra("type");
         mobileNo = getIntent().getStringExtra("mobileNo");
         customerType = getIntent().getStringExtra("customerType");
@@ -323,7 +313,7 @@ public class CustomerKYCActivity extends BaseCompactActivity implements RequestH
             jsonObject.put("serviceType", "VALIDATE_KYC_DETAILS");
             jsonObject.put("requestType", "EKYC_CHANNEL");
             jsonObject.put("agentId", list.get(0).getMobilno());
-            jsonObject.put("txnRef", "VKD" + tsLong.toString());
+            jsonObject.put("txnRef", tsLong.toString());
             jsonObject.put("typeMobileWeb", "mobile");
             jsonObject.put("mobileNo", mobile_no.getText().toString());
             jsonObject.put("documentType", spinner_value);

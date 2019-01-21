@@ -191,7 +191,7 @@ NetworkTransferActivity extends BaseCompactActivity implements RequestHandler, V
             jsonObject.put("serviceType", servicetype);
             jsonObject.put("requestType", "BC_CHANNEL");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("transactionID", "GMND" + tsLong.toString());
+            jsonObject.put("transactionID", tsLong.toString());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
             jsonObject.put("agentMobile", mobileNo);
@@ -218,7 +218,7 @@ NetworkTransferActivity extends BaseCompactActivity implements RequestHandler, V
             jsonObject.put("serviceType", "C2C_NETWORK_CREDIT");
             jsonObject.put("requestType", "BC_Channel");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("transactionID", "CNC" + tsLong.toString());
+            jsonObject.put("transactionID", tsLong.toString());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
             jsonObject.put("agentSenderID", list.get(0).getMobilno());

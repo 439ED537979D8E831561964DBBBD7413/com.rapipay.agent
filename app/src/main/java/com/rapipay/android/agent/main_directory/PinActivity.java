@@ -75,7 +75,7 @@ public class PinActivity extends BaseCompactActivity implements View.OnClickList
                 jsonObject.put("typeMobileWeb", "mobile");
                 jsonObject.put("otp", otppinView.getText().toString());
                 jsonObject.put("otpRefId", otpRefId);
-                jsonObject.put("txnRefId", "PHR" + tsLong.toString());
+                jsonObject.put("txnRefId", tsLong.toString());
                 jsonObject.put("agentId", agentId);
                 jsonObject.put("nodeAgentId", agentId);
                 jsonObject.put("orgTxnRef", regTxnRefId);
@@ -172,7 +172,7 @@ public class PinActivity extends BaseCompactActivity implements View.OnClickList
                 jsonObject.put("serviceType", "UPDATE_DOWNLAOD_DATA_STATUS");
                 jsonObject.put("requestType", "BC_Channel");
                 jsonObject.put("typeMobileWeb", "mobile");
-                jsonObject.put("transactionID", "UDDS" + tsLong.toString());
+                jsonObject.put("transactionID", tsLong.toString());
                 jsonObject.put("DataDownloadFlag", "Y");
                 jsonObject.put("agentMobile", list.get(0).getMobilno());
                 jsonObject.put("nodeAgentId", list.get(0).getMobilno());
@@ -199,7 +199,7 @@ public class PinActivity extends BaseCompactActivity implements View.OnClickList
                 jsonObject.put("requestType", "HANDSET_CHANNEL");
                 jsonObject.put("typeMobileWeb", "mobile");
                 jsonObject.put("nodeAgentId", list.get(0).getMobilno());
-                jsonObject.put("transactionID", "WLDD" + tsLong.toString());
+                jsonObject.put("transactionID", tsLong.toString());
                 jsonObject.put("timeStamp", format.format(date));
                 jsonObject.put("appType", BuildConfig.USERTYPE);
                 jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getSession(), jsonObject.toString()));
@@ -229,7 +229,7 @@ public class PinActivity extends BaseCompactActivity implements View.OnClickList
                 jsonObject.put("serviceType", "GET_MASTER_DATA");
                 jsonObject.put("requestType", "BC_CHANNEL");
                 jsonObject.put("typeMobileWeb", "mobile");
-                jsonObject.put("transactionID", "GMD" + tsLong.toString());
+                jsonObject.put("transactionID", tsLong.toString());
                 jsonObject.put("nodeAgentId", list.get(0).getMobilno());
                 jsonObject.put("sessionRefNo", list.get(0).getSessionRefNo());
                 jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getSession(), jsonObject.toString()));

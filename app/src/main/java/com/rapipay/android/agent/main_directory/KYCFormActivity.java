@@ -201,8 +201,14 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
         documentfront.setText("Upload " + documentType + " front");
         documentback = (AppCompatButton) findViewById(R.id.documentback);
         documentback.setText("Upload " + documentType + " back");
-        date1_text.setOnClickListener(checkDateClicked);
+        date1_text.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDialog(999);
+            }
+        });
         delete_all = (ImageView) findViewById(R.id.delete_all);
+        date1_text.setHint("Date Of Birth");
         fillPersonal();
         fillAddress();
         fillBusiness();
@@ -621,7 +627,7 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
             jsonObject.put("serviceType", "KYC_PROCESS");
             jsonObject.put("reKYC", "");
             jsonObject.put("agentId", list.get(0).getMobilno());
-            jsonObject.put("txnRef", "VKP" + tsLong.toString());
+            jsonObject.put("txnRef", tsLong.toString());
             jsonObject.put("requestType", "EKYC_CHANNEL");
             jsonObject.put("typeMobileWeb", "mobile");
             jsonObject.put("kycType", kycType);
@@ -661,14 +667,6 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
             e.printStackTrace();
         }
         return null;
-    }
-
-    private String getDataBase64(String data) {
-        try {
-            return Base64.encodeToString(data.getBytes("utf-8"), Base64.DEFAULT);
-        } catch (Exception e) {
-            return "";
-        }
     }
 
     private Bitmap addWaterMark(Bitmap src) {
@@ -729,6 +727,17 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
             date1_text.setError("Please enter valid date");
             date1_text.requestFocus();
             return false;
+        } else if (customerType.equalsIgnoreCase("C") && date1_text.getText().toString().isEmpty()) {
+            date1_text.setError("Please enter valid date");
+            date1_text.requestFocus();
+            return false;
+        } else if (customerType.equalsIgnoreCase("A")) {
+            if (!printDifference(mainDate(date1_text.getText().toString()))) {
+                date1_text.setError("Please enter valid date");
+                date1_text.requestFocus();
+                return false;
+            } else
+                return true;
         } else if (persons.equalsIgnoreCase("outside")) {
             if (passportphotoimage.getDrawable() == null) {
                 TextView self_photo = (TextView) findViewById(R.id.passportphoto);
@@ -800,7 +809,7 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
                 shop_photo.setError("Please upload valid data");
                 shop_photo.requestFocus();
                 return false;
-            }else if (gsin_no.getText().toString().length() != 0) {
+            } else if (gsin_no.getText().toString().length() != 0) {
                 if (!gsin_no.getText().toString().matches("^[0-9]{2}[a-zA-Z]{5}[0-9]{4}[a-zA-Z]{1}[0-9]{1}[a-zA-Z]{1}[a-z0-9A-Z]{1}$")) {
                     gsin_no.setError("Please upload valid data");
                     gsin_no.requestFocus();
@@ -965,21 +974,6 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
             }
         } catch (Exception e) {
         }
-    }
-
-    public Bitmap getResizedBitmap(Bitmap image, int maxSize) {
-        int width = image.getWidth();
-        int height = image.getHeight();
-
-        float bitmapRatio = (float) width / (float) height;
-        if (bitmapRatio > 1) {
-            width = maxSize;
-            height = (int) (width / bitmapRatio);
-        } else {
-            height = maxSize;
-            width = (int) (height * bitmapRatio);
-        }
-        return Bitmap.createScaledBitmap(image, width, height, true);
     }
 
     private void inspect(Uri uri, String documentType, String documentID, String imageType, TextView textView, ImageView view) {
@@ -1147,13 +1141,6 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
         return Base64.encodeToString(byteArray, Base64.DEFAULT);
     }
 
-    private String getBase64(Bitmap bitmap) {
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
-        byte[] byteArray = byteArrayOutputStream.toByteArray();
-        return Base64.encodeToString(byteArray, Base64.DEFAULT);
-    }
-
     private void parsePersonalJson(String scandata) {
         try {
             JSONObject object = new JSONObject(scandata);
@@ -1162,9 +1149,11 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
                 input_name.setEnabled(false);
             }
             if (object.has("dob")) {
-                date1_text.setText(dataconvert(object.getString("dob")));
-                date1_text.setEnabled(false);
-                date1_text.setOnClickListener(null);
+                if (object.getString("dob").contains("/") || object.getString("dob").contains("-")) {
+                    date1_text.setText(dataconvert(object.getString("dob")));
+                    date1_text.setEnabled(false);
+                    date1_text.setOnClickListener(null);
+                }
             }
 //            reset.setVisibility(View.VISIBLE);
         } catch (Exception e) {
@@ -1183,7 +1172,15 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
     }
 
     private String dataconvert(String formData) {
-        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+        SimpleDateFormat format = null;
+        if (formData.matches("^[0-9-]{5}[0-9]{2}[0-9-]{3}$"))
+            format = new SimpleDateFormat("yyyy-MM-dd");
+        else if (formData.matches("^[0-9-]{3}[0-9]{2}[0-9-]{5}$"))
+            format = new SimpleDateFormat("dd-MM-yyyy");
+        if (formData.matches("^[0-9/]{5}[0-9]{2}[0-9/]{3}$"))
+            format = new SimpleDateFormat("yyyy/MM/dd");
+        else if (formData.matches("^[0-9/]{3}[0-9]{2}[0-9/]{5}$"))
+            format = new SimpleDateFormat("dd/MM/yyyy");
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         try {
             Date date = format.parse(formData);

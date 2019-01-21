@@ -6,7 +6,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Locale;
 
 import me.grantland.widget.AutofitTextView;
 import com.rapipay.android.agent.Model.LastTransactionPozo;
@@ -57,7 +59,7 @@ public class LastTransAdapter extends RecyclerView.Adapter<LastTransAdapter.View
             } else {
                 layoutParams.height = 800;
             }*/
-        holder.btn_p_amounts.setText(mValues.get(position).getTxnAmount());
+        holder.btn_p_amounts.setText(format(mValues.get(position).getTxnAmount()));
         holder.btn_name.setText(mValues.get(position).getAccountNo());
         holder.p_transid.setText(mValues.get(position).getRefundTxnId());
         holder.btn_p_bank.setText(mValues.get(position).getBankName());
@@ -68,6 +70,15 @@ public class LastTransAdapter extends RecyclerView.Adapter<LastTransAdapter.View
     @Override
     public int getItemCount() {
         return mValues.size();
+    }
+    private String format(String amount) {
+        try {
+            NumberFormat formatter = NumberFormat.getInstance(new Locale("en", "IN"));
+            return formatter.format(formatter.parse(String.valueOf(Float.parseFloat(amount))));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
 

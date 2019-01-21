@@ -247,7 +247,7 @@ public class PendingRefundActivity extends BaseCompactActivity implements Reques
             jsonObject.put("serviceType", "SENDER_COMPLETE_DETAILS");
             jsonObject.put("requestType", "BC_CHANNEL");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("transactionID", "SCD" + tsLong.toString());
+            jsonObject.put("transactionID", tsLong.toString());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
             jsonObject.put("mobileNumber", number);
@@ -267,7 +267,7 @@ public class PendingRefundActivity extends BaseCompactActivity implements Reques
             jsonObject.put("serviceType", "GET_TXN_STATUS");
             jsonObject.put("requestType", "BC_CHANNEL");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("transactionID", "GTS" + tsLong.toString());
+            jsonObject.put("transactionID", tsLong.toString());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
             jsonObject.put("fundTransferId", transactionID);
@@ -287,7 +287,7 @@ public class PendingRefundActivity extends BaseCompactActivity implements Reques
             jsonObject.put("serviceType", "BC_Refund");
             jsonObject.put("requestType", "BC_CHANNEL");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("transactionID", "BCR" + tsLong.toString());
+            jsonObject.put("transactionID", tsLong.toString());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
             jsonObject.put("fundtransactionID", transactionID);
@@ -307,7 +307,7 @@ public class PendingRefundActivity extends BaseCompactActivity implements Reques
             jsonObject.put("requestType", "DMT_CHANNEL");
             jsonObject.put("typeMobileWeb", "mobile");
             jsonObject.put("transactionId", pozo.getRefundTxnId());
-            jsonObject.put("txnRef", "RT" + tsLong.toString());
+            jsonObject.put("txnRef", tsLong.toString());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("agentId", list.get(0).getMobilno());
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
@@ -525,7 +525,7 @@ public class PendingRefundActivity extends BaseCompactActivity implements Reques
             jsonObject.put("serviceType", "PROCESS_OTP");
             jsonObject.put("requestType", "DMT_CHANNEL");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("txnRef", "PO" + tsLong.toString());
+            jsonObject.put("txnRef", tsLong.toString());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("agentId", list.get(0).getMobilno());
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
@@ -546,7 +546,7 @@ public class PendingRefundActivity extends BaseCompactActivity implements Reques
             jsonObject.put("serviceType", "Verify_Mobile");
             jsonObject.put("requestType", "BC_CHANNEL");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("transactionID", "VM" + tsLong.toString());
+            jsonObject.put("transactionID", tsLong.toString());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());

@@ -36,6 +36,14 @@ public class MasterClass {
                 JSONArray array = object.getJSONArray("payeePayerTypeList");
                 insertPayeePayerDetails(array,db);
             }
+            if (object.has("pmt_paymentModeList")) {
+                JSONArray array = object.getJSONArray("pmt_paymentModeList");
+                insertNepalPaymentDetails(array,db);
+            }
+            if (object.has("pmt_bankList")) {
+                JSONArray array = object.getJSONArray("pmt_bankList");
+                insertNepalBankDetails(array,db);
+            }
             return true;
         }catch (Exception e){
             e.printStackTrace();
@@ -53,6 +61,38 @@ public class MasterClass {
                         "( ?, ?);";
                 SQLiteDatabase dba = db.getWritableDatabase();
                 dba.execSQL(insertSQL, new String[]{object.getString("typeID"), object.getString("paymentMode")});
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void insertNepalPaymentDetails(JSONArray array, RapipayDB db) {
+        try {
+            for (int i = 0; i < array.length(); i++) {
+                JSONObject object = array.getJSONObject(i);
+                String insertSQL = "INSERT INTO " + RapipayDB.TABLE_NEPAL_PAYMENTMOODE + "\n" +
+                        "(" + RapipayDB.COLOMN_PAYMENT_MODETYPE + "," + RapipayDB.COLOMN_PAYMENT_MODENAME + ")\n" +
+                        "VALUES \n" +
+                        "( ?, ?);";
+                SQLiteDatabase dba = db.getWritableDatabase();
+                dba.execSQL(insertSQL, new String[]{object.getString("operatorName"), object.getString("operatorDisplayName")});
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void insertNepalBankDetails(JSONArray array, RapipayDB db) {
+        try {
+            for (int i = 0; i < array.length(); i++) {
+                JSONObject object = array.getJSONObject(i);
+                String insertSQL = "INSERT INTO " + RapipayDB.TABLE_NEPAL_BANK + "\n" +
+                        "(" + RapipayDB.COLOMN_BANK_CODE + "," + RapipayDB.COLOMN__BANK_NAME + ")\n" +
+                        "VALUES \n" +
+                        "( ?, ?);";
+                SQLiteDatabase dba = db.getWritableDatabase();
+                dba.execSQL(insertSQL, new String[]{object.getString("bankCode"), object.getString("bankName")});
             }
         } catch (Exception e) {
             e.printStackTrace();

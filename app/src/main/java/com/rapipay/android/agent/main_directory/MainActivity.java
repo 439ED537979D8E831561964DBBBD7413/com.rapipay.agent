@@ -38,6 +38,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import com.rapipay.android.agent.BuildConfig;
 import com.rapipay.android.agent.Database.RapipayDB;
 import com.rapipay.android.agent.Model.BankDetailsPozo;
 import com.rapipay.android.agent.Model.HeaderePozo;
@@ -85,8 +86,13 @@ public class MainActivity extends BaseCompactActivity
             ArrayList<ImagePozo> imagePozoArrayList = db.getImageDetails(condition);
             if (imagePozoArrayList.size() != 0) {
                 byteConvert(back_click, imagePozoArrayList.get(0).getImagePath());
+            }else {
+                if (BuildConfig.APPTYPE == 1)
+                    back_click.setImageDrawable(getResources().getDrawable(R.drawable.ic_launcher));
+                if (BuildConfig.APPTYPE == 2)
+                    back_click.setImageDrawable(getResources().getDrawable(R.drawable.rapipay_parter));
             }
-            list = db.getDetails();
+//            list = db.getDetails();
             loadUrl();
         } else {
             dbNull(MainActivity.this);
@@ -122,7 +128,7 @@ public class MainActivity extends BaseCompactActivity
             jsonObject.put("serviceType", servicetype);
             jsonObject.put("requestType", "BC_CHANNEL");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("transactionID", "GNHD" + tsLong.toString());
+            jsonObject.put("transactionID", tsLong.toString());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
             jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
@@ -137,7 +143,6 @@ public class MainActivity extends BaseCompactActivity
         reset = (ImageView) findViewById(R.id.reset);
         reset.setOnClickListener(this);
         back_click = (ImageView) findViewById(R.id.back_click);
-
         tv = (TextView) this.findViewById(R.id.mywidget);
         tv.setSelected(true);
         reset.setColorFilter(getResources().getColor(R.color.colorPrimaryDark));
@@ -435,7 +440,7 @@ public class MainActivity extends BaseCompactActivity
                 jsonObject.put("serviceType", "GET_MASTER_DATA");
                 jsonObject.put("requestType", "BC_CHANNEL");
                 jsonObject.put("typeMobileWeb", "mobile");
-                jsonObject.put("transactionID", "GMD" + tsLong.toString());
+                jsonObject.put("transactionID", tsLong.toString());
                 jsonObject.put("nodeAgentId", list.get(0).getMobilno());
                 jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
                 jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
@@ -458,7 +463,7 @@ public class MainActivity extends BaseCompactActivity
                 jsonObject.put("serviceType", "UPDATE_DOWNLAOD_DATA_STATUS");
                 jsonObject.put("requestType", "BC_CHANNEL");
                 jsonObject.put("typeMobileWeb", "mobile");
-                jsonObject.put("transactionID", "UDDS" + tsLong.toString());
+                jsonObject.put("transactionID", tsLong.toString());
                 jsonObject.put("DataDownloadFlag", data + "1" + term);
                 jsonObject.put("agentMobile", list.get(0).getMobilno());
                 jsonObject.put("nodeAgentId", list.get(0).getMobilno());

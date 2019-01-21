@@ -116,7 +116,7 @@ public class RechargeHistory extends BaseCompactActivity implements View.OnClick
             jsonObject.put("serviceType", "Get_Txn_Recipt");
             jsonObject.put("requestType", "DMT_CHANNEL");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("txnRef", "GTRt" + tsLong.toString());
+            jsonObject.put("txnRef", tsLong.toString());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("agentId", list.get(0).getMobilno());
             jsonObject.put("orgTxnRef", pozo.getTransactionID());
@@ -159,7 +159,7 @@ public class RechargeHistory extends BaseCompactActivity implements View.OnClick
             jsonObject.put("serviceType", "RECHARGE_HISTORY");
             jsonObject.put("requestType", "UBP_CHANNEL");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("transactionID", "RH" + tsLong.toString());
+            jsonObject.put("transactionID", tsLong.toString());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("fromDate", date2_text.getText().toString());
             jsonObject.put("toDate", date1_text.getText().toString());

@@ -13,6 +13,8 @@
         android:layout_width="100dp"
         android:layout_height="50dp"
         android:layout_marginTop="8dp"
+        android:onClick="onClick"
+        android:clickable="true"
         android:layout_gravity="center|left"
         android:layout_marginLeft="10dp"
         android:scaleType="fitStart"/>
@@ -34,6 +36,7 @@
         android:scaleType="fitStart"
         android:layout_marginRight="5dp"
         android:onClick="onClick"
+        android:clickable="true"
         android:src="@drawable/reset"
         android:visibility="gone"/>
 </android.support.v7.widget.Toolbar>

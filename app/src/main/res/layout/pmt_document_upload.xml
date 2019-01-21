@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:autofit="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+
+
+    <me.grantland.widget.AutofitTextView
+        android:id="@+id/images_doc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:background="@drawable/border_view"
+        android:clickable="true"
+        android:gravity="center"
+        android:hint="No File Chosen"
+        android:onClick="onClick"
+        android:padding="10dp"
+        android:singleLine="true"
+        android:textSize="12dp"
+        autofit:minTextSize="8sp" />
+
+</LinearLayout>

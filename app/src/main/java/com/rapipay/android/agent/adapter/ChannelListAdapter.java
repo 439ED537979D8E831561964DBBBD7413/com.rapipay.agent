@@ -6,7 +6,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Locale;
 
 import me.grantland.widget.AutofitTextView;
 import com.rapipay.android.agent.Model.ChannelHistoryPozo;
@@ -65,10 +67,19 @@ public class ChannelListAdapter extends ArrayAdapter<ChannelHistoryPozo> {
 
         viewHolder.btn_p_amounts.setText("Bene Account ID : "+mValues.get(position).getAccount());
         viewHolder.btn_name.setText("Sender Name : " + mValues.get(position).getName());
-        viewHolder.p_transid.setText("Transaction Amt : " + mValues.get(position).getAmount());
+        viewHolder.p_transid.setText("Transaction Amt : " + format(mValues.get(position).getAmount()));
         viewHolder.btn_p_bank.setText("RRN : "+mValues.get(position).getServiceProviderTXNID());
         viewHolder.btn_status.setText("Status : "+mValues.get(position).getTxnId());
         // Return the completed view to render on screen
         return view;
+    }
+    private String format(String amount) {
+        try {
+            NumberFormat formatter = NumberFormat.getInstance(new Locale("en", "IN"));
+            return formatter.format(formatter.parse(String.valueOf(Float.parseFloat(amount))));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

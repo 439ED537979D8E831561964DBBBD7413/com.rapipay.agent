@@ -101,7 +101,7 @@ public class ChangeMobileFragment extends Fragment implements RequestHandler, Vi
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("requestType", "HANDSET_CHANNEL");
-            jsonObject.put("transactionID", "VKD" + tsLong.toString());
+            jsonObject.put("transactionID", tsLong.toString());
             jsonObject.put("newMobileNo", newmobileno.getText().toString());
             jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
         } catch (Exception e) {
@@ -119,7 +119,7 @@ public class ChangeMobileFragment extends Fragment implements RequestHandler, Vi
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("requestType", "HANDSET_CHANNEL");
-            jsonObject.put("transactionID", "VKD" + tsLong.toString());
+            jsonObject.put("transactionID", tsLong.toString());
             jsonObject.put("otp", oldotp.getText().toString());
             jsonObject.put("otpRefId", otpRefId);
             jsonObject.put("orgTxnRef", orgTxnId);
@@ -139,7 +139,7 @@ public class ChangeMobileFragment extends Fragment implements RequestHandler, Vi
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("requestType", "HANDSET_CHANNEL");
-            jsonObject.put("transactionID", "VKD" + tsLong.toString());
+            jsonObject.put("transactionID", tsLong.toString());
             jsonObject.put("newMobileNo", newmobileno.getText().toString());
             jsonObject.put("otp", newotp.getText().toString());
             jsonObject.put("otpRefId", otpRefId);

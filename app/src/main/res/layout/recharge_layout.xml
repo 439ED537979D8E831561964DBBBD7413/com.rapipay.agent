@@ -121,6 +121,7 @@
                 android:layout_marginRight="60dp"
                 android:background="@drawable/border_button"
                 android:onClick="onClick"
+                android:clickable="true"
                 android:text="@string/btnsubmit"
                 android:textColor="@color/white"
                 android:textSize="14dp" />

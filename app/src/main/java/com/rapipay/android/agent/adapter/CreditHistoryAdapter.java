@@ -5,8 +5,11 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Locale;
 
 import me.grantland.widget.AutofitTextView;
 import com.rapipay.android.agent.Model.CreditHistoryPozo;
@@ -20,7 +23,8 @@ public class CreditHistoryAdapter extends RecyclerView.Adapter<CreditHistoryAdap
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
-        public AutofitTextView btn_p_bank,btn_name,p_transid,btn_p_amounts,status;
+        public AutofitTextView btn_name,p_transid,btn_p_amounts,status;
+        private TextView btn_p_bank;
 
         public ViewHolder(View view) {
             super(view);
@@ -28,7 +32,7 @@ public class CreditHistoryAdapter extends RecyclerView.Adapter<CreditHistoryAdap
             btn_name = (AutofitTextView) view.findViewById(R.id.btn_name);
             btn_p_amounts = (AutofitTextView) view.findViewById(R.id.btn_p_amounts);
             p_transid = (AutofitTextView) view.findViewById(R.id.btn_p_transid);
-            btn_p_bank = (AutofitTextView)view.findViewById(R.id.btn_p_bank);
+            btn_p_bank = (TextView) view.findViewById(R.id.btn_p_bank);
             status = (AutofitTextView)view.findViewById(R.id.status);
         }
     }
@@ -58,7 +62,7 @@ public class CreditHistoryAdapter extends RecyclerView.Adapter<CreditHistoryAdap
             }*/
         holder.btn_p_amounts.setText(mValues.get(position).getBankName());
         holder.btn_name.setText(mValues.get(position).getRequestId());
-        holder.p_transid.setText(mValues.get(position).getAmount());
+        holder.p_transid.setText(format(mValues.get(position).getAmount()));
         holder.btn_p_bank.setText(mValues.get(position).getRemark());
         holder.status.setText(mValues.get(position).getStatus());
 
@@ -67,6 +71,15 @@ public class CreditHistoryAdapter extends RecyclerView.Adapter<CreditHistoryAdap
     @Override
     public int getItemCount() {
         return mValues.size();
+    }
+    private String format(String amount) {
+        try {
+            NumberFormat formatter = NumberFormat.getInstance(new Locale("en", "IN"));
+            return formatter.format(formatter.parse(String.valueOf(Float.parseFloat(amount))));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
 

@@ -284,7 +284,7 @@ public class RegisterUserActivity extends BaseCompactActivity implements Request
             jsonObject.put("serviceType", "B2BTempUserRequest");
             jsonObject.put("requestType", "HandSet_Channel");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("txnRefId", "B2BT" + tsLong.toString());
+            jsonObject.put("txnRefId", tsLong.toString());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("agentId", list.get(0).getMobilno());
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());

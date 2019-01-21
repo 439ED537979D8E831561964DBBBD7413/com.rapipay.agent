@@ -205,7 +205,7 @@ public class PassbookActivity extends BaseCompactActivity implements View.OnClic
             jsonObject.put("serviceType", "GET_LEADGER_DETAILS");
             jsonObject.put("requestType", "REPORT_CHANNEL");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("transactionID", "GLD" + tsLong.toString());
+            jsonObject.put("transactionID", tsLong.toString());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("agentMobile", list.get(0).getMobilno());
             jsonObject.put("fromDate", date2_text.getText().toString());
@@ -228,7 +228,7 @@ public class PassbookActivity extends BaseCompactActivity implements View.OnClic
             jsonObject.put("serviceType", "Get_Txn_Recipt");
             jsonObject.put("requestType", pozo.getTransferType());
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("txnRef", "GTR" + tsLong.toString());
+            jsonObject.put("txnRef", tsLong.toString());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("agentId", list.get(0).getMobilno());
             jsonObject.put("txnDate", pozo.getDate_id());

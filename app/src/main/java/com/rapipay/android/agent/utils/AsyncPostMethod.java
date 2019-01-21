@@ -74,20 +74,23 @@ public class AsyncPostMethod extends AsyncTask<String, String, String> {
 //         || object.getString("responseCode").equalsIgnoreCase("75059")
 //         || object.getString("responsecode").equalsIgnoreCase("75059")
         try {
+
             if (s != null) {
                 if (s.contains("DOCTYPE")) {
                     handler.chechStat(s);
                 } else if (!s.equalsIgnoreCase("false")) {
                     JSONObject object = new JSONObject(s);
                     if (object.has("responseCode")) {
-                        if (object.getString("responseCode").equalsIgnoreCase("200") || object.getString("responseCode").equalsIgnoreCase("300") || object.getString("responseCode").equalsIgnoreCase("101") || object.getString("responseCode").equalsIgnoreCase("75077") || object.getString("responseCode").equalsIgnoreCase("75115") || object.getString("responseCode").equalsIgnoreCase("75062") || object.getString("responseCode").equalsIgnoreCase("75061") || object.getString("responseCode").equalsIgnoreCase("75063") || object.getString("responseCode").equalsIgnoreCase("60116")) {
+                        if (object.getString("responseCode").equalsIgnoreCase("1032") || object.getString("responseCode").equalsIgnoreCase("86004") || object.getString("responseCode").equalsIgnoreCase("60236") || object.getString("responseCode").equalsIgnoreCase("200") || object.getString("responseCode").equalsIgnoreCase("300") || object.getString("responseCode").equalsIgnoreCase("101") || object.getString("responseCode").equalsIgnoreCase("75077") || object.getString("responseCode").equalsIgnoreCase("75115") || object.getString("responseCode").equalsIgnoreCase("75062") || object.getString("responseCode").equalsIgnoreCase("75061") || object.getString("responseCode").equalsIgnoreCase("75063") || object.getString("responseCode").equalsIgnoreCase("60116") || object.getString("responseCode").equalsIgnoreCase("86001") || object.getString("responseCode").equalsIgnoreCase("86002")) {
                             handler.chechStatus(object);
                             if (object.has("apiCommonResposne")) {
                                 JSONObject object1 = object.getJSONObject("apiCommonResposne");
-                                String balance = object1.getString("runningBalance");
-                                for (int i = 0; i < MainActivity.pozoArrayList.size(); i++) {
-                                    if (MainActivity.pozoArrayList.get(i).getHeaderID().equalsIgnoreCase("1"))
-                                        MainActivity.pozoArrayList.get(i).setHeaderData(balance);
+                                if(object1!=null) {
+                                    String balance = object1.getString("runningBalance");
+                                    for (int i = 0; i < MainActivity.pozoArrayList.size(); i++) {
+                                        if (MainActivity.pozoArrayList.get(i).getHeaderID().equalsIgnoreCase("1"))
+                                            MainActivity.pozoArrayList.get(i).setHeaderData(balance);
+                                    }
                                 }
                             }
                         } else if (object.getString("responseCode").equalsIgnoreCase("60147")) {
@@ -95,41 +98,33 @@ public class AsyncPostMethod extends AsyncTask<String, String, String> {
                             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             context.startActivity(intent);
                         } else {
-                            if(object.has("serviceType")) {
+                            if (object.has("serviceType")) {
                                 if (object.getString("serviceType").equalsIgnoreCase("PinVerify"))
                                     handler.chechStat(object.getString("responseMessage"));
                                 else if (object.getString("serviceType").equalsIgnoreCase("ValidCredentialService"))
                                     handler.chechStat(object.getString("responseMessage"));
                                 else
-                                    customDialog_Common(object.getString("responseMessage"));
-                            }else if (object.has("responseMessage"))
-                                customDialog_Common(object.getString("responseMessage"));
-                            else if (object.has("responseMsg"))
-                                customDialog_Common(object.getString("responseMsg"));
+                                    responseMSg(object);
+                            } else
+                                responseMSg(object);
                         }
                     } else if (object.has("responsecode")) {
-                        if (object.getString("responsecode").equalsIgnoreCase("200") || object.getString("responsecode").equalsIgnoreCase("101") || object.getString("responsecode").equalsIgnoreCase("300") || object.getString("responsecode").equalsIgnoreCase("75077") || object.getString("responseCode").equalsIgnoreCase("75061") || object.getString("responseCode").equalsIgnoreCase("75063")) {
+                        if (object.getString("responsecode").equalsIgnoreCase("200") || object.getString("responsecode").equalsIgnoreCase("101") || object.getString("responsecode").equalsIgnoreCase("300") || object.getString("responsecode").equalsIgnoreCase("75077") || object.getString("responseCode").equalsIgnoreCase("75115") || object.getString("responseCode").equalsIgnoreCase("75062") || object.getString("responseCode").equalsIgnoreCase("75061") || object.getString("responseCode").equalsIgnoreCase("60116") || object.getString("responseCode").equalsIgnoreCase("75063")  || object.getString("responseCode").equalsIgnoreCase("86001") || object.getString("responseCode").equalsIgnoreCase("86002")) {
                             handler.chechStatus(object);
                             if (object.has("apiCommonResposne")) {
                                 JSONObject object1 = object.getJSONObject("apiCommonResposne");
-                                String balance = object1.getString("runningBalance");
-                                for (int i = 0; i < MainActivity.pozoArrayList.size(); i++) {
-                                    if (MainActivity.pozoArrayList.get(i).getHeaderID().equalsIgnoreCase("1"))
-                                        MainActivity.pozoArrayList.get(i).setHeaderValue(balance);
+                                if(object1!=null) {
+                                    String balance = object1.getString("runningBalance");
+                                    for (int i = 0; i < MainActivity.pozoArrayList.size(); i++) {
+                                        if (MainActivity.pozoArrayList.get(i).getHeaderID().equalsIgnoreCase("1"))
+                                            MainActivity.pozoArrayList.get(i).setHeaderValue(balance);
+                                    }
                                 }
                             }
-                        } else {
-                            if (object.has("responseMessage"))
-                                customDialog_Common(object.getString("responseMessage"));
-                            else
-                                customDialog_Common(object.getString("responseMsg"));
-                        }
-                    } else {
-                        if (object.has("responseMessage"))
-                            customDialog_Common(object.getString("responseMessage"));
-                        else
-                            customDialog_Common(object.getString("responseMsg"));
-                    }
+                        } else
+                            responseMSg(object);
+                    } else
+                        responseMSg(object);
                 } else {
                     customDialog_Common("No Internet Connectivity");
 //                    Toast.makeText(context,"No Internet Connectivity",Toast.LENGTH_SHORT).show();
@@ -180,6 +175,17 @@ public class AsyncPostMethod extends AsyncTask<String, String, String> {
             });
             dialog.setView(alertLayout);
             alertDialog = dialog.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void responseMSg(JSONObject object) {
+        try {
+            if (object.has("responseMessage"))
+                customDialog_Common(object.getString("responseMessage"));
+            else if (object.has("responseMsg"))
+                customDialog_Common(object.getString("responseMsg"));
         } catch (Exception e) {
             e.printStackTrace();
         }

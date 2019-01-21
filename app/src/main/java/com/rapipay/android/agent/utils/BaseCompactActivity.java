@@ -2,6 +2,7 @@ package com.rapipay.android.agent.utils;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -38,11 +39,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -69,12 +72,12 @@ import java.util.Locale;
 import me.grantland.widget.AutofitTextView;
 
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationServices;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.rapipay.android.agent.Database.RapipayDB;
 import com.rapipay.android.agent.Model.BeneficiaryDetailsPozo;
 import com.rapipay.android.agent.Model.HeaderePozo;
 import com.rapipay.android.agent.Model.ImagePozo;
+import com.rapipay.android.agent.Model.PMTBenefPozo;
 import com.rapipay.android.agent.Model.RapiPayPozo;
 import com.rapipay.android.agent.Model.VersionPozo;
 import com.rapipay.android.agent.R;
@@ -154,6 +157,13 @@ public class BaseCompactActivity extends AppCompatActivity {
 
     }
 
+    protected String getBase64(Bitmap bitmap) {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+        byte[] byteArray = byteArrayOutputStream.toByteArray();
+        return Base64.encodeToString(byteArray, Base64.DEFAULT);
+    }
+
     protected Bitmap base64Convert(String encodedImage) {
         byte[] decodedString = Base64.decode(encodedImage, Base64.DEFAULT);
         Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
@@ -198,7 +208,7 @@ public class BaseCompactActivity extends AppCompatActivity {
             jsonObject.put("serviceType", "KYC_PROCESS");
             jsonObject.put("requestType", "EKYC_CHANNEL");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("txnRef", "KYCP" + tsLong.toString());
+            jsonObject.put("txnRef", tsLong.toString());
             jsonObject.put("agentId", parentID);
             jsonObject.put("mobileNo", mobileNo);
             jsonObject.put("kycType", kycType);
@@ -259,6 +269,8 @@ public class BaseCompactActivity extends AppCompatActivity {
         dba.execSQL("delete from " + RapipayDB.TABLE_FOOTER);
         dba.execSQL("delete from " + RapipayDB.TABLE_TRANSFERLIST);
         dba.execSQL("delete from " + RapipayDB.TABLE_PAYERPAYEE);
+        dba.execSQL("delete from " + RapipayDB.TABLE_NEPAL_BANK);
+        dba.execSQL("delete from " + RapipayDB.TABLE_NEPAL_PAYMENTMOODE);
         if (!type.equalsIgnoreCase("")) {
             dba.execSQL("delete from " + RapipayDB.TABLE_NAME);
             dba.execSQL("delete from " + RapipayDB.TABLE_MASTER);
@@ -316,6 +328,12 @@ public class BaseCompactActivity extends AppCompatActivity {
                 btn_ok.setTextSize(10);
                 alertLayout.findViewById(R.id.accept_term).setVisibility(View.VISIBLE);
                 customView_term(alertLayout, output);
+            } else if (type.equalsIgnoreCase("Fund Transfer Confirmation")) {
+                alertLayout.findViewById(R.id.custom_service).setVisibility(View.VISIBLE);
+                moneyTransgerFees(alertLayout, object, ob, null, output, msg, input);
+            } else if (type.equalsIgnoreCase("OTPLAYOUT")) {
+                alertLayout.findViewById(R.id.otp_layout_pmt).setVisibility(View.VISIBLE);
+                otpViewPMT(alertLayout, object);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -324,19 +342,19 @@ public class BaseCompactActivity extends AppCompatActivity {
         btn_ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (type.equalsIgnoreCase("PENDINGREFUND"))
+                if (type.equalsIgnoreCase("PENDINGREFUND")) {
                     anInterface.okClicked(input, ob);
-                else if (type.equalsIgnoreCase("KYCLAYOUTS"))
-                    anInterface.okClicked(type, ob);
-                else if (type.equalsIgnoreCase("LOGOUT")) {
+                    alertDialog.dismiss();
+                } else if (type.equalsIgnoreCase("LOGOUT")) {
                     return_Page();
-                } else if (type.equalsIgnoreCase("TERMCONDITION")) {
+                    alertDialog.dismiss();
+                } else if (type.equalsIgnoreCase("OTPLAYOUT")) {
                     anInterface.okClicked(type, ob);
-                } else if (type.equalsIgnoreCase("KYCLAYOUTS")) {
+//                    alertDialog.dismiss();
+                } else {
                     anInterface.okClicked(type, ob);
-                } else
-                    anInterface.okClicked(type, ob);
-                alertDialog.dismiss();
+                    alertDialog.dismiss();
+                }
             }
         });
         btn_cancel.setOnClickListener(new View.OnClickListener() {
@@ -362,6 +380,14 @@ public class BaseCompactActivity extends AppCompatActivity {
         Intent intent = new Intent(BaseCompactActivity.this, PinVerification.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
+    }
+
+    protected String getDataBase64(String data) {
+        try {
+            return Base64.encodeToString(data.getBytes("utf-8"), Base64.DEFAULT);
+        } catch (Exception e) {
+            return "";
+        }
     }
 
     protected void serviceFee(View alertLayout, JSONObject object, BeneficiaryDetailsPozo pozo, String msg, String input) throws Exception {
@@ -415,11 +441,49 @@ public class BaseCompactActivity extends AppCompatActivity {
         TextView change = (TextView) alertLayout.findViewById(R.id.change);
         change.setText(object.getString("sForComm"));
         btn_amount_servide.setText(object.getString("txnAmount"));
-        btn_account.setText(accountNo);
+        if (accountNo != null)
+            btn_account.setText(accountNo);
         btn_sendname.setText(input);
-        String condition = "where " + RapipayDB.COLOMN_IFSC + "='" + ifsc_code + "'";
-        btn_bank.setText(db.geBank(condition).get(0));
-        btn_name.setText(name);
+        if (ifsc_code != null) {
+            String condition = "where " + RapipayDB.COLOMN_IFSC + "='" + ifsc_code + "'";
+            btn_bank.setText(db.geBank(condition).get(0));
+        }
+        if (name != null)
+            btn_name.setText(name);
+        dialog.setView(alertLayout);
+    }
+
+    protected void moneyTransgerFees(View alertLayout, JSONObject object, Object ob, String ifsc_code, String name, String msg, String input) throws Exception {
+        TextView btn_name = (TextView) alertLayout.findViewById(R.id.btn_name_service);
+        TextView btn_servicefee = (TextView) alertLayout.findViewById(R.id.btn_servicefee);
+        btn_servicefee.setText(String.valueOf(Math.round(Double.parseDouble(object.getString("chargeServiceFee")) * 100.0) / 100.0));
+        TextView btn_igst = (TextView) alertLayout.findViewById(R.id.btn_igst);
+        btn_igst.setText(String.valueOf(Math.round(Double.parseDouble(object.getString("igst")) * 100.0) / 100.0));
+        TextView btn_cgst = (TextView) alertLayout.findViewById(R.id.btn_cgst);
+        btn_cgst.setText(String.valueOf(Math.round(Double.parseDouble(object.getString("cgst")) * 100.0) / 100.0));
+        TextView btn_sgst = (TextView) alertLayout.findViewById(R.id.btn_sgst);
+        btn_sgst.setText(String.valueOf(Math.round(Double.parseDouble(object.getString("sgst")) * 100.0) / 100.0));
+        TextView btn_sendname = (TextView) alertLayout.findViewById(R.id.btn_sendname);
+        TextView btn_account = (TextView) alertLayout.findViewById(R.id.btn_account_service);
+        TextView btn_bank = (TextView) alertLayout.findViewById(R.id.btn_bank_service);
+        TextView btn_amount_servide = (TextView) alertLayout.findViewById(R.id.btn_amount_servide);
+        TextView change = (TextView) alertLayout.findViewById(R.id.change);
+        change.setText(object.getString("sForComm"));
+        btn_amount_servide.setText(object.getString("txnAmount"));
+        if (ob != null) {
+            PMTBenefPozo pozo = (PMTBenefPozo) ob;
+            if (pozo.getAccount_Number().equalsIgnoreCase("null") || pozo.getAccount_Number().equalsIgnoreCase(""))
+                btn_account.setText(pozo.getAccount_Number());
+            else
+                alertLayout.findViewById(R.id.layout_account).setVisibility(View.GONE);
+            if (pozo.getBank_Details().equalsIgnoreCase("null") || pozo.getBank_Details().equalsIgnoreCase(""))
+                btn_bank.setText(pozo.getBank_Details());
+            else
+                alertLayout.findViewById(R.id.layout_bank).setVisibility(View.GONE);
+        }
+        btn_sendname.setText(input);
+        if (name != null)
+            btn_name.setText(name);
         dialog.setView(alertLayout);
     }
 
@@ -468,6 +532,11 @@ public class BaseCompactActivity extends AppCompatActivity {
         dialog.setView(alertLayout);
     }
 
+    protected void otpViewPMT(View alertLayout, JSONObject object) throws Exception {
+        otpView = (TextView) alertLayout.findViewById(R.id.input_otppmt);
+        dialog.setView(alertLayout);
+    }
+
     protected void customView(View alertLayout, String output) throws Exception {
         TextView otpView = (TextView) alertLayout.findViewById(R.id.dialog_msg);
         otpView.setText(output);
@@ -480,6 +549,51 @@ public class BaseCompactActivity extends AppCompatActivity {
         otpView.setText(Html.fromHtml(output));
         otpView.setVisibility(View.VISIBLE);
         dialog.setView(alertLayout);
+    }
+
+    @Override
+    protected Dialog onCreateDialog(int id) {
+        if (id == 999) {
+            Calendar calendar = Calendar.getInstance();
+            selectedDate = calendar.get(Calendar.DAY_OF_MONTH);
+            selectedMonth = calendar.get(Calendar.MONTH);
+            selectedYear = calendar.get(Calendar.YEAR);
+            return new DatePickerDialog(this,
+                    myDateListener, selectedYear, selectedMonth, selectedDate);
+        }
+        return null;
+    }
+
+    private DatePickerDialog.OnDateSetListener myDateListener = new
+            DatePickerDialog.OnDateSetListener() {
+                @Override
+                public void onDateSet(DatePicker arg0,
+                                      int arg1, int arg2, int arg3) {
+                    // TODO Auto-generated method stub
+                    // arg1 = year
+                    // arg2 = month
+                    // arg3 = day
+                    showDate(arg1, arg2 + 1, arg3);
+                }
+            };
+
+    private void showDate(int year, int month, int day) {
+        if (String.valueOf(month + 1).length() == 1)
+            months = "0" + String.valueOf(month);
+        else
+            months = String.valueOf(month);
+        if (String.valueOf(day).length() == 1)
+            dayss = "0" + String.valueOf(day);
+        else
+            dayss = String.valueOf(day);
+        if (selectedDate >= day && selectedMonth + 1 >= month && selectedYear >= year) {
+            date1_text.setText(year + "-" + months + "-" + dayss);
+            date1_text.setError(null);
+        } else if (selectedYear > year) {
+            date1_text.setText(year + "-" + months + "-" + dayss);
+            date1_text.setError(null);
+        } else
+            date1_text.setError("Please select correct date");
     }
 
     protected View.OnClickListener toDateClicked = new View.OnClickListener() {
@@ -562,19 +676,19 @@ public class BaseCompactActivity extends AppCompatActivity {
 //                        date1_text.setText(year + "-" + months + "-" + dayss);
 //                        dialog.dismiss();
 //                    } else {
-                        if (dayOfMonth <= selectedDate  && (month+1) <= (selectedMonth+1) && year==selectedYear) {
-                            date1_text.setText(year + "-" + months + "-" + dayss);
-                            dialog.dismiss();
-                        }else if (year<selectedYear) {
-                            date1_text.setText(year + "-" + months + "-" + dayss);
-                            dialog.dismiss();
-                        }else {
-                            date1_text.setText("");
-                            Toast.makeText(BaseCompactActivity.this,"Future date selection are not allowed",Toast.LENGTH_SHORT).show();
+                    if (dayOfMonth <= selectedDate && (month + 1) <= (selectedMonth + 1) && year == selectedYear) {
+                        date1_text.setText(year + "-" + months + "-" + dayss);
+                        dialog.dismiss();
+                    } else if (year < selectedYear) {
+                        date1_text.setText(year + "-" + months + "-" + dayss);
+                        dialog.dismiss();
+                    } else {
+                        date1_text.setText("");
+                        Toast.makeText(BaseCompactActivity.this, "Future date selection are not allowed", Toast.LENGTH_SHORT).show();
 //                            date1_text.setText(year + "-" + months + "-" + dayss);
-                                dialog.dismiss();
+                        dialog.dismiss();
 //                            }
-                        }
+                    }
 //                    }
                     date1_text.setError(null);
                     selectedDate = dayOfMonth;
@@ -992,7 +1106,7 @@ public class BaseCompactActivity extends AppCompatActivity {
             byteConvert(receipt_logo, imagePozoArrayList.get(0).getImagePath());
         }
         main_layout = (LinearLayout) alertLayout.findViewById(R.id.main_layout);
-
+        TextView mediums = (TextView) alertLayout.findViewById(R.id.medium);
         main_layout.setDrawingCacheEnabled(true);
         main_layout.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
                 View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
@@ -1000,7 +1114,7 @@ public class BaseCompactActivity extends AppCompatActivity {
         main_layout.buildDrawingCache(true);
 
         TextView text = (TextView) alertLayout.findViewById(R.id.dialog_title);
-        TextView mediums = (TextView) main_layout.findViewById(R.id.medium);
+
         text.setText(type);
         LinearLayout listLeft = (LinearLayout) main_layout.findViewById(R.id.listLeft);
         LinearLayout listRight = (LinearLayout) main_layout.findViewById(R.id.listRight);
@@ -1097,12 +1211,14 @@ public class BaseCompactActivity extends AppCompatActivity {
         alertDialog = dialog.show();
     }
 
-    protected void customReceiptForTransaction(final String type, final JSONObject object, final CustomInterface anInterface) {
+    protected void customReceiptNewTransaction(final String type, final JSONObject object, final CustomInterface anInterface) {
         this.anInterface = anInterface;
         left = new ArrayList<>();
         right = new ArrayList<>();
         medium = new ArrayList<>();
         bottom = new ArrayList<>();
+        String medium_value = "";
+        int q = 0;
         try {
             JSONArray array = object.getJSONArray("getTxnReceiptDataList");
             for (int i = 0; i < array.length(); i++) {
@@ -1120,6 +1236,10 @@ public class BaseCompactActivity extends AppCompatActivity {
                         right.add(jsonObject.getString("headerText") + " " + jsonObject.getString("headerValue"));
                 }
                 if (jsonObject.getString("displayType").equalsIgnoreCase("M")) {
+                    if (!jsonObject.getString("headerText").equalsIgnoreCase(medium_value)) {
+                        medium_value = jsonObject.getString("headerText");
+                        q = q + 1;
+                    }
                     if (jsonObject.getString("headerValue").equalsIgnoreCase("null"))
                         medium.add(jsonObject.getString("headerText") + " " + "NA");
                     else
@@ -1129,7 +1249,7 @@ public class BaseCompactActivity extends AppCompatActivity {
                     if (jsonObject.getString("headerValue").equalsIgnoreCase("null"))
                         bottom.add(new HeaderePozo(jsonObject.getString("headerText"), "NA"));
                     else
-                        bottom.add(new HeaderePozo(jsonObject.getString("headerText"), jsonObject.getString("headerValue")));
+                        bottom.add(new HeaderePozo(jsonObject.getString("headerText"), jsonObject.getString("headerValue"), medium_value));
                 }
             }
         } catch (Exception e) {
@@ -1137,8 +1257,13 @@ public class BaseCompactActivity extends AppCompatActivity {
         }
         dialog = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
-        View alertLayout = inflater.inflate(R.layout.receipt_layout_new, null);
-
+        View alertLayout = inflater.inflate(R.layout.pmt_receipt_layout, null);
+        ImageView receipt_logo = (ImageView) alertLayout.findViewById(R.id.receipt_logo);
+        String condition = "where " + RapipayDB.IMAGE_NAME + "='invoiceLogo.jpg'";
+        ArrayList<ImagePozo> imagePozoArrayList = db.getImageDetails(condition);
+        if (imagePozoArrayList.size() != 0) {
+            byteConvert(receipt_logo, imagePozoArrayList.get(0).getImagePath());
+        }
         main_layout = (LinearLayout) alertLayout.findViewById(R.id.main_layout);
 
         main_layout.setDrawingCacheEnabled(true);
@@ -1146,9 +1271,10 @@ public class BaseCompactActivity extends AppCompatActivity {
                 View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
         main_layout.layout(0, 0, main_layout.getMeasuredWidth(), main_layout.getMeasuredHeight());
         main_layout.buildDrawingCache(true);
-
+        AutofitTextView markdate = (AutofitTextView) alertLayout.findViewById(R.id.markdate);
+        TextView signature = (TextView) alertLayout.findViewById(R.id.signature);
         TextView text = (TextView) alertLayout.findViewById(R.id.dialog_title);
-        TextView mediums = (TextView) main_layout.findViewById(R.id.medium);
+
         text.setText(type);
         LinearLayout listLeft = (LinearLayout) main_layout.findViewById(R.id.listLeft);
         LinearLayout listRight = (LinearLayout) main_layout.findViewById(R.id.listRight);
@@ -1156,6 +1282,7 @@ public class BaseCompactActivity extends AppCompatActivity {
         AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
         ImageView share = (ImageView) alertLayout.findViewById(R.id.share);
         share.setColorFilter(getResources().getColor(R.color.colorPrimaryDark));
+        medium_value = "";
         if (left.size() != 0) {
             for (int k = 0; k < left.size(); k++) {
                 View inflate = inflater.inflate(R.layout.receipt_list, null);
@@ -1176,11 +1303,17 @@ public class BaseCompactActivity extends AppCompatActivity {
                 listRight.addView(inflate);
             }
         }
-        if (medium.size() == 1)
-            mediums.setText(medium.get(0));
+//        if (medium.size() == 1)
+//            mediums.setText(medium.get(0));
         if (bottom.size() != 0) {
             for (int i = 0; i < bottom.size(); i++) {
-                View inflate = inflater.inflate(R.layout.bottom_layout, null);
+                View inflate = inflater.inflate(R.layout.bottom_layout_pmt, null);
+                TextView mediums = (TextView) inflate.findViewById(R.id.medium_header);
+                if (!bottom.get(i).getHeaderID().equalsIgnoreCase(medium_value)) {
+                    mediums.setText(bottom.get(i).getHeaderID());
+                    medium_value = bottom.get(i).getHeaderID();
+                    mediums.setVisibility(View.VISIBLE);
+                }
                 AutofitTextView btn_name = (AutofitTextView) inflate.findViewById(R.id.btn_name);
                 TextView btn_p_bank = (TextView) inflate.findViewById(R.id.btn_p_bank);
                 LinearLayout top = (LinearLayout) inflate.findViewById(R.id.top);
@@ -1330,7 +1463,7 @@ public class BaseCompactActivity extends AppCompatActivity {
             jsonObject.put("serviceType", "APP_LIVE_STATUS");
             jsonObject.put("requestType", "handset_CHannel");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("transactionID", "ALS" + tsLong.toString());
+            jsonObject.put("transactionID", tsLong.toString());
             jsonObject.put("settingName", "Android");
             jsonObject.put("imeiNo", emi);
             jsonObject.put("checkSum", GenerateChecksum.checkSum(emi, jsonObject.toString()));
@@ -1508,4 +1641,65 @@ public class BaseCompactActivity extends AppCompatActivity {
             }
     }
 
+    protected Bitmap getResizedBitmap(Bitmap image, int maxSize) {
+        int width = image.getWidth();
+        int height = image.getHeight();
+
+        float bitmapRatio = (float) width / (float) height;
+        if (bitmapRatio > 1) {
+            width = maxSize;
+            height = (int) (width / bitmapRatio);
+        } else {
+            height = maxSize;
+            width = (int) (height * bitmapRatio);
+        }
+        return Bitmap.createScaledBitmap(image, width, height, true);
+    }
+
+    public boolean printDifference(Date startDate) {
+        //milliseconds
+        try {
+            Calendar c = Calendar.getInstance();
+            System.out.println("Current time => " + c.getTime());
+
+            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+            Date endDate = mainDate(df.format(c.getTime()));
+
+            long different = endDate.getTime() - startDate.getTime();
+
+            System.out.println("startDate : " + startDate);
+            System.out.println("endDate : " + endDate);
+            System.out.println("different : " + different);
+
+            long secondsInMilli = 1000;
+            long minutesInMilli = secondsInMilli * 60;
+            long hoursInMilli = minutesInMilli * 60;
+            long daysInMilli = hoursInMilli * 24;
+
+            long elapsedDays = different / daysInMilli;
+            different = different % daysInMilli;
+            long elapsedHours = different / hoursInMilli;
+            different = different % hoursInMilli;
+
+            long elapsedMinutes = different / minutesInMilli;
+            different = different % minutesInMilli;
+
+            long elapsedSeconds = different / secondsInMilli;
+            if (elapsedDays / 365 >= 18)
+                return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public Date mainDate(String date) {
+        try {
+            Date date1 = new SimpleDateFormat("yyyy-MM-dd").parse(date);
+            return date1;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }

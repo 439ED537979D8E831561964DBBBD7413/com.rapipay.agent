@@ -113,7 +113,7 @@
                 android:text="@string/p_remarks"
                 android:textSize="12sp" />
 
-            <me.grantland.widget.AutofitTextView
+            <TextView
                 android:id="@+id/btn_p_bank"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -121,9 +121,7 @@
                 android:text="@string/agentBalance"
                 android:textColor="@color/colorPrimaryDark"
                 android:textSize="12sp"
-                android:singleLine="true"
-                android:maxLines="1"
-                autofit:minTextSize="8sp"/>
+                android:inputType="textMultiLine"/>
         </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"

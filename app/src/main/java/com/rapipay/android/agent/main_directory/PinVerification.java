@@ -174,7 +174,7 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
                 jsonObject.put("serviceType", "PinVerify");
                 jsonObject.put("requestType", "handset_CHannel");
                 jsonObject.put("typeMobileWeb", "mobile");
-                jsonObject.put("txnRefId", "PVF" + tsLong.toString());
+                jsonObject.put("txnRefId", tsLong.toString());
                 jsonObject.put("agentId", list.get(0).getMobilno());
                 jsonObject.put("nodeAgentId", list.get(0).getMobilno());
                 jsonObject.put("pin", pinResults);
@@ -301,7 +301,7 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
                 jsonObject.put("serviceType", "GET_FOOTER_DATA");
                 jsonObject.put("requestType", "BC_CHANNEL");
                 jsonObject.put("typeMobileWeb", "mobile");
-                jsonObject.put("transactionID", "GFD" + tsLong.toString());
+                jsonObject.put("transactionID", tsLong.toString());
                 jsonObject.put("nodeAgentId", list.get(0).getMobilno());
                 if (db.getFooterDetail("banner").size() != 0)
                     jsonObject.put("timeStamp", db.getFooterDetail("banner").get(0).getTimeStamp());
@@ -327,7 +327,7 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
                 jsonObject.put("serviceType", "SERVICE_MASTER");
                 jsonObject.put("nodeAgentId", list.get(0).getMobilno());
                 jsonObject.put("requestType", "BC_CHANNEL");
-                jsonObject.put("transactionID", "GFD" + tsLong.toString());
+                jsonObject.put("transactionID", tsLong.toString());
                 jsonObject.put("typeMobileWeb", "mobile");
                 if (db.getMasterDetail("").size() != 0)
                     jsonObject.put("timeStamp", db.getMasterDetail("").get(0).getTimeStamp());

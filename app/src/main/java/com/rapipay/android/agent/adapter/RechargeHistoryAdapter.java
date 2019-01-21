@@ -6,7 +6,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Locale;
 
 import me.grantland.widget.AutofitTextView;
 import com.rapipay.android.agent.Model.RechargePozo;
@@ -60,7 +62,8 @@ public class RechargeHistoryAdapter extends RecyclerView.Adapter<RechargeHistory
         holder.btn_p_amounts.setText(mValues.get(position).getRechargeType());
         holder.btn_name.setText(mValues.get(position).getOperatorName());
         holder.p_transid.setText(mValues.get(position).getMobileNo());
-        holder.btn_p_bank.setText(mValues.get(position).getTxnAmount());
+        holder.btn_p_bank.setText(format(mValues.get(position).getTxnAmount()))
+        ;
         holder.txnid.setText(mValues.get(position).getTransactionID());
         holder.txnStatus.setText(mValues.get(position).getTxnStatus());
 
@@ -69,6 +72,15 @@ public class RechargeHistoryAdapter extends RecyclerView.Adapter<RechargeHistory
     @Override
     public int getItemCount() {
         return mValues.size();
+    }
+    private String format(String amount) {
+        try {
+            NumberFormat formatter = NumberFormat.getInstance(new Locale("en", "IN"));
+            return formatter.format(formatter.parse(String.valueOf(Float.parseFloat(amount))));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
 

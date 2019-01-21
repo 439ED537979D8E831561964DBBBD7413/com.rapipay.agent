@@ -142,7 +142,7 @@ public class ReChargeActivity extends BaseCompactActivity implements View.OnClic
             jsonObject.put("serviceType", serviceType);
             jsonObject.put("requestType", "UBP_Channel");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("transactionID", "UBPC" + tsLong.toString());
+            jsonObject.put("transactionID", tsLong.toString());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("serviceOperatorName", select_operator.getText().toString());
             jsonObject.put("rechargeType", operator_clicked);

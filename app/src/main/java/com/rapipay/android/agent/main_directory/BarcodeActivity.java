@@ -110,7 +110,6 @@ public class BarcodeActivity extends BaseCompactActivity implements VersionListe
                         ActivityCompat.requestPermissions(BarcodeActivity.this, new
                                 String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
                     }
-
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
