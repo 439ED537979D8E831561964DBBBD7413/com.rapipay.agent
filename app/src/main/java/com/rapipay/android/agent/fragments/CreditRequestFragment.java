@@ -516,7 +516,6 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
     }
 
     public JSONObject credit_request() {
-        Long tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         try {
             String remark = "";
@@ -527,7 +526,7 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
             jsonObject.put("serviceType", "CREDIT_FUND_REQUEST");
             jsonObject.put("requestType", "BC_CHANNEL");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("transactionID", tsLong.toString());
+            jsonObject.put("transactionID", ImageUtils.miliSeconds());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("agentID", list.get(0).getMobilno());
             jsonObject.put("parentID", list.get(0).getMobilno());

@@ -605,7 +605,6 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
     }
 
     public String getsession_ValidateKyc(String kycType) {
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         String byteBase64 = "", passportPhoto = "", signPhoto = "", shopPhoto = "", pancardImg = "", kycImage = "";
         if (customerType.equalsIgnoreCase("C"))
@@ -627,7 +626,7 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
             jsonObject.put("serviceType", "KYC_PROCESS");
             jsonObject.put("reKYC", "");
             jsonObject.put("agentId", list.get(0).getMobilno());
-            jsonObject.put("txnRef", tsLong.toString());
+            jsonObject.put("txnRef", ImageUtils.miliSeconds());
             jsonObject.put("requestType", "EKYC_CHANNEL");
             jsonObject.put("typeMobileWeb", "mobile");
             jsonObject.put("kycType", kycType);
@@ -759,7 +758,7 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
     }
 
     private Boolean addressValidation() {
-        if (!ImageUtils.commonAddress(city_name.getText().toString())) {
+        if (!ImageUtils.commonAddress(input_address.getText().toString())) {
             input_address.setError("Please enter valid address");
             input_address.requestFocus();
             return false;

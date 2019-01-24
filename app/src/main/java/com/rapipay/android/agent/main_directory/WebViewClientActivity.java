@@ -42,6 +42,7 @@ import com.rapipay.android.agent.interfaces.RequestHandler;
 import com.rapipay.android.agent.utils.AsyncPostMethod;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
 import com.rapipay.android.agent.utils.GenerateChecksum;
+import com.rapipay.android.agent.utils.ImageUtils;
 import com.rapipay.android.agent.utils.WebConfig;
 
 
@@ -280,7 +281,6 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
     }
 
     public String getsession_ValidateKyc(String tokenId, String orgTxnRef) {
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         String form = null;
         try {
@@ -289,7 +289,7 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
             jsonObject.put("agentId", parentId);
             jsonObject.put("typeMobileWeb", "mobile");
             jsonObject.put("tokenId", tokenId);
-            jsonObject.put("txnRef", tsLong.toString());
+            jsonObject.put("txnRef", ImageUtils.miliSeconds());
             jsonObject.put("orgTxnRef", orgTxnRef);
             jsonObject.put("nodeAgentId", nodeAgent);
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
@@ -308,7 +308,7 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
                         "\t\t\t<input name=\"sessionRefNo\" value=\"" + list.get(0).getAftersessionRefNo() + "\" type=\"hidden\"/>\n" +
                         "\t\t\t<input name=\"nodeAgentId\" value=\"" + nodeAgent + "\" type=\"hidden\"/>\n" +
                         "\t\t\t<input name=\"tokenId\" value=\"" + tokenId + "\" type=\"hidden\"/>\n" +
-                        "\t\t\t<input name=\"txnRef\" value=\"" + tsLong.toString() + "\" type=\"hidden\"/>\n" +
+                        "\t\t\t<input name=\"txnRef\" value=\"" + ImageUtils.miliSeconds() + "\" type=\"hidden\"/>\n" +
                         "\t\t\t<input name=\"orgTxnRef\" value=\"" + orgTxnRef + "\" type=\"hidden\"/>\n" +
                         "\t\t\t<input name=\"kycData\" value=\"" + base64image + "\" type=\"hidden\"/>\n" +
                         "\t\t\t<input name=\"kycImage\" value=\"" + RegisterUserFragment.byteBase64 + "\" type=\"hidden\"/>\n" +
@@ -331,7 +331,7 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
                         "\t\t\t<input name=\"sessionRefNo\" value=\"" + list.get(0).getAftersessionRefNo() + "\" type=\"hidden\"/>\n" +
                         "\t\t\t<input name=\"nodeAgentId\" value=\"" + nodeAgent + "\" type=\"hidden\"/>\n" +
                         "\t\t\t<input name=\"tokenId\" value=\"" + tokenId + "\" type=\"hidden\"/>\n" +
-                        "\t\t\t<input name=\"txnRef\" value=\"" + tsLong.toString() + "\" type=\"hidden\"/>\n" +
+                        "\t\t\t<input name=\"txnRef\" value=\"" + ImageUtils.miliSeconds() + "\" type=\"hidden\"/>\n" +
                         "\t\t\t<input name=\"orgTxnRef\" value=\"" + orgTxnRef + "\" type=\"hidden\"/>\n" +
                         "\t\t\t<input name=\"kycData\" value=\"" + base64image + "\" type=\"hidden\"/>\n" +
                         "\t\t\t<input name=\"kycImage\" value=\"" + RegisterUserActivity.byteBase64 + "\" type=\"hidden\"/>\n" +

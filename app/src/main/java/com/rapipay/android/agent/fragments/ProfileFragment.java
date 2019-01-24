@@ -27,6 +27,7 @@ import com.rapipay.android.agent.interfaces.RequestHandler;
 import com.rapipay.android.agent.utils.AsyncPostMethod;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
 import com.rapipay.android.agent.utils.GenerateChecksum;
+import com.rapipay.android.agent.utils.ImageUtils;
 import com.rapipay.android.agent.utils.LocalStorage;
 import com.rapipay.android.agent.utils.WebConfig;
 
@@ -41,7 +42,6 @@ public class ProfileFragment extends Fragment implements RequestHandler, View.On
 
     View rv;
     protected ArrayList<RapiPayPozo> list;
-    protected Long tsLong;
     protected LocalStorage localStorage;
     LinearLayout listView;
     ArrayList<HeaderePozo> pozoArrayList;
@@ -68,14 +68,13 @@ public class ProfileFragment extends Fragment implements RequestHandler, View.On
     }
 
     public JSONObject getJson_Validate() {
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         if (list.size() != 0) {
             try {
                 jsonObject.put("serviceType", "GET_USER_PROFILE_DETAILS");
                 jsonObject.put("requestType", "handset_CHannel");
                 jsonObject.put("typeMobileWeb", "mobile");
-                jsonObject.put("txnRefId", tsLong.toString());
+                jsonObject.put("txnRefId", ImageUtils.miliSeconds());
                 jsonObject.put("agentId", list.get(0).getMobilno());
                 jsonObject.put("nodeAgentId", list.get(0).getMobilno());
                 jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
@@ -239,14 +238,13 @@ public class ProfileFragment extends Fragment implements RequestHandler, View.On
     }
 
     public JSONObject updateJson_Validate(HashMap<String, String> listMap) {
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         if (list.size() != 0) {
             try {
                 jsonObject.put("serviceType", "UPDATE_USER_PROFILE_DETAILS");
                 jsonObject.put("requestType", "handset_CHannel");
                 jsonObject.put("typeMobileWeb", "mobile");
-                jsonObject.put("txnRefId", tsLong.toString());
+                jsonObject.put("txnRefId", ImageUtils.miliSeconds());
                 jsonObject.put("agentId", list.get(0).getMobilno());
                 jsonObject.put("nodeAgentId", list.get(0).getMobilno());
                 for (String key : listMap.keySet()) {

@@ -38,7 +38,6 @@ import java.util.ArrayList;
 
 public class CustomerKYCActivity extends BaseCompactActivity implements RequestHandler, View.OnClickListener {
     JSONObject jsonObject = null;
-    protected Long tsLong;
     EditText mobile_no, documentid;
     public static Bitmap bitmap_trans = null;
     public static String byteBase64;
@@ -307,13 +306,12 @@ public class CustomerKYCActivity extends BaseCompactActivity implements RequestH
     }
 
     public JSONObject request_user(String kycType) {
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("serviceType", "VALIDATE_KYC_DETAILS");
             jsonObject.put("requestType", "EKYC_CHANNEL");
             jsonObject.put("agentId", list.get(0).getMobilno());
-            jsonObject.put("txnRef", tsLong.toString());
+            jsonObject.put("txnRef", ImageUtils.miliSeconds());
             jsonObject.put("typeMobileWeb", "mobile");
             jsonObject.put("mobileNo", mobile_no.getText().toString());
             jsonObject.put("documentType", spinner_value);

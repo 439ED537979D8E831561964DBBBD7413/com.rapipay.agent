@@ -49,7 +49,6 @@ public class AgentKYCFragment extends BaseFragment implements RequestHandler, Vi
     protected ArrayList<RapiPayPozo> list;
     public static Bitmap bitmap_trans = null;
     public static String byteBase64;
-    protected Long tsLong;
     EditText mobile_no, documentid;
     private LinearLayout kyc_layout_bottom, scan_data;
     AppCompatButton sub_btn;
@@ -360,13 +359,12 @@ public class AgentKYCFragment extends BaseFragment implements RequestHandler, Vi
     }
 
     public JSONObject request_user(String kycType) {
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("serviceType", "VALIDATE_KYC_DETAILS");
             jsonObject.put("requestType", "EKYC_CHANNEL");
             jsonObject.put("agentId", list.get(0).getMobilno());
-            jsonObject.put("txnRef", tsLong.toString());
+            jsonObject.put("txnRef", ImageUtils.miliSeconds());
             jsonObject.put("typeMobileWeb", "mobile");
             jsonObject.put("mobileNo", mobile_no.getText().toString());
             jsonObject.put("documentType", spinner_value);

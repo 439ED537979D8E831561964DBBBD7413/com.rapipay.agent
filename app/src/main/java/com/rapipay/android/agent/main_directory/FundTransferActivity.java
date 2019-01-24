@@ -11,9 +11,11 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,9 +27,11 @@ import java.util.ArrayList;
 import com.rapipay.android.agent.Database.RapipayDB;
 import com.rapipay.android.agent.Model.BeneficiaryDetailsPozo;
 import com.rapipay.android.agent.Model.LastTransactionPozo;
+import com.rapipay.android.agent.Model.PaymentModePozo;
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.adapter.BeneficiaryAdapter;
 import com.rapipay.android.agent.adapter.LastTransAdapter;
+import com.rapipay.android.agent.adapter.PaymentAdapter;
 import com.rapipay.android.agent.interfaces.ClickListener;
 import com.rapipay.android.agent.interfaces.CustomInterface;
 import com.rapipay.android.agent.interfaces.RequestHandler;
@@ -45,13 +49,14 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
     AppCompatButton btn_otpsubmit, btn_fund, btn_verify;
     LinearLayout sender_layout, otp_layout, fundlayout, beneficiary_layout, last_tran_layout;
     String otpRefId, fund_transferId, ifsc_code;
-    TextView bank_select, text_ben;
+    TextView bank_select, text_ben,bank_select_bene;
     ImageView btn_sender, btn_search;
     RecyclerView beneficiary_details, trans_details;
     ArrayList<BeneficiaryDetailsPozo> beneficiaryDetailsPozoslist;
     ArrayList<LastTransactionPozo> transactionPozoArrayList;
     BeneficiaryDetailsPozo pozo;
     String amount = "";
+    TextView bene_number, bene_name, con_bene_number;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -66,7 +71,6 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
         input_otp.setText("");
         bank_select.setText("Select Bank");
     }
-
 
     private void initialize() {
         reset = (ImageView) findViewById(R.id.reset);
@@ -111,27 +115,11 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
                 customSpinner(bank_select, "Select Bank", list_bank);
             }
         });
-//        bank_select.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-//            @Override
-//            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-//                if (position != 0) {
-//                    String condition = "where " + RapipayDB.COLOMN__BANK_NAME + "='" + list_bank.get(position) + "'";
-//                    ifsc_code = db.geBankIFSC(condition).get(0);
-//                }
-//            }
-//
-//            @Override
-//            public void onNothingSelected(AdapterView<?> parent) {
-//
-//            }
-//        });
-
         beneficiary_details.addOnItemTouchListener(new RecyclerTouchListener(this, beneficiary_details, new ClickListener() {
             @Override
             public void onClick(View view, int position) {
                 pozo = beneficiaryDetailsPozoslist.get(position);
                 customDialog_Common("Fund Transfer", null, pozo, "Sure you want to Transfer?", "");
-//                customDialog_Ben(beneficiaryDetailsPozoslist.get(position));
             }
 
             @Override
@@ -174,13 +162,12 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
     }
 
     public JSONObject receipt_request(LastTransactionPozo pozo) {
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("serviceType", "Get_Txn_Recipt");
             jsonObject.put("requestType", "DMT_CHANNEL");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("txnRef", tsLong.toString());
+            jsonObject.put("txnRef", ImageUtils.miliSeconds());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("agentId", list.get(0).getMobilno());
             jsonObject.put("orgTxnRef", pozo.getRefundTxnId());
@@ -195,7 +182,6 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
     }
 
     public JSONObject getJson_Validate() {
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         if (!input_name.getText().toString().isEmpty() && !bank_select.getText().toString().isEmpty() && !bank_select.getText().toString().equalsIgnoreCase("Select Bank")) {
             try {
@@ -204,7 +190,7 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
                 jsonObject.put("serviceType", "Money_Transfer");
                 jsonObject.put("requestType", "BC_CHANNEL");
                 jsonObject.put("typeMobileWeb", "mobile");
-                jsonObject.put("transactionID", tsLong.toString());
+                jsonObject.put("transactionID", ImageUtils.miliSeconds());
                 jsonObject.put("txnAmmount", input_amount.getText().toString());
                 jsonObject.put("nodeAgentId", list.get(0).getMobilno());
                 jsonObject.put("senderName", input_name.getText().toString());
@@ -224,14 +210,13 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
     }
 
     public JSONObject getSender_Validate() {
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         if (!input_mobile.getText().toString().isEmpty() && input_mobile.getText().toString().length() == 10) {
             try {
                 jsonObject.put("serviceType", "SENDER_COMPLETE_DETAILS");
                 jsonObject.put("requestType", "BC_CHANNEL");
                 jsonObject.put("typeMobileWeb", "mobile");
-                jsonObject.put("transactionID", tsLong.toString());
+                jsonObject.put("transactionID", ImageUtils.miliSeconds());
                 jsonObject.put("nodeAgentId", list.get(0).getMobilno());
                 jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
                 jsonObject.put("mobileNumber", input_mobile.getText().toString());
@@ -247,15 +232,39 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
         return jsonObject;
     }
 
+    public JSONObject addBeneAccount(String accountNo, String ifsc_code, String bankAccountName, String CDFlag) {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("serviceType", "ADD_BENEFICIARY_DETAILS");
+            jsonObject.put("requestType", "BC_CHANNEL");
+            jsonObject.put("typeMobileWeb", "mobile");
+            jsonObject.put("transactionID", ImageUtils.miliSeconds());
+            jsonObject.put("nodeAgentId", list.get(0).getMobilno());
+            jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
+            jsonObject.put("mobileNumber", input_mobile.getText().toString());
+            jsonObject.put("accountNo", accountNo);
+            jsonObject.put("confirmAccountNo", accountNo);
+            jsonObject.put("senderMobile", input_mobile.getText().toString());
+            jsonObject.put("ifscCode", ifsc_code);
+            jsonObject.put("accountName", bankAccountName);
+            jsonObject.put("CDFlag", CDFlag);
+            jsonObject.put("reqFor", "BC1");
+            jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return jsonObject;
+    }
+
     public JSONObject addSender() {
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         if (!input_mobile.getText().toString().isEmpty() && input_mobile.getText().toString().length() == 10 && !input_name.getText().toString().isEmpty()) {
             try {
                 jsonObject.put("serviceType", "ADD_SENDER_DETAILS");
                 jsonObject.put("requestType", "BC_CHANNEL");
                 jsonObject.put("typeMobileWeb", "mobile");
-                jsonObject.put("transactionID", tsLong.toString());
+                jsonObject.put("transactionID", ImageUtils.miliSeconds());
                 jsonObject.put("nodeAgentId", list.get(0).getMobilno());
                 jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
                 jsonObject.put("mobileNumber", input_mobile.getText().toString());
@@ -273,14 +282,13 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
     }
 
     public JSONObject add_OtpDetails(String otpRefId, String fund_transferId) {
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         if (!input_mobile.getText().toString().isEmpty() && input_mobile.getText().toString().length() == 10 && input_otp.getText().toString().length() == 6 && !input_otp.getText().toString().isEmpty() && !input_name.getText().toString().isEmpty()) {
             try {
                 jsonObject.put("serviceType", "Verify_Mobile");
                 jsonObject.put("requestType", "BC_CHANNEL");
                 jsonObject.put("typeMobileWeb", "mobile");
-                jsonObject.put("transactionID", tsLong.toString());
+                jsonObject.put("transactionID", ImageUtils.miliSeconds());
                 jsonObject.put("nodeAgentId", list.get(0).getMobilno());
                 jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
                 jsonObject.put("senderMobile", input_mobile.getText().toString());
@@ -298,7 +306,6 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
         }
         return jsonObject;
     }
-
 
     @Override
     public void chechStatus(JSONObject object) {
@@ -327,15 +334,11 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
                     new AsyncPostMethod(WebConfig.BCRemittanceApp, getSender_Validate().toString(), headerData, FundTransferActivity.this).execute();
                 } else if (object.getString("serviceType").equalsIgnoreCase("GET_SERVICE_FEE")) {
                     customDialog_Common("Fund Transfer Confirmation", object, pozo, "Sure you want to Transfer?", input_mobile.getText().toString());
-//                    customService(pozo,object.getString("chargeServiceFee"),object.getString("cgst"),object.getString("igst"),object.getString("sgst"));
                 } else if (object.getString("serviceType").equalsIgnoreCase("Verify_Account")) {
-//                    customDialog("Account No :- " + object.getString("accountNo"));
                     customDialog_Common("Account Verify Details", object, pozo, "VerifyLayout", input_name.getText().toString());
                 } else if (object.getString("serviceType").equalsIgnoreCase("Money_Transfer_Bene")) {
-//                    customDialog(object.getString("responseMessage"));
                     customDialog_Common("Fund Transfer Details", object, pozo, "VerifyLayout", input_name.getText().toString());
                 } else if (object.getString("serviceType").equalsIgnoreCase("Money_Transfer")) {
-//                    customDialog(object.getString("responseMessage"));
                     if (object.has("getTxnReceiptDataList")) {
                         localStorage.setActivityState(LocalStorage.ROUTESTATE, "UPDATE");
                         try {
@@ -346,8 +349,6 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
                             customDialog_Common("Cannot generate receipt now please try later!", object, pozo, "VerifyLayout", input_name.getText().toString());
                         }
                     }
-//                    customDialog_Common("Money Transfer", null, null, "KYCLAYOUT", object.getString("responseMessage"));
-//                    customDialog_Common("Fund Transfer Details",object,pozo,"VerifyLayout",input_name.getText().toString());
                 } else if (object.getString("serviceType").equalsIgnoreCase("SENDER_COMPLETE_DETAILS")) {
                     hideKeyboard(FundTransferActivity.this);
                     otp_layout.setVisibility(View.GONE);
@@ -357,14 +358,6 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
                     clear();
                     input_name.setText(object.getString("senderName"));
                     text_ben.setText("Beneficiary Details (Available Limit : Rs " + format(object.getString("remainingLimit")) + ")");
-
-//                    if (list_bank.size() != 0) {
-//                        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
-//                                android.R.layout.simple_spinner_item, list_bank);
-//                        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//                        bank_select.setAdapter(dataAdapter);
-//                    }
-
                     if (object.has("oldTxnList")) {
                         if (Integer.parseInt(object.getString("oldTxnCount")) > 0) {
                             last_tran_layout.setVisibility(View.VISIBLE);
@@ -388,6 +381,8 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
                             customDialog_Common("Cannot generate receipt now please try later!", object, pozo, "VerifyLayout", input_name.getText().toString());
                         }
                     }
+                } else if (object.getString("serviceType").equalsIgnoreCase("ADD_BENEFICIARY_DETAILS")) {
+                    customDialog_Common("KYCLAYOUTS", null, null, null, null, object.getString("responseMessage"), FundTransferActivity.this);
                 }
             } else if (object.getString("responseCode").equalsIgnoreCase("101")) {
                 customDialog_Common("Money Transfer", null, null, "KYCLAYOUT", object.getString("responseMessage"));
@@ -410,18 +405,7 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
                 break;
             case R.id.btn_fund:
                 hideKeyboard(FundTransferActivity.this);
-                if (bank_select.getText().toString().equalsIgnoreCase("Select Bank")) {
-                    bank_select.setError("Please enter mandatory field");
-                    bank_select.requestFocus();
-                } else if (!ImageUtils.commonAccount(input_account.getText().toString(), 5, 30)) {
-                    input_account.setError("Please enter valid account number.");
-                    input_account.requestFocus();
-                } else if (!ImageUtils.commonAmount(input_amount.getText().toString())) {
-                    input_amount.setError("Please enter valid data");
-                    input_amount.requestFocus();
-                } else
-                    new AsyncPostMethod(WebConfig.BCRemittanceApp, service_fee(input_amount.getText().toString(), "Money_Transfer").toString(), headerData, FundTransferActivity.this).execute();
-//                new AsyncPostMethod(WebConfig.FUNDTRANSFER_URL, getJson_Validate().toString(), headerData, FundTransferActivity.this).execute();
+                addBeneDetails("FUNDTRANSFER", "Add Beneficiary Detail");
                 break;
             case R.id.btn_sender:
                 hideKeyboard(FundTransferActivity.this);
@@ -455,7 +439,74 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
                 reset();
                 input_mobile.setText("");
                 break;
+            case R.id.delete_all:
+                addBeneDetails("FUNDTRANSFER", "Add Beneficiary Detail");
+                break;
         }
+    }
+
+    private void addBeneDetails(final String type, String msg) {
+        dialog = new AlertDialog.Builder(this);
+        LayoutInflater inflater = getLayoutInflater();
+        final View alertLayout = inflater.inflate(R.layout.custom_layout_common, null);
+        TextView text = (TextView) alertLayout.findViewById(R.id.dialog_title);
+        TextView dialog_cancel = (TextView) alertLayout.findViewById(R.id.dialog_cancel);
+        text.setText(msg);
+        AppCompatButton btn_cancel = (AppCompatButton) alertLayout.findViewById(R.id.btn_cancel);
+        AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
+        try {
+            if (type.equalsIgnoreCase("FUNDTRANSFER")) {
+                alertLayout.findViewById(R.id.bc_add_bene_details).setVisibility(View.VISIBLE);
+                bene_number = (TextView) alertLayout.findViewById(R.id.bc_bene_number);
+                bene_name = (TextView) alertLayout.findViewById(R.id.bc_bene_name);
+                con_bene_number = (TextView) alertLayout.findViewById(R.id.bc_con_bene_num);
+                bank_select_bene = (TextView) alertLayout.findViewById(R.id.bank_select_bene);
+                bank_select_bene.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        ArrayList<String> list_bank = db.geBankDetails("");
+                        customSpinner(bank_select_bene, "Select Bank", list_bank);
+                    }
+                });
+                dialog.setView(alertLayout);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        dialog.setCancelable(false);
+        btn_ok.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (bank_select_bene.getText().toString().equalsIgnoreCase("Select Bank")) {
+                    bank_select_bene.setError("Please enter mandatory field");
+                    bank_select_bene.requestFocus();
+                } else if (!ImageUtils.commonAccount(bene_number.getText().toString(), 5, 30)) {
+                    bene_number.setError("Please enter valid beneficiary number");
+                    bene_number.requestFocus();
+                } else if (bene_name.getText().toString().isEmpty()) {
+                    bene_name.setError("Please enter valid data");
+                    bene_name.requestFocus();
+                } else if (!ImageUtils.commonAccount(con_bene_number.getText().toString(), 5, 30)) {
+                    con_bene_number.setError("Please enter valid confirm beneficiary number");
+                    con_bene_number.requestFocus();
+                } else if (!bene_number.getText().toString().equalsIgnoreCase(con_bene_number.getText().toString())) {
+                    con_bene_number.setError("Account number not matched");
+                    con_bene_number.requestFocus();
+                } else {
+                    newdialog.dismiss();
+                    String condition = "where " + RapipayDB.COLOMN__BANK_NAME + "='" + bank_select_bene.getText().toString() + "'";
+                    ifsc_code = db.geBankIFSC(condition).get(0);
+                    new AsyncPostMethod(WebConfig.BCRemittanceApp, addBeneAccount(bene_number.getText().toString(), ifsc_code, bene_name.getText().toString(), "D").toString(), headerData, FundTransferActivity.this).execute();
+                }
+            }
+        });
+        btn_cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                newdialog.dismiss();
+            }
+        });
+        newdialog = dialog.show();
     }
 
     private void reset() {
@@ -489,7 +540,6 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
     }
 
     public JSONObject verify_Account() {
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         try {
             String condition = "where " + RapipayDB.COLOMN__BANK_NAME + "='" + bank_select.getText().toString() + "'";
@@ -497,7 +547,7 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
             jsonObject.put("serviceType", "Verify_Account");
             jsonObject.put("requestType", "BC_CHANNEL");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("transactionID", tsLong.toString());
+            jsonObject.put("transactionID", ImageUtils.miliSeconds());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("senderName", input_name.getText().toString());
             jsonObject.put("IFSC", ifsc_code);
@@ -515,13 +565,12 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
     }
 
     public JSONObject service_fee(String txnAmmount, String subType) {
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("serviceType", "GET_SERVICE_FEE");
             jsonObject.put("requestType", "BC_CHANNEL");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("transactionID", tsLong.toString());
+            jsonObject.put("transactionID", ImageUtils.miliSeconds());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("agentID", list.get(0).getMobilno());
             jsonObject.put("subType", subType);
@@ -568,7 +617,7 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
     private void initializeBenAdapter(ArrayList<BeneficiaryDetailsPozo> list) {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         beneficiary_details.setLayoutManager(layoutManager);
-        beneficiary_details.setAdapter(new BeneficiaryAdapter(this, beneficiary_details, list));
+        beneficiary_details.setAdapter(new BeneficiaryAdapter(this, list));
     }
 
     private void initializeTransAdapter(ArrayList<LastTransactionPozo> list) {
@@ -578,13 +627,12 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
     }
 
     public JSONObject getMoney_Validate(String amount, String beneficiaryId) {
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("serviceType", "Money_Transfer_Bene");
             jsonObject.put("requestType", "BC_Channel");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("transactionID", tsLong.toString());
+            jsonObject.put("transactionID", ImageUtils.miliSeconds());
             jsonObject.put("txnAmmount", amount);
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("senderName", input_name.getText().toString());
@@ -630,7 +678,7 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
                 if (type.equalsIgnoreCase("Fund Transfer Details"))
                     customReceiptNew(type, object, FundTransferActivity.this);
                 else {
-                    btn_cancel.setVisibility(View.GONE);
+                    btn_ok.setText("Add Beneficiary");
                     alertLayout.findViewById(R.id.verifytransferlayout).setVisibility(View.VISIBLE);
                     verifyTransferFee(alertLayout, object);
                 }
@@ -668,6 +716,13 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
                     input_account.setText("");
                     input_amount.setText("");
                     bank_select.setText("Select Bank");
+                    if (type.equalsIgnoreCase("Account Verify Details")) {
+                        try {
+                            new AsyncPostMethod(WebConfig.BCRemittanceApp, addBeneAccount(object.getString("accountNo"), object.getString("ifscCode"), object.getString("bankAccountName"), "C").toString(), headerData, FundTransferActivity.this).execute();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
                 }
             }
         });
@@ -684,6 +739,8 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
     public void okClicked(String type, Object ob) {
         if (type.equalsIgnoreCase("Money Transfer") || type.equalsIgnoreCase("Transaction Receipt"))
             clear();
+        else if (type.equalsIgnoreCase("KYCLAYOUTS"))
+            new AsyncPostMethod(WebConfig.BCRemittanceApp, getSender_Validate().toString(), headerData, FundTransferActivity.this).execute();
     }
 
     @Override

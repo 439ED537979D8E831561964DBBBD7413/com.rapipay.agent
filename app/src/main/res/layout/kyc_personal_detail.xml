@@ -435,7 +435,7 @@
                     android:drawableTint="@color/white"
                     android:onClick="onClick"
                     android:padding="15dp"
-                    android:text="Upload Self photo"
+                    android:text="Upload Live photo"
                     android:textColor="@color/white"
                     android:textSize="14sp" />
 

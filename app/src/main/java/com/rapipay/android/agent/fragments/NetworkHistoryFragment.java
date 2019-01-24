@@ -34,11 +34,10 @@ import com.rapipay.android.agent.utils.AsyncPostMethod;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
 import com.rapipay.android.agent.utils.BaseFragment;
 import com.rapipay.android.agent.utils.GenerateChecksum;
+import com.rapipay.android.agent.utils.ImageUtils;
 import com.rapipay.android.agent.utils.WebConfig;
 
 public class NetworkHistoryFragment extends BaseFragment implements RequestHandler, View.OnClickListener,CustomInterface {
-
-    Long tsLong;
     View rv;
     private int first = 1, last = 25;
     private boolean isLoading;
@@ -243,13 +242,12 @@ public class NetworkHistoryFragment extends BaseFragment implements RequestHandl
     };
 
     public JSONObject channel_request(int fromIndex, int toIndex) {
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("serviceType", "C2C_CREDIT_HISTORY_REPORT");
             jsonObject.put("requestType", "BC_CHANNEL");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("transactionID", tsLong.toString());
+            jsonObject.put("transactionID", ImageUtils.miliSeconds());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("fromDate", date2_text.getText().toString());
             jsonObject.put("toDate", date1_text.getText().toString());

@@ -216,6 +216,11 @@ public class DashBoardFragments extends Fragment {
                     intent.putExtra("TYPE", "M");
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
+                }else if (id.equalsIgnoreCase("6")) {
+                    Intent intent = new Intent(getActivity(), DailyCommissionActivity.class);
+                    intent.putExtra("TYPE", "U");
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
                 }
 
             }

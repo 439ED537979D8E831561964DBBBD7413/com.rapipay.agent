@@ -30,6 +30,7 @@ import com.rapipay.android.agent.interfaces.VersionListener;
 import com.rapipay.android.agent.utils.AsyncPostMethod;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
 import com.rapipay.android.agent.utils.GenerateChecksum;
+import com.rapipay.android.agent.utils.ImageUtils;
 import com.rapipay.android.agent.utils.LocalStorage;
 import com.rapipay.android.agent.utils.RouteClass;
 import com.rapipay.android.agent.utils.WebConfig;
@@ -66,17 +67,17 @@ public class LoginScreenActivity extends BaseCompactActivity implements View.OnC
     }
 
     public JSONObject getJson_Validate() {
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("serviceType", "ValidCredentialService");
             jsonObject.put("requestType", "handset_CHannel");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("txnRefId", "KYCPROCESS" + tsLong.toString());
+            jsonObject.put("txnRefId", ImageUtils.miliSeconds());
             jsonObject.put("agentId", input_user.getText().toString());
             jsonObject.put("nodeAgentId", input_user.getText().toString());
             jsonObject.put("password", input_password.getText().toString());
             jsonObject.put("imeiNo", imei);
+            jsonObject.put("domainName",BuildConfig.DOMAINNAME);
             jsonObject.put("checkSum", GenerateChecksum.checkSum(imei, jsonObject.toString()));
 
         } catch (Exception e) {
@@ -209,11 +210,11 @@ public class LoginScreenActivity extends BaseCompactActivity implements View.OnC
     public void checkVersion(ArrayList<VersionPozo> list) {
         for (int i = 0; i < list.size(); i++) {
             if (list.get(i).getName() != null)
-                if (list.get(i).getName().equalsIgnoreCase("PROD")) {
+                if (list.get(i).getName().equalsIgnoreCase("APP_UPDATE_ST")) {
                     try {
                         PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
                         String version = pInfo.versionName;
-                        if (!version.equalsIgnoreCase(list.get(i + 1).getValue())) {
+                        if (("F").equalsIgnoreCase(list.get(i + 1).getValue())) {
                             customDialog_Common("KYCLAYOUTSS", null, null, "Update Available", null, "You are running on lower version please update for new versions!.", LoginScreenActivity.this);
                         } else {
                             new AsyncPostMethod(WebConfig.LOGIN_URL, getJson_Validate().toString(), "", LoginScreenActivity.this).execute();

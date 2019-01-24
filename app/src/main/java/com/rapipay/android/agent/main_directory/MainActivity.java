@@ -55,6 +55,7 @@ import com.rapipay.android.agent.interfaces.RequestHandler;
 import com.rapipay.android.agent.utils.AsyncPostMethod;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
 import com.rapipay.android.agent.utils.GenerateChecksum;
+import com.rapipay.android.agent.utils.ImageUtils;
 import com.rapipay.android.agent.utils.LocalStorage;
 import com.rapipay.android.agent.utils.MasterClass;
 import com.rapipay.android.agent.utils.WebConfig;
@@ -101,6 +102,7 @@ public class MainActivity extends BaseCompactActivity
 
     private void url() {
         new AsyncPostMethod(WebConfig.COMMONAPI, getDashBoard("GET_NODE_HEADER_DATA").toString(), headerData, MainActivity.this).execute();
+        localStorage.setActivityState(LocalStorage.ROUTESTATE, "0");
     }
 
     private void loadUrl() {
@@ -122,13 +124,12 @@ public class MainActivity extends BaseCompactActivity
     }
 
     public JSONObject getDashBoard(String servicetype) {
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("serviceType", servicetype);
             jsonObject.put("requestType", "BC_CHANNEL");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("transactionID", tsLong.toString());
+            jsonObject.put("transactionID", ImageUtils.miliSeconds());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
             jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
@@ -167,7 +168,6 @@ public class MainActivity extends BaseCompactActivity
                 drawer.openDrawer(GravityCompat.START);
             }
         });
-
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         View headerLayout = navigationView.inflateHeaderView(R.layout.nav_header_main);
@@ -433,14 +433,13 @@ public class MainActivity extends BaseCompactActivity
 
     public JSONObject getMaster_Validate() {
         ArrayList<RapiPayPozo> list = db.getDetails();
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         if (list.size() != 0) {
             try {
                 jsonObject.put("serviceType", "GET_MASTER_DATA");
                 jsonObject.put("requestType", "BC_CHANNEL");
                 jsonObject.put("typeMobileWeb", "mobile");
-                jsonObject.put("transactionID", tsLong.toString());
+                jsonObject.put("transactionID", ImageUtils.miliSeconds());
                 jsonObject.put("nodeAgentId", list.get(0).getMobilno());
                 jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
                 jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
@@ -456,14 +455,13 @@ public class MainActivity extends BaseCompactActivity
 
     public JSONObject acknowledge(String data, String term) {
         ArrayList<RapiPayPozo> list = db.getDetails();
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         if (list.size() != 0) {
             try {
                 jsonObject.put("serviceType", "UPDATE_DOWNLAOD_DATA_STATUS");
                 jsonObject.put("requestType", "BC_CHANNEL");
                 jsonObject.put("typeMobileWeb", "mobile");
-                jsonObject.put("transactionID", tsLong.toString());
+                jsonObject.put("transactionID", ImageUtils.miliSeconds());
                 jsonObject.put("DataDownloadFlag", data + "1" + term);
                 jsonObject.put("agentMobile", list.get(0).getMobilno());
                 jsonObject.put("nodeAgentId", list.get(0).getMobilno());

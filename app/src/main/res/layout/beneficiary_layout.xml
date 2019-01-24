@@ -33,7 +33,6 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="400"
-                android:onClick="onClick"
                 android:text="@string/p_names"
                 android:inputType="textMultiLine"
                 android:textColor="@color/colorPrimaryDark"
@@ -61,7 +60,6 @@
                 android:inputType="textMultiLine"
                 android:layout_height="wrap_content"
                 android:layout_weight="400"
-                android:onClick="onClick"
                 android:text="@string/p_accountno"
                 android:textColor="@color/colorPrimaryDark"
                 android:textSize="12sp" />
@@ -88,8 +86,31 @@
                 android:inputType="textMultiLine"
                 android:layout_height="wrap_content"
                 android:layout_weight="400"
-                android:onClick="onClick"
                 android:text="@string/p_bank"
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="12sp" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_margin="3sp"
+            android:weightSum="800">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="400"
+                android:inputType="text"
+                android:text="@string/isverified"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/isverified"
+                android:layout_width="0dp"
+                android:inputType="textMultiLine"
+                android:layout_height="wrap_content"
+                android:layout_weight="400"
                 android:textColor="@color/colorPrimaryDark"
                 android:textSize="12sp" />
         </LinearLayout>

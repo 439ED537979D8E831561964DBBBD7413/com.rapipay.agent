@@ -24,6 +24,7 @@ import com.rapipay.android.agent.interfaces.RequestHandler;
 import com.rapipay.android.agent.utils.AsyncPostMethod;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
 import com.rapipay.android.agent.utils.GenerateChecksum;
+import com.rapipay.android.agent.utils.ImageUtils;
 import com.rapipay.android.agent.utils.WebConfig;
 
 public class PassbookActivity extends BaseCompactActivity implements View.OnClickListener, RequestHandler {
@@ -199,13 +200,12 @@ public class PassbookActivity extends BaseCompactActivity implements View.OnClic
 //    }
 
     public JSONObject channel_request(int fromIndex, int toIndex) {
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("serviceType", "GET_LEADGER_DETAILS");
             jsonObject.put("requestType", "REPORT_CHANNEL");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("transactionID", tsLong.toString());
+            jsonObject.put("transactionID", ImageUtils.miliSeconds());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("agentMobile", list.get(0).getMobilno());
             jsonObject.put("fromDate", date2_text.getText().toString());
@@ -222,13 +222,12 @@ public class PassbookActivity extends BaseCompactActivity implements View.OnClic
     }
 
     public JSONObject receipt_request(ChannelHistoryPozo pozo) {
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("serviceType", "Get_Txn_Recipt");
             jsonObject.put("requestType", pozo.getTransferType());
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("txnRef", tsLong.toString());
+            jsonObject.put("txnRef", ImageUtils.miliSeconds());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("agentId", list.get(0).getMobilno());
             jsonObject.put("txnDate", pozo.getDate_id());

@@ -99,7 +99,7 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
     private static final int CAMERA_REQUEST = 1888, SELECT_PDF_DIALOG = 2999;
     private int SELECT_FILE = 1889;
     private TextInputLayout state_update_top, gender_layout, document_layout;
-    private ImageView delete_all;
+
     Spinner bank_district, bank_city, account_type, gender_spinner, spinner_docType;
     private ArrayList<NepalDistrictPozo> nepalDistrictPozoArrayList = null;
     private ArrayList<NepalCityPozo> nepalCityPozoArrayList = null;
@@ -279,14 +279,13 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
     }
 
     public JSONObject getServiceFee(String amount, String mode) {
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         if (!input_mobile.getText().toString().isEmpty() && input_mobile.getText().toString().length() == 10) {
             try {
                 jsonObject.put("serviceType", "GET_SERVICE_FEE");
                 jsonObject.put("requestType", "BC_CHANNEL");
                 jsonObject.put("typeMobileWeb", "mobile");
-                jsonObject.put("transactionID", tsLong.toString());
+                jsonObject.put("transactionID", ImageUtils.miliSeconds());
                 jsonObject.put("agentID", list.get(0).getMobilno());
                 jsonObject.put("nodeAgentId", list.get(0).getMobilno());
                 jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
@@ -305,14 +304,13 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
     }
 
     public JSONObject addBene(String number, String name, String city, String address, String relation, String beneType, String branchID, String accountNo, String confirm, String beneID, String accountType) {
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         if (!input_mobile.getText().toString().isEmpty() && input_mobile.getText().toString().length() == 10) {
             try {
                 jsonObject.put("serviceType", "ADD_BENEFICIARY_DETAILS");
                 jsonObject.put("requestType", "BC_CHANNEL");
                 jsonObject.put("typeMobileWeb", "mobile");
-                jsonObject.put("transactionID", tsLong.toString());
+                jsonObject.put("transactionID", ImageUtils.miliSeconds());
                 jsonObject.put("agentID", list.get(0).getMobilno());
                 jsonObject.put("nodeAgentId", list.get(0).getMobilno());
                 jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
@@ -343,14 +341,13 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
     }
 
     public JSONObject getMoneyTransferPMT(String amount, String mode, PMTBenefPozo pozo) {
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         if (!input_mobile.getText().toString().isEmpty() && input_mobile.getText().toString().length() == 10) {
             try {
                 jsonObject.put("serviceType", "MONEY_TRANSFER_PMT");
                 jsonObject.put("requestType", "BC_CHANNEL");
                 jsonObject.put("typeMobileWeb", "mobile");
-                jsonObject.put("transactionID", tsLong.toString());
+                jsonObject.put("transactionID", ImageUtils.miliSeconds());
                 jsonObject.put("mobileNumber", input_mobile.getText().toString());
                 jsonObject.put("nodeAgentId", list.get(0).getMobilno());
                 jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
@@ -369,14 +366,13 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
     }
 
     public JSONObject getOtpPMT(String mode) {
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         if (!input_mobile.getText().toString().isEmpty() && input_mobile.getText().toString().length() == 10) {
             try {
                 jsonObject.put("serviceType", "VERIFY_SENDER_OTP");
                 jsonObject.put("requestType", "BC_CHANNEL");
                 jsonObject.put("typeMobileWeb", "mobile");
-                jsonObject.put("transactionID", tsLong.toString());
+                jsonObject.put("transactionID", ImageUtils.miliSeconds());
                 jsonObject.put("senderMobile", input_mobile.getText().toString());
                 jsonObject.put("nodeAgentId", list.get(0).getMobilno());
                 jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
@@ -394,14 +390,13 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
     }
 
     private JSONObject getSender_Validate() {
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         if (!input_mobile.getText().toString().isEmpty() && input_mobile.getText().toString().length() == 10) {
             try {
                 jsonObject.put("serviceType", "SENDER_COMPLETE_DETAILS");
                 jsonObject.put("requestType", "BC_CHANNEL");
                 jsonObject.put("typeMobileWeb", "mobile");
-                jsonObject.put("transactionID", tsLong.toString());
+                jsonObject.put("transactionID", ImageUtils.miliSeconds());
                 jsonObject.put("nodeAgentId", list.get(0).getMobilno());
                 jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
                 jsonObject.put("mobileNumber", input_mobile.getText().toString());
@@ -418,14 +413,13 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
     }
 
     private JSONObject getNepalDistrict(String bankCode) {
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         if (!input_mobile.getText().toString().isEmpty() && input_mobile.getText().toString().length() == 10) {
             try {
                 jsonObject.put("serviceType", "GET_BANK_DISTRICT");
                 jsonObject.put("requestType", "BC_CHANNEL");
                 jsonObject.put("typeMobileWeb", "mobile");
-                jsonObject.put("transactionID", tsLong.toString());
+                jsonObject.put("transactionID", ImageUtils.miliSeconds());
                 jsonObject.put("agentMobile", list.get(0).getMobilno());
                 jsonObject.put("nodeAgentId", list.get(0).getMobilno());
                 jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
@@ -443,14 +437,13 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
     }
 
     private JSONObject getNepalCity(String bankCode, String districtCode) {
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         if (!input_mobile.getText().toString().isEmpty() && input_mobile.getText().toString().length() == 10) {
             try {
                 jsonObject.put("serviceType", "GET_BRANCH_CITY");
                 jsonObject.put("requestType", "BC_CHANNEL");
                 jsonObject.put("typeMobileWeb", "mobile");
-                jsonObject.put("transactionID", tsLong.toString());
+                jsonObject.put("transactionID", ImageUtils.miliSeconds());
                 jsonObject.put("agentMobile", list.get(0).getMobilno());
                 jsonObject.put("nodeAgentId", list.get(0).getMobilno());
                 jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
@@ -469,14 +462,13 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
     }
 
     private JSONObject addSenderDetails() {
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         if (!input_mobile.getText().toString().isEmpty() && input_mobile.getText().toString().length() == 10) {
             try {
                 jsonObject.put("serviceType", "ADD_SENDER_DETAILS");
                 jsonObject.put("requestType", "BC_CHANNEL");
                 jsonObject.put("typeMobileWeb", "mobile");
-                jsonObject.put("transactionID", tsLong.toString());
+                jsonObject.put("transactionID", ImageUtils.miliSeconds());
                 jsonObject.put("nodeAgentId", list.get(0).getMobilno());
                 jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
                 jsonObject.put("mobileNumber", input_mobile.getText().toString());
@@ -508,14 +500,13 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
     }
 
     private JSONObject docUpload(String userTxnId) {
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         if (!input_mobile.getText().toString().isEmpty() && input_mobile.getText().toString().length() == 10) {
             try {
                 jsonObject.put("serviceType", "UPLOAD_SIGNED_TXN_RECEIPT");
                 jsonObject.put("requestType", "BC_CHANNEL");
                 jsonObject.put("typeMobileWeb", "mobile");
-                jsonObject.put("transactionID", tsLong.toString());
+                jsonObject.put("transactionID", ImageUtils.miliSeconds());
                 jsonObject.put("nodeAgentId", list.get(0).getMobilno());
                 jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
                 jsonObject.put("userTxnId", userTxnId);
@@ -1241,12 +1232,6 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
             @Override
             public void onClick(View v) {
 
-                alertDialog.dismiss();
-            }
-        });
-        dialog_cancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
                 alertDialog.dismiss();
             }
         });

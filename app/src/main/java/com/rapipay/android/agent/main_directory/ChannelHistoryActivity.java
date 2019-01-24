@@ -26,6 +26,7 @@ import com.rapipay.android.agent.interfaces.RequestHandler;
 import com.rapipay.android.agent.utils.AsyncPostMethod;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
 import com.rapipay.android.agent.utils.GenerateChecksum;
+import com.rapipay.android.agent.utils.ImageUtils;
 import com.rapipay.android.agent.utils.WebConfig;
 
 public class ChannelHistoryActivity extends BaseCompactActivity implements View.OnClickListener, RequestHandler, CustomInterface {
@@ -92,13 +93,12 @@ public class ChannelHistoryActivity extends BaseCompactActivity implements View.
     }
 
     public JSONObject receipt_request(ChannelHistoryPozo pozo) {
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("serviceType", "Get_Txn_Recipt");
             jsonObject.put("requestType", "DMT_CHANNEL");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("txnRef", tsLong.toString());
+            jsonObject.put("txnRef", ImageUtils.miliSeconds());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("agentId", list.get(0).getMobilno());
             jsonObject.put("orgTxnRef", pozo.getOrgTxnid());
@@ -133,13 +133,12 @@ public class ChannelHistoryActivity extends BaseCompactActivity implements View.
     }
 
     public JSONObject channel_request(int fromIndex, int toIndex) {
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("serviceType", "GET_CHANNEL_TXN_HISTORY");
             jsonObject.put("requestType", "REPORT_CHANNEL");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("transactionID", tsLong.toString());
+            jsonObject.put("transactionID", ImageUtils.miliSeconds());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("fromTxnDate", date2_text.getText().toString());
             jsonObject.put("toTxnDate", date1_text.getText().toString());
@@ -155,13 +154,12 @@ public class ChannelHistoryActivity extends BaseCompactActivity implements View.
     }
 
 //    public JSONObject receipt_request(ChannelHistoryPozo pozo) {
-//        tsLong = System.currentTimeMillis() / 1000;
 //        JSONObject jsonObject = new JSONObject();
 //        try {
 //            jsonObject.put("serviceType", "Get_Txn_Recipt");
 //            jsonObject.put("requestType", pozo.getTransferType());
 //            jsonObject.put("typeMobileWeb", "mobile");
-//            jsonObject.put("txnRef", tsLong.toString());
+//            jsonObject.put("txnRef", ImageUtils.miliSeconds());
 //            jsonObject.put("nodeAgentId", list.get(0).getMobilno());
 //            jsonObject.put("agentId", list.get(0).getMobilno());
 //            jsonObject.put("txnDate", pozo.getDate_id());

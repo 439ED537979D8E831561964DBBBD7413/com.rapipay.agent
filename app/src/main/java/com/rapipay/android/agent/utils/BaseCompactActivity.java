@@ -92,10 +92,10 @@ import com.rapipay.android.agent.main_directory.PinVerification;
 public class BaseCompactActivity extends AppCompatActivity {
     protected GoogleApiClient googleApiClient;
     protected String imei;
+    protected ImageView delete_all;
     protected ArrayList<VersionPozo> versionPozoArrayList;
     protected AutofitTextView date2_text, date1_text;
     protected FirebaseAnalytics mFirebaseAnalytics;
-    protected Long tsLong;
     protected static String balance = null;
     protected static final int CONTACT_PICKER_RESULT = 1;
     protected TextView heading;
@@ -121,7 +121,6 @@ public class BaseCompactActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         db = new RapipayDB(this);
-        tsLong = System.currentTimeMillis() / 1000;
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         localStorage = LocalStorage.getInstance(this);
         hideKeyboard(this);
@@ -208,7 +207,7 @@ public class BaseCompactActivity extends AppCompatActivity {
             jsonObject.put("serviceType", "KYC_PROCESS");
             jsonObject.put("requestType", "EKYC_CHANNEL");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("txnRef", tsLong.toString());
+            jsonObject.put("txnRef", ImageUtils.miliSeconds());
             jsonObject.put("agentId", parentID);
             jsonObject.put("mobileNo", mobileNo);
             jsonObject.put("kycType", kycType);
@@ -493,6 +492,7 @@ public class BaseCompactActivity extends AppCompatActivity {
         TextView btn_name = (TextView) alertLayout.findViewById(R.id.btn_name);
         TextView btn_account = (TextView) alertLayout.findViewById(R.id.btn_account);
         TextView btn_bank = (TextView) alertLayout.findViewById(R.id.btn_bank);
+        TextView notverified = (TextView) alertLayout.findViewById(R.id.notverified);
         if (!pozo.getAccountno().equalsIgnoreCase("null"))
             btn_account.setText(pozo.getAccountno());
         else
@@ -505,6 +505,10 @@ public class BaseCompactActivity extends AppCompatActivity {
             btn_name.setText(pozo.getName());
         else
             btn_name.setText("NA");
+        if(pozo.getIfsc().equalsIgnoreCase("NOT-VEREFIED"))
+            notverified.setVisibility(View.VISIBLE);
+        else
+            notverified.setVisibility(View.GONE);
         ben_amount = (TextView) alertLayout.findViewById(R.id.input_amount_ben);
         dialog.setView(alertLayout);
     }
@@ -1457,13 +1461,12 @@ public class BaseCompactActivity extends AppCompatActivity {
     }
 
     public JSONObject version(String emi) {
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("serviceType", "APP_LIVE_STATUS");
             jsonObject.put("requestType", "handset_CHannel");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("transactionID", tsLong.toString());
+            jsonObject.put("transactionID", ImageUtils.miliSeconds());
             jsonObject.put("settingName", "Android");
             jsonObject.put("imeiNo", emi);
             jsonObject.put("checkSum", GenerateChecksum.checkSum(emi, jsonObject.toString()));

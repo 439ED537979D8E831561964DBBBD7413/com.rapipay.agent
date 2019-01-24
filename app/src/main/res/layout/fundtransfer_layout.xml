@@ -194,7 +194,7 @@
                             android:id="@+id/input_account"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="@string/p_account"
+                            android:hint="@string/p_recaccount"
                             android:inputType="number"
                             android:textSize="16dp" />
                     </android.support.design.widget.TextInputLayout>
@@ -204,7 +204,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="5dp"
-                        android:layout_marginTop="5dp">
+                        android:layout_marginTop="5dp"
+                        android:visibility="gone">
 
                         <EditText
                             android:id="@+id/input_amount"
@@ -230,7 +231,7 @@
                             android:layout_weight="400"
                             android:background="@drawable/border_button"
                             android:onClick="onClick"
-                            android:text="@string/btnfund"
+                            android:text="@string/btnben"
                             android:textColor="@color/white"
                             android:textSize="10dp" />
 

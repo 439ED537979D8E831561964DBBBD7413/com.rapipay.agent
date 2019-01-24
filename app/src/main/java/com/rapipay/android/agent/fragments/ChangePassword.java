@@ -20,6 +20,7 @@ import com.rapipay.android.agent.interfaces.RequestHandler;
 import com.rapipay.android.agent.utils.AsyncPostMethod;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
 import com.rapipay.android.agent.utils.GenerateChecksum;
+import com.rapipay.android.agent.utils.ImageUtils;
 import com.rapipay.android.agent.utils.LocalStorage;
 import com.rapipay.android.agent.utils.RouteClass;
 import com.rapipay.android.agent.utils.WebConfig;
@@ -32,7 +33,6 @@ public class ChangePassword extends Fragment implements RequestHandler, View.OnC
 
     View rv;
     protected ArrayList<RapiPayPozo> list;
-    protected Long tsLong;
     AppCompatButton btn_login;
     protected LocalStorage localStorage;
     TextInputEditText pinView, otppinView, confirmpinView;
@@ -79,14 +79,13 @@ public class ChangePassword extends Fragment implements RequestHandler, View.OnC
     }
 
     public JSONObject getJson_Validate() {
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         if (list.size() != 0) {
             try {
                 jsonObject.put("serviceType", "CHANGE_PASSWORD");
                 jsonObject.put("requestType", "handset_CHannel");
                 jsonObject.put("typeMobileWeb", "mobile");
-                jsonObject.put("txnRefId", tsLong.toString());
+                jsonObject.put("txnRefId", ImageUtils.miliSeconds());
                 jsonObject.put("agentId", list.get(0).getMobilno());
                 jsonObject.put("nodeAgentId", list.get(0).getMobilno());
                 jsonObject.put("oldPassword", otppinView.getText().toString());

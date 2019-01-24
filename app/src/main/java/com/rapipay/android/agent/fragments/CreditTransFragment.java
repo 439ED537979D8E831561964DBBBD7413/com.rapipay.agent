@@ -33,6 +33,7 @@ import com.rapipay.android.agent.utils.AsyncPostMethod;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
 import com.rapipay.android.agent.utils.BaseFragment;
 import com.rapipay.android.agent.utils.GenerateChecksum;
+import com.rapipay.android.agent.utils.ImageUtils;
 import com.rapipay.android.agent.utils.RecyclerTouchListener;
 import com.rapipay.android.agent.utils.WebConfig;
 
@@ -213,13 +214,12 @@ public class CreditTransFragment extends BaseFragment implements RequestHandler,
     };
 
     public JSONObject channel_request() {
-        Long tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("serviceType", "CREDIT_FUND_REQ_REPORT");
             jsonObject.put("requestType", "BC_CHANNEL");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("transactionID", tsLong.toString());
+            jsonObject.put("transactionID", ImageUtils.miliSeconds());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("fromDate", date2_text.getText().toString());
             jsonObject.put("toDate", date1_text.getText().toString());

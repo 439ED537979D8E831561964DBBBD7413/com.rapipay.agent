@@ -23,12 +23,12 @@ import com.rapipay.android.agent.interfaces.RequestHandler;
 import com.rapipay.android.agent.utils.AsyncPostMethod;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
 import com.rapipay.android.agent.utils.GenerateChecksum;
+import com.rapipay.android.agent.utils.ImageUtils;
 import com.rapipay.android.agent.utils.LocalStorage;
 import com.rapipay.android.agent.utils.MasterClass;
 import com.rapipay.android.agent.utils.RouteClass;
 import com.rapipay.android.agent.utils.WebConfig;
 import com.rapipay.android.agent.view.PinEntryEditText;
-
 
 public class PinActivity extends BaseCompactActivity implements View.OnClickListener, RequestHandler, CustomInterface {
 
@@ -66,7 +66,6 @@ public class PinActivity extends BaseCompactActivity implements View.OnClickList
     }
 
     public JSONObject getJson_Validate() {
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         if (!pinView.getText().toString().isEmpty() && !otppinView.getText().toString().isEmpty() && !confirmpinView.getText().toString().isEmpty() && pinView.getText().toString().equalsIgnoreCase(confirmpinView.getText().toString())) {
             try {
@@ -75,7 +74,7 @@ public class PinActivity extends BaseCompactActivity implements View.OnClickList
                 jsonObject.put("typeMobileWeb", "mobile");
                 jsonObject.put("otp", otppinView.getText().toString());
                 jsonObject.put("otpRefId", otpRefId);
-                jsonObject.put("txnRefId", tsLong.toString());
+                jsonObject.put("txnRefId", ImageUtils.miliSeconds());
                 jsonObject.put("agentId", agentId);
                 jsonObject.put("nodeAgentId", agentId);
                 jsonObject.put("orgTxnRef", regTxnRefId);
@@ -84,6 +83,7 @@ public class PinActivity extends BaseCompactActivity implements View.OnClickList
                 jsonObject.put("sessionRefNo", sessionRefNo);
                 jsonObject.put("deviceName", Build.MANUFACTURER);
                 jsonObject.put("osType", "ANDROID");
+                jsonObject.put("domainName",BuildConfig.DOMAINNAME);
                 jsonObject.put("checkSum", GenerateChecksum.checkSum(sessionKey, jsonObject.toString()));
 
             } catch (Exception e) {
@@ -165,14 +165,13 @@ public class PinActivity extends BaseCompactActivity implements View.OnClickList
     }
 
     public JSONObject acknowledge() {
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         if (list.size() != 0) {
             try {
                 jsonObject.put("serviceType", "UPDATE_DOWNLAOD_DATA_STATUS");
                 jsonObject.put("requestType", "BC_Channel");
                 jsonObject.put("typeMobileWeb", "mobile");
-                jsonObject.put("transactionID", tsLong.toString());
+                jsonObject.put("transactionID", ImageUtils.miliSeconds());
                 jsonObject.put("DataDownloadFlag", "Y");
                 jsonObject.put("agentMobile", list.get(0).getMobilno());
                 jsonObject.put("nodeAgentId", list.get(0).getMobilno());
@@ -189,7 +188,6 @@ public class PinActivity extends BaseCompactActivity implements View.OnClickList
     }
 
     public JSONObject getWLDetails() {
-        tsLong = System.currentTimeMillis() / 1000;
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date date = new Date();
         JSONObject jsonObject = new JSONObject();
@@ -199,7 +197,7 @@ public class PinActivity extends BaseCompactActivity implements View.OnClickList
                 jsonObject.put("requestType", "HANDSET_CHANNEL");
                 jsonObject.put("typeMobileWeb", "mobile");
                 jsonObject.put("nodeAgentId", list.get(0).getMobilno());
-                jsonObject.put("transactionID", tsLong.toString());
+                jsonObject.put("transactionID", ImageUtils.miliSeconds());
                 jsonObject.put("timeStamp", format.format(date));
                 jsonObject.put("appType", BuildConfig.USERTYPE);
                 jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getSession(), jsonObject.toString()));
@@ -222,14 +220,13 @@ public class PinActivity extends BaseCompactActivity implements View.OnClickList
 
     public JSONObject getMaster_Validate() {
         list = db.getDetails();
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         if (list.size() != 0) {
             try {
                 jsonObject.put("serviceType", "GET_MASTER_DATA");
                 jsonObject.put("requestType", "BC_CHANNEL");
                 jsonObject.put("typeMobileWeb", "mobile");
-                jsonObject.put("transactionID", tsLong.toString());
+                jsonObject.put("transactionID", ImageUtils.miliSeconds());
                 jsonObject.put("nodeAgentId", list.get(0).getMobilno());
                 jsonObject.put("sessionRefNo", list.get(0).getSessionRefNo());
                 jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getSession(), jsonObject.toString()));

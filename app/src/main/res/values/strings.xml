@@ -40,7 +40,7 @@
     <string name="btnsender">Add Sender</string>
     <string name="btnfund">Fund Transfer</string>
     <string name="btnben">Add Beneficiary</string>
-    <string name="btnverify">Verify Account</string>
+    <string name="btnverify">Verify/Add Account</string>
     <string name="p_accounttr">Account Transfer</string>
     <string name="p_benaadd">Add New Beneficiary</string>
     <string name="p_bendd">Add Beneficiary</string>
@@ -128,6 +128,7 @@
     <string name="agentName">Agent Name</string>
     <string name="creditID">CreditID</string>
     <string name="agentBalance">Agent Balance</string>
+    <string name="notverified">This is a Non - Verified Beneficiary, We recommend to verify the account. Any transaction done to this Beneficiary, company will not be responsible for incorrect account transfer.</string>
     <string name="p_accountno">AC No</string>
     <string name="link">HTML Link</string>
     <string name="p_payeeaccountno">Payee Account</string>
@@ -137,6 +138,7 @@
     <string name="p_ifsccode">IFSC</string>
     <string name="p_bank">Bank</string>
     <string name="p_bankname">Bank Name</string>
+    <string name="isverified">Is Verified</string>
     <string name="p_payeebank">Payee Bank</string>
     <string name="p_rrn">RRN</string>
     <string name="p_amounts">Amount</string>

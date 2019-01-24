@@ -10,7 +10,9 @@ import android.os.Parcelable;
 import android.provider.MediaStore;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import com.rapipay.android.agent.Model.ImagePozo;
@@ -191,6 +193,12 @@ public class ImageUtils {
 
 
         return isCamera ? getCaptureImageOutputUri(context) : data.getData();
+    }
+
+    public static String miliSeconds(){
+        SimpleDateFormat df=new SimpleDateFormat("ssmmHHMMddSSS");
+        Date date=new Date();
+        return df.format(date);
     }
 
 }

@@ -21,6 +21,7 @@ import com.rapipay.android.agent.interfaces.RequestHandler;
 import com.rapipay.android.agent.utils.AsyncPostMethod;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
 import com.rapipay.android.agent.utils.GenerateChecksum;
+import com.rapipay.android.agent.utils.ImageUtils;
 import com.rapipay.android.agent.utils.WebConfig;
 
 public class DailyCommissionActivity extends BaseCompactActivity implements RequestHandler,View.OnClickListener {
@@ -54,6 +55,8 @@ public class DailyCommissionActivity extends BaseCompactActivity implements Requ
             heading.setText("Daily Commission");
         else if (type.equalsIgnoreCase("M"))
             heading.setText("Monthly Commission");
+        else if (type.equalsIgnoreCase("U"))
+            heading.setText("UnSettled Commission");
         trans_details = (ListView) findViewById(R.id.trans_details);
         trans_details.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
@@ -81,13 +84,12 @@ public class DailyCommissionActivity extends BaseCompactActivity implements Requ
     }
 
     public JSONObject getNetwork_Validate(int fromIndex, int toIndex) {
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("serviceType", "MY_COMMISION_REPORT");
             jsonObject.put("requestType", "REPORT_CHANNEL");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("transactionID", tsLong.toString());
+            jsonObject.put("transactionID", ImageUtils.miliSeconds());
             jsonObject.put("commisionType", type);
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());

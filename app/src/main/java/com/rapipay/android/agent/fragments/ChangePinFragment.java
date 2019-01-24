@@ -19,6 +19,7 @@ import com.rapipay.android.agent.main_directory.PinVerification;
 import com.rapipay.android.agent.utils.AsyncPostMethod;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
 import com.rapipay.android.agent.utils.GenerateChecksum;
+import com.rapipay.android.agent.utils.ImageUtils;
 import com.rapipay.android.agent.utils.WebConfig;
 import com.rapipay.android.agent.view.PinEntryEditText;
 
@@ -30,7 +31,6 @@ public class ChangePinFragment extends Fragment implements RequestHandler, View.
 
     View rv;
     protected ArrayList<RapiPayPozo> list;
-    protected Long tsLong;
     AppCompatButton btn_login;
     PinEntryEditText pinView, otppinView;
 
@@ -69,14 +69,13 @@ public class ChangePinFragment extends Fragment implements RequestHandler, View.
     }
 
     public JSONObject getJson_Validate() {
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         if (list.size() != 0) {
             try {
                 jsonObject.put("serviceType", "ChangePin");
                 jsonObject.put("requestType", "handset_CHannel");
                 jsonObject.put("typeMobileWeb", "mobile");
-                jsonObject.put("txnRefId", tsLong.toString());
+                jsonObject.put("txnRefId", ImageUtils.miliSeconds());
                 jsonObject.put("agentId", list.get(0).getMobilno());
                 jsonObject.put("nodeAgentId", list.get(0).getMobilno());
                 jsonObject.put("oldPin", otppinView.getText().toString());

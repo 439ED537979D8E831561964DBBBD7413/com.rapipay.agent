@@ -33,7 +33,6 @@ import java.util.ArrayList;
 public class ChangeMobileFragment extends Fragment implements RequestHandler, View.OnClickListener {
     protected ArrayList<RapiPayPozo> list;
     EditText newmobileno, oldotp, newotp;
-    protected Long tsLong;
     protected String headerData = (WebConfig.BASIC_USERID + ":" + WebConfig.BASIC_PASSWORD);
     LinearLayout old_number, new_number;
     AppCompatButton sub_btn, sub_btn_oldotp, sub_btn_newotp;
@@ -93,7 +92,6 @@ public class ChangeMobileFragment extends Fragment implements RequestHandler, Vi
     }
 
     public JSONObject request_user() {
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("serviceType", "CHANGE_MOBILE_NO");
@@ -101,7 +99,7 @@ public class ChangeMobileFragment extends Fragment implements RequestHandler, Vi
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("requestType", "HANDSET_CHANNEL");
-            jsonObject.put("transactionID", tsLong.toString());
+            jsonObject.put("transactionID", ImageUtils.miliSeconds());
             jsonObject.put("newMobileNo", newmobileno.getText().toString());
             jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
         } catch (Exception e) {
@@ -111,7 +109,6 @@ public class ChangeMobileFragment extends Fragment implements RequestHandler, Vi
     }
 
     public JSONObject oldRequest_user() {
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("serviceType", "CHANGE_VERIFY_OTP");
@@ -119,7 +116,7 @@ public class ChangeMobileFragment extends Fragment implements RequestHandler, Vi
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("requestType", "HANDSET_CHANNEL");
-            jsonObject.put("transactionID", tsLong.toString());
+            jsonObject.put("transactionID", ImageUtils.miliSeconds());
             jsonObject.put("otp", oldotp.getText().toString());
             jsonObject.put("otpRefId", otpRefId);
             jsonObject.put("orgTxnRef", orgTxnId);
@@ -131,7 +128,6 @@ public class ChangeMobileFragment extends Fragment implements RequestHandler, Vi
     }
 
     public JSONObject newRequest_user() {
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("serviceType", "VERIFY_CHNAGE_MOBILE_OTP");
@@ -139,7 +135,7 @@ public class ChangeMobileFragment extends Fragment implements RequestHandler, Vi
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("requestType", "HANDSET_CHANNEL");
-            jsonObject.put("transactionID", tsLong.toString());
+            jsonObject.put("transactionID", ImageUtils.miliSeconds());
             jsonObject.put("newMobileNo", newmobileno.getText().toString());
             jsonObject.put("otp", newotp.getText().toString());
             jsonObject.put("otpRefId", otpRefId);

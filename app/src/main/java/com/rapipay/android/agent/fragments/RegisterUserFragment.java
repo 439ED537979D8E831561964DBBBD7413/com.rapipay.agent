@@ -58,7 +58,6 @@ public class RegisterUserFragment extends Fragment implements RequestHandler, Vi
     int scan_check = 0;
     public static Bitmap bitmap_trans = null;
     protected ArrayList<RapiPayPozo> list;
-    protected Long tsLong;
     ArrayList<String> spinner_list;
     protected String headerData = (WebConfig.BASIC_USERID + ":" + WebConfig.BASIC_PASSWORD);
 
@@ -321,13 +320,12 @@ public class RegisterUserFragment extends Fragment implements RequestHandler, Vi
     }
 
     public JSONObject request_user() {
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("serviceType", "B2BTempUserRequest");
             jsonObject.put("requestType", "HandSet_Channel");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("txnRefId", tsLong.toString());
+            jsonObject.put("txnRefId", ImageUtils.miliSeconds());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("agentId", list.get(0).getMobilno());
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());

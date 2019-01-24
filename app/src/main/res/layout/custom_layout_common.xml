@@ -215,6 +215,16 @@
                         android:maxLength="10"
                         android:textSize="16dp" />
                 </android.support.design.widget.TextInputLayout>
+                <TextView
+                    android:id="@+id/notverified"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textMultiLine"
+                    android:textSize="14dp"
+                    android:textColor="@color/red"
+                    android:padding="5dp"
+                    android:visibility="gone"
+                    android:text="@string/notverified"/>
 
             </LinearLayout>
 
@@ -607,6 +617,12 @@
             <include
                 android:id="@+id/add_bene_details"
                 layout="@layout/addbenedetails_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone" />
+            <include
+                android:id="@+id/bc_add_bene_details"
+                layout="@layout/bc_bene_transfer_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="gone" />

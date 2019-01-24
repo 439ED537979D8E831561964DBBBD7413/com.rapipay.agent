@@ -136,13 +136,12 @@ public class ReChargeActivity extends BaseCompactActivity implements View.OnClic
     }
 
     public JSONObject reCharge_request() {
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("serviceType", serviceType);
             jsonObject.put("requestType", "UBP_Channel");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("transactionID", tsLong.toString());
+            jsonObject.put("transactionID", ImageUtils.miliSeconds());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("serviceOperatorName", select_operator.getText().toString());
             jsonObject.put("rechargeType", operator_clicked);

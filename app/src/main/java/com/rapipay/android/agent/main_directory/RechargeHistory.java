@@ -29,6 +29,7 @@ import com.rapipay.android.agent.interfaces.RequestHandler;
 import com.rapipay.android.agent.utils.AsyncPostMethod;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
 import com.rapipay.android.agent.utils.GenerateChecksum;
+import com.rapipay.android.agent.utils.ImageUtils;
 import com.rapipay.android.agent.utils.RecyclerTouchListener;
 import com.rapipay.android.agent.utils.WebConfig;
 
@@ -110,13 +111,12 @@ public class RechargeHistory extends BaseCompactActivity implements View.OnClick
     }
 
     public JSONObject receipt_request(RechargePozo pozo) {
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("serviceType", "Get_Txn_Recipt");
             jsonObject.put("requestType", "DMT_CHANNEL");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("txnRef", tsLong.toString());
+            jsonObject.put("txnRef", ImageUtils.miliSeconds());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("agentId", list.get(0).getMobilno());
             jsonObject.put("orgTxnRef", pozo.getTransactionID());
@@ -153,13 +153,12 @@ public class RechargeHistory extends BaseCompactActivity implements View.OnClick
     }
 
     public JSONObject channel_request(int fromIndex, int toIndex) {
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("serviceType", "RECHARGE_HISTORY");
             jsonObject.put("requestType", "UBP_CHANNEL");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("transactionID", tsLong.toString());
+            jsonObject.put("transactionID", ImageUtils.miliSeconds());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("fromDate", date2_text.getText().toString());
             jsonObject.put("toDate", date1_text.getText().toString());

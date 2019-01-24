@@ -19,8 +19,10 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.rapipay.android.agent.BuildConfig;
 import com.rapipay.android.agent.Model.VersionPozo;
 import com.rapipay.android.agent.interfaces.VersionListener;
+import com.rapipay.android.agent.utils.ImageUtils;
 import com.rapipay.android.agent.utils.LocalStorage;
 import com.viewpagerindicator.CirclePageIndicator;
 
@@ -167,14 +169,13 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
     }
 
     public JSONObject getJson_Validate(String pinResults) {
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         if (list.size() != 0) {
             try {
                 jsonObject.put("serviceType", "PinVerify");
                 jsonObject.put("requestType", "handset_CHannel");
                 jsonObject.put("typeMobileWeb", "mobile");
-                jsonObject.put("txnRefId", tsLong.toString());
+                jsonObject.put("txnRefId", ImageUtils.miliSeconds());
                 jsonObject.put("agentId", list.get(0).getMobilno());
                 jsonObject.put("nodeAgentId", list.get(0).getMobilno());
                 jsonObject.put("pin", pinResults);
@@ -182,6 +183,7 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
                 jsonObject.put("deviceName", Build.MANUFACTURER);
                 jsonObject.put("sessionRefNo", list.get(0).getSessionRefNo());
                 jsonObject.put("osType", "ANDROID");
+                jsonObject.put("domainName",BuildConfig.DOMAINNAME);
                 jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getSession(), jsonObject.toString()));
 
             } catch (Exception e) {
@@ -294,14 +296,13 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
     }
 
     public JSONObject getFooterData() {
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         if (list.size() != 0) {
             try {
                 jsonObject.put("serviceType", "GET_FOOTER_DATA");
                 jsonObject.put("requestType", "BC_CHANNEL");
                 jsonObject.put("typeMobileWeb", "mobile");
-                jsonObject.put("transactionID", tsLong.toString());
+                jsonObject.put("transactionID", ImageUtils.miliSeconds());
                 jsonObject.put("nodeAgentId", list.get(0).getMobilno());
                 if (db.getFooterDetail("banner").size() != 0)
                     jsonObject.put("timeStamp", db.getFooterDetail("banner").get(0).getTimeStamp());
@@ -318,7 +319,6 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
     }
 
     public JSONObject getMaster() {
-        tsLong = System.currentTimeMillis() / 1000;
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date date = new Date();
         JSONObject jsonObject = new JSONObject();
@@ -327,7 +327,7 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
                 jsonObject.put("serviceType", "SERVICE_MASTER");
                 jsonObject.put("nodeAgentId", list.get(0).getMobilno());
                 jsonObject.put("requestType", "BC_CHANNEL");
-                jsonObject.put("transactionID", tsLong.toString());
+                jsonObject.put("transactionID", ImageUtils.miliSeconds());
                 jsonObject.put("typeMobileWeb", "mobile");
                 if (db.getMasterDetail("").size() != 0)
                     jsonObject.put("timeStamp", db.getMasterDetail("").get(0).getTimeStamp());
@@ -409,11 +409,11 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
     public void checkVersion(ArrayList<VersionPozo> list) {
         for (int i = 0; i < list.size(); i++) {
             if (list.get(i).getName() != null)
-                if (list.get(i).getName().equalsIgnoreCase("PROD")) {
+                if (list.get(i).getName().equalsIgnoreCase("APP_UPDATE_ST")) {
                     try {
                         PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
                         String version = pInfo.versionName;
-                        if (!version.equalsIgnoreCase(list.get(i + 1).getValue())) {
+                        if (("F").equalsIgnoreCase(list.get(i + 1).getValue())) {
                             customDialog_Common("KYCLAYOUTSS", null, null, "Update Available", null, "You are running on lower version please update for new versions!.", PinVerification.this);
                         } else {
                             new AsyncPostMethod(WebConfig.LOGIN_URL, getJson_Validate(confirmpinView.getText().toString()).toString(), "", PinVerification.this).execute();

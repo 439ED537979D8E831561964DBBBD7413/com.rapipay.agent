@@ -25,6 +25,7 @@ import com.rapipay.android.agent.interfaces.RequestHandler;
 import com.rapipay.android.agent.utils.AsyncPostMethod;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
 import com.rapipay.android.agent.utils.GenerateChecksum;
+import com.rapipay.android.agent.utils.ImageUtils;
 import com.rapipay.android.agent.utils.WebConfig;
 
 public class
@@ -185,13 +186,12 @@ NetworkTransferActivity extends BaseCompactActivity implements RequestHandler, V
     }
 
     public JSONObject getNetwork_Validate(String servicetype, String mobileNo, int fromIndex, int toIndex) {
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("serviceType", servicetype);
             jsonObject.put("requestType", "BC_CHANNEL");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("transactionID", tsLong.toString());
+            jsonObject.put("transactionID", ImageUtils.miliSeconds());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
             jsonObject.put("agentMobile", mobileNo);
@@ -212,13 +212,12 @@ NetworkTransferActivity extends BaseCompactActivity implements RequestHandler, V
     }
 
     public JSONObject getNetwork_Transfer(String receiverId, String txnAmount) {
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("serviceType", "C2C_NETWORK_CREDIT");
             jsonObject.put("requestType", "BC_Channel");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("transactionID", tsLong.toString());
+            jsonObject.put("transactionID", ImageUtils.miliSeconds());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
             jsonObject.put("agentSenderID", list.get(0).getMobilno());

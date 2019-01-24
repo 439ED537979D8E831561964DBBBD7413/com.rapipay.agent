@@ -15,13 +15,11 @@ import com.rapipay.android.agent.R;
 public class BeneficiaryAdapter extends RecyclerView.Adapter<BeneficiaryAdapter.ViewHolder> {
 
     private ArrayList<BeneficiaryDetailsPozo> mValues;
-    private RecyclerView mRecyclerView;
     private Context context;
-    private String type;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
-        public final TextView btn_name,btn_account,btn_bank;
+        public final TextView btn_name, btn_account, btn_bank, isverified;
 
         public ViewHolder(View view) {
             super(view);
@@ -29,12 +27,12 @@ public class BeneficiaryAdapter extends RecyclerView.Adapter<BeneficiaryAdapter.
             btn_name = (TextView) view.findViewById(R.id.btn_name);
             btn_account = (TextView) view.findViewById(R.id.btn_account);
             btn_bank = (TextView) view.findViewById(R.id.btn_bank);
+            isverified = (TextView) view.findViewById(R.id.isverified);
         }
     }
 
-    public BeneficiaryAdapter(Context context, RecyclerView recyclerView, ArrayList<BeneficiaryDetailsPozo> items) {
+    public BeneficiaryAdapter(Context context, ArrayList<BeneficiaryDetailsPozo> items) {
         mValues = items;
-        mRecyclerView = recyclerView;
         this.context = context;
     }
 
@@ -47,18 +45,13 @@ public class BeneficiaryAdapter extends RecyclerView.Adapter<BeneficiaryAdapter.
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
-           /* FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) holder.mImageView.getLayoutParams();
-            if (mRecyclerView.getLayoutManager() instanceof GridLayoutManager) {
-                layoutParams.height = 200;
-            } else if (mRecyclerView.getLayoutManager() instanceof StaggeredGridLayoutManager) {
-                layoutParams.height = 600;
-            } else {
-                layoutParams.height = 800;
-            }*/
         holder.btn_bank.setText(mValues.get(position).getBank());
         holder.btn_name.setText(mValues.get(position).getName());
         holder.btn_account.setText(mValues.get(position).getAccountno());
-
+        if (!mValues.get(position).getIfsc().equalsIgnoreCase("NOT-VEREFIED"))
+            holder.isverified.setText("VEREFIED");
+        else
+            holder.isverified.setText(mValues.get(position).getIfsc());
     }
 
     @Override

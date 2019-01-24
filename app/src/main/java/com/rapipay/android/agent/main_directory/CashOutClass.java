@@ -441,13 +441,12 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
     }
 
     public JSONObject getCashOutDetails(String mobile, String txnAmmount) {
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("serviceType", "Initiate_Mpos_Txn");
             jsonObject.put("requestType", "HANDSET_CHANNEL");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("transactionID", tsLong.toString());
+            jsonObject.put("transactionID", ImageUtils.miliSeconds());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("agentMobile", list.get(0).getMobilno());
             jsonObject.put("customerMobile", mobile);
@@ -475,13 +474,12 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
 
     public JSONObject updateCashOutDetails(String hostResponse) {
         transactionFlag = false;
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("serviceType", "Update_Mpos_Txn");
             jsonObject.put("requestType", "HANDSET_CHANNEL");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("transactionID", tsLong.toString());
+            jsonObject.put("transactionID", ImageUtils.miliSeconds());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("agentMobile", list.get(0).getMobilno());
             jsonObject.put("responseData", hostResponse);

@@ -157,13 +157,12 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
     }
 
     public JSONObject fund_transfer(BeneficiaryDetailsPozo pozo, String type, String amount) {
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("serviceType", "FUND_TRANSFER");
             jsonObject.put("requestType", "DMT_Channel");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("txnRef", tsLong.toString());
+            jsonObject.put("txnRef", ImageUtils.miliSeconds());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("agentId", list.get(0).getMobilno());
             jsonObject.put("customerId", customerId);
@@ -181,13 +180,12 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
     }
 
     public JSONObject delete_Benef(BeneficiaryDetailsPozo pozo) {
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("serviceType", "DELETE_PAYEE");
             jsonObject.put("requestType", "DMT_Channel");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("txnRef", tsLong.toString());
+            jsonObject.put("txnRef", ImageUtils.miliSeconds());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("agentId", list.get(0).getMobilno());
             jsonObject.put("customerId", customerId);
@@ -282,7 +280,6 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
     }
 
     public JSONObject verify_Account() {
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         try {
             String condition = "where " + RapipayDB.COLOMN__BANK_NAME + "='" + bank_select.getText().toString() + "'";
@@ -290,13 +287,15 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
             jsonObject.put("serviceType", "Verify_Account");
             jsonObject.put("requestType", "BC_CHANNEL");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("transactionID", tsLong.toString());
+            jsonObject.put("transactionID", ImageUtils.miliSeconds());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("senderName", input_name.getText().toString());
             jsonObject.put("IFSC", ifsc_code);
             jsonObject.put("accountNo", input_account.getText().toString());
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
             jsonObject.put("mobileNumber", input_mobile.getText().toString());
+            jsonObject.put("txnAmmount", "1");
+            jsonObject.put("reqFor", "BC1");
             jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
 
         } catch (Exception e) {
@@ -404,14 +403,13 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
     }
 
     public JSONObject getSender_Validate() {
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         if (!input_mobile.getText().toString().isEmpty() && input_mobile.getText().toString().length() == 10) {
             try {
                 jsonObject.put("serviceType", "GET_WALLET_STATUS");
                 jsonObject.put("requestType", "DMT_Channel");
                 jsonObject.put("typeMobileWeb", "mobile");
-                jsonObject.put("txnRef", tsLong.toString());
+                jsonObject.put("txnRef", ImageUtils.miliSeconds());
                 jsonObject.put("nodeAgentId", list.get(0).getMobilno());
                 jsonObject.put("agentId", list.get(0).getMobilno());
                 jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
@@ -430,13 +428,12 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
     }
 
     public JSONObject processOtp(String otp, String otpRefId) {
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("serviceType", "PROCESS_OTP");
             jsonObject.put("requestType", "DMT_CHANNEL");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("txnRef", tsLong.toString());
+            jsonObject.put("txnRef", ImageUtils.miliSeconds());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("agentId", list.get(0).getMobilno());
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
@@ -451,7 +448,6 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
     }
 
     public JSONObject processPayee() {
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         try {
             String condition = "where " + RapipayDB.COLOMN__BANK_NAME + "='" + bank_select.getText().toString() + "'";
@@ -459,7 +455,7 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
             jsonObject.put("serviceType", "ADD_PAYEE");
             jsonObject.put("requestType", "DMT_CHANNEL");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("txnRef", tsLong.toString());
+            jsonObject.put("txnRef", ImageUtils.miliSeconds());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("agentId", list.get(0).getMobilno());
             jsonObject.put("beneficiaryName", input_ben_name.getText().toString());
@@ -564,13 +560,12 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
     }
 
     public JSONObject service_fee(String txnAmmount) {
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("serviceType", "GET_SERVICE_FEE");
             jsonObject.put("requestType", "BC_CHANNEL");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("transactionID", tsLong.toString());
+            jsonObject.put("transactionID", ImageUtils.miliSeconds());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("agentID", list.get(0).getMobilno());
             jsonObject.put("subType", "Fund_Transfer");

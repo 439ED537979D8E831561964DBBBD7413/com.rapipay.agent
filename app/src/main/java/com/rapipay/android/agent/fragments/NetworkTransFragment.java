@@ -62,7 +62,6 @@ public class NetworkTransFragment extends BaseFragment implements RequestHandler
     View rv;
     protected ArrayList<RapiPayPozo> list;
     NetworkAdapter adapter;
-    protected Long tsLong;
     NetworkTransferPozo pozoClick;
 
     @Nullable
@@ -362,13 +361,12 @@ public class NetworkTransFragment extends BaseFragment implements RequestHandler
     }
 
     public JSONObject getNetwork_Transfer(String receiverId, String txnAmount) {
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("serviceType", "C2C_NETWORK_CREDIT");
             jsonObject.put("requestType", "BC_CHANNEL");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("transactionID", tsLong.toString());
+            jsonObject.put("transactionID", ImageUtils.miliSeconds());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
             jsonObject.put("agentSenderID", list.get(0).getMobilno());
@@ -426,13 +424,12 @@ public class NetworkTransFragment extends BaseFragment implements RequestHandler
     }
 
     public JSONObject getDashBoard(String servicetype) {
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("serviceType", servicetype);
             jsonObject.put("requestType", "BC_CHANNEL");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("transactionID", tsLong.toString());
+            jsonObject.put("transactionID", ImageUtils.miliSeconds());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
             jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));

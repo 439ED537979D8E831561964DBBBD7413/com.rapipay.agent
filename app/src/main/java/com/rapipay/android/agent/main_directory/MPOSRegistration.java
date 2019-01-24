@@ -28,6 +28,7 @@ import com.rapipay.android.agent.interfaces.CustomInterface;
 import com.rapipay.android.agent.interfaces.RequestHandler;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
 import com.rapipay.android.agent.utils.GenerateChecksum;
+import com.rapipay.android.agent.utils.ImageUtils;
 import com.rapipay.android.agent.utils.WebConfig;
 
 import org.json.JSONObject;
@@ -69,7 +70,7 @@ public class MPOSRegistration extends BaseCompactActivity implements RequestHand
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
             jsonObject.put("responseUrl", "");
-            jsonObject.put("trnasactionId", tsLong.toString());
+            jsonObject.put("trnasactionId", ImageUtils.miliSeconds());
             form = "<html>\n" +
                     "\t<body>\n" +
                     "\t\t<form name=\"mposRegister\" id=\"mposRegister\" method=\"POST\" action=\"" + WebConfig.MPOSREG + "" + "\">\n" +
@@ -81,7 +82,7 @@ public class MPOSRegistration extends BaseCompactActivity implements RequestHand
                     "\t\t\t<input name=\"nodeAgentId\" value=\"" + list.get(0).getMobilno() + "\" type=\"hidden\"/>\n" +
                     "\t\t\t<input name=\"sessionRefNo\" value=\"" + list.get(0).getAftersessionRefNo() + "\" type=\"hidden\"/>\n" +
                     "\t\t\t<input name=\"responseUrl\" value=\"" + "" + "\" type=\"hidden\"/>\n" +
-                    "\t\t\t<input name=\"trnasactionId\" value=\"" + tsLong.toString() + "\" type=\"hidden\"/>\n" +
+                    "\t\t\t<input name=\"trnasactionId\" value=\"" + ImageUtils.miliSeconds() + "\" type=\"hidden\"/>\n" +
                     "\t\t\t<input name=\"checkSum\" value=\"" + GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()) + "\" type=\"hidden\"/>\n" +
                     "\t\t\t<input type=\"submit\"/>\n" +
                     "\t\t</form>\n" +

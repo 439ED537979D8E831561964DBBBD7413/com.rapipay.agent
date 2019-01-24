@@ -22,6 +22,7 @@ import com.rapipay.android.agent.utils.AsyncPostMethod;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
 import com.rapipay.android.agent.utils.BaseFragment;
 import com.rapipay.android.agent.utils.GenerateChecksum;
+import com.rapipay.android.agent.utils.ImageUtils;
 import com.rapipay.android.agent.utils.WebConfig;
 
 import org.json.JSONArray;
@@ -32,7 +33,6 @@ import java.util.ArrayList;
 public class PendingKyc extends BaseFragment implements RequestHandler {
 
     protected String headerData = (WebConfig.BASIC_USERID + ":" + WebConfig.BASIC_PASSWORD);
-    protected Long tsLong;
     protected ArrayList<RapiPayPozo> list;
     ListView trans_details;
     PendingKYCAdapter adapter;
@@ -108,7 +108,6 @@ public class PendingKyc extends BaseFragment implements RequestHandler {
 
     public String getsession_ValidateKyc(String kycType, PendingKYCPozo pendingKYCPozo) {
         JSONObject kycMapData = new JSONObject();
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         String form = null;
         try {
@@ -116,7 +115,6 @@ public class PendingKyc extends BaseFragment implements RequestHandler {
             jsonObject.put("serviceType", "KYC_PROCESS");
             jsonObject.put("reKYC", "");
             jsonObject.put("agentId", list.get(0).getMobilno());
-            jsonObject.put("txnRef", tsLong.toString());
             jsonObject.put("requestType", "EKYC_CHANNEL");
             jsonObject.put("typeMobileWeb", "mobile");
             jsonObject.put("kycType", kycType);
@@ -158,13 +156,12 @@ public class PendingKyc extends BaseFragment implements RequestHandler {
     }
 
     public JSONObject request_user() {
-        tsLong = System.currentTimeMillis() / 1000;
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("serviceType", "PENDING_AGENT_KYC");
             jsonObject.put("requestType", "EKYC_Channel");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("txnRef", tsLong.toString());
+            jsonObject.put("txnRef", ImageUtils.miliSeconds());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("agentId", list.get(0).getMobilno());
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
