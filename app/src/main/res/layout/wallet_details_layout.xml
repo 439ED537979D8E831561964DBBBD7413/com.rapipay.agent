@@ -240,7 +240,7 @@
                             android:background="@drawable/border_button"
                             android:onClick="onClick"
                             android:clickable="true"
-                            android:text="@string/btnverify"
+                            android:text="@string/walletbtnverify"
                             android:textColor="@color/white"
                             android:textSize="10dp" />
 

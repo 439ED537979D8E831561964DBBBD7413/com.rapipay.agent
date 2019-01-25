@@ -17,6 +17,7 @@ import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.adapter.HeaderAdapter;
 import com.rapipay.android.agent.adapter.SimpleStringRecyclerViewAdapter;
 import com.rapipay.android.agent.interfaces.ClickListener;
+import com.rapipay.android.agent.main_directory.AEPS_BBPS_RegistrationActivity;
 import com.rapipay.android.agent.main_directory.CashOutClass;
 import com.rapipay.android.agent.main_directory.ChannelHistoryActivity;
 import com.rapipay.android.agent.main_directory.CreditTabPage;
@@ -82,7 +83,21 @@ public class DashBoardFragments extends Fragment {
         recycler_view3.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), recycler_view3, new ClickListener() {
             @Override
             public void onClick(View view, int position) {
-                Toast.makeText(getActivity(),"Under Process", Toast.LENGTH_SHORT).show();
+                if (position == 0) {
+                    Intent intent = new Intent(getActivity(), MPOSRegistration.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                }else if (position == 1) {
+                    Intent intent = new Intent(getActivity(), AEPS_BBPS_RegistrationActivity.class);
+                    intent.putExtra("typeput", "AEPS");
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                }else if (position == 2) {
+                    Intent intent = new Intent(getActivity(), AEPS_BBPS_RegistrationActivity.class);
+                    intent.putExtra("typeput", "BBPS");
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                }
             }
 
             @Override
@@ -93,21 +108,17 @@ public class DashBoardFragments extends Fragment {
         recycler_view6.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), recycler_view6, new ClickListener() {
             @Override
             public void onClick(View view, int position) {
-                if (position == 0) {
-                    Intent intent = new Intent(getActivity(), MPOSRegistration.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    startActivity(intent);
-                }else if (position == 1) {
+                 if (position == 0) {
                     Intent intent = new Intent(getActivity(), CashOutClass.class);
                     intent.putExtra("typeput", "CASHOUT");
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
-                }else if (position ==2) {
+                }else if (position ==1) {
                     Intent intent = new Intent(getActivity(), CashOutClass.class);
                     intent.putExtra("typeput", "SALE");
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
-                }else if (position ==3) {
+                }else if (position ==2) {
                     Intent intent = new Intent(getActivity(), CashOutClass.class);
                     intent.putExtra("typeput", "EMI");
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

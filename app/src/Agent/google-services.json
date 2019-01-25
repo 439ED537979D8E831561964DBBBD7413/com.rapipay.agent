@@ -10,7 +10,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:1046244990559:android:f56a80ac863321bb",
         "android_client_info": {
-          "package_name": "com.rapipay.android.agent"
+          "package_name": "com.rapipay.android.agents"
         }
       },
       "oauth_client": [
@@ -18,7 +18,7 @@
           "client_id": "1046244990559-2pfr7cpblg6144gllel87tsqfo2b33ue.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.rapipay.android.agent",
+            "package_name": "com.rapipay.android.agents",
             "certificate_hash": "169a1de2b8bdebb883da827041780688a7e63ae7"
           }
         },

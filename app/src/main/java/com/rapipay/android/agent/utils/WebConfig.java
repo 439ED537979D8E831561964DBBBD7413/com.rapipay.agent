@@ -26,6 +26,7 @@ public class WebConfig {
     public static String LOGIN_URL=WEBMain+"SecLogOnApp/SecLogOnService";
     public static String PMTSERVICE_DETAILS=WEBMain+"IndoNepalFTAPP/PMTService";
     public static String BCRemittanceApp = WEBMain + "BCRemittanceApp/BCService";
+    public static String AEPSReg = WEBMain + "KYC_RAPIPAY_APP/registrationForward";
      public WebConfig(String main){
          WEBMain = main;
      }

@@ -111,18 +111,16 @@
                 android:background="@color/colorbackground"/>
 
             <TextView
-                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center"
                 android:padding="2dp"
-                android:text="@string/p_travel"
+                android:text="Registration's"
                 android:textStyle="bold"
                 android:textColor="@color/colorPrimaryDark"
                 android:textSize="12dp"/>
 
             <android.support.v7.widget.RecyclerView
-                android:visibility="gone"
                 android:id="@+id/recycler_view3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

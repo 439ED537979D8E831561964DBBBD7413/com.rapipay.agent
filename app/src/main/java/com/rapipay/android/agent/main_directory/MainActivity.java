@@ -89,7 +89,7 @@ public class MainActivity extends BaseCompactActivity
                 byteConvert(back_click, imagePozoArrayList.get(0).getImagePath());
             }else {
                 if (BuildConfig.APPTYPE == 1)
-                    back_click.setImageDrawable(getResources().getDrawable(R.drawable.ic_launcher));
+                    back_click.setImageDrawable(getResources().getDrawable(R.drawable.rapipay_agent));
                 if (BuildConfig.APPTYPE == 2)
                     back_click.setImageDrawable(getResources().getDrawable(R.drawable.rapipay_parter));
             }

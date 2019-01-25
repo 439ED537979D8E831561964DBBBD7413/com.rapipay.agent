@@ -40,8 +40,8 @@ import com.rapipay.android.agent.utils.WebConfig;
 public class WalletDetailsActivity extends BaseCompactActivity implements View.OnClickListener, RequestHandler, CustomInterface {
 
     EditText input_account, input_mobile, input_otp, input_ben_name;
-    TextView input_name,spinner;
-    AppCompatButton btn_otpsubmit,btn_payee;
+    TextView input_name, spinner;
+    AppCompatButton btn_otpsubmit, btn_payee;
     LinearLayout sender_layout, otp_layout, fundlayout, beneficiary_layout, last_tran_layout;
     String otpRefId, ifsc_code;
     TextView bank_select;
@@ -52,7 +52,7 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
     String customerId;
     int benePosition;
     private WalletBeneficiaryAdapter adapter;
-    String TYPE,mobileNo;
+    String TYPE, mobileNo;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -93,7 +93,7 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
         fundlayout = (LinearLayout) findViewById(R.id.fundlayout);
         beneficiary_layout = (LinearLayout) findViewById(R.id.beneficiary_layout);
         beneficiary_details = (RecyclerView) findViewById(R.id.beneficiary_details);
-        btn_payee = (AppCompatButton)findViewById(R.id.btn_payee);
+        btn_payee = (AppCompatButton) findViewById(R.id.btn_payee);
         btn_payee.setOnClickListener(this);
 //last tranction
         last_tran_layout = (LinearLayout) findViewById(R.id.last_tran_layout);
@@ -308,7 +308,7 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
     public void chechStatus(JSONObject object) {
         try {
             reset.setVisibility(View.VISIBLE);
-            if(object.has("apiCommonResposne")) {
+            if (object.has("apiCommonResposne")) {
                 JSONObject object1 = object.getJSONObject("apiCommonResposne");
                 String balance = object1.getString("runningBalance");
                 heading.setText("Wallet Fund Transfer (Balance : Rs." + format(balance) + ")");
@@ -334,7 +334,7 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
                             btn_sender.setVisibility(View.GONE);
                             input_name.setText(object.getString("customerName"));
                             customerId = object.getString("customerId");
-                            text_ben.setText("Beneficiary Details Transfer Limit" + "\n" +  "Daily : Rs " + format(object.getString("dailyRemainigLimit"))  + "\n" +  "Monthly : Rs " + format(object.getString("monthlyRemainigLimit")));
+                            text_ben.setText("Beneficiary Details Transfer Limit" + "\n" + "Daily : Rs " + format(object.getString("dailyRemainigLimit")) + "\n" + "Monthly : Rs " + format(object.getString("monthlyRemainigLimit")));
 //                            list_bank = db.geBankDetails("");
 //                            if (list_bank.size() != 0) {
 //                                ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
@@ -357,6 +357,9 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
             } else if (object.getString("serviceType").equalsIgnoreCase("Verify_Account")) {
                 if (object.getString("responseCode").equalsIgnoreCase("200"))
                     customDialog_Common("VerifyLayout", object, null, "Verify Account Details", input_name.getText().toString(), null);
+                else if (object.getString("responseCode").equalsIgnoreCase("101")) {
+                    customDialog_Common("KYCLAYOUTLAY", null, null, "Verify Account Details", null,object.getString("responseMessage"));
+                }
             } else if (object.getString("serviceType").equalsIgnoreCase("ADD_PAYEE")) {
                 if (object.getString("responseCode").equalsIgnoreCase("200") && object.has("otpId"))
                     customDialog_Common("OTPLAYOUT", object, null, "Add Payee OTP", null, null);
@@ -376,7 +379,7 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
                             customReceiptNew("Fund Transfer Detail", object, WalletDetailsActivity.this);
                         } catch (Exception e) {
                             e.printStackTrace();
-                            customDialog_Common("KYCLAYOUTL", object,null,"","","Cannot generate receipt now please try later!");
+                            customDialog_Common("KYCLAYOUTL", object, null, "", "", "Cannot generate receipt now please try later!");
                         }
                     }
                 }

@@ -57,115 +57,6 @@ public class PassbookActivity extends BaseCompactActivity implements View.OnClic
         fromimage.setOnClickListener(fromDateClicked);
         fromimage.setColorFilter(getResources().getColor(R.color.colorPrimaryDark));
     }
-//    String months,dayss;
-//    private void picDate() {
-//        months=null;dayss=null;
-//        findViewById(R.id.date1).setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                // custom dialog
-//                final Dialog dialog = new Dialog(PassbookActivity.this);
-//                dialog.setContentView(R.layout.datepickerview);
-//                dialog.setTitle("");
-//
-//                DatePicker datePicker = (DatePicker) dialog.findViewById(R.id.datePicker1);
-//                Calendar calendar = Calendar.getInstance();
-//                calendar.setTimeInMillis(System.currentTimeMillis());
-//                selectedDate = calendar.get(Calendar.DAY_OF_MONTH);
-//                selectedMonth = calendar.get(Calendar.MONTH);
-//                selectedYear = calendar.get(Calendar.YEAR);
-//                datePicker.init(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH), new DatePicker.OnDateChangedListener() {
-//
-//                    @Override
-//                    public void onDateChanged(DatePicker datePicker, int year, int month, int dayOfMonth) {
-//                        Log.e("Date", "Year=" + year + " Month=" + (month + 1) + " day=" + dayOfMonth);
-//                        if(String.valueOf(month+1).length()==1)
-//                            months = "0"+ String.valueOf(month+1);
-//                        else
-//                            months = String.valueOf(month+1);
-//                        if(String.valueOf(dayOfMonth).length()==1)
-//                            dayss = "0"+String.valueOf(dayOfMonth);
-//                        else
-//                            dayss = String.valueOf(dayOfMonth);
-//                        if (selectedDate == dayOfMonth && selectedMonth == month && selectedYear == year) {
-//                            date1_text.setText(year + "-" + months + "-" + dayss);
-//                            dialog.dismiss();
-//                        } else {
-//
-//                            if (selectedDate != dayOfMonth) {
-//                                date1_text.setText(year + "-" + months + "-" + dayss);
-//                                dialog.dismiss();
-//                            } else {
-//                                if (selectedMonth != month) {
-//                                    date1_text.setText(year + "-" + months + "-" + dayss);
-//                                    dialog.dismiss();
-//                                }
-//                            }
-//                        }
-//                        selectedDate = dayOfMonth;
-//                        selectedMonth = (month);
-//                        selectedYear = year;
-//                    }
-//                });
-//                dialog.show();
-//            }
-//        });
-//    }
-//
-//    private void picDate1() {
-//        months=null;dayss=null;
-//        findViewById(R.id.date2).setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                // custom dialog
-//                final Dialog dialog = new Dialog(PassbookActivity.this);
-//                dialog.setContentView(R.layout.datepickerview);
-//                dialog.setTitle("");
-//
-//                DatePicker datePicker = (DatePicker) dialog.findViewById(R.id.datePicker1);
-//                Calendar calendar = Calendar.getInstance();
-//                calendar.setTimeInMillis(System.currentTimeMillis());
-//                selectedDate = calendar.get(Calendar.DAY_OF_MONTH);
-//                selectedMonth = calendar.get(Calendar.MONTH);
-//                selectedYear = calendar.get(Calendar.YEAR);
-//                datePicker.init(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH), new DatePicker.OnDateChangedListener() {
-//
-//                    @Override
-//                    public void onDateChanged(DatePicker datePicker, int year, int month, int dayOfMonth) {
-//                        Log.e("Date", "Year=" + year + " Month=" + (month + 1) + " day=" + dayOfMonth);
-//                        if(String.valueOf(month+1).length()==1)
-//                            months = "0"+ String.valueOf(month+1);
-//                        else
-//                            months = String.valueOf(month+1);
-//                        if(String.valueOf(dayOfMonth).length()==1)
-//                            dayss = "0"+String.valueOf(dayOfMonth);
-//                        else
-//                            dayss = String.valueOf(dayOfMonth);
-//                        if (selectedDate == dayOfMonth && selectedMonth == month && selectedYear == year) {
-//                            date2_text.setText(year + "-" + months + "-" + dayss);
-//                            dialog.dismiss();
-//                        } else {
-//
-//                            if (selectedDate != dayOfMonth) {
-//                                date2_text.setText(year + "-" + months + "-" + dayss);
-//                                dialog.dismiss();
-//                            } else {
-//                                if (selectedMonth != month) {
-//                                    date2_text.setText(year + "-" + months + "-" + dayss);
-//                                    dialog.dismiss();
-//                                }
-//                            }
-//                        }
-//                        selectedDate = dayOfMonth;
-//                        selectedMonth = (month);
-//                        selectedYear = year;
-//                    }
-//                });
-//                dialog.show();
-//            }
-//        });
-//    }
-
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -185,19 +76,6 @@ public class PassbookActivity extends BaseCompactActivity implements View.OnClic
                 break;
         }
     }
-
-//    private void calender(final TextView textview) {
-//        dateFormatter = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-//        Calendar newCalendar = Calendar.getInstance();
-//        pickerDialog = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
-//            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-//                Calendar newDate = Calendar.getInstance();
-//                newDate.set(year, monthOfYear, dayOfMonth);
-//                textview.setText(dateFormatter.format(newDate.getTime()));
-//            }
-//        }, newCalendar.get(Calendar.YEAR), newCalendar.get(Calendar.MONTH), newCalendar.get(Calendar.DAY_OF_MONTH));
-//        pickerDialog.show();
-//    }
 
     public JSONObject channel_request(int fromIndex, int toIndex) {
         JSONObject jsonObject = new JSONObject();

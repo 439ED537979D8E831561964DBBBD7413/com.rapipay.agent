@@ -84,6 +84,7 @@ public class PinActivity extends BaseCompactActivity implements View.OnClickList
                 jsonObject.put("deviceName", Build.MANUFACTURER);
                 jsonObject.put("osType", "ANDROID");
                 jsonObject.put("domainName",BuildConfig.DOMAINNAME);
+                jsonObject.put("clientRequestIP",ImageUtils.ipAddress(PinActivity.this));
                 jsonObject.put("checkSum", GenerateChecksum.checkSum(sessionKey, jsonObject.toString()));
 
             } catch (Exception e) {

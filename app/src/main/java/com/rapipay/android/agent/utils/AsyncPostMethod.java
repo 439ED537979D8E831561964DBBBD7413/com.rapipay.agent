@@ -71,10 +71,7 @@ public class AsyncPostMethod extends AsyncTask<String, String, String> {
     @Override
     protected void onPostExecute(String s) {
         super.onPostExecute(s);
-//         || object.getString("responseCode").equalsIgnoreCase("75059")
-//         || object.getString("responsecode").equalsIgnoreCase("75059")
         try {
-
             if (s != null) {
                 if (s.contains("DOCTYPE")) {
                     handler.chechStat(s);

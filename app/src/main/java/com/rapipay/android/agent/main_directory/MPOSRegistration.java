@@ -23,6 +23,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.TextView;
 
+import com.rapipay.android.agent.Model.PendingKYCPozo;
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.interfaces.CustomInterface;
 import com.rapipay.android.agent.interfaces.RequestHandler;
@@ -42,7 +43,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class MPOSRegistration extends BaseCompactActivity implements RequestHandler, View.OnClickListener, CustomInterface {
+public class MPOSRegistration extends BaseCompactActivity implements View.OnClickListener, CustomInterface {
 
     WebView web;
     private ValueCallback<Uri[]> mUploadMessage;
@@ -51,13 +52,15 @@ public class MPOSRegistration extends BaseCompactActivity implements RequestHand
     private static final String TAG = MainActivity.class.getSimpleName();
     ArrayList<String> listPath = new ArrayList<>();
     private long size = 0;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.webview_layout);
         mpos_service();
-        TYPE="outside";
+        TYPE = "outside";
     }
+
     public String getmpos_Validate() {
         String form = null;
         JSONObject jsonObject = new JSONObject();
@@ -96,6 +99,7 @@ public class MPOSRegistration extends BaseCompactActivity implements RequestHand
         }
         return form;
     }
+
     public void mpos_service() {
         heading = (TextView) findViewById(R.id.toolbar_title);
         heading.setText("MPOS Registration");
@@ -106,12 +110,6 @@ public class MPOSRegistration extends BaseCompactActivity implements RequestHand
         webSettings.setJavaScriptEnabled(true);
         webSettings.setLoadWithOverviewMode(true);
         webSettings.setAllowFileAccess(true);
-
-        //        webSettings.setJavaScriptEnabled(true);
-        //        webSettings.setUseWideViewPort(true);
-        //        webSettings.setLoadWithOverviewMode(true);
-        //        webSettings.setAllowFileAccess(true);
-        //        webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
         web.setWebViewClient(new myWebClient());
         web.setWebChromeClient(new PQChromeClient());
         if (Build.VERSION.SDK_INT >= 19)
@@ -120,11 +118,9 @@ public class MPOSRegistration extends BaseCompactActivity implements RequestHand
         if (formPostData != null)
             web.loadDataWithBaseURL("", formPostData, "text/html", "UTF-8", "");
     }
-    public class PQChromeClient extends WebChromeClient {
 
-        // For Android 5.0+
+    public class PQChromeClient extends WebChromeClient {
         public boolean onShowFileChooser(WebView view, ValueCallback<Uri[]> filePath, FileChooserParams fileChooserParams) {
-            // Double check that we don't have any existing callbacks
             if (mUploadMessage != null) {
                 mUploadMessage.onReceiveValue(null);
             }
@@ -133,27 +129,51 @@ public class MPOSRegistration extends BaseCompactActivity implements RequestHand
             return true;
         }
     }
-    @Override
-    public void chechStatus(JSONObject object) {
-        try {
-            if (object.getString("responseCode").equalsIgnoreCase("200")) {
-                if (object.getString("serviceType").equalsIgnoreCase("GET_FORM_DATA")) {
 
-                }
-            }
+    public String getsession_ValidateKyc(String kycType) {
+        JSONObject kycMapData = new JSONObject();
+        JSONObject jsonObject = new JSONObject();
+        String form = null;
+        try {
+            kycMapData.put("mobileNo", list.get(0).getMobilno());
+            jsonObject.put("serviceType", "KYC_PROCESS");
+            jsonObject.put("reKYC", "Y");
+            jsonObject.put("agentId", list.get(0).getMobilno());
+            jsonObject.put("requestType", "EKYC_CHANNEL");
+            jsonObject.put("typeMobileWeb", "mobile");
+            jsonObject.put("kycType", kycType);
+            jsonObject.put("nodeAgentId", list.get(0).getMobilno());
+            jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
+            jsonObject.put("isreKYC", "N");
+            jsonObject.put("txnRef", ImageUtils.miliSeconds());
+            jsonObject.put("isAuto", "1");
+            jsonObject.put("isEditable", "Y");
+            jsonObject.put("listdata", kycMapData.toString());
+            jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
+            form = "<html>\n" +
+                    "\t<body>\n" +
+                    "\t\t<form name=\"validatekyc\" id=\"validatekyc\" method=\"POST\" action=\"" + WebConfig.EKYC_FORWARD_POST + "\">\n" +
+                    "\t\t\t<input name=\"requestedData\" value=\"" + getDataBase64(jsonObject.toString()) + "\" type=\"hidden\"/>\n" +
+                    "\t\t\t<input type=\"submit\"/>\n" +
+                    "\t\t</form>\n" +
+                    "\t\t<script language=\"JavaScript\" type=\"text/javascript\">\n" +
+                    "\t\t\t\t\tdocument.getElementById(\"validatekyc\").submit();\n" +
+                    "\t\t</script>\n" +
+                    "\t</body>\n" +
+                    "</html>";
+            return form;
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return null;
     }
-    @Override
-    public void chechStat(String object) {
 
-    }
     @Override
     public void onBackPressed() {
         setBack_click(this);
         finish();
     }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -163,6 +183,7 @@ public class MPOSRegistration extends BaseCompactActivity implements RequestHand
                 break;
         }
     }
+
     public class myWebClient extends WebViewClient {
         ProgressDialog progressDialog;
 
@@ -230,6 +251,10 @@ public class MPOSRegistration extends BaseCompactActivity implements RequestHand
                         if (response.equalsIgnoreCase("User Cancel The Request")) {
                             setBack_click(MPOSRegistration.this);
                             finish();
+                        } else if (response.contains("responseCode")) {
+                            JSONObject object = new JSONObject(response);
+                            if (object.getString("responseCode").equalsIgnoreCase("75161"))
+                                customDialog_Common("KYCLAYOUT", null, null, getResources().getString(R.string.Alert), null, object.getString("responseMessage"), MPOSRegistration.this);
                         } else
                             customDialog_Common("KYCLAYOUTS", null, null, getResources().getString(R.string.Alert), null, response, MPOSRegistration.this);
 
@@ -243,6 +268,7 @@ public class MPOSRegistration extends BaseCompactActivity implements RequestHand
 
         }
     }
+
     public String inputStreamAsString(String url) {
         String data = null;
         try {
@@ -262,6 +288,7 @@ public class MPOSRegistration extends BaseCompactActivity implements RequestHand
         }
         return null;
     }
+
     public Map<String, String> getQueryMap(String query) {
         if (query.contains("?")) {
             String[] params = query.split("\\?");
@@ -278,17 +305,28 @@ public class MPOSRegistration extends BaseCompactActivity implements RequestHand
             return null;
         }
     }
+
     @Override
     public void okClicked(String type, Object ob) {
         if (type.equalsIgnoreCase("KYCLAYOUTS")) {
             setBack_click(MPOSRegistration.this);
             finish();
+        } else if (type.equalsIgnoreCase("KYCLAYOUT")) {
+            String formData = getsession_ValidateKyc("A");
+            Intent intent = new Intent(MPOSRegistration.this, WebViewVerify.class);
+            intent.putExtra("persons", "pending");
+            intent.putExtra("mobileNo", list.get(0).getMobilno());
+            intent.putExtra("formData", formData);
+//                        intent.putExtra("documentID", documentID);
+            startActivity(intent);
         }
     }
+
     @Override
     public void cancelClicked(String type, Object ob) {
 
     }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode != INPUT_FILE_REQUEST_CODE || mUploadMessage == null) {

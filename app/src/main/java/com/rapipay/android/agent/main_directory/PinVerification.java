@@ -6,6 +6,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -15,6 +16,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.text.format.Formatter;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -170,6 +172,8 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
 
     public JSONObject getJson_Validate(String pinResults) {
         JSONObject jsonObject = new JSONObject();
+        WifiManager wm = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
+        String wifiIP = Formatter.formatIpAddress(wm.getConnectionInfo().getIpAddress());
         if (list.size() != 0) {
             try {
                 jsonObject.put("serviceType", "PinVerify");
@@ -184,6 +188,7 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
                 jsonObject.put("sessionRefNo", list.get(0).getSessionRefNo());
                 jsonObject.put("osType", "ANDROID");
                 jsonObject.put("domainName",BuildConfig.DOMAINNAME);
+                jsonObject.put("clientRequestIP",ImageUtils.ipAddress(PinVerification.this));
                 jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getSession(), jsonObject.toString()));
 
             } catch (Exception e) {

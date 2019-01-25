@@ -47,9 +47,6 @@ public class ChannelHistoryActivity extends BaseCompactActivity implements View.
 
     private void initialize() {
         heading = (TextView) findViewById(R.id.toolbar_title);
-//        if (balance != null)
-//            heading.setText("Transaction History);
-//        else
         heading.setText("Transaction History");
         btn_fund = (ImageView) findViewById(R.id.btn_fund);
         btn_fund.setOnClickListener(this);
@@ -153,26 +150,6 @@ public class ChannelHistoryActivity extends BaseCompactActivity implements View.
         return jsonObject;
     }
 
-//    public JSONObject receipt_request(ChannelHistoryPozo pozo) {
-//        JSONObject jsonObject = new JSONObject();
-//        try {
-//            jsonObject.put("serviceType", "Get_Txn_Recipt");
-//            jsonObject.put("requestType", pozo.getTransferType());
-//            jsonObject.put("typeMobileWeb", "mobile");
-//            jsonObject.put("txnRef", ImageUtils.miliSeconds());
-//            jsonObject.put("nodeAgentId", list.get(0).getMobilno());
-//            jsonObject.put("agentId", list.get(0).getMobilno());
-//            jsonObject.put("txnDate", pozo.getDate_id());
-//            jsonObject.put("orgTxnRef", pozo.getOrgTxnid());
-//            jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
-//            jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        return jsonObject;
-//    }
-
     @Override
     public void chechStatus(JSONObject object) {
         try {
@@ -183,7 +160,8 @@ public class ChannelHistoryActivity extends BaseCompactActivity implements View.
                     if (object.has("getTxnReceiptDataList"))
                         try {
                             JSONArray array = object.getJSONArray("getTxnReceiptDataList");
-                            customReceiptNew("Transaction Receipt", object, ChannelHistoryActivity.this);
+                            customReceiptNewTransaction("Transaction Receipt", object, ChannelHistoryActivity.this);
+//                            customReceiptNew("Transaction Receipt", object, ChannelHistoryActivity.this);
                         } catch (Exception e) {
                             e.printStackTrace();
                             customDialog_Common("KYCLAYOUTS",null,null,"Transaction Receipt","","Cannot generate receipt now please try later!", ChannelHistoryActivity.this);

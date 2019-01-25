@@ -41,6 +41,7 @@
     <string name="btnfund">Fund Transfer</string>
     <string name="btnben">Add Beneficiary</string>
     <string name="btnverify">Verify/Add Account</string>
+    <string name="walletbtnverify">Verify Account</string>
     <string name="p_accounttr">Account Transfer</string>
     <string name="p_benaadd">Add New Beneficiary</string>
     <string name="p_bendd">Add Beneficiary</string>

@@ -56,7 +56,7 @@ public class SpashScreenActivity extends BaseCompactActivity implements CustomIn
 
     private void route_path(boolean flag) {
         if (BuildConfig.APPTYPE == 1)
-            imageView.setImageDrawable(getResources().getDrawable(R.drawable.ic_launcher));
+            imageView.setImageDrawable(getResources().getDrawable(R.drawable.rapipay_agent));
         if (BuildConfig.APPTYPE == 2)
             imageView.setImageDrawable(getResources().getDrawable(R.drawable.rapipay_parter));
         if(flag) {

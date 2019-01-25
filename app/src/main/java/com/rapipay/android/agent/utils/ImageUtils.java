@@ -6,8 +6,10 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
+import android.net.wifi.WifiManager;
 import android.os.Parcelable;
 import android.provider.MediaStore;
+import android.text.format.Formatter;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -17,6 +19,8 @@ import java.util.List;
 
 import com.rapipay.android.agent.Model.ImagePozo;
 import com.rapipay.android.agent.R;
+
+import static android.content.Context.WIFI_SERVICE;
 
 public class ImageUtils {
 
@@ -43,7 +47,7 @@ public class ImageUtils {
     public static ArrayList<ImagePozo> getSixthImageUrl() {
         ArrayList<ImagePozo> list = new ArrayList<>();
         list.clear();
-        list.add(new ImagePozo(1,"MPOS Registration",R.drawable.mposreg));
+//        list.add(new ImagePozo(1,"MPOS Registration",R.drawable.mposreg));
         list.add(new ImagePozo(2,"Cash@Pos",R.drawable.mposcash));
         list.add(new ImagePozo(3, "Sale", R.drawable.mposale));
         list.add(new ImagePozo(4, "EMI", R.drawable.mposemi));
@@ -66,9 +70,10 @@ public class ImageUtils {
     public static ArrayList<ImagePozo> getThirdImageUrl() {
         ArrayList<ImagePozo> list = new ArrayList<>();
         list.clear();
-        list.add(new ImagePozo(1, "Insurance", R.drawable.insurance_rapi));
-        list.add(new ImagePozo(2, "Travel Booking", R.drawable.trac_rapi));
-        list.add(new ImagePozo(3, "Shopping", R.drawable.rapi_shopping));
+        list.add(new ImagePozo(1,"MPOS Registration",R.drawable.mposreg));
+        list.add(new ImagePozo(1, "AEPS Registration", R.drawable.aeps));
+        list.add(new ImagePozo(2, "BBPS Registration", R.drawable.bbps));
+//        list.add(new ImagePozo(3, "Shopping", R.drawable.rapi_shopping));
         return list;
     }
 
@@ -199,6 +204,10 @@ public class ImageUtils {
         SimpleDateFormat df=new SimpleDateFormat("ssmmHHMMddSSS");
         Date date=new Date();
         return df.format(date);
+    }
+    public static String ipAddress(Context context){
+        WifiManager wm = (WifiManager) context.getApplicationContext().getSystemService(WIFI_SERVICE);
+        return Formatter.formatIpAddress(wm.getConnectionInfo().getIpAddress());
     }
 
 }

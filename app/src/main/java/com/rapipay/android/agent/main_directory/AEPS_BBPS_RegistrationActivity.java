@@ -23,9 +23,13 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.TextView;
 
+import com.rapipay.android.agent.Model.PendingKYCPozo;
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.interfaces.CustomInterface;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
+import com.rapipay.android.agent.utils.GenerateChecksum;
+import com.rapipay.android.agent.utils.ImageUtils;
+import com.rapipay.android.agent.utils.WebConfig;
 
 import org.json.JSONObject;
 
@@ -37,24 +41,27 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class WebViewVerify extends BaseCompactActivity implements CustomInterface, View.OnClickListener {
+public class AEPS_BBPS_RegistrationActivity extends BaseCompactActivity implements CustomInterface, View.OnClickListener {
     WebView web;
     private ValueCallback<Uri[]> mUploadMessage;
-    private String mobileNo, formData;
     private static final int INPUT_FILE_REQUEST_CODE = 1;
     private long size = 0;
+    String typeput;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.webview_layout);
+        typeput = getIntent().getStringExtra("typeput");
         initialize();
     }
 
     private void initialize() {
         heading = (TextView) findViewById(R.id.toolbar_title);
-        heading.setText("KYC Registration");
-        TYPE = getIntent().getStringExtra("persons");
-        mobileNo = getIntent().getStringExtra("mobileNo");
+        if (typeput.equalsIgnoreCase("AEPS"))
+            heading.setText("AEPS Registration");
+        else if (typeput.equalsIgnoreCase("BBPS"))
+            heading.setText("BBPS Registration");
         web = (WebView) findViewById(R.id.webview01);
         WebSettings webSettings = web.getSettings();
         webSettings.setAppCacheEnabled(true);
@@ -67,14 +74,44 @@ public class WebViewVerify extends BaseCompactActivity implements CustomInterfac
         if (Build.VERSION.SDK_INT >= 19) {
             web.setLayerType(View.LAYER_TYPE_HARDWARE, null);
         }
-        if (TYPE.equalsIgnoreCase("pending")) {
-            formData = getIntent().getStringExtra("formData");
-            if (formData != null)
-                web.loadDataWithBaseURL("", formData, "text/html", "UTF-8", "");
-        }else {
-            if (KYCFormActivity.formData != null)
-                web.loadDataWithBaseURL("", KYCFormActivity.formData, "text/html", "UTF-8", "");
+        web.loadDataWithBaseURL("", getregistrationDetails(), "text/html", "UTF-8", "");
+    }
+
+    public String getregistrationDetails() {
+        JSONObject jsonObject = new JSONObject();
+        if (list.size() != 0) {
+            try {
+                if (typeput.equalsIgnoreCase("AEPS")) {
+                    jsonObject.put("serviceType", "AEPS_REGISTRATION");
+                    jsonObject.put("requestType", "AEPS_CHANNEL");
+                } else if (typeput.equalsIgnoreCase("BBPS")) {
+                    jsonObject.put("serviceType", "BBPS_REGISTRATION");
+                    jsonObject.put("requestType", "BBPS_CHANNEL");
+                }
+                jsonObject.put("typeMobileWeb", "mobile");
+                jsonObject.put("transactionID", ImageUtils.miliSeconds());
+                jsonObject.put("agentId", list.get(0).getMobilno());
+                jsonObject.put("nodeAgentId", list.get(0).getMobilno());
+                jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
+                jsonObject.put("responseUrl", "");
+                jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
+                String form = "<html>\n" +
+                        "\t<body>\n" +
+                        "\t\t<form name=\"validatekyc\" id=\"validatekyc\" method=\"POST\" action=\"" + WebConfig.AEPSReg + "\">\n" +
+                        "\t\t\t<input name=\"requestedData\" value=\"" + getDataBase64(jsonObject.toString()) + "\" type=\"hidden\"/>\n" +
+                        "\t\t\t<input type=\"submit\"/>\n" +
+                        "\t\t</form>\n" +
+                        "\t\t<script language=\"JavaScript\" type=\"text/javascript\">\n" +
+                        "\t\t\t\t\tdocument.getElementById(\"validatekyc\").submit();\n" +
+                        "\t\t</script>\n" +
+                        "\t</body>\n" +
+                        "</html>";
+                return form;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
+        return null;
     }
 
     public class myWebClient extends WebViewClient {
@@ -83,7 +120,8 @@ public class WebViewVerify extends BaseCompactActivity implements CustomInterfac
         @Override
         public void onLoadResource(WebView view, String url) {
             if (progressDialog == null) {
-                progressDialog = new ProgressDialog(WebViewVerify.this);
+                // in standard case YourActivity.this
+                progressDialog = new ProgressDialog(AEPS_BBPS_RegistrationActivity.this);
                 progressDialog.setMessage("Loading...");
                 progressDialog.show();
             }
@@ -114,7 +152,7 @@ public class WebViewVerify extends BaseCompactActivity implements CustomInterfac
 
         @Override
         public void onReceivedSslError(WebView view, final SslErrorHandler handler, SslError error) {
-            final AlertDialog.Builder builder = new AlertDialog.Builder(WebViewVerify.this);
+            final AlertDialog.Builder builder = new AlertDialog.Builder(AEPS_BBPS_RegistrationActivity.this);
             builder.setMessage(R.string.notification_error_ssl_cert_invalid);
             builder.setCancelable(false);
             builder.setPositiveButton("continue", new DialogInterface.OnClickListener() {
@@ -142,23 +180,12 @@ public class WebViewVerify extends BaseCompactActivity implements CustomInterfac
                     try {
                         JSONObject object = new JSONObject(response);
                         if (object.has("responseCode"))
-                            if (object.getString("responseCode").equalsIgnoreCase("60187")) {
-                                customDialog_Common("KYCLAYOUTS", null, null, getResources().getString(R.string.Alert), null, object.getString("responseMessage"), WebViewVerify.this);
-                                //                            customDialog(object.getString("responseMessage"));
-                            } else if (object.getString("responseCode").equalsIgnoreCase("60147") || object.getString("responseCode").equalsIgnoreCase("60173")) {
-                                deleteFile();
-                                if (TYPE.equalsIgnoreCase("internal")) {
-                                    Intent intent = new Intent(WebViewVerify.this, WalletDetailsActivity.class);
-                                    intent.putExtra("mobileNo", "");
-                                    intent.putExtra("type", "");
-                                    startActivity(intent);
-                                } else if (TYPE.equalsIgnoreCase("outside")) {
-                                    Intent intent = new Intent(WebViewVerify.this, MainActivity.class);
-                                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                    startActivity(intent);
-                                }
-                                finish();
-                            }
+                           if (object.getString("responseCode").equalsIgnoreCase("200")) {
+                               customDialog_Common("KYCLAYOUTS", null, null, getResources().getString(R.string.Alert), null, object.getString("responseMessage"), AEPS_BBPS_RegistrationActivity.this);
+                            }else if (object.getString("responseCode").equalsIgnoreCase("75161")) {
+                               customDialog_Common("KYCLAYOUT", null, null, getResources().getString(R.string.Alert), null, object.getString("responseMessage"), AEPS_BBPS_RegistrationActivity.this);
+                           }else
+                                customDialog_Common("KYCLAYOUTS", null, null, getResources().getString(R.string.Alert), null, object.getString("responseMessage"), AEPS_BBPS_RegistrationActivity.this);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -168,7 +195,6 @@ public class WebViewVerify extends BaseCompactActivity implements CustomInterfac
                 startActivity(browserIntent);
             }
             return true;
-
         }
     }
 
@@ -209,16 +235,56 @@ public class WebViewVerify extends BaseCompactActivity implements CustomInterfac
         }
     }
 
+    public String getsession_ValidateKyc(String kycType) {
+        JSONObject kycMapData = new JSONObject();
+        JSONObject jsonObject = new JSONObject();
+        String form = null;
+        try {
+            kycMapData.put("mobileNo", list.get(0).getMobilno());
+            jsonObject.put("serviceType", "KYC_PROCESS");
+            jsonObject.put("reKYC", "Y");
+            jsonObject.put("txnRef", ImageUtils.miliSeconds());
+            jsonObject.put("agentId", list.get(0).getMobilno());
+            jsonObject.put("requestType", "EKYC_CHANNEL");
+            jsonObject.put("typeMobileWeb", "mobile");
+            jsonObject.put("kycType", kycType);
+            jsonObject.put("nodeAgentId", list.get(0).getMobilno());
+            jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
+            jsonObject.put("isreKYC", "N");
+            jsonObject.put("isAuto", "1");
+            jsonObject.put("isEditable", "Y");
+            jsonObject.put("listdata", kycMapData.toString());
+            jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
+            form = "<html>\n" +
+                    "\t<body>\n" +
+                    "\t\t<form name=\"validatekyc\" id=\"validatekyc\" method=\"POST\" action=\"" + WebConfig.EKYC_FORWARD_POST + "\">\n" +
+                    "\t\t\t<input name=\"requestedData\" value=\"" + getDataBase64(jsonObject.toString()) + "\" type=\"hidden\"/>\n" +
+                    "\t\t\t<input type=\"submit\"/>\n" +
+                    "\t\t</form>\n" +
+                    "\t\t<script language=\"JavaScript\" type=\"text/javascript\">\n" +
+                    "\t\t\t\t\tdocument.getElementById(\"validatekyc\").submit();\n" +
+                    "\t\t</script>\n" +
+                    "\t</body>\n" +
+                    "</html>";
+            return form;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
     public class PQChromeClient extends WebChromeClient {
         public boolean onShowFileChooser(WebView view, ValueCallback<Uri[]> filePath, FileChooserParams fileChooserParams) {
+            // Double check that we don't have any existing callbacks
             if (mUploadMessage != null) {
                 mUploadMessage.onReceiveValue(null);
             }
             mUploadMessage = filePath;
             loadCamera();
             return true;
+
         }
     }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode != INPUT_FILE_REQUEST_CODE || mUploadMessage == null) {
@@ -239,6 +305,7 @@ public class WebViewVerify extends BaseCompactActivity implements CustomInterfac
         } catch (Exception e) {
             Log.e("Error!", "Error while opening image file" + e.getLocalizedMessage());
         }
+
         if (data != null || mCameraPhotoPath != null) {
             Integer count = 1;
             ClipData images = null;
@@ -247,6 +314,7 @@ public class WebViewVerify extends BaseCompactActivity implements CustomInterfac
             } catch (Exception e) {
                 Log.e("Error!", e.getLocalizedMessage());
             }
+
             if (images == null && data != null && data.getDataString() != null) {
                 count = data.getDataString().length();
             } else if (images != null) {
@@ -267,17 +335,23 @@ public class WebViewVerify extends BaseCompactActivity implements CustomInterfac
                     }
                 }
             }
-
             mUploadMessage.onReceiveValue(results);
             mUploadMessage = null;
         }
     }
+
     @Override
     public void okClicked(String type, Object ob) {
         if (type.equalsIgnoreCase("KYCLAYOUTS")) {
-            db.deleteRow(mobileNo, "");
             setBack_click(this);
             finish();
+        }else  if (type.equalsIgnoreCase("KYCLAYOUT")) {
+            String formData = getsession_ValidateKyc("A");
+            Intent intent = new Intent(AEPS_BBPS_RegistrationActivity.this, WebViewVerify.class);
+            intent.putExtra("persons", "pending");
+            intent.putExtra("mobileNo", list.get(0).getMobilno());
+            intent.putExtra("formData", formData);
+            startActivity(intent);
         }
     }
 
@@ -298,6 +372,8 @@ public class WebViewVerify extends BaseCompactActivity implements CustomInterfac
 
     @Override
     public void onBackPressed() {
+        setBack_click(this);
         finish();
     }
 }
+
