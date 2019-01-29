@@ -50,7 +50,6 @@ import com.rapipay.android.agent.utils.GenerateChecksum;
 import com.rapipay.android.agent.utils.RouteClass;
 import com.rapipay.android.agent.utils.WebConfig;
 
-
 public class PinVerification extends BaseCompactActivity implements RequestHandler, View.OnClickListener, CustomInterface, VersionListener {
     private ViewPager mPager;
     private static int currentPage = 0;
@@ -77,7 +76,6 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
 //            loadMaster();
         } else
             dbNull(PinVerification.this);
-
     }
 
     private void loadApi() {
@@ -130,7 +128,6 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
         final float density = getResources().getDisplayMetrics().density;
         indicator.setRadius(5 * density);
         NUM_PAGES = IMAGES.length;
-        // Auto start of viewpager
         final Handler handler = new Handler();
         final Runnable Update = new Runnable() {
             public void run() {
@@ -148,7 +145,6 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
             }
         }, 3000, 3000);
 
-        // Pager listener over indicator
         indicator.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 
             @Override
@@ -360,9 +356,6 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
                 if (object.getString("headerValue").equalsIgnoreCase("banner")) {
                     bannerlist.add(new HeaderePozo(object.getString("headerValue"), object.getString("headerData"), object.getString("headerId")));
                 }
-//                else
-//                    imagelist.add(new HeaderePozo(object.getString("headerValue"), object.getString("headerData"), object.getString("headerId")));
-
             }
         } catch (Exception e) {
             e.printStackTrace();

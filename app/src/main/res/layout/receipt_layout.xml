@@ -17,7 +17,6 @@
         android:textColor="@color/white"
         android:textSize="18dp" />
 
-
     <ListView
         android:layout_below="@+id/dialog_title"
         android:id="@+id/listbottom"
@@ -56,4 +55,4 @@
             android:textColor="@color/white"
             android:textSize="16dp" />
     </RelativeLayout>
-</RelativeLayout><!--</ScrollView>-->
+</RelativeLayout>

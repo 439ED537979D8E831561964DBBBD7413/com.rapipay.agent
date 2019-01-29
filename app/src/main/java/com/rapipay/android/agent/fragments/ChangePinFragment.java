@@ -51,7 +51,6 @@ public class ChangePinFragment extends Fragment implements RequestHandler, View.
         otppinView = (PinEntryEditText) view.findViewById(R.id.otppinView);
     }
 
-
     @Override
     public void onClick(View v) {
         switch (v.getId()) {

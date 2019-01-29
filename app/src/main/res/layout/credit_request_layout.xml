@@ -182,8 +182,5 @@
                         android:textSize="14dp" />
                 </LinearLayout>
             </LinearLayout>
-
-
         </LinearLayout>
-        <!--</android.support.v7.widget.CardView>-->
     </android.support.v4.widget.NestedScrollView>

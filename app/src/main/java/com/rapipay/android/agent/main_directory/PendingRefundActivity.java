@@ -59,9 +59,6 @@ public class PendingRefundActivity extends BaseCompactActivity implements Reques
 
     private void initialize() {
         heading = (TextView) findViewById(R.id.toolbar_title);
-//        if (balance != null)
-//            heading.setText("Pending & Refund (Balance : Rs. " + balance + " )");
-//        else
         heading.setText("Pending & Refund");
         btn_search = (ImageView) findViewById(R.id.btn_search);
         btn_search.setOnClickListener(new View.OnClickListener() {
@@ -74,10 +71,8 @@ public class PendingRefundActivity extends BaseCompactActivity implements Reques
         input_mobile = (EditText) findViewById(R.id.input_mobile);
         beneficiary_layout = (LinearLayout) findViewById(R.id.beneficiary_layout);
         beneficiary_details = (RecyclerView) findViewById(R.id.beneficiary_details);
-//last tranction
         last_tran_layout = (LinearLayout) findViewById(R.id.last_tran_layout);
         trans_details = (RecyclerView) findViewById(R.id.trans_details);
-        //        refund transaction
         refund_tran_layout = (LinearLayout) findViewById(R.id.refund_tran_layout);
         refund_details = (RecyclerView) findViewById(R.id.refund_details);
         refund_details.addOnItemTouchListener(new RecyclerTouchListener(this, refund_details, new ClickListener() {
@@ -96,7 +91,6 @@ public class PendingRefundActivity extends BaseCompactActivity implements Reques
 
             }
         }));
-//        pending transaction
         pending_tran_layout = (LinearLayout) findViewById(R.id.pending_tran_layout);
         pending_details = (RecyclerView) findViewById(R.id.pending_details);
         pending_details.addOnItemTouchListener(new RecyclerTouchListener(this, pending_details, new ClickListener() {

@@ -103,7 +103,6 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
         fundlayout = (LinearLayout) findViewById(R.id.fundlayout);
         beneficiary_layout = (LinearLayout) findViewById(R.id.beneficiary_layout);
         beneficiary_details = (RecyclerView) findViewById(R.id.beneficiary_details);
-//last tranction
         last_tran_layout = (LinearLayout) findViewById(R.id.last_tran_layout);
         trans_details = (RecyclerView) findViewById(R.id.trans_details);
 

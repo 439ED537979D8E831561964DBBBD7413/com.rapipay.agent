@@ -22,6 +22,7 @@ import com.rapipay.android.agent.main_directory.CashOutClass;
 import com.rapipay.android.agent.main_directory.ChannelHistoryActivity;
 import com.rapipay.android.agent.main_directory.CreditTabPage;
 import com.rapipay.android.agent.main_directory.DailyCommissionActivity;
+import com.rapipay.android.agent.main_directory.Fino_AEPS_BBPS_Activity;
 import com.rapipay.android.agent.main_directory.FundTransferActivity;
 import com.rapipay.android.agent.main_directory.MPOSRegistration;
 import com.rapipay.android.agent.main_directory.MainActivity;
@@ -94,6 +95,11 @@ public class DashBoardFragments extends Fragment {
                     startActivity(intent);
                 }else if (position == 2) {
                     Intent intent = new Intent(getActivity(), AEPS_BBPS_RegistrationActivity.class);
+                    intent.putExtra("typeput", "BBPS");
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                }else if (position == 3) {
+                    Intent intent = new Intent(getActivity(), Fino_AEPS_BBPS_Activity.class);
                     intent.putExtra("typeput", "BBPS");
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
@@ -249,11 +255,6 @@ public class DashBoardFragments extends Fragment {
                     intent.putExtra("OPERATOR", "MOBILE");
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
-//                } else if (position == 0) {
-//                    Intent intent = new Intent(getActivity(), ReChargeActivity.class);
-//                    intent.putExtra("OPERATOR", "PRE");
-//                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//                    startActivity(intent);
                 }
                 else if (position == 1) {
                     Intent intent = new Intent(getActivity(), ReChargeActivity.class);
@@ -267,7 +268,6 @@ public class DashBoardFragments extends Fragment {
                 }else {
                     Toast.makeText(getActivity(),"Under Process", Toast.LENGTH_SHORT).show();
                 }
-
             }
 
             @Override

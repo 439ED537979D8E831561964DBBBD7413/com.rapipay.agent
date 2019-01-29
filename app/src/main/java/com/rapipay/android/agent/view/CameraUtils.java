@@ -12,9 +12,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-/**
- * Created by sonu on 23/03/17.
- */
 
 public class CameraUtils {
 

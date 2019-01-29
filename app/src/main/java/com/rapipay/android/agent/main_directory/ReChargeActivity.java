@@ -54,9 +54,6 @@ public class ReChargeActivity extends BaseCompactActivity implements View.OnClic
             serviceType = "DTH_RECHARGE";
             heading.setText("DTH RECHARGE");
             input_number.setFilters(new InputFilter[]{new InputFilter.LengthFilter(15)});
-//            LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-//            p.weight = 1;
-//            input_number.setLayoutParams(p);
         } else if (operator_clicked.equalsIgnoreCase("PRE")) {
             serviceType = "MOBILE_RECHARGE";
             heading.setText("PREPAID RECHARGE");
@@ -83,7 +80,6 @@ public class ReChargeActivity extends BaseCompactActivity implements View.OnClic
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                // find which radio button is selected
                 if (checkedId == R.id.prepaid) {
                     serviceType = "MOBILE_RECHARGE";
                     operator_clicked = "PRE";

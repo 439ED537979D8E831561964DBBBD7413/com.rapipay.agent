@@ -18,7 +18,6 @@ public class WalletBeneficiaryAdapter extends RecyclerView.Adapter<WalletBenefic
     private ArrayList<BeneficiaryDetailsPozo> mValues;
     private RecyclerView mRecyclerView;
     private Context context;
-    private String type;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
@@ -48,24 +47,14 @@ public class WalletBeneficiaryAdapter extends RecyclerView.Adapter<WalletBenefic
         return new ViewHolder(view);
     }
 
-
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
-           /* FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) holder.mImageView.getLayoutParams();
-            if (mRecyclerView.getLayoutManager() instanceof GridLayoutManager) {
-                layoutParams.height = 200;
-            } else if (mRecyclerView.getLayoutManager() instanceof StaggeredGridLayoutManager) {
-                layoutParams.height = 600;
-            } else {
-                layoutParams.height = 800;
-            }*/
         holder.btn_bank.setText(mValues.get(position).getAccountno());
         holder.btn_name.setText(mValues.get(position).getBeneficiaryId());
         holder.btn_account.setText(mValues.get(position).getName());
         if (mValues.get(position).getBank().equalsIgnoreCase(""))
             holder.accname.setVisibility(View.GONE);
         holder.btn_accountname.setText(mValues.get(position).getBank());
-
     }
 
     @Override

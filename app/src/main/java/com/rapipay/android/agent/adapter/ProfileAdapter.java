@@ -52,11 +52,9 @@ public class ProfileAdapter extends ArrayAdapter<HeaderePozo> {
         } else {
             viewHolder = (ViewHolder) view.getTag();
         }
-
         viewHolder.headervalue.setText(mValues.get(position).getHeaderData());
         viewHolder.headerdata.setText(mValues.get(position).getHeaderValue());
         viewHolder.headerdataedit.setText(mValues.get(position).getHeaderValue());
-//        headerePozoArrayList.put(mValues.get(position).getHeaderData(),mValues.get(position).getHeaderValue());
         if (mValues.get(position).getHeaderID().equalsIgnoreCase("Y"))
             viewHolder.headeredit.setVisibility(View.VISIBLE);
         else
@@ -81,11 +79,8 @@ public class ProfileAdapter extends ArrayAdapter<HeaderePozo> {
 
             @Override
             public void afterTextChanged(Editable s) {
-//                headerePozoArrayList.put(mValues.get(position).getHeaderData(),  s.toString());
-//                headerePozoArrayList.get(position).setHeaderValue(s.toString());
             }
         });
-        // Return the completed view to render on screen
         return view;
     }
 

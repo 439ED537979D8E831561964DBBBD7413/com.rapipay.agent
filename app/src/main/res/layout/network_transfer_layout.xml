@@ -13,12 +13,6 @@
         <include layout="@layout/toolbar" />
     </android.support.design.widget.AppBarLayout>
 
-    <!--<android.support.v4.widget.NestedScrollView-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent"-->
-    <!--android:background="@color/white"-->
-    <!--app:layout_behavior="@string/appbar_scrolling_view_behavior">-->
-
     <LinearLayout
         android:id="@+id/last_tran_layout"
         android:layout_width="match_parent"
@@ -69,5 +63,4 @@
             android:layout_marginTop="5dp" />
 
     </LinearLayout>
-    <!--</android.support.v4.widget.NestedScrollView>-->
 </android.support.design.widget.CoordinatorLayout>

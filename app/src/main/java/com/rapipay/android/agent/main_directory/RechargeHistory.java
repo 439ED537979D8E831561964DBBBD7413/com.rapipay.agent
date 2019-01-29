@@ -49,7 +49,6 @@ public class RechargeHistory extends BaseCompactActivity implements View.OnClick
         initialize();
     }
 
-
     @Override
     public void onBackPressed() {
         setBack_click(this);

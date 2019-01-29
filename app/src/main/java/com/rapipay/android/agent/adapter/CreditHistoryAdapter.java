@@ -49,23 +49,13 @@ public class CreditHistoryAdapter extends RecyclerView.Adapter<CreditHistoryAdap
         return new ViewHolder(view);
     }
 
-
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
-           /* FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) holder.mImageView.getLayoutParams();
-            if (mRecyclerView.getLayoutManager() instanceof GridLayoutManager) {
-                layoutParams.height = 200;
-            } else if (mRecyclerView.getLayoutManager() instanceof StaggeredGridLayoutManager) {
-                layoutParams.height = 600;
-            } else {
-                layoutParams.height = 800;
-            }*/
         holder.btn_p_amounts.setText(mValues.get(position).getBankName());
         holder.btn_name.setText(mValues.get(position).getRequestId());
         holder.p_transid.setText(format(mValues.get(position).getAmount()));
         holder.btn_p_bank.setText(mValues.get(position).getRemark());
         holder.status.setText(mValues.get(position).getStatus());
-
     }
 
     @Override

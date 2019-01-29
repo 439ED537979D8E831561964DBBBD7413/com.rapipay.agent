@@ -60,7 +60,6 @@ public class AgentKYCFragment extends BaseFragment implements RequestHandler, Vi
     protected String headerData = (WebConfig.BASIC_USERID + ":" + WebConfig.BASIC_PASSWORD);
     private View rv = null;
 
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
@@ -298,7 +297,6 @@ public class AgentKYCFragment extends BaseFragment implements RequestHandler, Vi
         }
     }
 
-
     private void resumeCall() {
         String condition = "where " + RapipayDB.MOBILENO + "='" + mobile_no.getText().toString() + "'" + " AND " + RapipayDB.DOCUMENTTYPE + "='" + spinner_value + "'" + " AND " + RapipayDB.DOCUMENTID + "='" + documentid.getText().toString() + "'";
         newKYCList_Personal = BaseCompactActivity.db.getKYCDetails_Personal(condition);
@@ -349,9 +347,7 @@ public class AgentKYCFragment extends BaseFragment implements RequestHandler, Vi
 
     public void hideKeyboard(Activity activity) {
         InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
-        //Find the currently focused view, so we can grab the correct window token from it.
         View view = activity.getCurrentFocus();
-        //If no view currently has focus, create a new one, just so we can grab a window token from it
         if (view == null) {
             view = new View(activity);
         }

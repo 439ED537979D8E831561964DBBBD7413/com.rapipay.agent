@@ -125,8 +125,6 @@
                 android:text="@string/btnsubmit"
                 android:textColor="@color/white"
                 android:textSize="14dp" />
-
-
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
 </android.support.design.widget.CoordinatorLayout>

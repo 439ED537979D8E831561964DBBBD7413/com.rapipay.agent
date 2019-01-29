@@ -39,7 +39,6 @@ public class HttpConnector {
     }
 
     public static void setServerCert(Context cert) {
-//        serverCert = serverCrt;
         try {
             // Load CAs from an InputStream
             // (could be from a resource or ByteArrayInputStream or ...)
@@ -161,99 +160,4 @@ public class HttpConnector {
         }
     }
 
-//    protected String serverUpdate(String[] params,Context _context) {
-//        try {
-//            URL url= new URL(params[0]);
-//            transfertype =params[1];
-//            _SFunction=params[2];
-//            _Windoestype=params[3];
-//            System.out.println("Error in http connection " + url.toString());
-//
-//            if ( isConnectingToInternet(_context)==true) {
-//                InputStream inputStream = null;
-//                if (params[1].equals("POST")) {
-//                    transfertype = "POST";
-//                    String _json="";
-//                    _json=params[4];
-//                    try {
-//                        HttpClient httpclient = new DefaultHttpClient();
-//                        HttpPost httppost = new HttpPost(params[0]);
-//                        System.setProperty("http.keepAlive", "false");
-//                        StringEntity se = new StringEntity(_json);
-//                        httppost.setEntity(se);
-//                        httppost.setHeader("Accept", "application/json");
-//                        httppost.setHeader("Content-type", "application/json");
-//                        if(_token==true){
-//                            httppost.setHeader("Token", GlobalClass.getToKen());
-//                            httppost.setHeader("Mobile", GlobalClass.getMobileNo());
-//                            httppost.setHeader("MG", GlobalClass.getMedsaveGuest());
-//                            System.out.println("Json Post Data  " + _json);
-//                        }
-//                        HttpResponse response = httpclient.execute(httppost);
-//                        inputStream = response.getEntity().getContent();
-//                        if(inputStream != null)
-//                            result = convertInputStreamToString(inputStream);
-//                        else
-//                            result = "Did not work!";
-//                    } catch (Exception e) {
-//                        System.out.println("Error in http connection " + e.toString());
-//                    }
-//                } else if (params[1].equals("GET")) {
-//                    try {
-//                        transfertype = "GET";
-//                        DefaultHttpClient httpclient = new DefaultHttpClient();
-//                        String host = url.toString();
-//                        host = host.replace(" ", "%20");
-//                        HttpGet request = new HttpGet(host);
-//                        System.out.println("host url :    " + host);
-//
-//                        // request = new HttpGet(host.trim()+URLEncoder.encode(params[3].toString(),"UTF-8"));
-//                        request.setHeader("Accept", "application/json");
-//                        request.setHeader("Content-type", "application/json");
-//                        HttpResponse response = httpclient.execute(request);
-//                        String res = response.toString();
-//                        System.out.println("response:    " + res);
-//                        res = res.replaceAll("\\s+", "");
-//                        if (res != null) {
-//                            HttpEntity entity = response.getEntity();
-//                            result = EntityUtils.toString(entity);
-//                            int index = result.indexOf(":");
-//                            index = index + 1;
-//                            System.out.println("Get Response : " + result);
-//                        }
-//                    } catch (Exception e) {
-//                        Toast.makeText(_context, "ERROR " + e.getMessage(),
-//                                Toast.LENGTH_LONG).show();
-//                        System.out.println("Error in http connection " + e.toString());
-//                    }
-//                }
-//            }
-//            else
-//            {
-//                Toast.makeText(_context, R.string.prompt_Internet, Toast.LENGTH_LONG).show();
-//                return "";
-//            }
-//        }
-//        catch (IOException e) {
-//            e.printStackTrace();
-//            Log.v("WCF 2", e.getMessage());
-//        }
-//        //result=result.replace( "{","" ).replace( "}","" );
-//        //result=result.substring(2);
-//        //result=removeLastChar(result);
-//        //result=convertStandardJSONString(result);
-//        return result;
-//    }
-
-    private static String convertInputStreamToString(InputStream inputStream) throws IOException {
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-        String line = "";
-        String result = "";
-        while ((line = bufferedReader.readLine()) != null)
-            result += line;
-
-        inputStream.close();
-        return result;
-
-    }
 }

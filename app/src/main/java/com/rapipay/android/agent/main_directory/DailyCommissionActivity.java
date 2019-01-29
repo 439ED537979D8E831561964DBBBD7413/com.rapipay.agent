@@ -4,14 +4,10 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.AbsListView;
-import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
 
 import com.rapipay.android.agent.Model.CommissionPozo;
@@ -145,9 +141,6 @@ public class DailyCommissionActivity extends BaseCompactActivity implements Requ
             adapter.notifyDataSetChanged();
         }
         isLoading = false;
-//        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-//        trans_details.setLayoutManager(layoutManager);
-//        trans_details.setAdapter(new DailyAdapter(this, trans_details, list));
     }
 
     @Override

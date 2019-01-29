@@ -74,19 +74,13 @@ public class MPOSRegistration extends BaseCompactActivity implements View.OnClic
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
             jsonObject.put("responseUrl", "");
             jsonObject.put("trnasactionId", ImageUtils.miliSeconds());
+            jsonObject.put("checkSum",GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
             form = "<html>\n" +
                     "\t<body>\n" +
                     "\t\t<form name=\"mposRegister\" id=\"mposRegister\" method=\"POST\" action=\"" + WebConfig.MPOSREG + "" + "\">\n" +
                     "\t\t\t<input name=\"serviceType\" value=\"GET_FORM_DATA\" type=\"hidden\"/>\n" +
-                    "\t\t\t<input name=\"mobileNo\" value=\"" + list.get(0).getMobilno() + "\" type=\"hidden\"/>\n" +
-                    "\t\t\t<input name=\"agentId\" value=\"" + list.get(0).getMobilno() + "\" type=\"hidden\"/>\n" +
                     "\t\t\t<input name=\"typeMobileWeb\" value=\"mobile\" type=\"hidden\"/>\n" +
-                    "\t\t\t<input name=\"requestType\" value=\"EKYC_CHANNEL\" type=\"hidden\"/>\n" +
-                    "\t\t\t<input name=\"nodeAgentId\" value=\"" + list.get(0).getMobilno() + "\" type=\"hidden\"/>\n" +
-                    "\t\t\t<input name=\"sessionRefNo\" value=\"" + list.get(0).getAftersessionRefNo() + "\" type=\"hidden\"/>\n" +
-                    "\t\t\t<input name=\"responseUrl\" value=\"" + "" + "\" type=\"hidden\"/>\n" +
-                    "\t\t\t<input name=\"trnasactionId\" value=\"" + ImageUtils.miliSeconds() + "\" type=\"hidden\"/>\n" +
-                    "\t\t\t<input name=\"checkSum\" value=\"" + GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()) + "\" type=\"hidden\"/>\n" +
+                    "\t\t\t<input name=\"requestedData\" value=\"" + getDataBase64(jsonObject.toString()) + "\" type=\"hidden\"/>\n" +
                     "\t\t\t<input type=\"submit\"/>\n" +
                     "\t\t</form>\n" +
                     "\t\t<script language=\"JavaScript\" type=\"text/javascript\">\n" +
@@ -190,7 +184,6 @@ public class MPOSRegistration extends BaseCompactActivity implements View.OnClic
         @Override
         public void onLoadResource(WebView view, String url) {
             if (progressDialog == null) {
-                // in standard case YourActivity.this
                 progressDialog = new ProgressDialog(MPOSRegistration.this);
                 progressDialog.setMessage("Loading...");
                 progressDialog.show();
@@ -243,7 +236,6 @@ public class MPOSRegistration extends BaseCompactActivity implements View.OnClic
 
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
-            // TODO Auto-generated method stub
             if (url.contains("?")) {
                 String response = inputStreamAsString(url);
                 if (response != null) {
@@ -262,7 +254,7 @@ public class MPOSRegistration extends BaseCompactActivity implements View.OnClic
                         e.printStackTrace();
                     }
                 }
-            } else if (url.contains("forwordEntity"))
+            } else if (url.contains("forwordEntity") || url.contains("merchantEnroForm"))
                 web.loadUrl(url);
             return true;
 
@@ -317,7 +309,6 @@ public class MPOSRegistration extends BaseCompactActivity implements View.OnClic
             intent.putExtra("persons", "pending");
             intent.putExtra("mobileNo", list.get(0).getMobilno());
             intent.putExtra("formData", formData);
-//                        intent.putExtra("documentID", documentID);
             startActivity(intent);
         }
     }
@@ -343,7 +334,6 @@ public class MPOSRegistration extends BaseCompactActivity implements View.OnClic
             listPath.add(file_path);
             File file = new File(file_path);
             size = file.length();
-
         } catch (Exception e) {
             Log.e("Error!", "Error while opening image file" + e.getLocalizedMessage());
         }

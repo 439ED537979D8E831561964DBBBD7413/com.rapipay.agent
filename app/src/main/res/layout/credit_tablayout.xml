@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:autofit="http://schemas.android.com/tools"
@@ -37,7 +35,6 @@
             app:tabMode="fixed"
             app:tabSelectedTextColor="@color/white"
             app:tabTextColor="@color/white" />
-        <!--</android.support.design.widget.AppBarLayout>-->
         <FrameLayout
             android:id="@+id/frame_container"
             android:layout_width="match_parent"

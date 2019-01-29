@@ -182,8 +182,6 @@ public class ProfileFragment extends Fragment implements RequestHandler, View.On
                     headerePozoArrayList.put(pozoArrayList.get(i).getHeaderData(), pozoArrayList.get(i).getHeaderValue());
                 } else
                     headeredit.setVisibility(View.GONE);
-//                if (pozoArrayList.get(i).getHeaderData().equalsIgnoreCase("Date of birth"))
-//                    headerdataedit.setOnClickListener(toDateClicked);
                 headeredit.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -217,13 +215,10 @@ public class ProfileFragment extends Fragment implements RequestHandler, View.On
                     public void afterTextChanged(Editable s) {
                         String tag = (String) textEdit.getTag();
                         headerePozoArrayList.put(tag, s.toString());
-//                headerePozoArrayList.get(position).setHeaderValue(s.toString());
                     }
                 });
                 listView.addView(view);
             }
-//            adapter = new ProfileAdapter(pozoArrayList, getActivity());
-//            listView.setAdapter(adapter);
         }
     }
 
@@ -250,16 +245,6 @@ public class ProfileFragment extends Fragment implements RequestHandler, View.On
                 for (String key : listMap.keySet()) {
                     jsonObject.put(key, listMap.get(key));
                 }
-//                if (listMap.containsKey("State"))
-//                    jsonObject.put("statename", listMap.get("State"));
-//                if (listMap.containsKey("Email ID"))
-//                    jsonObject.put("emailId", listMap.get("Email ID"));
-//                if (listMap.containsKey("Date Of birth"))
-//                    jsonObject.put("dateOfBirth", listMap.get("Date Of birth"));
-//                if (listMap.containsKey("GSTIN"))
-//                    jsonObject.put("gstin", listMap.get("GSTIN"));
-//                if (listMap.containsKey("PAN No"))
-//                    jsonObject.put("panCardNo", listMap.get("PAN No"));
                 jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
                 jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
 

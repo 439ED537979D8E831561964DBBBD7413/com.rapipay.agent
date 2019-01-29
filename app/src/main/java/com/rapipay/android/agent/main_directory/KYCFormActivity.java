@@ -291,7 +291,6 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
                     }
                     if (newKYCList_Address.get(0).getDOCUMENTBACK_PHOTO() != null && !newKYCList_Address.get(0).getDOCUMENTBACK_PHOTO().equalsIgnoreCase("")) {
                         loadImageFromStorage(newKYCList_Address.get(0).getDOCUMENTBACK_IMAGENAME(), (ImageView) findViewById(R.id.documentbackimage), newKYCList_Address.get(0).getDOCUMENTBACK_PHOTO());
-//                        byteConvert((ImageView) findViewById(R.id.documentbackimage), newKYCList_Address.get(0).getDOCUMENTBACK_PHOTO());
                         findViewById(R.id.documentback).setVisibility(View.GONE);
                         if (!kycMapImage.has("uploadBack"))
                             kycMapImage.put("uploadBack", getBase64(addWaterMark(getBitmap((ImageView) findViewById(R.id.documentbackimage)))));
@@ -354,7 +353,6 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
                     }
                     if (newKYCList_Verify.get(0).getSIGN_PHOTO() != null && !newKYCList_Verify.get(0).getSIGN_PHOTO().equalsIgnoreCase("")) {
                         loadImageFromStorage(newKYCList_Verify.get(0).getSIGN_PHOTO_IMAGENAME(), (ImageView) findViewById(R.id.signphoto), newKYCList_Verify.get(0).getSIGN_PHOTO());
-//                        byteConvert((ImageView) findViewById(R.id.signphoto), newKYCList_Verify.get(0).getSIGN_PHOTO());
                         findViewById(R.id.sign_photo).setVisibility(View.GONE);
                         if (!kycMapImage.has("signPhoto"))
                             kycMapImage.put("signPhoto", getBase64(addWaterMark(getBitmap((ImageView) findViewById(R.id.signphoto)))));
@@ -383,7 +381,6 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
                     }
                     if (newKYCList_Business.get(0).getSHOP_PHOTO() != null && !newKYCList_Business.get(0).getSHOP_PHOTO().equalsIgnoreCase("")) {
                         loadImageFromStorage(newKYCList_Business.get(0).getSHOP_PHOTO_IMAGENAME(), (ImageView) findViewById(R.id.shopphoto), newKYCList_Business.get(0).getSHOP_PHOTO());
-//                        byteConvert((ImageView) findViewById(R.id.shopphoto), newKYCList_Business.get(0).getSHOP_PHOTO());
                         findViewById(R.id.shop_photo).setVisibility(View.GONE);
                         if (!kycMapImage.has("shopPhoto"))
                             kycMapImage.put("shopPhoto", getBase64(addWaterMark(getBitmap((ImageView) findViewById(R.id.shopphoto)))));
@@ -681,9 +678,7 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
         paint.setTextSize(10);
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_OVER)); // Text Overlapping Pattern
         Bitmap waterMark = BitmapFactory.decodeResource(getResources(), R.drawable.rapipay);
-//        canvas.drawBitmap(waterMark, 0, 0, paint);
         canvas.drawText(currentDateandTime, w / 4, h - 10, paint);
-
         return result;
     }
 
@@ -857,8 +852,6 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
                     intent.setAction(MediaStore.ACTION_IMAGE_CAPTURE);
                     intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
                     startActivityForResult(intent, id1);
-//                    Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//                    startActivityForResult(cameraIntent, id1);
                 } else if (items[item].equals("Choose from Gallery")) {
                     Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                     intent.setType("image/*");
@@ -924,31 +917,8 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
                 inspect(imageUri, documentType, documentID, imageType, textView, view);
             }
         } else if (id_2 == 1) {
-//            Uri uri = data.getData();
             inspect(data.getData(), documentType, documentID, imageType, textView, view);
         }
-//        if (thumbnail != null) {
-//
-//            int fileSizeInBytes = byteSizeOf(thumbnail);
-//            long fileSizeInKB = fileSizeInBytes / 1024;
-//            // Convert the KB to MegaBytes (1 MB = 1024 KBytes)
-//            long fileSizeInMB = fileSizeInKB / 1024;
-//            if (fileSizeInMB > 2)
-//                Toast.makeText(KYCFormActivity.this, "Length Should be less than 2 MB", Toast.LENGTH_SHORT).show();
-//            else if (fileSizeInKB > 500 && fileSizeInMB < 2) {
-//                if (imageType.equalsIgnoreCase("uploadFront")) {
-//                    if (inspectFromBitmap(thumbnail, documentType, documentID))
-//                        updateImage(thumbnail, view, textView, imageType);
-//                } else
-//                    updateImage(thumbnail, view, textView, imageType);
-//            } else {
-//                if (imageType.equalsIgnoreCase("uploadFront")) {
-//                    if (inspectFromBitmap(thumbnail, documentType, documentID))
-//                        updateImage(thumbnail, view, textView, imageType);
-//                } else
-//                    updateImage(thumbnail, view, textView, imageType);
-//            }
-//        }
     }
 
     private void updateImage(Bitmap thumbnail, ImageView view, TextView textView, String imageType) {
@@ -956,7 +926,6 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
             Bitmap bitmap = getResizedBitmap(thumbnail, 600);
             int fileSizeInBytes = byteSizeOf(bitmap);
             long fileSizeInKB = fileSizeInBytes / 1024;
-            // Convert the KB to MegaBytes (1 MB = 1024 KBytes)
             long fileSizeInMB = fileSizeInKB / 1024;
             if (fileSizeInMB > 2)
                 Toast.makeText(KYCFormActivity.this, "Length Should be less than 2 MB", Toast.LENGTH_SHORT).show();
@@ -1008,44 +977,10 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
                     updateImage(bitmap, view, textView, imageType);
             } else
                 updateImage(bitmap, view, textView, imageType);
-//            int fileSizeInBytes = byteSizeOf(bitmap);
-//            long fileSizeInKB = fileSizeInBytes / 1024;
-//            // Convert the KB to MegaBytes (1 MB = 1024 KBytes)
-//            long fileSizeInMB = fileSizeInKB / 1024;
-//            if (fileSizeInMB > 2)
-//                Toast.makeText(KYCFormActivity.this, "Length Should be less than 2 MB", Toast.LENGTH_SHORT).show();
-//            else if (fileSizeInKB > 500 && fileSizeInMB < 2) {
-//                if (imageType.equalsIgnoreCase("uploadFront")) {
-//                    if (inspectFromBitmap(thumbnail, documentType, documentID))
-//                        updateImage(thumbnail, view, textView, imageType);
-//                } else
-//                    updateImage(thumbnail, view, textView, imageType);
-//            } else {
-//                if (imageType.equalsIgnoreCase("uploadFront")) {
-//                    if (inspectFromBitmap(thumbnail, documentType, documentID))
-//                        updateImage(thumbnail, view, textView, imageType);
-//                } else
-//                    updateImage(thumbnail, view, textView, imageType);
-//            }
-//        }
-        } catch (
-                FileNotFoundException e)
-
+        } catch (FileNotFoundException e)
         {
             Log.w(TAG, "Failed to find the file: " + uri, e);
         }
-//        finally {
-//            if (bitmap != null) {
-//                bitmap.recycle();
-//            }
-//            if (is != null) {
-//                try {
-//                    is.close();
-//                } catch (IOException e) {
-//                    Log.w(TAG, "Failed to close InputStream", e);
-//                }
-//            }
-//        }
 
     }
 
@@ -1154,7 +1089,6 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
                     date1_text.setOnClickListener(null);
                 }
             }
-//            reset.setVisibility(View.VISIBLE);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -1297,18 +1231,9 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
         customProgessDialog = new CustomProgessDialog(KYCFormActivity.this);
         SQLiteDatabase dba = db.getWritableDatabase();
         try {
-//            String insertSQL = "INSERT INTO " + RapipayDB.TABLE_KYC_ADDRESS + "\n" +
-//                    "(" + RapipayDB.MOBILENO + "," + RapipayDB.ADDRESS + "," + RapipayDB.CITY + "," + RapipayDB.STATE + "," + RapipayDB.PINCODE + "," + RapipayDB.DOCUMENTFRONT_IMAGENAME + "," + RapipayDB.DOCUMENTBACK_IMAGENAME + ","
-//                    + RapipayDB.DOCUMENTFRONT_PHOTO + "," + RapipayDB.DOCUMENTBACK_PHOTO + "," + RapipayDB.ADDRESS_CLICKED + "," + RapipayDB.DOCUMENTTYPE + "," + RapipayDB.DOCUMENTID + ")\n" +
-//                    "VALUES \n" +
-//                    "(?,?,?,?,?,?,?,?,?,?,?,?);";
-
             String frontimageName = "frontPhoto_" + mobileNo + ".jpg";
             String backimageName = "backPhoto_" + mobileNo + ".jpg";
-//            String pathFront = saveToInternalStorage(base64Convert(mapPhoto.getString("uploadFront")), frontimageName);
             String pathBack = saveToInternalStorage(base64Convert(mapPhoto.getString("uploadBack")), backimageName);
-//            dba.execSQL(insertSQL, new String[]{mobileNo, mapValue.getString("address"), mapValue.getString("city"), mapValue.getString("state"), mapValue.getString("pinCode"), frontimageName, backimageName, pathFront, pathBack, "true", documentType, documentID});
-
             ContentValues values = new ContentValues();
             values.put(RapipayDB.MOBILENO, mobileNo);
             values.put(RapipayDB.ADDRESS, mapValue.getString("address"));
@@ -1323,7 +1248,6 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
             values.put(RapipayDB.DOCUMENTFRONT_PHOTO, byteConvert(mapPhoto.getString("uploadFront")));
             values.put(RapipayDB.DOCUMENTBACK_PHOTO, pathBack);
             dba.insert(RapipayDB.TABLE_KYC_ADDRESS, null, values);
-
             customProgessDialog.hide_progress();
         } catch (Exception e) {
             e.printStackTrace();
@@ -1339,7 +1263,6 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
             documentID, String documentType, String customerType) {
         customProgessDialog = new CustomProgessDialog(KYCFormActivity.this);
         SQLiteDatabase dba = db.getWritableDatabase();
-//        String pathPan = "", pathShop = "";
         try {
             String panimageName = "panPhoto_" + mobileNo + ".jpg";
             String shopimageName = "shopPhoto_" + mobileNo + ".jpg";
@@ -1393,7 +1316,6 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
     public void onLocationChanged(Location location) {
         mylocation = location;
         if (mylocation != null) {
-//            bluetooth();
         }
     }
 
@@ -1404,13 +1326,10 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
 
     @Override
     public void onConnectionSuspended(int i) {
-        //Do whatever you need
-        //You can display a message here
     }
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-        //You can display a message here
     }
 
     protected void getMyLocation() {
@@ -1439,8 +1358,6 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
                             final Status status = result.getStatus();
                             switch (status.getStatusCode()) {
                                 case LocationSettingsStatusCodes.SUCCESS:
-                                    // All location settings are satisfied.
-                                    // You can initialize location requests here.
                                     int permissionLocation = ContextCompat
                                             .checkSelfPermission(KYCFormActivity.this,
                                                     Manifest.permission.ACCESS_FINE_LOCATION);
@@ -1450,24 +1367,13 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
                                     }
                                     break;
                                 case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-                                    // Location settings are not satisfied.
-                                    // But could be fixed by showing the user a dialog.
                                     try {
-                                        // Show the dialog by calling startResolutionForResult(),
-                                        // and check the result in onActivityResult().
-                                        // Ask to turn on GPS automatically
                                         status.startResolutionForResult(KYCFormActivity.this,
                                                 REQUEST_CHECK_SETTINGS_GPS);
                                     } catch (IntentSender.SendIntentException e) {
-                                        // Ignore the error.
                                     }
                                     break;
                                 case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-                                    // Location settings are not satisfied.
-                                    // However, we have no way
-                                    // to fix the
-                                    // settings so we won't show the dialog.
-                                    // finish();
                                     break;
                             }
                         }
@@ -1511,5 +1417,4 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
                 .build();
         googleApiClient.connect();
     }
-
 }

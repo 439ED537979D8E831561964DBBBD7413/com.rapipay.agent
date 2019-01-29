@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
     <android.support.design.widget.CoordinatorLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -29,16 +28,6 @@
                 android:orientation="vertical"
                 android:theme="@style/AppTheme"
                 android:visibility="visible">
-
-                <!--<TextView-->
-                    <!--android:id="@+id/heading"-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:background="@color/colorPrimaryDark"-->
-                    <!--android:gravity="center"-->
-                    <!--android:padding="5dp"-->
-                    <!--android:text="@string/p_req"-->
-                    <!--android:textColor="@color/white" />-->
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -168,9 +157,6 @@
                             android:textSize="16dp" />
                     </LinearLayout>
                 </LinearLayout>
-
-
             </LinearLayout>
-            <!--</android.support.v7.widget.CardView>-->
         </ScrollView>
     </android.support.design.widget.CoordinatorLayout>

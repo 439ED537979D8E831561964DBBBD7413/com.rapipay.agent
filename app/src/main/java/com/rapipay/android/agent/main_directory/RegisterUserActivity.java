@@ -139,7 +139,6 @@ public class RegisterUserActivity extends BaseCompactActivity implements Request
                 Intent intent = new Intent(RegisterUserActivity.this, BarcodeActivity.class);
                 intent.putExtra("type", "inside");
                 startActivityForResult(intent, 1);
-//                startActivityForResult(new Intent(RegisterUserActivity.this, BarcodeActivity.class), 1);
                 break;
         }
     }
@@ -332,15 +331,10 @@ public class RegisterUserActivity extends BaseCompactActivity implements Request
     }
 
     public void loadIMEI() {
-        // Check if the READ_PHONE_STATE permission is already available.
         if (ActivityCompat.checkSelfPermission(RegisterUserActivity.this, Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
-            // READ_PHONE_STATE permission has not been granted.
-//            checkAndRequestPermissions();
             requestReadPhoneStatePermission();
         } else {
-
-            // READ_PHONE_STATE permission is already been granted.
             doPermissionGrantedStuffs();
         }
     }
@@ -359,7 +353,6 @@ public class RegisterUserActivity extends BaseCompactActivity implements Request
             });
 
         } else {
-            // READ_PHONE_STATE permission has not been granted yet. Request it directly.
             ActivityCompat.requestPermissions(RegisterUserActivity.this, new String[]{Manifest.permission.CAMERA},
                     PERMISSIONS_REQUEST_READ_PHONE_STATE);
         }
@@ -370,12 +363,8 @@ public class RegisterUserActivity extends BaseCompactActivity implements Request
                                            @NonNull int[] grantResults) {
 
         if (requestCode == PERMISSIONS_REQUEST_READ_PHONE_STATE) {
-            // Received permission result for READ_PHONE_STATE permission.est.");
-            // Check if the only required permission has been granted
             if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // READ_PHONE_STATE permission has been granted, proceed with displaying IMEI Number
                 doPermissionGrantedStuffs();
-
             } else {
                 alertPerm(getString(R.string.permissions_not_granted_read_phone_state), new DialogInterface.OnClickListener() {
                     @Override
@@ -400,7 +389,7 @@ public class RegisterUserActivity extends BaseCompactActivity implements Request
 
     private void doPermissionGrantedStuffs() {
         if (ActivityCompat.checkSelfPermission(RegisterUserActivity.this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-//            selectImage();
+
         }
     }
 }

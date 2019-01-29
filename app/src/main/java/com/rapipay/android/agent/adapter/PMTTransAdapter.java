@@ -48,7 +48,6 @@ public class PMTTransAdapter extends RecyclerView.Adapter<PMTTransAdapter.ViewHo
         return new ViewHolder(view);
     }
 
-
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         holder.requestAmt.setText(format(mValues.get(position).getRequestAmt()));

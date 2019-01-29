@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import me.grantland.widget.AutofitTextView;
-import com.rapipay.android.agent.Model.ChannelHistoryPozo;
 import com.rapipay.android.agent.Model.PassbookPozo;
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.adapter.PassbookAdapter;
@@ -91,26 +90,6 @@ public class PassbookActivity extends BaseCompactActivity implements View.OnClic
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
             jsonObject.put("fromIndex", String.valueOf(fromIndex));
             jsonObject.put("toIndex", String.valueOf(toIndex));
-            jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return jsonObject;
-    }
-
-    public JSONObject receipt_request(ChannelHistoryPozo pozo) {
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("serviceType", "Get_Txn_Recipt");
-            jsonObject.put("requestType", pozo.getTransferType());
-            jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("txnRef", ImageUtils.miliSeconds());
-            jsonObject.put("nodeAgentId", list.get(0).getMobilno());
-            jsonObject.put("agentId", list.get(0).getMobilno());
-            jsonObject.put("txnDate", pozo.getDate_id());
-            jsonObject.put("orgTxnRef", pozo.getOrgTxnid());
-            jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
             jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
 
         } catch (Exception e) {

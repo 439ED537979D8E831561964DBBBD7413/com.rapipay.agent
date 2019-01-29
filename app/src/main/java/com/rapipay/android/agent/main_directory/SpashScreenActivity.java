@@ -1,6 +1,5 @@
 package com.rapipay.android.agent.main_directory;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.widget.ImageView;
@@ -24,7 +23,6 @@ public class SpashScreenActivity extends BaseCompactActivity implements CustomIn
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
-//        if (BuildConfig.ROLL.equalsIgnoreCase("Branch2"))
         localStorage.setActivityState(LocalStorage.LOGOUT, "0");
         initialization();
         new Handler().postDelayed(new Runnable() {

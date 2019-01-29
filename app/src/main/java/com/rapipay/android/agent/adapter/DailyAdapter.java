@@ -19,17 +19,7 @@ public class DailyAdapter extends ArrayAdapter<CommissionPozo> {
 
     public class ViewHolder  {
         public AutofitTextView btn_name,p_transid,btn_p_amounts,status;
-//
-//        public ViewHolder(View view) {
-//            super(view);
-//            mView = view;
-//            btn_name = (AutofitTextView) view.findViewById(R.id.btn_name);
-//            btn_p_amounts = (AutofitTextView) view.findViewById(R.id.btn_p_amounts);
-//            p_transid = (AutofitTextView) view.findViewById(R.id.btn_p_transid);
-//            status = (AutofitTextView)view.findViewById(R.id.status);
-//        }
     }
-
 
     @Override
     public int getCount() {
@@ -43,11 +33,8 @@ public class DailyAdapter extends ArrayAdapter<CommissionPozo> {
     @Override
     public View getView(int position, View view, ViewGroup parent) {
         CommissionPozo dataModel = getItem(position);
-        // Check if an existing view is being reused, otherwise inflate the view
         ViewHolder viewHolder; // view lookup cache stored in tag
-
         final View result;
-
         if (view == null) {
             viewHolder = new ViewHolder();
             LayoutInflater inflater = LayoutInflater.from(getContext());
@@ -68,25 +55,6 @@ public class DailyAdapter extends ArrayAdapter<CommissionPozo> {
         return view;
 
     }
-//    @Override
-//    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-//        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.commission_adapter_layout, parent, false);
-//        return new ViewHolder(view);
-//    }
-//
-//
-//    @Override
-//    public void onBindViewHolder(final ViewHolder holder, final int position) {
-//        holder.btn_p_amounts.setText(mValues.get(position).getTxnDate());
-//        holder.btn_name.setText(mValues.get(position).getServiceName());
-//        holder.p_transid.setText(mValues.get(position).getTxncrdrAmount());
-//        holder.status.setText(mValues.get(position).getTransactionStatus());
-//    }
-//
-//    @Override
-//    public int getItemCount() {
-//        return mValues.size();
-//    }
 }
 
 

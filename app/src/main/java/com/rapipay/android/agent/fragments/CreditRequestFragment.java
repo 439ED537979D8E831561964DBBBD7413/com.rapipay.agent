@@ -46,10 +46,6 @@ import com.rapipay.android.agent.Database.RapipayDB;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -227,15 +223,10 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
     }
 
     public void loadIMEI() {
-        // Check if the READ_PHONE_STATE permission is already available.
         if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
-            // READ_PHONE_STATE permission has not been granted.
-//            checkAndRequestPermissions();
             requestReadPhoneStatePermission();
         } else {
-
-            // READ_PHONE_STATE permission is already been granted.
             doPermissionGrantedStuffs();
         }
     }
@@ -254,7 +245,6 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
             });
 
         } else {
-            // READ_PHONE_STATE permission has not been granted yet. Request it directly.
             ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CAMERA},
                     PERMISSIONS_REQUEST_READ_PHONE_STATE);
         }
@@ -263,14 +253,9 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
-
         if (requestCode == PERMISSIONS_REQUEST_READ_PHONE_STATE) {
-            // Received permission result for READ_PHONE_STATE permission.est.");
-            // Check if the only required permission has been granted
             if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // READ_PHONE_STATE permission has been granted, proceed with displaying IMEI Number
                 doPermissionGrantedStuffs();
-
             } else {
                 alertPerm(getString(R.string.permissions_not_granted_read_phone_state), new DialogInterface.OnClickListener() {
                     @Override
@@ -278,7 +263,6 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
                         loadIMEI();
                     }
                 });
-
             }
         }
     }
@@ -406,9 +390,6 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
                     Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                     intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
                     startActivityForResult(intent, CAMERA_REQUEST);
-//                    Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//                    startActivityForResult(cameraIntent, CAMERA_REQUEST);
-
                 } else if (items[item].equals("Choose from Gallery")) {
                     Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                     intent.setType("image/*");
@@ -435,34 +416,24 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
         paint.setTextSize(10);
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_OVER)); // Text Overlapping Pattern
         Bitmap waterMark = BitmapFactory.decodeResource(getResources(), R.drawable.rapipay);
-//        canvas.drawBitmap(waterMark, 0, 0, paint);
         canvas.drawText(currentDateandTime, w / 4, h - 10, paint);
 
         return result;
     }
     private void setPic(String mCurrentPhotoPath) {
-        // Get the dimensions of the View
         int targetW = image.getWidth();
         int targetH = image.getHeight();
-
-        // Get the dimensions of the bitmap
         BitmapFactory.Options bmOptions = new BitmapFactory.Options();
         bmOptions.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
         int photoW = bmOptions.outWidth;
         int photoH = bmOptions.outHeight;
-
-        // Determine how much to scale down the image
         int scaleFactor = Math.min(photoW/targetW, photoH/targetH);
-
-        // Decode the image file into a Bitmap sized to fill the View
         bmOptions.inJustDecodeBounds = false;
         bmOptions.inSampleSize = scaleFactor;
         bmOptions.inPurgeable = true;
-
         Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
         imageBase64 = getBytesFromBitmap(addWaterMark(bitmap));
-//        mImageView.setImageBitmap(bitmap);
     }
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);

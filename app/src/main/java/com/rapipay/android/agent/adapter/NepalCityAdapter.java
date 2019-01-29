@@ -8,7 +8,6 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.rapipay.android.agent.Model.NepalCityPozo;
-import com.rapipay.android.agent.Model.NepalDistrictPozo;
 import com.rapipay.android.agent.R;
 
 import java.util.ArrayList;

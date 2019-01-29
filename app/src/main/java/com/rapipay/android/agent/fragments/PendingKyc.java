@@ -84,20 +84,7 @@ public class PendingKyc extends BaseFragment implements RequestHandler {
                         intent.putExtra("persons", "pending");
                         intent.putExtra("mobileNo", pendingKYCPozo.getMobileNo());
                         intent.putExtra("formData", formData);
-//                        intent.putExtra("documentID", documentID);
                         startActivity(intent);
-//                        Intent intent = new Intent(getActivity(), WebViewClientActivity.class);
-//                        intent.putExtra("mobileNo", pendingKYCPozo.getMobileNo());
-//                        String base64 = pendingKYCPozo.getFullName() + "~" + pendingKYCPozo.getEmailId() + "~" + pendingKYCPozo.getCompanyName() + "~" + pendingKYCPozo.getFullAddress() + "~" + pendingKYCPozo.getStateName() + "~" + "1";
-//                        byte[] bytes = base64.getBytes("utf-8");
-//                        String imageEncoded = Base64.encodeToString(bytes, Base64.DEFAULT);
-//                        intent.putExtra("base64", imageEncoded);
-//                        intent.putExtra("parentId", list.get(0).getMobilno());
-//                        intent.putExtra("sessionKey", list.get(0).getPinsession());
-//                        intent.putExtra("sessionRefNo", list.get(0).getAftersessionRefNo());
-//                        intent.putExtra("nodeAgent", list.get(0).getMobilno());
-//                        intent.putExtra("type", "pending");
-//                        startActivity(intent);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -177,7 +164,6 @@ public class PendingKyc extends BaseFragment implements RequestHandler {
     public void chechStatus(JSONObject object) {
         try {
             if (object.getString("responseCode").equalsIgnoreCase("200")) {
-//                if (object.getString("serviceType").equalsIgnoreCase("PENDING_AGENT_KYC")) {
                 try {
                     if (object.has("agentKycPendingList")) {
                         insertLastTransDetails(object.getJSONArray("agentKycPendingList"));
@@ -185,7 +171,6 @@ public class PendingKyc extends BaseFragment implements RequestHandler {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-//                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -212,9 +197,6 @@ public class PendingKyc extends BaseFragment implements RequestHandler {
     }
 
     private void initializeTransAdapter(ArrayList<PendingKYCPozo> list) {
-//        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
-//        trans_details.setLayoutManager(layoutManager);
-//        trans_details.setAdapter(new NetworkHistoryAdapter(getActivity(), trans_details, list));
         if (first == 1) {
             adapter = new PendingKYCAdapter(list, getActivity());
             trans_details.setAdapter(adapter);

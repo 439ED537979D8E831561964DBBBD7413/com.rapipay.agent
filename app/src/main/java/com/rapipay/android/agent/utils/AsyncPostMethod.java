@@ -18,7 +18,6 @@ import com.rapipay.android.agent.interfaces.RequestHandler;
 import com.rapipay.android.agent.main_directory.MainActivity;
 import com.rapipay.android.agent.main_directory.PinVerification;
 
-
 public class AsyncPostMethod extends AsyncTask<String, String, String> {
     String url, xmlData, strHeaderData;
     HttpConnector connector;
@@ -124,7 +123,6 @@ public class AsyncPostMethod extends AsyncTask<String, String, String> {
                         responseMSg(object);
                 } else {
                     customDialog_Common("No Internet Connectivity");
-//                    Toast.makeText(context,"No Internet Connectivity",Toast.LENGTH_SHORT).show();
                 }
             } else {
                 customDialog_Common("Connection TimeOut, Please Try Again!");

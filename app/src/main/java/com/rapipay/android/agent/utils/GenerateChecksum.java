@@ -16,15 +16,12 @@ public class GenerateChecksum {
             SecretKeySpec keySpec = new SecretKeySpec(byteKey, HMAC_SHA512);
             sha512_HMAC.init(keySpec);
             byte[] mac_data = sha512_HMAC.doFinal(inputData.getBytes("UTF-8"));
-            // result = Base64.encodeBase64String(mac_data);
             int IncVar = 0;
             String TempData = "";
             while (IncVar < mac_data.length) {
                 TempData += String.format("%02x", mac_data[IncVar]);
                 IncVar += 1;
             }
-            // BASE64Encoder base64encoder = new BASE64Encoder();
-            // result=base64encoder.encode(mac_data);
             return TempData.toUpperCase();
         } catch (Exception e) {
             Log.e("ERROR","inside catch block of CheckSum>>>>>>>" + e.getLocalizedMessage());

@@ -44,7 +44,6 @@ public class CustomSpinnerAdapter extends ArrayAdapter<String> {
             viewHolder = (ViewHolder) view.getTag();
         }
         viewHolder.recycler_text.setText(mValues.get(position));
-        // Return the completed view to render on screen
         return view;
     }
 

@@ -52,18 +52,8 @@ public class FooterAdapter extends RecyclerView.Adapter<FooterAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
-
-           /* FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) holder.mImageView.getLayoutParams();
-            if (mRecyclerView.getLayoutManager() instanceof GridLayoutManager) {
-                layoutParams.height = 200;
-            } else if (mRecyclerView.getLayoutManager() instanceof StaggeredGridLayoutManager) {
-                layoutParams.height = 600;
-            } else {
-                layoutParams.height = 800;
-            }*/
         holder.recycler_text.setText(mValues.get(position).getHeaderData());
         loadImageFromStorage(mValues.get(position).getHeaderValue(),holder.mImageView,mValues.get(position).getPath());
-//        holder.mImageView.setImageDrawable(context.getResources().getDrawable(mValues.get(position).getImageUrl()));
     }
 
     @Override
@@ -73,7 +63,6 @@ public class FooterAdapter extends RecyclerView.Adapter<FooterAdapter.ViewHolder
 
     private void loadImageFromStorage(String name, ImageView view, String path)
     {
-
         try {
             File f=new File(path, name);
             Bitmap b = BitmapFactory.decodeStream(new FileInputStream(f));

@@ -17,7 +17,6 @@ import com.rapipay.android.agent.Database.RapipayDB;
 import com.rapipay.android.agent.Model.RapiPayPozo;
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.interfaces.RequestHandler;
-import com.rapipay.android.agent.main_directory.PinVerification;
 import com.rapipay.android.agent.utils.AsyncPostMethod;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
 import com.rapipay.android.agent.utils.GenerateChecksum;

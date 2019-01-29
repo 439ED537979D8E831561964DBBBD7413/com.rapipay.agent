@@ -73,13 +73,6 @@ public class RegisterUserFragment extends Fragment implements RequestHandler, Vi
         initialize(rv);
         return rv;
     }
-//    @Override
-//    public void onCreate(@Nullable Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        setContentView(R.layout.register_user_activity);
-//
-//        initialize();
-//    }
 
     private void initialize(View view) {
         bitmap_trans = null;
@@ -101,33 +94,11 @@ public class RegisterUserFragment extends Fragment implements RequestHandler, Vi
             input_number.setText(mobileNo);
         view.findViewById(R.id.btn_fund).setOnClickListener(this);
         view.findViewById(R.id.btn_scan_submit).setOnClickListener(this);
-//        if (list_state.size() != 0) {
-//            ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
-//                    android.R.layout.simple_spinner_item, list_state);
-//            dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//            select_state.setAdapter(dataAdapter);
-//        }
-//        select_state.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-//            @Override
-//            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-//                if (position != 0)
-//                    state = list_state.get(position);
-//            }
-//
-//            @Override
-//            public void onNothingSelected(AdapterView<?> parent) {
-//
-//            }
-//        });
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-//            case R.id.back_click:
-//                setBack_click(this);
-//                finish();
-//                break;
             case R.id.btn_fund:
                 if (!ImageUtils.commonRegex(input_name.getText().toString(), 150, " ")) {
                     input_name.setError("Please enter valid data");
@@ -252,12 +223,10 @@ public class RegisterUserFragment extends Fragment implements RequestHandler, Vi
             if (input_name.getText().toString().isEmpty() || input_address.getText().toString().isEmpty() || select_state.getText().toString().isEmpty())
                 Toast.makeText(getActivity(), "Please fill entry manually", Toast.LENGTH_SHORT).show();
             select_state.setEnabled(false);
-//            reset.setVisibility(View.VISIBLE);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
 
     @Override
     public void chechStatus(JSONObject object) {
@@ -283,23 +252,6 @@ public class RegisterUserFragment extends Fragment implements RequestHandler, Vi
             e.printStackTrace();
         }
     }
-//
-//    private void customDialog(String msg) {
-//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//        builder.setTitle(R.string.app_name);
-//        //Setting message manually and performing action on button click
-//        builder.setMessage(msg)
-//                .setCancelable(false)
-//                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-//                    public void onClick(DialogInterface dialog, int id) {
-//                        clear();
-//                        dialog.dismiss();
-//                    }
-//                });
-//        //Creating dialog box
-//        AlertDialog alert = builder.create();
-//        alert.show();
-//    }
 
     private void clear() {
         input_number.setText("");
@@ -428,15 +380,10 @@ public class RegisterUserFragment extends Fragment implements RequestHandler, Vi
     }
 
     public void loadIMEI() {
-        // Check if the READ_PHONE_STATE permission is already available.
         if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
-            // READ_PHONE_STATE permission has not been granted.
-//            checkAndRequestPermissions();
             requestReadPhoneStatePermission();
         } else {
-
-            // READ_PHONE_STATE permission is already been granted.
             doPermissionGrantedStuffs();
         }
     }
@@ -455,7 +402,6 @@ public class RegisterUserFragment extends Fragment implements RequestHandler, Vi
             });
 
         } else {
-            // READ_PHONE_STATE permission has not been granted yet. Request it directly.
             ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CAMERA},
                     PERMISSIONS_REQUEST_READ_PHONE_STATE);
         }
@@ -466,12 +412,8 @@ public class RegisterUserFragment extends Fragment implements RequestHandler, Vi
                                            @NonNull int[] grantResults) {
 
         if (requestCode == PERMISSIONS_REQUEST_READ_PHONE_STATE) {
-            // Received permission result for READ_PHONE_STATE permission.est.");
-            // Check if the only required permission has been granted
             if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // READ_PHONE_STATE permission has been granted, proceed with displaying IMEI Number
                 doPermissionGrantedStuffs();
-
             } else {
                 alertPerm(getString(R.string.permissions_not_granted_read_phone_state), new DialogInterface.OnClickListener() {
                     @Override
@@ -496,7 +438,6 @@ public class RegisterUserFragment extends Fragment implements RequestHandler, Vi
 
     private void doPermissionGrantedStuffs() {
         if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-//            selectImage();
         }
     }
 }

@@ -20,7 +20,6 @@ public class LastTransAdapter extends RecyclerView.Adapter<LastTransAdapter.View
     private ArrayList<LastTransactionPozo> mValues;
     private RecyclerView mRecyclerView;
     private Context context;
-    private String type;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
@@ -37,7 +36,6 @@ public class LastTransAdapter extends RecyclerView.Adapter<LastTransAdapter.View
             btn_rrn = (AutofitTextView)view.findViewById(R.id.btn_rrn);
         }
     }
-
     public LastTransAdapter(Context context, RecyclerView recyclerView, ArrayList<LastTransactionPozo> items) {
         mValues = items;
         mRecyclerView = recyclerView;
@@ -49,8 +47,6 @@ public class LastTransAdapter extends RecyclerView.Adapter<LastTransAdapter.View
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.last_trans_layout, parent, false);
         return new ViewHolder(view);
     }
-
-
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         holder.btn_p_amounts.setText(format(mValues.get(position).getTxnAmount()));
@@ -58,7 +54,6 @@ public class LastTransAdapter extends RecyclerView.Adapter<LastTransAdapter.View
         holder.p_transid.setText(mValues.get(position).getRefundTxnId());
         holder.btn_p_bank.setText(mValues.get(position).getBankName());
         holder.btn_rrn.setText(mValues.get(position).getServiceProviderTXNID());
-
     }
 
     @Override

@@ -585,38 +585,16 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
                         customDialog_Common("OTPLAYOUT", null, null, "Add Sender Details", null, null, PMTRemittanceActivity.this);
                     else {
                         new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, getSender_Validate().toString(), headerData, PMTRemittanceActivity.this).execute();
-//                        if (object.has("senderDetails")) {
                         delete_all.setVisibility(View.VISIBLE);
                         sender_layout.setVisibility(View.GONE);
-//                            JSONArray array = object.getJSONArray("senderDetails");
-//                            JSONObject jsonObject = array.getJSONObject(0);
-//                            enterSenderDetails(jsonObject);
-//                        }
-//                        if (object.has("beneListDetail")) {
-//                            if (Integer.parseInt(object.getString("beneCount")) > 0) {
-//                                beneficiary_layout.setVisibility(View.VISIBLE);
-//                                insertBenfDetails(object.getJSONArray("beneListDetail"));
-//                            }
-//                        }
                     }
                 }
             } else if (object.getString("serviceType").equalsIgnoreCase("VERIFY_SENDER_OTP")) {
                 if (object.getString("responseCode").equalsIgnoreCase("200")) {
-//                    if (object.has("senderDetails")) {
                     alertDialog.dismiss();
                     new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, getSender_Validate().toString(), headerData, PMTRemittanceActivity.this).execute();
                     sender_layout.setVisibility(View.GONE);
                     delete_all.setVisibility(View.VISIBLE);
-//                        JSONArray array = object.getJSONArray("senderDetails");
-//                        JSONObject jsonObject = array.getJSONObject(0);
-//                        enterSenderDetails(jsonObject);
-//                    }
-//                    if (object.has("beneListDetail")) {
-//                        if (Integer.parseInt(object.getString("beneCount")) > 0) {
-//                            beneficiary_layout.setVisibility(View.VISIBLE);
-//                            insertBenfDetails(object.getJSONArray("beneListDetail"));
-//                        }
-//                    }
                 } else if (object.getString("responseCode").equalsIgnoreCase("60236")) {
                     otpView.setText("");
                     otpView.setError("Please enter correct otp");
@@ -972,7 +950,6 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                         if (position != 0) {
                             accountType = list_account_type.get(position).getPaymentMode();
-//                            new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, getNepalDistrict(nepalBank).toString(), headerData, PMTRemittanceActivity.this).execute();
                         } else
                             accountType = "";
                     }
@@ -1002,7 +979,6 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                         if (position != 0) {
                             branchID = nepalCityPozoArrayList.get(position).getBranchId();
-//                            new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, getNepalCity(nepalBank,nepalDistrict).toString(), headerData, PMTRemittanceActivity.this).execute();
                         } else
                             branchID = "";
                     }
@@ -1138,7 +1114,6 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                         if (position != 0) {
                             accountType = list_account_type.get(position).getPaymentMode();
-//                            new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, getNepalDistrict(nepalBank).toString(), headerData, PMTRemittanceActivity.this).execute();
                         } else
                             accountType = "";
                     }
@@ -1168,7 +1143,6 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                         if (position != 0) {
                             branchID = nepalCityPozoArrayList.get(position).getBranchId();
-//                            new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, getNepalCity(nepalBank,nepalDistrict).toString(), headerData, PMTRemittanceActivity.this).execute();
                         } else
                             branchID = "";
                     }
@@ -1359,11 +1333,6 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
                     intent4.putExtra(Constant.MAX_NUMBER, 1);
                     intent4.putExtra(NormalFilePickActivity.SUFFIX, new String[]{"pdf"});
                     startActivityForResult(intent4, SELECT_PDF_DIALOG);
-//                    Intent intent = new Intent();
-//                    intent.setType("application/pdf");
-//                    intent.setAction(Intent.ACTION_GET_CONTENT);
-//                    startActivityForResult(
-//                            Intent.createChooser(intent, "Select PDF"), SELECT_PDF_DIALOG);
                 } else if (items[item].equals("Cancel")) {
                     dialog.dismiss();
                 }
@@ -1385,36 +1354,26 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
         paint.setTextSize(10);
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_OVER)); // Text Overlapping Pattern
         Bitmap waterMark = BitmapFactory.decodeResource(getResources(), R.drawable.rapipay);
-//        canvas.drawBitmap(waterMark, 0, 0, paint);
         canvas.drawText(currentDateandTime, w / 4, h - 10, paint);
 
         return result;
     }
 
     private void setPic(String mCurrentPhotoPath) {
-        // Get the dimensions of the View
         int targetW = image.getWidth();
         int targetH = image.getHeight();
-
-        // Get the dimensions of the bitmap
         BitmapFactory.Options bmOptions = new BitmapFactory.Options();
         bmOptions.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
         int photoW = bmOptions.outWidth;
         int photoH = bmOptions.outHeight;
-
-        // Determine how much to scale down the image
         int scaleFactor = Math.min(photoW / targetW, photoH / targetH);
-
-        // Decode the image file into a Bitmap sized to fill the View
         bmOptions.inJustDecodeBounds = false;
         bmOptions.inSampleSize = scaleFactor;
         bmOptions.inPurgeable = true;
-
         Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
         imageBase64 = getBytesFromBitmap(addWaterMark(bitmap));
         imgType = "jpg";
-//        mImageView.setImageBitmap(bitmap);
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -1467,60 +1426,12 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
                 imageBase64 = getStringFile(list.get(0).getPath());
                 image.setText(list.get(0).getName());
                 imgType = "pdf";
-//                Uri selectedImageUri = data.getData();
-//                String uriString = selectedImageUri.toString();
-//                File myFiles = new File(uriString);
-////                String path = myFiles.getAbsolutePath();
-//                if (uriString.startsWith("content://")) {
-//                    Cursor cursor = null;
-//                    try {
-//                        cursor = getContentResolver().query(selectedImageUri, null, null, null, null);
-//                        if (cursor != null && cursor.moveToFirst()) {
-//                            image.setText(cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)));
-//                        }
-//                    } finally {
-//                        cursor.close();
-//                    }
-//                } else if (uriString.startsWith("file://")) {
-//                    image.setText(myFiles.getName());
-//                }
-//                if (selectedImageUri.getLastPathSegment().endsWith("pdf")) {
-//                    File myFile;
-//                    try {
-//                        myFile = new File(getPDFPath(selectedImageUri));
-//                        selectedImagePath = myFile.getAbsolutePath();
-//                        if (myFile.exists() && myFile.length() > 0) {
-//                            imageBase64 = getStringFile(myFile);
-//                            image.setText("" + selectedImagePath.substring(selectedImagePath
-//                                    .lastIndexOf("/") + 1));
-//                            image.setVisibility(View.VISIBLE);
-//                        }
-//                    } catch (Exception e) {
-//                        System.out.println("PDF Path : Exception ");
-//                        e.printStackTrace();
-//                    }
-
-//                } else {
-//                    Toast.makeText(PMTRemittanceActivity.this, "Invalid file type", Toast.LENGTH_SHORT).show();
-//                }
             } else if (requestCode == CONTACT_PICKER_RESULT) {
                 reset();
                 contactRead(data, input_mobile);
             }
         }
     }
-//
-//    public String getPDFPath(Uri uri) {
-//        final String id = DocumentsContract.getDocumentId(uri);
-//        final Uri contentUri = ContentUris.withAppendedId(
-//                Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
-//
-//        String[] projection = {MediaStore.Images.Media.DATA};
-//        Cursor cursor = getContentResolver().query(uri, projection, null, null, null);
-//        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-//        cursor.moveToFirst();
-//        return cursor.getString(column_index);
-//    }
 
     public String getStringFile(String f) {
         InputStream inputStream = null;
@@ -1567,15 +1478,10 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
     }
 
     public void loadCamera() {
-        // Check if the READ_PHONE_STATE permission is already available.
         if (ActivityCompat.checkSelfPermission(PMTRemittanceActivity.this, Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
-            // READ_PHONE_STATE permission has not been granted.
-//            checkAndRequestPermissions();
             requestReadPhoneStatePermission();
         } else {
-
-            // READ_PHONE_STATE permission is already been granted.
             doPermissionGrantedStuffs();
         }
     }
@@ -1594,7 +1500,6 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
             });
 
         } else {
-            // READ_PHONE_STATE permission has not been granted yet. Request it directly.
             ActivityCompat.requestPermissions(PMTRemittanceActivity.this, new String[]{Manifest.permission.CAMERA},
                     PERMISSIONS_REQUEST_READ_PHONE_STATE);
         }
@@ -1605,12 +1510,8 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
                                            @NonNull int[] grantResults) {
 
         if (requestCode == PERMISSIONS_REQUEST_READ_PHONE_STATE) {
-            // Received permission result for READ_PHONE_STATE permission.est.");
-            // Check if the only required permission has been granted
             if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // READ_PHONE_STATE permission has been granted, proceed with displaying IMEI Number
                 doPermissionGrantedStuffs();
-
             } else {
                 alertPerm(getString(R.string.permissions_not_granted_read_phone_state), new DialogInterface.OnClickListener() {
                     @Override
@@ -1618,7 +1519,6 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
                         loadIMEI();
                     }
                 });
-
             }
         }
     }

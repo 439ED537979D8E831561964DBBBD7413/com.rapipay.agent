@@ -41,7 +41,7 @@ android {
             flavorDimensions "default"
             buildConfigField("String", "ROLL", "\"Agent\"")
             resValue "string", "app_name", "RapiPay Agent App"
-            applicationId "com.rapipay.android.agents"
+            applicationId "com.rapipay.android.agent"
         }
     }
     useLibrary 'org.apache.http.legacy'
@@ -49,6 +49,7 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation files('libs/finosdk.aar')
     implementation 'com.android.support:appcompat-v7:27.1.1'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
@@ -79,7 +80,6 @@ dependencies {
     implementation files('libs/mpaysdk-release-v.1.0.34.jar')
     implementation 'de.greenrobot:greendao:2.1.0'
     implementation 'org.greenrobot:eventbus:3.0.0'
-    implementation files('libs/finosdk.aar')
     implementation 'com.android.support:multidex:1.0.0'
 }
 apply plugin: 'com.google.gms.google-services'

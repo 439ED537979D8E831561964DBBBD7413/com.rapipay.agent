@@ -95,7 +95,6 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
         beneficiary_details = (RecyclerView) findViewById(R.id.beneficiary_details);
         btn_payee = (AppCompatButton) findViewById(R.id.btn_payee);
         btn_payee.setOnClickListener(this);
-//last tranction
         last_tran_layout = (LinearLayout) findViewById(R.id.last_tran_layout);
         trans_details = (RecyclerView) findViewById(R.id.trans_details);
 
@@ -107,20 +106,6 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
                 customSpinner(bank_select, "Select Bank", list_bank);
             }
         });
-//        bank_select.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-//            @Override
-//            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-//                if (position != 0) {
-//                    String condition = "where " + RapipayDB.COLOMN__BANK_NAME + "='" + list_bank.get(position) + "'";
-//                    ifsc_code = db.geBankIFSC(condition).get(0);
-//                }
-//            }
-//
-//            @Override
-//            public void onNothingSelected(AdapterView<?> parent) {
-//
-//            }
-//        });
 
         beneficiary_details.addOnItemTouchListener(new RecyclerTouchListener(this, beneficiary_details, new ClickListener() {
             @Override
@@ -335,13 +320,6 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
                             input_name.setText(object.getString("customerName"));
                             customerId = object.getString("customerId");
                             text_ben.setText("Beneficiary Details Transfer Limit" + "\n" + "Daily : Rs " + format(object.getString("dailyRemainigLimit")) + "\n" + "Monthly : Rs " + format(object.getString("monthlyRemainigLimit")));
-//                            list_bank = db.geBankDetails("");
-//                            if (list_bank.size() != 0) {
-//                                ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
-//                                        android.R.layout.simple_spinner_item, list_bank);
-//                                dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//                                bank_select.setAdapter(dataAdapter);
-//                            }
 
                             if (object.has("beneficiaries")) {
                                 if (Integer.parseInt(object.getString("beneficiaryCount")) > 0) {
@@ -397,10 +375,6 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
         Intent intent = new Intent(WalletDetailsActivity.this, CustomerKYCActivity.class);
         intent.putExtra("mobileNo", input_mobile.getText().toString());
         intent.putExtra("customerType", "C");
-//        intent.putExtra("parentId", list.get(0).getMobilno());
-//        intent.putExtra("sessionKey", list.get(0).getPinsession());
-//        intent.putExtra("sessionRefNo", list.get(0).getAftersessionRefNo());
-//        intent.putExtra("nodeAgent", list.get(0).getMobilno());
         intent.putExtra("type", "internal");
         startActivity(intent);
     }
@@ -623,7 +597,6 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
                     customView(alertLayout, output);
                 } else if (type.equalsIgnoreCase("FUNDTRANSFER")) {
                     alertLayout.findViewById(R.id.fundtransfer).setVisibility(View.VISIBLE);
-//                    fundTransferView(alertLayout,(BeneficiaryDetailsPozo)ob);
                 } else if (type.equalsIgnoreCase("Fund Transfer Confirmation")) {
                     alertLayout.findViewById(R.id.custom_service).setVisibility(View.VISIBLE);
                     serviceFee(alertLayout, object, (BeneficiaryDetailsPozo) ob, msg, input);
@@ -661,9 +634,6 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
                         } else if (type.equalsIgnoreCase("BENLAYOUT")) {
                             customFund_Transfer((BeneficiaryDetailsPozo) ob, "RapiPay");
                         } else if (type.equalsIgnoreCase("Fund Transfer Confirmation"))
-//                            if (spinner.getText().toString().equalsIgnoreCase("Select Transfer Type"))
-//                                spinner.setError("Please select transfer type.");
-//                            else
                             new AsyncPostMethod(WebConfig.WALLETTRANSFER_URL, fund_transfer(beneficiaryDetailsPozoslist.get(benePosition), spinner.getText().toString(), ben_amount.getText().toString()).toString(), headerData, WalletDetailsActivity.this).execute();
                         else if (type.equalsIgnoreCase("KYCLAYOUTLAY")) {
                             beneficiaryDetailsPozoslist.remove(benePosition);
@@ -671,9 +641,6 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
                         } else if (type.equalsIgnoreCase("VerifyLayout") || type.equalsIgnoreCase("KYCLAYOUTL")) {
                             input_account.setText("");
                             input_ben_name.setText("");
-//                            ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(WalletDetailsActivity.this,
-//                                    android.R.layout.simple_spinner_item, list_bank);
-//                            dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                             bank_select.setText("Select Bank");
                         }
                         alertDialog.dismiss();

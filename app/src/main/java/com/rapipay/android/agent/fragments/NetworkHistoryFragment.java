@@ -297,9 +297,6 @@ public class NetworkHistoryFragment extends BaseFragment implements RequestHandl
     }
 
     private void initializeTransAdapter(ArrayList<NetworkHistoryPozo> list) {
-//        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
-//        trans_details.setLayoutManager(layoutManager);
-//        trans_details.setAdapter(new NetworkHistoryAdapter(getActivity(), trans_details, list));
         if (first == 1) {
             adapter = new NetworkHistoryAdapter(list, getActivity());
             trans_details.setAdapter(adapter);

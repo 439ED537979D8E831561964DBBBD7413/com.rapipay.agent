@@ -34,8 +34,6 @@ public class NetworkTab extends BaseCompactActivity implements View.OnClickListe
     private void setupTabLayout() {
         fragment_credit = new NetworkTransFragment();
         transFragment = new NetworkHistoryFragment();
-//        transFragment = new CreditTransFragment();
-
         tabLayout.addTab(tabLayout.newTab().setText("Credit to Network"), true);
         tabLayout.addTab(tabLayout.newTab().setText("Network Credit History"));
     }

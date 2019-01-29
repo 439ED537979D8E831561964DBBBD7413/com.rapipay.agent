@@ -21,12 +21,4 @@
         android:textColor="@android:color/white"
         android:textSize="20sp" />
 
-    <!--<Button-->
-        <!--android:id="@+id/btnAction"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_alignParentBottom="true"-->
-        <!--android:text="SCANNING DETAILS" />-->
-
-
 </RelativeLayout>

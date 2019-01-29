@@ -185,9 +185,6 @@
                         android:layout_marginTop="5dp"
                         android:gravity="center_horizontal" />
                 </LinearLayout>
-
-
             </LinearLayout>
-
         </android.support.v4.widget.NestedScrollView>>
     </android.support.design.widget.CoordinatorLayout>

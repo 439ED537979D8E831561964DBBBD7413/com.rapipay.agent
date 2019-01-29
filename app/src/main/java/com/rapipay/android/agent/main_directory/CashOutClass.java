@@ -165,7 +165,6 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                         }
                     } else if (!typeput.equalsIgnoreCase("EMI")) {
                         if (!transactionFlag) {
-                            // From server data we get bluetooth mac addressm and merchantrefno which will be changes here
                             initialization = new PaymentInitialization(CashOutClass.this);
                             if (typeput.equalsIgnoreCase("CASHOUT"))
                                 initialization.initiateTransaction(handler, DeviceType.ME30S, accessBluetoothDetails(), input_amount.getText().toString() + ".00", PaymentTransactionConstants.CASH_AT_POS, PaymentTransactionConstants.DEBIT,
@@ -194,7 +193,6 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                     }
                 }
                 if (msg.what == FAIL)
-
                 {
                     try {
                         clear();
@@ -228,7 +226,6 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                             Toast.makeText(CashOutClass.this, "Please pair device through bluetooth", Toast.LENGTH_SHORT).show();
                     } catch (Exception e) {
                     }
-//                    alertMessage((String) msg.obj);
                 }
                 if (msg.what == CHIP_TRANSACTION_APPROVED || msg.what == SWIP_TRANSACTION_APPROVED)
 
@@ -249,7 +246,6 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                 if (msg.what == QPOS_DEVICE)
 
                 {
-//                    alertMessage((String) msg.obj);
                 } else if (msg.what == TRANSACTION_FAILED || msg.what == CHIP_TRANSACTION_DECLINED || msg.what == SWIP_TRANSACTION_DECLINED)
 
                 {
@@ -384,9 +380,6 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                 loadIMEI();
                 break;
             case R.id.btn_fund:
-              /*  break;
-            case R.id.reciept_details:
-                default:*/
                 hideKeyboard(CashOutClass.this);
                 if (!ImageUtils.commonAmount(input_mobile.getText().toString())) {
                     input_mobile.setError("Please enter mobile number");
@@ -433,11 +426,9 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
     }
 
     boolean transactionFlag = false;
-
     @Override
     protected void onResume() {
         super.onResume();
-
     }
 
     public JSONObject getCashOutDetails(String mobile, String txnAmmount) {
@@ -527,7 +518,6 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
     }
 
     int i = 0;
-
     private void generateReceipt(JSONArray array) {
         i = 0;
         try {
@@ -585,21 +575,6 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                 }
                 i++;
             }
-
-//            left.add("DATE:" + " " + type.getDate());
-//            left.add("MID:" + " " + mid);
-//            left.add("BATCH No:" + " " + type.getBatchNo());
-
-//            right.add("TIME:" + " " + type.getDate());
-//            right.add("TID:" + " " + tid);
-//            right.add("INVOICE No:" + " " + type.getInvoiceNo());
-
-//            bottom.add("CARD NUM : " + "XXXX-XXXX-XXXX-" + type.getCardNumber());
-//            bottom.add("CARD BRAND :" + type.getCardBrand() + "  " + "CARD TYPE :" + type.getCardType());
-//            bottom.add("RRN : " + type.getRRN() + "  " + "Transaction Id : " + type.getTransactionId());
-//            bottom.add("AID : " + type.getAID() + "  " + "TC : " + type.getTC());
-//            medium.add(typeput);
-//            medium.add(type.getCardBrand());
             transactionFlag = false;
             if (left.size() != 0 && right.size() != 0 && bottom.size() != 0 && medium.size() != 0 && custName != null && amount != null)
                 customReceiptCastSaleOut(list.get(0).getAgentName(), left, right, bottom, medium, amount, custName, CashOutClass.this);
@@ -632,13 +607,10 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
 
     @Override
     public void onConnectionSuspended(int i) {
-        //Do whatever you need
-        //You can display a message here
     }
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-        //You can display a message here
     }
 
     private void getMyLocation() {
@@ -667,8 +639,6 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                             final Status status = result.getStatus();
                             switch (status.getStatusCode()) {
                                 case LocationSettingsStatusCodes.SUCCESS:
-                                    // All location settings are satisfied.
-                                    // You can initialize location requests here.
                                     int permissionLocation = ContextCompat
                                             .checkSelfPermission(CashOutClass.this,
                                                     Manifest.permission.ACCESS_FINE_LOCATION);
@@ -678,24 +648,13 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                                     }
                                     break;
                                 case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-                                    // Location settings are not satisfied.
-                                    // But could be fixed by showing the user a dialog.
                                     try {
-                                        // Show the dialog by calling startResolutionForResult(),
-                                        // and check the result in onActivityResult().
-                                        // Ask to turn on GPS automatically
                                         status.startResolutionForResult(CashOutClass.this,
                                                 REQUEST_CHECK_SETTINGS_GPS);
                                     } catch (IntentSender.SendIntentException e) {
-                                        // Ignore the error.
                                     }
                                     break;
                                 case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-                                    // Location settings are not satisfied.
-                                    // However, we have no way
-                                    // to fix the
-                                    // settings so we won't show the dialog.
-                                    // finish();
                                     break;
                             }
                         }
@@ -750,7 +709,6 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
 
     private void bluetooth() {
         btAdapter = BluetoothAdapter.getDefaultAdapter();
-        // Phone does not support Bluetooth so let the user know and exit.
         if (btAdapter == null) {
             new AlertDialog.Builder(this)
                     .setTitle("Not compatible")
@@ -791,8 +749,7 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                                     + " ,bluetoothAddress:"
                                     + bluetoothAddress);
                     if (!TextUtils.isEmpty(bluetoothAddress)) {
-                        return bluetoothAddress;                        //display blutooth address and name in dialog
-//                        showBluetoothDetails(bluetoothName, bluetoothAddress);
+                        return bluetoothAddress;
                     }
                 } else {
                     isPosPaired = false;
@@ -800,11 +757,9 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
             }
             if (!isPosPaired) {
                 return "";
-//                mBinder.buttonProceedToVoid.setEnabled(true);
             }
         } else {
             return "";
-//            mBinder.buttonProceedToVoid.setEnabled(true);
         }
         return "";
     }

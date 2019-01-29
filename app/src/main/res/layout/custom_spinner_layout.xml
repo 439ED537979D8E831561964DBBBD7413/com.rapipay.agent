@@ -4,7 +4,6 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <!-- Editext for Search -->
     <TextView
         android:id="@+id/spinner_title"
         android:layout_width="match_parent"
@@ -51,11 +50,7 @@
                 android:maxLength="10"
                 android:textSize="16dp" />
         </android.support.design.widget.TextInputLayout>
-
-
     </LinearLayout>
-
-
     <!-- List View -->
     <ListView
         android:layout_below="@+id/layoutmain"

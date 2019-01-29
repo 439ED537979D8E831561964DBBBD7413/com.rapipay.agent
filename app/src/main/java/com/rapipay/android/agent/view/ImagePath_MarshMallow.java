@@ -9,9 +9,6 @@ import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 
-/**
- * Created by SONU on 14/01/16.
- */
 public class ImagePath_MarshMallow {
     public  static String getPath(final Context context, final Uri uri) {
 

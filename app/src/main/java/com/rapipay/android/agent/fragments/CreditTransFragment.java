@@ -77,7 +77,6 @@ public class CreditTransFragment extends BaseFragment implements RequestHandler,
             @Override
             public void onClick(View view, int position) {
                 CreditHistoryPozo pozo = transactionPozoArrayList.get(position);
-//                new AsyncPostMethod(WebConfig.WALLETTRANSFER_URL, receipt_request(pozo).toString(), headerData, getActivity()).execute();
             }
 
             @Override
@@ -169,7 +168,6 @@ public class CreditTransFragment extends BaseFragment implements RequestHandler,
             final Dialog dialog = new Dialog(getActivity());
             dialog.setContentView(R.layout.datepickerview);
             dialog.setTitle("");
-
             DatePicker datePicker = (DatePicker) dialog.findViewById(R.id.datePicker1);
             Calendar calendar = Calendar.getInstance();
             calendar.setTimeInMillis(System.currentTimeMillis());

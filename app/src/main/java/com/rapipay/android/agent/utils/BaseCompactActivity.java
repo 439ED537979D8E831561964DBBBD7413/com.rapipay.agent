@@ -127,22 +127,6 @@ public class BaseCompactActivity extends AppCompatActivity {
         if (db != null && db.getDetails_Rapi())
             list = db.getDetails();
     }
-
-    //    private void align_text_center() {
-//        ActionBar ab = getSupportActionBar();
-//        ab.setBackgroundDrawable(getResources().getDrawable(R.drawable.splash_screen));
-//        TextView tv = new TextView(getApplicationContext());
-//        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
-//                RelativeLayout.LayoutParams.MATCH_PARENT, // Width of TextView
-//                RelativeLayout.LayoutParams.WRAP_CONTENT); // Height of TextView
-//        tv.setLayoutParams(lp);
-//        tv.setText(ab.getTitle());
-//        tv.setTextSize(24.0f);
-//        tv.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
-//        tv.setGravity(Gravity.CENTER);
-//        ab.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-//        ab.setCustomView(tv);
-//    }
     protected void loadImageFromStorage(String name, ImageView view, String path) {
 
         try {
@@ -177,8 +161,6 @@ public class BaseCompactActivity extends AppCompatActivity {
 
     protected byte[] byteConvert(String encodedImage) {
         return Base64.decode(encodedImage, Base64.DEFAULT);
-//        Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-//        return decodedByte;
     }
 
     protected String saveToInternalStorage(Bitmap bitmapImage, String name) {
@@ -349,7 +331,6 @@ public class BaseCompactActivity extends AppCompatActivity {
                     alertDialog.dismiss();
                 } else if (type.equalsIgnoreCase("OTPLAYOUT")) {
                     anInterface.okClicked(type, ob);
-//                    alertDialog.dismiss();
                 } else {
                     anInterface.okClicked(type, ob);
                     alertDialog.dismiss();
@@ -676,10 +657,6 @@ public class BaseCompactActivity extends AppCompatActivity {
                         dayss = "0" + String.valueOf(dayOfMonth);
                     else
                         dayss = String.valueOf(dayOfMonth);
-//                    if (selectedDate == dayOfMonth && selectedMonth == month ) {
-//                        date1_text.setText(year + "-" + months + "-" + dayss);
-//                        dialog.dismiss();
-//                    } else {
                     if (dayOfMonth <= selectedDate && (month + 1) <= (selectedMonth + 1) && year == selectedYear) {
                         date1_text.setText(year + "-" + months + "-" + dayss);
                         dialog.dismiss();
@@ -689,11 +666,8 @@ public class BaseCompactActivity extends AppCompatActivity {
                     } else {
                         date1_text.setText("");
                         Toast.makeText(BaseCompactActivity.this, "Future date selection are not allowed", Toast.LENGTH_SHORT).show();
-//                            date1_text.setText(year + "-" + months + "-" + dayss);
                         dialog.dismiss();
-//                            }
                     }
-//                    }
                     date1_text.setError(null);
                     selectedDate = dayOfMonth;
                     selectedMonth = (month);
@@ -1059,7 +1033,6 @@ public class BaseCompactActivity extends AppCompatActivity {
             }
         });
         alertDialog = dialog.show();
-//        alertDialog.getWindow().setLayout(1300, 1850);
     }
 
     protected void customReceiptNew(final String type, final JSONObject object, final CustomInterface anInterface) {

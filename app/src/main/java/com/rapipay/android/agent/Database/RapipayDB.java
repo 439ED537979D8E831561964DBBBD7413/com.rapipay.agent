@@ -36,8 +36,6 @@ public class RapipayDB extends SQLiteOpenHelper {
     public static final String COLOMN_DISPLAYTYPE = "displayType";
     public static final String COLOMN_ORDER = "orderid";
     public static final String COLOMN_ICON = "icon";
-
-
     // Table 2
     public static final String TABLE_OPERATOR = "Operators";
     public static final String TABLE_MASTER = "Masters";
@@ -132,14 +130,6 @@ public class RapipayDB extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-//        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
-//        db.execSQL("DROP TABLE IF EXISTS " + TABLE_BANK);
-//        db.execSQL("DROP TABLE IF EXISTS " + TABLE_PAYMENT);
-//        db.execSQL("DROP TABLE IF EXISTS " + TABLE_STATE);
-//        db.execSQL("DROP TABLE IF EXISTS " + TABLE_OPERATOR);
-//        db.execSQL("DROP TABLE IF EXISTS " + TABLE_TRANSFERLIST);
-//        db.execSQL("DROP TABLE IF EXISTS " + TABLE_PAYERPAYEE);
-//        db.execSQL("DROP TABLE IF EXISTS " + TABLE_FOOTER);
         if (newVersion > oldVersion) {
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_KYC_PERSONAL);
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_KYC_ADDRESS);
@@ -147,7 +137,6 @@ public class RapipayDB extends SQLiteOpenHelper {
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_KYC_VERIFICATION);
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_NEPAL_PAYMENTMOODE);
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_NEPAL_BANK);
-//            db.execSQL("DROP TABLE IF EXISTS " + TABLE_FOOTER);
             db.execSQL("create table IF NOT EXISTS " + TABLE_NEPAL_PAYMENTMOODE + " ( " + COLOMN_PAYMENT_MODETYPE + " VARCHAR(10) , " + COLOMN_PAYMENT_MODENAME + " VARCHAR(50));");
             db.execSQL("create table IF NOT EXISTS " + TABLE_NEPAL_BANK + " ( " + COLOMN_BANK_CODE + " VARCHAR(10) , " + COLOMN__BANK_NAME + " VARCHAR(50));");
             db.execSQL("create table IF NOT EXISTS " + TABLE_MASTER + " ( " + COLOMN_FRONTID + " VARCHAR(10) , " + COLOMN_SERVICETYPENAME + " VARCHAR(50) , " + COLOMN_DISPLAYNAME + " VARCHAR(50) , " + COLOMN_DISPLAYTYPE + " VARCHAR(50), " + COLOMN_ICON + " BLOB DEFAULT NULL, " + COLOMN_ORDER + " VARCHAR(50), " + IMAGE_TIME_STAMP + " VARCHAR(50));");
@@ -158,7 +147,6 @@ public class RapipayDB extends SQLiteOpenHelper {
             db.execSQL("create table IF NOT EXISTS " + TABLE_KYC_VERIFICATION + " ( " + MOBILENO + " VARCHAR(10) , " + SELF_PHOTO_IMAGENAME + " VARCHAR(100), " + SIGN_PHOTO_IMAGENAME + " VARCHAR(100), " + VERIFY_CLICKED + " VARCHAR(10), " + SELF_PHOTO + " BLOB DEFAULT NULL, " + SIGN_PHOTO + " VARCHAR(30), " + DOCUMENTTYPE + " VARCHAR(20), " + DOCUMENTID + " VARCHAR(15));");
             db.execSQL("create table IF NOT EXISTS " + TABLE_IMAGES + " ( " + IMAGE_NAME + " VARCHAR(30) , " + IMAGE_PATH_WL + " BLOB DEFAULT NULL);");
         }
-//        onCreate(db);
     }
 
     public ArrayList<RapiPayPozo> getDetails() {
@@ -455,11 +443,7 @@ public class RapipayDB extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery(selectQuery, null);
         if (cursor.moveToFirst()) {
             do {
-//                HeaderePozo payPozo = new HeaderePozo();
-//                payPozo.setHeaderID(cursor.getString(0));
                 list.add(cursor.getString(2));
-//                payPozo.setHeaderData(cursor.getString(2));
-//                list.add(payPozo);
             } while (cursor.moveToNext());
         }
         return list;
@@ -528,10 +512,6 @@ public class RapipayDB extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery(selectQuery, null);
         if (cursor.moveToFirst()) {
             do {
-//                HeaderePozo payPozo = new HeaderePozo();
-//                payPozo.setHeaderID(cursor.getString(0));
-//                payPozo.setHeaderValue(cursor.getString(1));
-//                payPozo.setHeaderData(cursor.getString(2));
                 list.add(cursor.getString(2));
             } while (cursor.moveToNext());
         }
@@ -546,10 +526,6 @@ public class RapipayDB extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery(selectQuery, null);
         if (cursor.moveToFirst()) {
             do {
-//                HeaderePozo payPozo = new HeaderePozo();
-//                payPozo.setHeaderID(cursor.getString(0));
-//                payPozo.setHeaderValue(cursor.getString(1));
-//                payPozo.setHeaderData(cursor.getString(2));
                 list.add(cursor.getString(2));
             } while (cursor.moveToNext());
         }
@@ -567,7 +543,6 @@ public class RapipayDB extends SQLiteOpenHelper {
                 PaymentModePozo payPozo = new PaymentModePozo();
                 payPozo.setTypeID(cursor.getString(0));
                 payPozo.setPaymentMode(cursor.getString(1));
-//                payPozo.setHeaderData(cursor.getString(2));
                 list.add(payPozo);
             } while (cursor.moveToNext());
         }
@@ -585,7 +560,6 @@ public class RapipayDB extends SQLiteOpenHelper {
                 PaymentModePozo payPozo = new PaymentModePozo();
                 payPozo.setTypeID(cursor.getString(0));
                 payPozo.setPaymentMode(cursor.getString(1));
-//                payPozo.setHeaderData(cursor.getString(2));
                 list.add(payPozo);
             } while (cursor.moveToNext());
         }

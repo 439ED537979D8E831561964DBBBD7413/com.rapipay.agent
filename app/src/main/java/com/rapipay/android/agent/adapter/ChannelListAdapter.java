@@ -19,7 +19,6 @@ public class ChannelListAdapter extends ArrayAdapter<ChannelHistoryPozo> {
     private ArrayList<ChannelHistoryPozo> mValues;
     Context mContext;
 
-    // View lookup cache
     private  class ViewHolder {
         public View mView;
         public AutofitTextView btn_p_bank,btn_name,p_transid,btn_p_amounts,btn_status;
@@ -37,17 +36,11 @@ public class ChannelListAdapter extends ArrayAdapter<ChannelHistoryPozo> {
         return mValues.size();
     }
 
-    private int lastPosition = -1;
 
     @Override
     public View getView(int position, View view, ViewGroup parent) {
-        // Get the data item for this position
-        ChannelHistoryPozo dataModel = getItem(position);
-        // Check if an existing view is being reused, otherwise inflate the view
-        ViewHolder viewHolder; // view lookup cache stored in tag
-
+        ViewHolder viewHolder;
         final View result;
-
         if (view == null) {
             viewHolder = new ViewHolder();
             LayoutInflater inflater = LayoutInflater.from(getContext());
@@ -70,7 +63,6 @@ public class ChannelListAdapter extends ArrayAdapter<ChannelHistoryPozo> {
         viewHolder.p_transid.setText("Transaction Amt : " + format(mValues.get(position).getAmount()));
         viewHolder.btn_p_bank.setText("RRN : "+mValues.get(position).getServiceProviderTXNID());
         viewHolder.btn_status.setText("Status : "+mValues.get(position).getTxnId());
-        // Return the completed view to render on screen
         return view;
     }
     private String format(String amount) {

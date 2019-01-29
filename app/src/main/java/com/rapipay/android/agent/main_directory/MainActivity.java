@@ -93,7 +93,6 @@ public class MainActivity extends BaseCompactActivity
                 if (BuildConfig.APPTYPE == 2)
                     back_click.setImageDrawable(getResources().getDrawable(R.drawable.rapipay_parter));
             }
-//            list = db.getDetails();
             loadUrl();
         } else {
             dbNull(MainActivity.this);
@@ -147,14 +146,11 @@ public class MainActivity extends BaseCompactActivity
         tv = (TextView) this.findViewById(R.id.mywidget);
         tv.setSelected(true);
         reset.setColorFilter(getResources().getColor(R.color.colorPrimaryDark));
-//        reset.setVisibility(View.VISIBLE);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
         if (Build.VERSION.SDK_INT >= 9) {
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
             StrictMode.setThreadPolicy(policy);
         }
-
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -189,50 +185,6 @@ public class MainActivity extends BaseCompactActivity
         super.onResume();
         invalidateOptionsMenu();
     }
-
-//    private void setupTabLayout() {
-//        fragment = new DashBoardFragments();
-//        fragment = new DashBoardFragments();
-//
-//        tabLayout.addTab(tabLayout.newTab().setText("Home"), true);
-//        tabLayout.addTab(tabLayout.newTab().setText("TWO"));
-//    }
-//
-//    private void bindWidgetsWithAnEvent() {
-//        tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-//            @Override
-//            public void onTabSelected(TabLayout.Tab tab) {
-//                setCurrentTabFragment(tab.getPosition());
-//            }
-//
-//            @Override
-//            public void onTabUnselected(TabLayout.Tab tab) {
-//            }
-//
-//            @Override
-//            public void onTabReselected(TabLayout.Tab tab) {
-//            }
-//        });
-//    }
-
-//    private void setCurrentTabFragment(int tabPosition) {
-//        switch (tabPosition) {
-//            case 0:
-//                replaceFragment(fragment);
-//                break;
-//            case 1:
-//                replaceFragment(fragment);
-//                break;
-//        }
-//    }
-//
-//    public void replaceFragment(Fragment fragment) {
-//        FragmentManager fm = getSupportFragmentManager();
-//        FragmentTransaction ft = fm.beginTransaction();
-//        ft.replace(R.id.frame_container, fragment);
-//        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-//        ft.commit();
-//    }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -287,8 +239,6 @@ public class MainActivity extends BaseCompactActivity
                 String imageName = "image" + ".jpg";
                 String path = saveToInternalStorage(bm, imageName);
                 localStorage.setActivityState(LocalStorage.IMAGEPATH, path);
-                // SaveInDB(bm);
-                // filePath =selectedImagePath;
             }
         }
     }
@@ -308,10 +258,8 @@ public class MainActivity extends BaseCompactActivity
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
         int id = item.getItemId();
         Fragment fragment = null;
-//        fragment = new Change_Password();
         if (id == R.id.nav_home) {
             reset.setVisibility(View.VISIBLE);
             fragment = new DashBoardFragments();
@@ -345,12 +293,6 @@ public class MainActivity extends BaseCompactActivity
 
     private void itemSelection(int id) {
         onNavigationItemSelected(navigationView.getMenu().getItem(0));
-//        switch (id) {
-//            case 0:
-//                DashBoardFragments fragment = new DashBoardFragments();
-//                fragmentReplace(fragment);
-//                break;
-//        }
     }
 
     @Override
@@ -419,9 +361,6 @@ public class MainActivity extends BaseCompactActivity
         }
 
         itemSelection(0);
-//        setse
-//        bindWidgetsWithAnEvent();
-//        setupTabLayout();
     }
 
     private void callMasterDetails() {
@@ -488,21 +427,6 @@ public class MainActivity extends BaseCompactActivity
             drawer.closeDrawer(GravityCompat.START);
         }
         customDialog_Common("KYCLAYOUT", null, null, "Rapipay", null, "Are you sure you want to exit ?", MainActivity.this);
-//        if (doubleBackToExitPressedOnce) {
-//            super.onBackPressed();
-//            finish();
-//            return;
-//        }
-//
-//        this.doubleBackToExitPressedOnce = true;
-//        Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
-//
-//        new Handler().postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                doubleBackToExitPressedOnce = false;
-//            }
-//        }, 2000);
     }
 
     @Override

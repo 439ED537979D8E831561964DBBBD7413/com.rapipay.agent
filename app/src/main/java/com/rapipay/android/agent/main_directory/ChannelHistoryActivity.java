@@ -12,12 +12,9 @@ import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-
-import java.nio.channels.Channel;
 import java.util.ArrayList;
 
 import me.grantland.widget.AutofitTextView;
-
 import com.rapipay.android.agent.Model.ChannelHistoryPozo;
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.adapter.ChannelListAdapter;
@@ -75,7 +72,6 @@ public class ChannelHistoryActivity extends BaseCompactActivity implements View.
             public void onScrollStateChanged(AbsListView view, int scrollState) {
 
             }
-
             @Override
             public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
                 int lastInScreen = firstVisibleItem + visibleItemCount;
@@ -161,7 +157,6 @@ public class ChannelHistoryActivity extends BaseCompactActivity implements View.
                         try {
                             JSONArray array = object.getJSONArray("getTxnReceiptDataList");
                             customReceiptNewTransaction("Transaction Receipt", object, ChannelHistoryActivity.this);
-//                            customReceiptNew("Transaction Receipt", object, ChannelHistoryActivity.this);
                         } catch (Exception e) {
                             e.printStackTrace();
                             customDialog_Common("KYCLAYOUTS",null,null,"Transaction Receipt","","Cannot generate receipt now please try later!", ChannelHistoryActivity.this);

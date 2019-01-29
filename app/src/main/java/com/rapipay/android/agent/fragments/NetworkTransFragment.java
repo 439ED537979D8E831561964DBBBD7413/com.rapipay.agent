@@ -125,28 +125,6 @@ public class NetworkTransFragment extends BaseFragment implements RequestHandler
                 }
             }
         });
-
-
-//        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
-//        trans_details.setLayoutManager(layoutManager);
-//        trans_details.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), trans_details, new ClickListener() {
-//            @Override
-//            public void onClick(View view, int position) {
-//                if (clickedId.equalsIgnoreCase("0"))
-//                    customDialog_Ben(transactionPozoArrayList.get(position),"Network Transfer","AMOUNTTRANSFER","","Credit To Network");
-//            }
-//
-//            @Override
-//            public void onLongClick(View view, int position) {
-//
-//            }
-//        }));
-//        trans_details.addOnScrollListener(new RecyclerView.OnScrollListener() {
-//            @Override
-//            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-//                super.onScrollStateChanged(recyclerView, newState);
-//            }
-//        });
     }
 
     @Override
@@ -161,7 +139,6 @@ public class NetworkTransFragment extends BaseFragment implements RequestHandler
                     }
                 } else if (object.getString("serviceType").equalsIgnoreCase("C2C_NETWORK_CREDIT")) {
                     customDialog_Ben(null, object.getString("responseMessage"), "NETWORK_CREDIT", null, "Credit Confirmation");
-//                    customDialog(object.getString("responseMessage"));
                 } else if (object.getString("serviceType").equalsIgnoreCase("GET_NODE_HEADER_DATA")) {
                     if (object.has("headerList")) {
                         if (Integer.parseInt(object.getString("listCount")) > 0) {
@@ -222,7 +199,6 @@ public class NetworkTransFragment extends BaseFragment implements RequestHandler
             adapter.notifyDataSetChanged();
         }
         isLoading = false;
-//        Toast.makeText(getActivity(),"TAG",Toast.LENGTH_SHORT).show();
     }
 
     public JSONObject getNetwork_Validate(String servicetype, String mobileNo, int fromIndex, int toIndex) {
@@ -285,14 +261,7 @@ public class NetworkTransFragment extends BaseFragment implements RequestHandler
                         textsss.setError("Please enter valid data");
                         textsss.requestFocus();
                     } else {
-//                        for (int i = 0; i < MainActivity.pozoArrayList.size(); i++) {
-//                            if (MainActivity.pozoArrayList.get(i).getHeaderID().equalsIgnoreCase("1"))
-//                                if (MainActivity.pozoArrayList.get(i).getHeaderData().equalsIgnoreCase("null") || formatss(MainActivity.pozoArrayList.get(i).getHeaderData()).equalsIgnoreCase("0")) {
-//                                    url();
-//                                } else {
                                     customDialogConfirm(pozo, "Are you sure you want to Transfer?", "CONFIRMATION", textsss.getText().toString(), "Credit Confirmation");
-//                                }
-//                        }
                         alertDialog.dismiss();
                     }
                 } else if (type.equalsIgnoreCase("NETWORK_CREDIT")) {
@@ -307,22 +276,6 @@ public class NetworkTransFragment extends BaseFragment implements RequestHandler
                 alertDialog.dismiss();
             }
         });
-//        dialog.setPositiveButton("Network Transfer", new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialog, int which) {
-//                if (!text.getText().toString().isEmpty()) {
-//                    hideKeyboard(getActivity());
-//                    confirmDialog("Sure you want to Transfer?",text,pozo);
-//                    dialog.dismiss();
-//                }
-//            }
-//        });
-//        dialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialog, int which) {
-//                dialog.dismiss();
-//            }
-//        });
         alertDialog = dialog.show();
     }
 
@@ -379,46 +332,6 @@ public class NetworkTransFragment extends BaseFragment implements RequestHandler
         }
         return jsonObject;
     }
-
-//    private void customDialog(String msg) {
-//        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-//        builder.setTitle(R.string.app_name);
-//        //Setting message manually and performing action on button click
-//        builder.setMessage(msg)
-//                .setCancelable(false)
-//                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-//                    public void onClick(DialogInterface dialog, int id) {
-//                        loadApi();
-//                        dialog.dismiss();
-//                    }
-//                });
-//        //Creating dialog box
-//        AlertDialog alert = builder.create();
-//        alert.show();
-//    }
-
-    //    private void confirmDialog(String msg,final TextView text,final NetworkTransferPozo pozo) {
-//        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-//        builder.setTitle(R.string.app_name);
-//        //Setting message manually and performing action on button click
-//        builder.setMessage(msg)
-//                .setCancelable(false)
-//                .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//
-//                    }
-//                })
-//                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-//                    public void onClick(DialogInterface dialog, int id) {
-//                        new AsyncPostMethod(WebConfig.NETWORKTRANSFER_URL, getNetwork_Transfer(pozo.getMobileNo(), text.getText().toString()).toString(), headerData, NetworkTransFragment.this, getActivity()).execute();
-//                        dialog.dismiss();
-//                    }
-//                });
-//        //Creating dialog box
-//        AlertDialog alert = builder.create();
-//        alert.show();
-//    }
     private void url() {
         new AsyncPostMethod(WebConfig.COMMONAPI, getDashBoard("GET_NODE_HEADER_DATA").toString(), headerData, getActivity()).execute();
     }
@@ -447,9 +360,7 @@ public class NetworkTransFragment extends BaseFragment implements RequestHandler
 
     public void hideKeyboard(Activity activity) {
         InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
-        //Find the currently focused view, so we can grab the correct window token from it.
         View view = activity.getCurrentFocus();
-        //If no view currently has focus, create a new one, just so we can grab a window token from it
         if (view == null) {
             view = new View(activity);
         }

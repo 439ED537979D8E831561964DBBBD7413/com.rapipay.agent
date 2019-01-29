@@ -52,14 +52,6 @@ public class SimpleStringRecyclerViewAdapter extends RecyclerView.Adapter<Simple
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
-           /* FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) holder.mImageView.getLayoutParams();
-            if (mRecyclerView.getLayoutManager() instanceof GridLayoutManager) {
-                layoutParams.height = 200;
-            } else if (mRecyclerView.getLayoutManager() instanceof StaggeredGridLayoutManager) {
-                layoutParams.height = 600;
-            } else {
-                layoutParams.height = 800;
-            }*/
         holder.mImageView.setImageDrawable(context.getResources().getDrawable(mValues.get(position).getImageUrl()));
         holder.recycler_text.setText(mValues.get(position).getImageName());
         if (type.equalsIgnoreCase("first"))
@@ -67,10 +59,6 @@ public class SimpleStringRecyclerViewAdapter extends RecyclerView.Adapter<Simple
         holder.mLayoutItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                Intent intent = new Intent(mActivity, ItemDetailsActivity.class);
-//                intent.putExtra(STRING_IMAGE_URI, mValues[position]);
-//                intent.putExtra(STRING_IMAGE_POSITION, position);
-//                mActivity.startActivity(intent);
 
             }
         });

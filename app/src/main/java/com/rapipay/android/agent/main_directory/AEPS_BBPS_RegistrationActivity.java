@@ -120,7 +120,6 @@ public class AEPS_BBPS_RegistrationActivity extends BaseCompactActivity implemen
         @Override
         public void onLoadResource(WebView view, String url) {
             if (progressDialog == null) {
-                // in standard case YourActivity.this
                 progressDialog = new ProgressDialog(AEPS_BBPS_RegistrationActivity.this);
                 progressDialog.setMessage("Loading...");
                 progressDialog.show();
@@ -173,7 +172,6 @@ public class AEPS_BBPS_RegistrationActivity extends BaseCompactActivity implemen
 
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
-            // TODO Auto-generated method stub
             if (!url.contains("offlineaadhaar")) {
                 String response = inputStreamAsString(url);
                 if (response != null) {
@@ -274,14 +272,12 @@ public class AEPS_BBPS_RegistrationActivity extends BaseCompactActivity implemen
     }
     public class PQChromeClient extends WebChromeClient {
         public boolean onShowFileChooser(WebView view, ValueCallback<Uri[]> filePath, FileChooserParams fileChooserParams) {
-            // Double check that we don't have any existing callbacks
             if (mUploadMessage != null) {
                 mUploadMessage.onReceiveValue(null);
             }
             mUploadMessage = filePath;
             loadCamera();
             return true;
-
         }
     }
 

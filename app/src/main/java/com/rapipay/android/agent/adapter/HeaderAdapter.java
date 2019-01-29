@@ -47,21 +47,11 @@ public class HeaderAdapter extends RecyclerView.Adapter<HeaderAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
-
-           /* FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) holder.mImageView.getLayoutParams();
-            if (mRecyclerView.getLayoutManager() instanceof GridLayoutManager) {
-                layoutParams.height = 200;
-            } else if (mRecyclerView.getLayoutManager() instanceof StaggeredGridLayoutManager) {
-                layoutParams.height = 600;
-            } else {
-                layoutParams.height = 800;
-            }*/
         holder.input_name.setText(mValues.get(position).getHeaderValue());
         if (mValues.get(position).getHeaderData().matches(".*\\d+.*") && !mValues.get(position).getHeaderValue().equalsIgnoreCase("Parent Mobile") && !mValues.get(position).getHeaderValue().equalsIgnoreCase("TOP_PARENT")  && !mValues.get(position).getHeaderValue().equalsIgnoreCase("Agent Name"))
             holder.btn_name.setText(format(mValues.get(position).getHeaderData()));
         else
             holder.btn_name.setText(mValues.get(position).getHeaderData());
-
     }
 
     @Override

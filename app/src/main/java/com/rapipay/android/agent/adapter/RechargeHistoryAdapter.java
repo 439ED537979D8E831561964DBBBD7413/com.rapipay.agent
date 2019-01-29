@@ -51,14 +51,6 @@ public class RechargeHistoryAdapter extends RecyclerView.Adapter<RechargeHistory
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
-           /* FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) holder.mImageView.getLayoutParams();
-            if (mRecyclerView.getLayoutManager() instanceof GridLayoutManager) {
-                layoutParams.height = 200;
-            } else if (mRecyclerView.getLayoutManager() instanceof StaggeredGridLayoutManager) {
-                layoutParams.height = 600;
-            } else {
-                layoutParams.height = 800;
-            }*/
         holder.btn_p_amounts.setText(mValues.get(position).getRechargeType());
         holder.btn_name.setText(mValues.get(position).getOperatorName());
         holder.p_transid.setText(mValues.get(position).getMobileNo());
@@ -66,7 +58,6 @@ public class RechargeHistoryAdapter extends RecyclerView.Adapter<RechargeHistory
         ;
         holder.txnid.setText(mValues.get(position).getTransactionID());
         holder.txnStatus.setText(mValues.get(position).getTxnStatus());
-
     }
 
     @Override

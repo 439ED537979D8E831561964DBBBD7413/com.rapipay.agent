@@ -57,38 +57,3 @@ public class EMITenureAdapter extends ArrayAdapter<AcquirerEmiDetailsVO> {
         return view;
     }
 }
-
-//        extends ArrayAdapter<AcquirerEmiDetailsVO> {
-//    private ArrayList<AcquirerEmiDetailsVO> mValues;
-//    Context mContext;
-//private class ViewHolder {
-//    public View mView;
-//    public TextView amount, percentage, tenure;
-//}    //
-//    public EMITenureAdapter(ArrayList<AcquirerEmiDetailsVO> data, Context context) {
-//        super(context, R.layout.tenure_layout, data);
-//        this.mValues = data;
-//        this.mContext = context;
-//    }
-//
-//    @Override
-//    public View getView(int position, View view, ViewGroup parent) {
-//        ViewHolder viewHolder; // view lookup cache stored in tag
-//        if (view == null) {
-//            viewHolder = new ViewHolder();
-//            LayoutInflater inflater = LayoutInflater.from(getContext());
-//            view = inflater.inflate(R.layout.tenure_layout, parent, false);
-//            viewHolder.amount = (TextView) view.findViewById(R.id.amount);
-//            viewHolder.percentage = (TextView) view.findViewById(R.id.percentage);
-//            viewHolder.tenure = (TextView) view.findViewById(R.id.tenure);
-//            view.setTag(viewHolder);
-//        } else {
-//            viewHolder = (ViewHolder) view.getTag();
-//        }
-//
-//        viewHolder.amount.setText(String.valueOf(mValues.get(position).getEmiAmount()));
-//        viewHolder.percentage.setText(String.valueOf(mValues.get(position).getEmiPercentage()));
-//        viewHolder.tenure.setText(String.valueOf(mValues.get(position).getEmiTenure()));
-//        return view;
-//    }
-//}

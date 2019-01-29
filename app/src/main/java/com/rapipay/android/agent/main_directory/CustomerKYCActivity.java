@@ -53,8 +53,6 @@ public class CustomerKYCActivity extends BaseCompactActivity implements RequestH
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.customer_kyc_layout);
-//        if (BaseCompactActivity.db != null && BaseCompactActivity.db.getDetails_Rapi())
-//            list = BaseCompactActivity.db.getDetails();
         TYPE = getIntent().getStringExtra("type");
         mobileNo = getIntent().getStringExtra("mobileNo");
         customerType = getIntent().getStringExtra("customerType");
@@ -296,9 +294,7 @@ public class CustomerKYCActivity extends BaseCompactActivity implements RequestH
 
     public void hideKeyboard(Activity activity) {
         InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
-        //Find the currently focused view, so we can grab the correct window token from it.
         View view = activity.getCurrentFocus();
-        //If no view currently has focus, create a new one, just so we can grab a window token from it
         if (view == null) {
             view = new View(activity);
         }
@@ -383,7 +379,6 @@ public class CustomerKYCActivity extends BaseCompactActivity implements RequestH
                             spinner.setClickable(false);
                         }
                         hideKeyboard(CustomerKYCActivity.this);
-
                     }
                 }
             }
@@ -462,7 +457,6 @@ public class CustomerKYCActivity extends BaseCompactActivity implements RequestH
                     scan_data.setVisibility(View.GONE);
                     kyc_layout_bottom.setVisibility(View.VISIBLE);
                     scan = true;
-//                    parseJson(jsonObject);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

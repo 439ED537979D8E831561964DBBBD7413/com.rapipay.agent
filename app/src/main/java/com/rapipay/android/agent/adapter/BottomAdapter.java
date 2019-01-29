@@ -7,11 +7,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
 import java.util.ArrayList;
-
 import me.grantland.widget.AutofitTextView;
-
 import com.rapipay.android.agent.Model.HeaderePozo;
 import com.rapipay.android.agent.R;
 
@@ -20,7 +17,6 @@ public class BottomAdapter extends ArrayAdapter<HeaderePozo> {
     private ArrayList<HeaderePozo> mValues;
     Context mContext;
 
-    // View lookup cache
     private class ViewHolder {
         public View mView;
         public TextView btn_p_bank;

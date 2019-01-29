@@ -58,13 +58,6 @@ public class PinEntryEditText extends AppCompatEditText {
         super(context, attrs, defStyleAttr);
         init(context, attrs);
     }
-
-//    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-//    public PinEntryEditText(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-//        super(context, attrs, defStyleAttr, defStyleRes);
-//        init(context, attrs);
-//    }
-
     private void init(Context context, AttributeSet attrs) {
         float multi = context.getResources().getDisplayMetrics().density;
         mLineStroke = multi * mLineStroke;

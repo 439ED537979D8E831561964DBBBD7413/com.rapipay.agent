@@ -74,9 +74,7 @@ NetworkTransferActivity extends BaseCompactActivity implements RequestHandler, V
                     if (!pozo.getAgentCategory().equalsIgnoreCase("Retailer")) {
                         logList.add(new NetworkManagePozo(pozo.getMobileNo(), pozo.getMobileNo()));
                         mobileNo = pozo.getMobileNo();
-//                        back_click.setVisibility(View.VISIBLE);
                         customDialog_Common("NETWORKLAYOUT", null, pozo, "Network Option", null, null, NetworkTransferActivity.this);
-//                        customPopUp(pozo);
                     } else
                         reDirect_Activity(pozo);
                 }
@@ -99,31 +97,6 @@ NetworkTransferActivity extends BaseCompactActivity implements RequestHandler, V
                 }
             }
         });
-//        trans_details.addOnItemTouchListener(new RecyclerTouchListener(this, trans_details, new ClickListener() {
-//            @Override
-//            public void onClick(View view, int position) {
-////                if (clickedId.equalsIgnoreCase("0"))
-////                    customDialog_Common("NETWORKPOPUP", null, transactionPozoArrayList.get(position), "Network Option", null, null, NetworkTransferActivity.this);
-//////                    customDialog_Ben(transactionPozoArrayList.get(position));
-////                else
-//                if (clickedId.equalsIgnoreCase("2")) {
-//                    NetworkTransferPozo pozo = transactionPozoArrayList.get(position);
-//                    if (!pozo.getAgentCategory().equalsIgnoreCase("Retailer")) {
-//                        logList.add(new NetworkManagePozo(pozo.getMobileNo(), pozo.getMobileNo()));
-//                        mobileNo = pozo.getMobileNo();
-//                        back_click.setVisibility(View.VISIBLE);
-//                        customDialog_Common("NETWORKLAYOUT", null, pozo, "Network Option", null, null, NetworkTransferActivity.this);
-////                        customPopUp(pozo);
-//                    } else
-//                        reDirect_Activity(pozo);
-//                }
-//            }
-//
-//            @Override
-//            public void onLongClick(View view, int position) {
-//
-//            }
-//        }));
     }
 
     @Override
@@ -138,7 +111,6 @@ NetworkTransferActivity extends BaseCompactActivity implements RequestHandler, V
                     }
                 } else if (object.getString("serviceType").equalsIgnoreCase("C2C_NETWORK_CREDIT")) {
                     customDialog_Common("KYCLAYOUT", null, null, "Network Detail", null, object.getString("responseMessage"), NetworkTransferActivity.this);
-//                    customDialog(object.getString("responseMessage"));
                 }
             }
         } catch (Exception e) {
@@ -180,9 +152,6 @@ NetworkTransferActivity extends BaseCompactActivity implements RequestHandler, V
             adapter.notifyDataSetChanged();
         }
         isLoading = false;
-//        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-//        trans_details.setLayoutManager(layoutManager);
-//        trans_details.setAdapter(new NetworkTransferAdapter(this, trans_details, list));
     }
 
     public JSONObject getNetwork_Validate(String servicetype, String mobileNo, int fromIndex, int toIndex) {
@@ -209,26 +178,6 @@ NetworkTransferActivity extends BaseCompactActivity implements RequestHandler, V
     public void onBackPressed() {
         setBack_click(this);
         finish();
-    }
-
-    public JSONObject getNetwork_Transfer(String receiverId, String txnAmount) {
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("serviceType", "C2C_NETWORK_CREDIT");
-            jsonObject.put("requestType", "BC_Channel");
-            jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("transactionID", ImageUtils.miliSeconds());
-            jsonObject.put("nodeAgentId", list.get(0).getMobilno());
-            jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
-            jsonObject.put("agentSenderID", list.get(0).getMobilno());
-            jsonObject.put("agentReciverID", receiverId);
-            jsonObject.put("txnAmount", txnAmount);
-            jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return jsonObject;
     }
 
     private void reDirect_Activity(NetworkTransferPozo pozo) {

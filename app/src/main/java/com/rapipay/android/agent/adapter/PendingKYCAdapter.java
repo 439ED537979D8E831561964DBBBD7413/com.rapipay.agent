@@ -11,9 +11,6 @@ import com.rapipay.android.agent.Model.PendingKYCPozo;
 import com.rapipay.android.agent.R;
 
 import java.util.ArrayList;
-
-import me.grantland.widget.AutofitTextView;
-
 public class PendingKYCAdapter extends ArrayAdapter<PendingKYCPozo> {
 
     private ArrayList<PendingKYCPozo> mValues;
@@ -30,14 +27,9 @@ public class PendingKYCAdapter extends ArrayAdapter<PendingKYCPozo> {
     }
     @Override
     public View getView(int position, View view, ViewGroup parent) {
-        // Get the data item for this position
-        // Check if an existing view is being reused, otherwise inflate the view
         ViewHolder viewHolder; // view lookup cache stored in tag
-
         final View result;
-
         if (view == null) {
-
             viewHolder = new ViewHolder();
             LayoutInflater inflater = LayoutInflater.from(getContext());
             view = inflater.inflate(R.layout.pending_layut_adapter, parent, false);
@@ -52,7 +44,6 @@ public class PendingKYCAdapter extends ArrayAdapter<PendingKYCPozo> {
         } else {
             viewHolder = (ViewHolder) view.getTag();
         }
-
         viewHolder.btn_p_amounts.setText(mValues.get(position).getCompanyName());
         viewHolder.btn_name.setText(mValues.get(position).getFullName()+" ("+mValues.get(position).getMobileNo()+") ");
         viewHolder.p_transid.setText(mValues.get(position).getEmailId());
@@ -60,32 +51,8 @@ public class PendingKYCAdapter extends ArrayAdapter<PendingKYCPozo> {
         viewHolder.createdon.setText("Created On - "+mValues.get(position).getCreationDate());
         viewHolder.remark.setText("Remarks - "+mValues.get(position).getRemarks());
         viewHolder.status.setText("Status - "+mValues.get(position).getStatusAction());
-        // Return the completed view to render on screen
         return view;
     }
-
-//
-//    @Override
-//    public void onBindViewHolder(final ViewHolder holder, final int position) {
-//           /* FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) holder.mImageView.getLayoutParams();
-//            if (mRecyclerView.getLayoutManager() instanceof GridLayoutManager) {
-//                layoutParams.height = 200;
-//            } else if (mRecyclerView.getLayoutManager() instanceof StaggeredGridLayoutManager) {
-//                layoutParams.height = 600;
-//            } else {
-//                layoutParams.height = 800;
-//            }*/
-//        holder.btn_p_amounts.setText(mValues.get(position).getRequestAmount());
-//        holder.btn_name.setText(mValues.get(position).getAgentID());
-//        holder.p_transid.setText(mValues.get(position).getCreditID());
-//        holder.btn_p_bank.setText(mValues.get(position).getCreatedOn());
-//
-//    }
-//
-//    @Override
-//    public int getItemCount() {
-//        return mValues.size();
-//    }
 }
 
 
