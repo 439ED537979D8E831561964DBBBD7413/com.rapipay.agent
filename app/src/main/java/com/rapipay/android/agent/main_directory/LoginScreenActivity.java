@@ -197,7 +197,7 @@ public class LoginScreenActivity extends BaseCompactActivity implements View.OnC
             input_password.setText("");
         } else if (type.equalsIgnoreCase("KYCLAYOUTSS")) {
             Intent webIntent = new Intent(Intent.ACTION_VIEW,
-                    Uri.parse("https://play.google.com/store/apps/details?id=" + getPackageName()));
+                    Uri.parse("https://play.google.com/store/apps/details?id=" + "com.rapipay.android.agents"));
             startActivity(webIntent);
         }
     }
@@ -218,7 +218,7 @@ public class LoginScreenActivity extends BaseCompactActivity implements View.OnC
                         if (("F").equalsIgnoreCase(list.get(i + 1).getValue())) {
                             customDialog_Common("KYCLAYOUTSS", null, null, "Update Available", null, "You are running on lower version please update for new versions!.", LoginScreenActivity.this);
                         } else {
-                            new AsyncPostMethod(WebConfig.LOGIN_URL, getJson_Validate().toString(), "", LoginScreenActivity.this).execute();
+                            new AsyncPostMethod(WebConfig.LOGIN_URL, getJson_Validate().toString(), "", LoginScreenActivity.this,getString(R.string.responseTimeOut)).execute();
                         }
                     } catch (PackageManager.NameNotFoundException e) {
                         e.printStackTrace();

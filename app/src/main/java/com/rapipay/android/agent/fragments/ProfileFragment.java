@@ -64,7 +64,7 @@ public class ProfileFragment extends Fragment implements RequestHandler, View.On
     }
 
     private void loadApi() {
-        new AsyncPostMethod(WebConfig.LOGIN_URL, getJson_Validate().toString(), "", ProfileFragment.this, getActivity()).execute();
+        new AsyncPostMethod(WebConfig.LOGIN_URL, getJson_Validate().toString(), "", ProfileFragment.this, getActivity(),getString(R.string.responseTimeOut)).execute();
     }
 
     public JSONObject getJson_Validate() {
@@ -227,7 +227,7 @@ public class ProfileFragment extends Fragment implements RequestHandler, View.On
         switch (v.getId()) {
             case R.id.btn_login:
                 HashMap<String, String> list = headerePozoArrayList;
-                new AsyncPostMethod(WebConfig.LOGIN_URL, updateJson_Validate(list).toString(), "", ProfileFragment.this, getActivity()).execute();
+                new AsyncPostMethod(WebConfig.LOGIN_URL, updateJson_Validate(list).toString(), "", ProfileFragment.this, getActivity(),getString(R.string.responseTimeOut)).execute();
                 break;
         }
     }

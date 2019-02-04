@@ -87,7 +87,7 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
             kycType = "C";
         else
             kycType = "A";
-        new AsyncPostMethod(WebConfig.EKYC, getJson_Validate(mobileNo, kycType, parentId,PancardDetails,DocumentType, sessionKey, sessionRefNo, nodeAgent).toString(), headerData, WebViewClientActivity.this).execute();
+        new AsyncPostMethod(WebConfig.EKYC, getJson_Validate(mobileNo, kycType, parentId,PancardDetails,DocumentType, sessionKey, sessionRefNo, nodeAgent).toString(), headerData, WebViewClientActivity.this,getString(R.string.responseTimeOut)).execute();
         web = (WebView) findViewById(R.id.webview01);
         WebSettings webSettings = web.getSettings();
         webSettings.setAppCacheEnabled(true);

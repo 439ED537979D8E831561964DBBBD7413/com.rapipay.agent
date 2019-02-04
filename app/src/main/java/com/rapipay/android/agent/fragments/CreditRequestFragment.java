@@ -313,7 +313,7 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
                     date1_text.setError("Please select date");
                     date1_text.requestFocus();
                 } else if ((!paymode.isEmpty() && !imageBase64.isEmpty()) || !filePath.isEmpty())
-                    new AsyncPostMethod(WebConfig.CRNF, credit_request().toString(), headerData, CreditRequestFragment.this, getActivity()).execute();
+                    new AsyncPostMethod(WebConfig.CRNF, credit_request().toString(), headerData, CreditRequestFragment.this, getActivity(),getString(R.string.responseTimeOut)).execute();
                 else
                     Toast.makeText(getActivity(), "Please select mandatory fields", Toast.LENGTH_SHORT).show();
                 break;

@@ -117,7 +117,7 @@ public class NetworkHistoryFragment extends BaseFragment implements RequestHandl
                 if (totalItemCount != 0 && totalItemCount == last && lastInScreen == totalItemCount && !isLoading) {
                     first = last + 1;
                     last += 25;
-                    new AsyncPostMethod(WebConfig.CommonReport, channel_request(first, last).toString(), headerData, NetworkHistoryFragment.this, getActivity()).execute();
+                    new AsyncPostMethod(WebConfig.CommonReport, channel_request(first, last).toString(), headerData, NetworkHistoryFragment.this, getActivity(),getString(R.string.responseTimeOut)).execute();
                     isLoading = true;
                 }
             }
@@ -137,7 +137,7 @@ public class NetworkHistoryFragment extends BaseFragment implements RequestHandl
                     date1_text.setError("Please enter valid data");
                     date1_text.requestFocus();
                 } else
-                    new AsyncPostMethod(WebConfig.CommonReport, channel_request(first, last).toString(), headerData, NetworkHistoryFragment.this, getActivity()).execute();
+                    new AsyncPostMethod(WebConfig.CommonReport, channel_request(first, last).toString(), headerData, NetworkHistoryFragment.this, getActivity(),getString(R.string.responseTimeOut)).execute();
                 break;
         }
     }

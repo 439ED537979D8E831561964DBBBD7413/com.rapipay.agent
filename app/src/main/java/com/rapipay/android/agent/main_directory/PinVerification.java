@@ -79,11 +79,11 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
     }
 
     private void loadApi() {
-        new AsyncPostMethod(WebConfig.NETWORKTRANSFER_URL, getFooterData().toString(), headerData, PinVerification.this).execute();
+        new AsyncPostMethod(WebConfig.NETWORKTRANSFER_URL, getFooterData().toString(), headerData, PinVerification.this,getString(R.string.responseTimeOut)).execute();
     }
 
     private void loadMaster() {
-        new AsyncPostMethod(WebConfig.LOGIN_URL, getMaster().toString(), headerData, PinVerification.this).execute();
+        new AsyncPostMethod(WebConfig.LOGIN_URL, getMaster().toString(), headerData, PinVerification.this,getString(R.string.responseTimeOut)).execute();
     }
 
     private void initialize() {
@@ -281,7 +281,7 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
             confirmpinView.setText("");
         else if (type.equalsIgnoreCase("KYCLAYOUTSS")) {
             Intent webIntent = new Intent(Intent.ACTION_VIEW,
-                    Uri.parse("https://play.google.com/store/apps/details?id=" + getPackageName()));
+                    Uri.parse("https://play.google.com/store/apps/details?id=" + "com.rapipay.android.agents"));
             startActivity(webIntent);
         } else if (type.equalsIgnoreCase("SESSIONEXPIRE"))
             jumpPage();
@@ -414,7 +414,7 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
                         if (("F").equalsIgnoreCase(list.get(i + 1).getValue())) {
                             customDialog_Common("KYCLAYOUTSS", null, null, "Update Available", null, "You are running on lower version please update for new versions!.", PinVerification.this);
                         } else {
-                            new AsyncPostMethod(WebConfig.LOGIN_URL, getJson_Validate(confirmpinView.getText().toString()).toString(), "", PinVerification.this).execute();
+                            new AsyncPostMethod(WebConfig.LOGIN_URL, getJson_Validate(confirmpinView.getText().toString()).toString(), "", PinVerification.this,getString(R.string.responseTimeOut)).execute();
                         }
                     } catch (PackageManager.NameNotFoundException e) {
                         e.printStackTrace();

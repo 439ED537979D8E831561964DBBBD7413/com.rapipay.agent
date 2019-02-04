@@ -583,7 +583,7 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
     }
 
     private void reDirectWebView() {
-        new AsyncPostMethod(WebConfig.ProcessKYC, getKycMapImage().toString(), headerData, KYCFormActivity.this).execute();
+        new AsyncPostMethod(WebConfig.ProcessKYC, getKycMapImage().toString(), headerData, KYCFormActivity.this,getString(R.string.responseTimeOut)).execute();
 //
     }
 

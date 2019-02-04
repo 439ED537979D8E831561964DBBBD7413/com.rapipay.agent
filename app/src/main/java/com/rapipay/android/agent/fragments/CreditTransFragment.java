@@ -157,7 +157,7 @@ public class CreditTransFragment extends BaseFragment implements RequestHandler,
                     date1_text.setError("Please enter valid data");
                     date1_text.requestFocus();
                 } else
-                    new AsyncPostMethod(WebConfig.CommonReport, channel_request().toString(), headerData, CreditTransFragment.this, getActivity()).execute();
+                    new AsyncPostMethod(WebConfig.CommonReport, channel_request().toString(), headerData, CreditTransFragment.this, getActivity(),getString(R.string.responseTimeOut)).execute();
                 break;
         }
     }

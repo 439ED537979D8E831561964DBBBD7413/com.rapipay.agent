@@ -1459,7 +1459,7 @@ public class BaseCompactActivity extends AppCompatActivity {
     }
 
     protected void loadVersion(String emi) {
-        new AsyncPostMethod(WebConfig.LOGIN_URL, version(emi).toString(), headerData, BaseCompactActivity.this).execute();
+        new AsyncPostMethod(WebConfig.LOGIN_URL, version(emi).toString(), headerData, BaseCompactActivity.this,getString(R.string.responseTimeOut)).execute();
     }
 
     protected void versionDetails(JSONArray array, VersionListener listener) {

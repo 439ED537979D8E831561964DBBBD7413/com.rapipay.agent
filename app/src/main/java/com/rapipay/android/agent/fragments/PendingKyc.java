@@ -68,7 +68,7 @@ public class PendingKyc extends BaseFragment implements RequestHandler {
                 if (totalItemCount != 0 && totalItemCount == last && lastInScreen == totalItemCount && !isLoading) {
                     first = last + 1;
                     last += 25;
-                    new AsyncPostMethod(WebConfig.EKYC, request_user().toString(), headerData, PendingKyc.this, getActivity()).execute();
+                    new AsyncPostMethod(WebConfig.EKYC, request_user().toString(), headerData, PendingKyc.this, getActivity(),getString(R.string.responseTimeOut)).execute();
                     isLoading = true;
                 }
             }
@@ -132,7 +132,7 @@ public class PendingKyc extends BaseFragment implements RequestHandler {
     }
 
     private void loadApi() {
-        new AsyncPostMethod(WebConfig.EKYC, request_user().toString(), headerData, PendingKyc.this, getActivity()).execute();
+        new AsyncPostMethod(WebConfig.EKYC, request_user().toString(), headerData, PendingKyc.this, getActivity(),getString(R.string.responseTimeOut)).execute();
     }
 
     private String getDataBase64(String data) {

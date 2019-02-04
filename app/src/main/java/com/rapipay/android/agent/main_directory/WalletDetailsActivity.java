@@ -134,7 +134,7 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
             @Override
             public void afterTextChanged(Editable s) {
                 if (s.length() == 10)
-                    new AsyncPostMethod(WebConfig.WALLETTRANSFER_URL, getSender_Validate().toString(), headerData, WalletDetailsActivity.this).execute();
+                    new AsyncPostMethod(WebConfig.WALLETTRANSFER_URL, getSender_Validate().toString(), headerData, WalletDetailsActivity.this,getString(R.string.responseTimeOutTrans)).execute();
                 else
                     reset();
             }
@@ -193,7 +193,7 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
                     input_otp.setError("Please enter mandatory field");
                 else if (!otpRefId.isEmpty() && !input_otp.getText().toString().isEmpty()) {
                     hideKeyboard(WalletDetailsActivity.this);
-                    new AsyncPostMethod(WebConfig.WALLETTRANSFER_URL, processOtp(input_otp.getText().toString(), otpRefId).toString(), headerData, WalletDetailsActivity.this).execute();
+                    new AsyncPostMethod(WebConfig.WALLETTRANSFER_URL, processOtp(input_otp.getText().toString(), otpRefId).toString(), headerData, WalletDetailsActivity.this,getString(R.string.responseTimeOutTrans)).execute();
                 }
                 break;
             case R.id.back_click:
@@ -216,7 +216,7 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
                     input_ben_name.setError("Please enter mandatory field");
                     input_ben_name.requestFocus();
                 } else
-                    new AsyncPostMethod(WebConfig.FUNDTRANSFER_URL, verify_Account().toString(), headerData, WalletDetailsActivity.this).execute();
+                    new AsyncPostMethod(WebConfig.FUNDTRANSFER_URL, verify_Account().toString(), headerData, WalletDetailsActivity.this,getString(R.string.responseTimeOutTrans)).execute();
                 break;
             case R.id.btn_payee:
                 hideKeyboard(WalletDetailsActivity.this);
@@ -230,7 +230,7 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
                     input_ben_name.setError("Please enter mandatory field");
                     input_ben_name.requestFocus();
                 } else
-                    new AsyncPostMethod(WebConfig.WALLETTRANSFER_URL, processPayee().toString(), headerData, WalletDetailsActivity.this).execute();
+                    new AsyncPostMethod(WebConfig.WALLETTRANSFER_URL, processPayee().toString(), headerData, WalletDetailsActivity.this,getString(R.string.responseTimeOutTrans)).execute();
 
                 break;
             case R.id.reset:
@@ -329,7 +329,7 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
                             }
                         }
                     } else {
-                        new AsyncPostMethod(WebConfig.WALLETTRANSFER_URL, getSender_Validate().toString(), headerData, WalletDetailsActivity.this).execute();
+                        new AsyncPostMethod(WebConfig.WALLETTRANSFER_URL, getSender_Validate().toString(), headerData, WalletDetailsActivity.this,getString(R.string.responseTimeOutTrans)).execute();
                     }
                 }
             } else if (object.getString("serviceType").equalsIgnoreCase("Verify_Account")) {
@@ -522,7 +522,7 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
                     ben_amount.setError("Please enter valid amount.");
                     ben_amount.requestFocus();
                 } else {
-                    new AsyncPostMethod(WebConfig.FUNDTRANSFER_URL, service_fee(ben_amount.getText().toString()).toString(), headerData, WalletDetailsActivity.this).execute();
+                    new AsyncPostMethod(WebConfig.FUNDTRANSFER_URL, service_fee(ben_amount.getText().toString()).toString(), headerData, WalletDetailsActivity.this,getString(R.string.responseTimeOutTrans)).execute();
                     newdialog.dismiss();
                 }
             }
@@ -619,14 +619,14 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
                         if (type.equalsIgnoreCase("OTPLAYOUT")) {
                             if (!otpView.getText().toString().isEmpty()) {
                                 hideKeyboard(WalletDetailsActivity.this);
-                                new AsyncPostMethod(WebConfig.WALLETTRANSFER_URL, processOtp(otpView.getText().toString(), object.getString("otpId")).toString(), headerData, WalletDetailsActivity.this).execute();
+                                new AsyncPostMethod(WebConfig.WALLETTRANSFER_URL, processOtp(otpView.getText().toString(), object.getString("otpId")).toString(), headerData, WalletDetailsActivity.this,getString(R.string.responseTimeOutTrans)).execute();
                             }
                         } else if (type.equalsIgnoreCase("KYCLAYOUT") || type.equalsIgnoreCase("KYCLAYOUTL")) {
                             if (object.getString("responseCode").equalsIgnoreCase("75061"))
                                 callKYC();
                             else if (object.getString("serviceType").equalsIgnoreCase("ADD_PAYEE")) {
                                 clear();
-                                new AsyncPostMethod(WebConfig.WALLETTRANSFER_URL, getSender_Validate().toString(), headerData, WalletDetailsActivity.this).execute();
+                                new AsyncPostMethod(WebConfig.WALLETTRANSFER_URL, getSender_Validate().toString(), headerData, WalletDetailsActivity.this,getString(R.string.responseTimeOutTrans)).execute();
                             } else if (object.getString("serviceType").equalsIgnoreCase("DELETE_PAYEE")) {
                                 beneficiaryDetailsPozoslist.remove(benePosition);
                                 adapter.notifyDataSetChanged();
@@ -634,7 +634,7 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
                         } else if (type.equalsIgnoreCase("BENLAYOUT")) {
                             customFund_Transfer((BeneficiaryDetailsPozo) ob, "RapiPay");
                         } else if (type.equalsIgnoreCase("Fund Transfer Confirmation"))
-                            new AsyncPostMethod(WebConfig.WALLETTRANSFER_URL, fund_transfer(beneficiaryDetailsPozoslist.get(benePosition), spinner.getText().toString(), ben_amount.getText().toString()).toString(), headerData, WalletDetailsActivity.this).execute();
+                            new AsyncPostMethod(WebConfig.WALLETTRANSFER_URL, fund_transfer(beneficiaryDetailsPozoslist.get(benePosition), spinner.getText().toString(), ben_amount.getText().toString()).toString(), headerData, WalletDetailsActivity.this,getString(R.string.responseTimeOutTrans)).execute();
                         else if (type.equalsIgnoreCase("KYCLAYOUTLAY")) {
                             beneficiaryDetailsPozoslist.remove(benePosition);
                             adapter.notifyDataSetChanged();
@@ -653,7 +653,7 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
                 @Override
                 public void onClick(View v) {
                     if (type.equalsIgnoreCase("BENLAYOUT")) {
-                        new AsyncPostMethod(WebConfig.WALLETTRANSFER_URL, delete_Benef((BeneficiaryDetailsPozo) ob).toString(), headerData, WalletDetailsActivity.this).execute();
+                        new AsyncPostMethod(WebConfig.WALLETTRANSFER_URL, delete_Benef((BeneficiaryDetailsPozo) ob).toString(), headerData, WalletDetailsActivity.this,getString(R.string.responseTimeOutTrans)).execute();
                     }
                     alertDialog.dismiss();
                 }

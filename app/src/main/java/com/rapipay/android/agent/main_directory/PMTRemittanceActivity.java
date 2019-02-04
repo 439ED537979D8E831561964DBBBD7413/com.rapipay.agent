@@ -213,7 +213,7 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
             @Override
             public void afterTextChanged(Editable s) {
                 if (s.length() == 10)
-                    new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, getSender_Validate().toString(), headerData, PMTRemittanceActivity.this).execute();
+                    new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, getSender_Validate().toString(), headerData, PMTRemittanceActivity.this,getString(R.string.responseTimeOutTrans)).execute();
                 else
                     reset();
             }
@@ -584,7 +584,7 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
                     if (otp_flag)
                         customDialog_Common("OTPLAYOUT", null, null, "Add Sender Details", null, null, PMTRemittanceActivity.this);
                     else {
-                        new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, getSender_Validate().toString(), headerData, PMTRemittanceActivity.this).execute();
+                        new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, getSender_Validate().toString(), headerData, PMTRemittanceActivity.this,getString(R.string.responseTimeOutTrans)).execute();
                         delete_all.setVisibility(View.VISIBLE);
                         sender_layout.setVisibility(View.GONE);
                     }
@@ -592,7 +592,7 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
             } else if (object.getString("serviceType").equalsIgnoreCase("VERIFY_SENDER_OTP")) {
                 if (object.getString("responseCode").equalsIgnoreCase("200")) {
                     alertDialog.dismiss();
-                    new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, getSender_Validate().toString(), headerData, PMTRemittanceActivity.this).execute();
+                    new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, getSender_Validate().toString(), headerData, PMTRemittanceActivity.this,getString(R.string.responseTimeOutTrans)).execute();
                     sender_layout.setVisibility(View.GONE);
                     delete_all.setVisibility(View.VISIBLE);
                 } else if (object.getString("responseCode").equalsIgnoreCase("60236")) {
@@ -606,7 +606,7 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
                     nepalBank = "";
                     nepalDistrict = "";
                     if (bene_update)
-                        new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, getServiceFee(amount, paymode).toString(), headerData, PMTRemittanceActivity.this).execute();
+                        new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, getServiceFee(amount, paymode).toString(), headerData, PMTRemittanceActivity.this,getString(R.string.responseTimeOutTrans)).execute();
                     else
                         customDialog_Common("KYCLAYOUTS", null, null, null, null, object.getString("responseMessage"), PMTRemittanceActivity.this);
                 }
@@ -744,7 +744,7 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
                 } else if (selectGender.equalsIgnoreCase("")) {
                     Toast.makeText(PMTRemittanceActivity.this, "Please Select Gender", Toast.LENGTH_SHORT).show();
                 } else {
-                    new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, addSenderDetails().toString(), headerData, PMTRemittanceActivity.this).execute();
+                    new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, addSenderDetails().toString(), headerData, PMTRemittanceActivity.this,getString(R.string.responseTimeOutTrans)).execute();
                 }
                 break;
         }
@@ -800,14 +800,14 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
     @Override
     public void okClicked(String type, Object ob) {
         if (type.equalsIgnoreCase("Fund Transfer Confirmation")) {
-            new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, getMoneyTransferPMT(input_amountss.getText().toString(), paymode, pozo).toString(), headerData, PMTRemittanceActivity.this).execute();
+            new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, getMoneyTransferPMT(input_amountss.getText().toString(), paymode, pozo).toString(), headerData, PMTRemittanceActivity.this,getString(R.string.responseTimeOutTrans)).execute();
         } else if (type.equalsIgnoreCase("OTPLAYOUT")) {
             if (!otpView.getText().toString().isEmpty()) {
-                new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, getOtpPMT(otpView.getText().toString()).toString(), headerData, PMTRemittanceActivity.this).execute();
+                new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, getOtpPMT(otpView.getText().toString()).toString(), headerData, PMTRemittanceActivity.this,getString(R.string.responseTimeOutTrans)).execute();
                 otp_flag = false;
             }
         } else if (type.equalsIgnoreCase("KYCLAYOUTS") || type.equalsIgnoreCase("INDO-NEPAL BILL PAYMENT")) {
-            new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, getSender_Validate().toString(), headerData, PMTRemittanceActivity.this).execute();
+            new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, getSender_Validate().toString(), headerData, PMTRemittanceActivity.this,getString(R.string.responseTimeOutTrans)).execute();
         }
     }
 
@@ -855,7 +855,7 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
                     image.setError("Please Select document");
                     image.requestFocus();
                 } else {
-                    new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, docUpload(ob.getUserTxnId()).toString(), headerData, PMTRemittanceActivity.this).execute();
+                    new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, docUpload(ob.getUserTxnId()).toString(), headerData, PMTRemittanceActivity.this,getString(R.string.responseTimeOutTrans)).execute();
                     newdialog.dismiss();
                 }
             }
@@ -931,7 +931,7 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                         if (position != 0) {
                             nepalBank = list_bank.get(position).getTypeID();
-                            new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, getNepalDistrict(nepalBank).toString(), headerData, PMTRemittanceActivity.this).execute();
+                            new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, getNepalDistrict(nepalBank).toString(), headerData, PMTRemittanceActivity.this,getString(R.string.responseTimeOutTrans)).execute();
                             if (nepalCityPozoArrayList != null || nepalCityAdapter != null) {
                                 nepalCityPozoArrayList.clear();
                                 nepalCityAdapter.notifyDataSetChanged();
@@ -964,7 +964,7 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                         if (position != 0) {
                             nepalDistrict = nepalDistrictPozoArrayList.get(position).getDistricCode();
-                            new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, getNepalCity(nepalBank, nepalDistrict).toString(), headerData, PMTRemittanceActivity.this).execute();
+                            new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, getNepalCity(nepalBank, nepalDistrict).toString(), headerData, PMTRemittanceActivity.this,getString(R.string.responseTimeOutTrans)).execute();
                         } else
                             nepalDistrict = "";
                     }
@@ -1003,10 +1003,10 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
                     input_amountss.setError("Please enter valid data");
                     input_amountss.requestFocus();
                 } else if (!paymode.equalsIgnoreCase("PMTAD")) {
-                    new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, getServiceFee(input_amountss.getText().toString(), paymode).toString(), headerData, PMTRemittanceActivity.this).execute();
+                    new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, getServiceFee(input_amountss.getText().toString(), paymode).toString(), headerData, PMTRemittanceActivity.this,getString(R.string.responseTimeOutTrans)).execute();
                     alertDialog.dismiss();
                 } else if (paymode.equalsIgnoreCase("PMTAD") && !(ob.getAccount_Number().equalsIgnoreCase("null") || ob.getAccount_Number().equalsIgnoreCase("")) && !(ob.getBank_Details().equalsIgnoreCase("null") || ob.getBank_Details().equalsIgnoreCase(""))) {
-                    new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, getServiceFee(input_amountss.getText().toString(), paymode).toString(), headerData, PMTRemittanceActivity.this).execute();
+                    new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, getServiceFee(input_amountss.getText().toString(), paymode).toString(), headerData, PMTRemittanceActivity.this,getString(R.string.responseTimeOutTrans)).execute();
                     alertDialog.dismiss();
                 } else {
                     if (nepalBank.equalsIgnoreCase(""))
@@ -1025,7 +1025,7 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
                         Toast.makeText(PMTRemittanceActivity.this, "Please Select Account Type", Toast.LENGTH_SHORT).show();
                     else if (accountno.getText().toString().equalsIgnoreCase(confirmAccountNo.getText().toString())) {
                         String split[] = ob.getReceiver_Details().split(",");
-                        new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, addBene(ob.getReceiver_Mobile(), split[0], split[1], split[2], ob.getRelation_With_Sender(), "U", branchID, accountno.getText().toString(), confirmAccountNo.getText().toString(), ob.getPmt_Bene_Id(), accountType).toString(), headerData, PMTRemittanceActivity.this).execute();
+                        new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, addBene(ob.getReceiver_Mobile(), split[0], split[1], split[2], ob.getRelation_With_Sender(), "U", branchID, accountno.getText().toString(), confirmAccountNo.getText().toString(), ob.getPmt_Bene_Id(), accountType).toString(), headerData, PMTRemittanceActivity.this,getString(R.string.responseTimeOutTrans)).execute();
                         bene_update = true;
                         amount = input_amountss.getText().toString();
                         alertDialog.dismiss();
@@ -1095,7 +1095,7 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                         if (position != 0) {
                             nepalBank = list_payment.get(position).getTypeID();
-                            new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, getNepalDistrict(nepalBank).toString(), headerData, PMTRemittanceActivity.this).execute();
+                            new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, getNepalDistrict(nepalBank).toString(), headerData, PMTRemittanceActivity.this,getString(R.string.responseTimeOutTrans)).execute();
                             if (nepalCityPozoArrayList != null || nepalCityAdapter != null) {
                                 nepalCityPozoArrayList.clear();
                                 nepalCityAdapter.notifyDataSetChanged();
@@ -1128,7 +1128,7 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                         if (position != 0) {
                             nepalDistrict = nepalDistrictPozoArrayList.get(position).getDistricCode();
-                            new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, getNepalCity(nepalBank, nepalDistrict).toString(), headerData, PMTRemittanceActivity.this).execute();
+                            new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, getNepalCity(nepalBank, nepalDistrict).toString(), headerData, PMTRemittanceActivity.this,getString(R.string.responseTimeOutTrans)).execute();
                         } else
                             nepalDistrict = "";
                     }
@@ -1192,12 +1192,12 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
                     } else if (accountType.equalsIgnoreCase(""))
                         Toast.makeText(PMTRemittanceActivity.this, "Please Select Account Type", Toast.LENGTH_SHORT).show();
                     else if (accountno.getText().toString().equalsIgnoreCase(confirmAccountNo.getText().toString())) {
-                        new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, addBene(bene_number.getText().toString(), bene_name.getText().toString(), bene_city.getText().toString(), bene_address.getText().toString(), bene_relation.getText().toString(), "I", branchID, accountno.getText().toString(), confirmAccountNo.getText().toString(), "", accountType).toString(), headerData, PMTRemittanceActivity.this).execute();
+                        new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, addBene(bene_number.getText().toString(), bene_name.getText().toString(), bene_city.getText().toString(), bene_address.getText().toString(), bene_relation.getText().toString(), "I", branchID, accountno.getText().toString(), confirmAccountNo.getText().toString(), "", accountType).toString(), headerData, PMTRemittanceActivity.this,getString(R.string.responseTimeOutTrans)).execute();
                         alertDialog.dismiss();
                     } else
                         Toast.makeText(PMTRemittanceActivity.this, "Account number not match", Toast.LENGTH_SHORT).show();
                 } else {
-                    new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, addBene(bene_number.getText().toString(), bene_name.getText().toString(), bene_city.getText().toString(), bene_address.getText().toString(), bene_relation.getText().toString(), "I", branchID, "", "", "", "").toString(), headerData, PMTRemittanceActivity.this).execute();
+                    new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, addBene(bene_number.getText().toString(), bene_name.getText().toString(), bene_city.getText().toString(), bene_address.getText().toString(), bene_relation.getText().toString(), "I", branchID, "", "", "", "").toString(), headerData, PMTRemittanceActivity.this,getString(R.string.responseTimeOutTrans)).execute();
                     alertDialog.dismiss();
                 }
             }

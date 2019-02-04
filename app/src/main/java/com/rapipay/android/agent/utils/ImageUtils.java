@@ -56,7 +56,7 @@ public class ImageUtils {
         list.add(new ImagePozo(1,"MPOS Registration",R.drawable.mposreg));
         list.add(new ImagePozo(2, "AEPS Registration", R.drawable.aeps));
         list.add(new ImagePozo(3, "BBPS Registration", R.drawable.bbps));
-        list.add(new ImagePozo(4, "Fino", R.drawable.bbps));
+//        list.add(new ImagePozo(4, "Fino", R.drawable.bbps));
         return list;
     }
 

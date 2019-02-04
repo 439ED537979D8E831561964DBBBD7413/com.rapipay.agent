@@ -62,7 +62,7 @@ public class ChangePinFragment extends Fragment implements RequestHandler, View.
                 else if (otppinView.getText().toString().equalsIgnoreCase(pinView.getText().toString()))
                     pinView.setError("Old and Current pin cannot be same");
                 else
-                    new AsyncPostMethod(WebConfig.UAT, getJson_Validate().toString(), "", ChangePinFragment.this, getActivity()).execute();
+                    new AsyncPostMethod(WebConfig.UAT, getJson_Validate().toString(), "", ChangePinFragment.this, getActivity(),getString(R.string.responseTimeOut)).execute();
                 break;
         }
     }

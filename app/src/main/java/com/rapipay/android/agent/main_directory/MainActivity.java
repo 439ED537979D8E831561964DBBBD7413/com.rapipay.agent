@@ -100,7 +100,7 @@ public class MainActivity extends BaseCompactActivity
     }
 
     private void url() {
-        new AsyncPostMethod(WebConfig.COMMONAPI, getDashBoard("GET_NODE_HEADER_DATA").toString(), headerData, MainActivity.this).execute();
+        new AsyncPostMethod(WebConfig.COMMONAPI, getDashBoard("GET_NODE_HEADER_DATA").toString(), headerData, MainActivity.this,getString(R.string.responseTimeOut)).execute();
         localStorage.setActivityState(LocalStorage.ROUTESTATE, "0");
     }
 
@@ -302,7 +302,7 @@ public class MainActivity extends BaseCompactActivity
                 if (object.getString("serviceType").equalsIgnoreCase("GET_MASTER_DATA")) {
                     if (new MasterClass().getMasterData(object, db))
                         if (term.equalsIgnoreCase("N"))
-                            new AsyncPostMethod(WebConfig.NETWORKTRANSFER_URL, acknowledge(data, term).toString(), headerData, MainActivity.this).execute();
+                            new AsyncPostMethod(WebConfig.NETWORKTRANSFER_URL, acknowledge(data, term).toString(), headerData, MainActivity.this,getString(R.string.responseTimeOut)).execute();
                 } else if (object.getString("serviceType").equalsIgnoreCase("GET_NODE_HEADER_DATA")) {
                     if (object.has("headerList")) {
                         localStorage.setActivityState(LocalStorage.ROUTESTATE, "0");
@@ -336,7 +336,7 @@ public class MainActivity extends BaseCompactActivity
                         if (object.getString("headerData").equalsIgnoreCase("Y")) {
                             JSONObject object1 = array.getJSONObject(i + 1);
                             if (object1.getString("headerValue").equalsIgnoreCase("TCLINK")) {
-                                new AsyncPostMethod(object1.getString("headerData"), "", "", MainActivity.this).execute();
+                                new AsyncPostMethod(object1.getString("headerData"), "", "", MainActivity.this,getString(R.string.responseTimeOut)).execute();
                             }
                         }
                     }
@@ -366,7 +366,7 @@ public class MainActivity extends BaseCompactActivity
     private void callMasterDetails() {
         ArrayList<BankDetailsPozo> list = db.geBanktDetails("");
         if (list.size() == 0) {
-            new AsyncPostMethod(WebConfig.CommonReport, getMaster_Validate().toString(), headerData, MainActivity.this).execute();
+            new AsyncPostMethod(WebConfig.CommonReport, getMaster_Validate().toString(), headerData, MainActivity.this,getString(R.string.responseTimeOut)).execute();
         }
     }
 
@@ -433,7 +433,7 @@ public class MainActivity extends BaseCompactActivity
     public void okClicked(String type, Object ob) {
         super.onBackPressed();
         if (type.equalsIgnoreCase("TERMCONDITION")) {
-            new AsyncPostMethod(WebConfig.NETWORKTRANSFER_URL, acknowledge(data, term).toString(), headerData, MainActivity.this).execute();
+            new AsyncPostMethod(WebConfig.NETWORKTRANSFER_URL, acknowledge(data, term).toString(), headerData, MainActivity.this,getString(R.string.responseTimeOut)).execute();
         } else if (type.equalsIgnoreCase("SESSIONEXPIRE"))
             jumpPage();
         else

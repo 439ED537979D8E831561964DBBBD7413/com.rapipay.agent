@@ -130,7 +130,7 @@ public class RegisterUserActivity extends BaseCompactActivity implements Request
                             e.printStackTrace();
                         }
                     } else
-                        new AsyncPostMethod(WebConfig.LOGIN_URL, request_user().toString(), headerData, RegisterUserActivity.this).execute();
+                        new AsyncPostMethod(WebConfig.LOGIN_URL, request_user().toString(), headerData, RegisterUserActivity.this,getString(R.string.responseTimeOut)).execute();
                 }
                 break;
             case R.id.btn_scan_submit:

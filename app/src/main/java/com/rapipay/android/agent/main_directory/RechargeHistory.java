@@ -99,7 +99,7 @@ public class RechargeHistory extends BaseCompactActivity implements View.OnClick
             @Override
             public void onClick(View view, int position) {
                 RechargePozo pozo = transactionPozoArrayList.get(position);
-                new AsyncPostMethod(WebConfig.WALLETTRANSFER_URL, receipt_request(pozo).toString(), headerData, RechargeHistory.this).execute();
+                new AsyncPostMethod(WebConfig.WALLETTRANSFER_URL, receipt_request(pozo).toString(), headerData, RechargeHistory.this,getString(R.string.responseTimeOut)).execute();
             }
 
             @Override
@@ -146,7 +146,7 @@ public class RechargeHistory extends BaseCompactActivity implements View.OnClick
                     date1_text.setError("Please enter mandatory field");
                     date1_text.requestFocus();
                 } else
-                    new AsyncPostMethod(WebConfig.RECHARGE_URL, channel_request(0, 5).toString(), headerData, RechargeHistory.this).execute();
+                    new AsyncPostMethod(WebConfig.RECHARGE_URL, channel_request(0, 5).toString(), headerData, RechargeHistory.this,getString(R.string.responseTimeOut)).execute();
                 break;
         }
     }

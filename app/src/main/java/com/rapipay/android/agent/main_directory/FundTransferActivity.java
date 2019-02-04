@@ -130,7 +130,7 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
             @Override
             public void onClick(View view, int position) {
                 LastTransactionPozo pozo = transactionPozoArrayList.get(position);
-                new AsyncPostMethod(WebConfig.WALLETTRANSFER_URL, receipt_request(pozo).toString(), headerData, FundTransferActivity.this).execute();
+                new AsyncPostMethod(WebConfig.WALLETTRANSFER_URL, receipt_request(pozo).toString(), headerData, FundTransferActivity.this,getString(R.string.responseTimeOutTrans)).execute();
             }
 
             @Override
@@ -153,7 +153,7 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
             @Override
             public void afterTextChanged(Editable s) {
                 if (s.length() == 10)
-                    new AsyncPostMethod(WebConfig.BCRemittanceApp, getSender_Validate().toString(), headerData, FundTransferActivity.this).execute();
+                    new AsyncPostMethod(WebConfig.BCRemittanceApp, getSender_Validate().toString(), headerData, FundTransferActivity.this,getString(R.string.responseTimeOutTrans)).execute();
                 else
                     reset();
             }
@@ -330,7 +330,7 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
                     otpRefId = object.getString("otpRefId");
                     fund_transferId = object.getString("transactionId");
                 } else if (object.getString("serviceType").equalsIgnoreCase("ADD_SENDER_DETAILS")) {
-                    new AsyncPostMethod(WebConfig.BCRemittanceApp, getSender_Validate().toString(), headerData, FundTransferActivity.this).execute();
+                    new AsyncPostMethod(WebConfig.BCRemittanceApp, getSender_Validate().toString(), headerData, FundTransferActivity.this,getString(R.string.responseTimeOutTrans)).execute();
                 } else if (object.getString("serviceType").equalsIgnoreCase("GET_SERVICE_FEE")) {
                     customDialog_Common("Fund Transfer Confirmation", object, pozo, "Sure you want to Transfer?", input_mobile.getText().toString());
                 } else if (object.getString("serviceType").equalsIgnoreCase("Verify_Account")) {
@@ -409,14 +409,14 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
             case R.id.btn_sender:
                 hideKeyboard(FundTransferActivity.this);
                 if (!input_name.getText().toString().isEmpty())
-                    new AsyncPostMethod(WebConfig.BCRemittanceApp, addSender().toString(), headerData, FundTransferActivity.this).execute();
+                    new AsyncPostMethod(WebConfig.BCRemittanceApp, addSender().toString(), headerData, FundTransferActivity.this,getString(R.string.responseTimeOutTrans)).execute();
                 else
                     Toast.makeText(FundTransferActivity.this, "Please enter text", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.btn_otpsubmit:
                 if (!otpRefId.isEmpty() && !fund_transferId.isEmpty() && !input_otp.getText().toString().isEmpty()) {
                     hideKeyboard(FundTransferActivity.this);
-                    new AsyncPostMethod(WebConfig.BCRemittanceApp, add_OtpDetails(otpRefId, fund_transferId).toString(), headerData, FundTransferActivity.this).execute();
+                    new AsyncPostMethod(WebConfig.BCRemittanceApp, add_OtpDetails(otpRefId, fund_transferId).toString(), headerData, FundTransferActivity.this,getString(R.string.responseTimeOutTrans)).execute();
                 } else
                     Toast.makeText(FundTransferActivity.this, "Please enter OTP", Toast.LENGTH_SHORT).show();
                 break;
@@ -429,7 +429,7 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
                     input_account.setError("Please enter valid account number.");
                     input_account.requestFocus();
                 } else if (input_amount.getText().toString().isEmpty()) {
-                    new AsyncPostMethod(WebConfig.BCRemittanceApp, verify_Account().toString(), headerData, FundTransferActivity.this).execute();
+                    new AsyncPostMethod(WebConfig.BCRemittanceApp, verify_Account().toString(), headerData, FundTransferActivity.this,getString(R.string.responseTimeOutTrans)).execute();
                 } else {
                     Toast.makeText(this, "Input Amount is not applicable for verify account.", Toast.LENGTH_SHORT).show();
                 }
@@ -495,7 +495,7 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
                     newdialog.dismiss();
                     String condition = "where " + RapipayDB.COLOMN__BANK_NAME + "='" + bank_select_bene.getText().toString() + "'";
                     ifsc_code = db.geBankIFSC(condition).get(0);
-                    new AsyncPostMethod(WebConfig.BCRemittanceApp, addBeneAccount(bene_number.getText().toString(), ifsc_code, bene_name.getText().toString(), "D").toString(), headerData, FundTransferActivity.this).execute();
+                    new AsyncPostMethod(WebConfig.BCRemittanceApp, addBeneAccount(bene_number.getText().toString(), ifsc_code, bene_name.getText().toString(), "D").toString(), headerData, FundTransferActivity.this,getString(R.string.responseTimeOutTrans)).execute();
                 }
             }
         });
@@ -698,9 +698,9 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
                 if (type.equalsIgnoreCase("Fund Transfer Confirmation"))
                     try {
                         if (!object.getString("subType").equalsIgnoreCase("Money_Transfer"))
-                            new AsyncPostMethod(WebConfig.BCRemittanceApp, getMoney_Validate(ben_amount.getText().toString(), pozo.getBeneficiaryId()).toString(), headerData, FundTransferActivity.this).execute();
+                            new AsyncPostMethod(WebConfig.BCRemittanceApp, getMoney_Validate(ben_amount.getText().toString(), pozo.getBeneficiaryId()).toString(), headerData, FundTransferActivity.this,getString(R.string.responseTimeOutTrans)).execute();
                         else
-                            new AsyncPostMethod(WebConfig.FUNDTRANSFER_URL, getJson_Validate().toString(), headerData, FundTransferActivity.this).execute();
+                            new AsyncPostMethod(WebConfig.FUNDTRANSFER_URL, getJson_Validate().toString(), headerData, FundTransferActivity.this,getString(R.string.responseTimeOutTrans)).execute();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -709,7 +709,7 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
                         ben_amount.setError("Please enter valid amount.");
                         ben_amount.requestFocus();
                     } else {
-                        new AsyncPostMethod(WebConfig.FUNDTRANSFER_URL, service_fee(ben_amount.getText().toString(), "Money_Transfer_Bene").toString(), headerData, FundTransferActivity.this).execute();
+                        new AsyncPostMethod(WebConfig.FUNDTRANSFER_URL, service_fee(ben_amount.getText().toString(), "Money_Transfer_Bene").toString(), headerData, FundTransferActivity.this,getString(R.string.responseTimeOutTrans)).execute();
                     }
                 } else if (type.equalsIgnoreCase("Money Transfer") || type.equalsIgnoreCase("Account Verify Details") || type.equalsIgnoreCase("Cannot generate receipt now please try later!")) {
                     input_account.setText("");
@@ -717,7 +717,7 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
                     bank_select.setText("Select Bank");
                     if (type.equalsIgnoreCase("Account Verify Details")) {
                         try {
-                            new AsyncPostMethod(WebConfig.BCRemittanceApp, addBeneAccount(object.getString("accountNo"), object.getString("ifscCode"), object.getString("bankAccountName"), "C").toString(), headerData, FundTransferActivity.this).execute();
+                            new AsyncPostMethod(WebConfig.BCRemittanceApp, addBeneAccount(object.getString("accountNo"), object.getString("ifscCode"), object.getString("bankAccountName"), "C").toString(), headerData, FundTransferActivity.this,getString(R.string.responseTimeOutTrans)).execute();
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -739,7 +739,7 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
         if (type.equalsIgnoreCase("Money Transfer") || type.equalsIgnoreCase("Transaction Receipt"))
             clear();
         else if (type.equalsIgnoreCase("KYCLAYOUTS"))
-            new AsyncPostMethod(WebConfig.BCRemittanceApp, getSender_Validate().toString(), headerData, FundTransferActivity.this).execute();
+            new AsyncPostMethod(WebConfig.BCRemittanceApp, getSender_Validate().toString(), headerData, FundTransferActivity.this,getString(R.string.responseTimeOutTrans)).execute();
     }
 
     @Override

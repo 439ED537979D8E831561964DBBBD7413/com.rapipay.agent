@@ -137,7 +137,7 @@ public class RegisterUserFragment extends Fragment implements RequestHandler, Vi
                             e.printStackTrace();
                         }
                     } else
-                        new AsyncPostMethod(WebConfig.LOGIN_URL, request_user().toString(), headerData, RegisterUserFragment.this, getActivity()).execute();
+                        new AsyncPostMethod(WebConfig.LOGIN_URL, request_user().toString(), headerData, RegisterUserFragment.this, getActivity(),getString(R.string.responseTimeOut)).execute();
                 }
                 break;
             case R.id.btn_scan_submit:

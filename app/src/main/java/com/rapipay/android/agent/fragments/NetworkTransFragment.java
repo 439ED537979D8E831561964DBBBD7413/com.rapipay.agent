@@ -81,7 +81,7 @@ public class NetworkTransFragment extends BaseFragment implements RequestHandler
 
     private void loadApi() {
         logList.add(new NetworkManagePozo(list.get(0).getMobilno(), list.get(0).getMobilno()));
-        new AsyncPostMethod(WebConfig.CommonReport, getNetwork_Validate("GET_MY_NODE_DETAILS", list.get(0).getMobilno(), first, last).toString(), headerData, NetworkTransFragment.this, getActivity()).execute();
+        new AsyncPostMethod(WebConfig.CommonReport, getNetwork_Validate("GET_MY_NODE_DETAILS", list.get(0).getMobilno(), first, last).toString(), headerData, NetworkTransFragment.this, getActivity(),getString(R.string.responseTimeOut)).execute();
     }
 
     @Override
@@ -120,7 +120,7 @@ public class NetworkTransFragment extends BaseFragment implements RequestHandler
                 if (totalItemCount != 0 && totalItemCount == last && lastInScreen == totalItemCount && !isLoading) {
                     first = last + 1;
                     last += 25;
-                    new AsyncPostMethod(WebConfig.CommonReport, getNetwork_Validate("GET_MY_NODE_DETAILS", list.get(0).getMobilno(), first, last).toString(), headerData, NetworkTransFragment.this, getActivity()).execute();
+                    new AsyncPostMethod(WebConfig.CommonReport, getNetwork_Validate("GET_MY_NODE_DETAILS", list.get(0).getMobilno(), first, last).toString(), headerData, NetworkTransFragment.this, getActivity(),getString(R.string.responseTimeOut)).execute();
                     isLoading = true;
                 }
             }
@@ -299,7 +299,7 @@ public class NetworkTransFragment extends BaseFragment implements RequestHandler
             public void onClick(View v) {
                 if (type.equalsIgnoreCase("CONFIRMATION")) {
                     alertDialogs.dismiss();
-                    new AsyncPostMethod(WebConfig.CRNF, getNetwork_Transfer(pozo.getMobileNo(), amount).toString(), headerData, NetworkTransFragment.this, getActivity()).execute();
+                    new AsyncPostMethod(WebConfig.CRNF, getNetwork_Transfer(pozo.getMobileNo(), amount).toString(), headerData, NetworkTransFragment.this, getActivity(),getString(R.string.responseTimeOut)).execute();
                 }
                 alertDialogs.dismiss();
             }
@@ -333,7 +333,7 @@ public class NetworkTransFragment extends BaseFragment implements RequestHandler
         return jsonObject;
     }
     private void url() {
-        new AsyncPostMethod(WebConfig.COMMONAPI, getDashBoard("GET_NODE_HEADER_DATA").toString(), headerData, getActivity()).execute();
+        new AsyncPostMethod(WebConfig.COMMONAPI, getDashBoard("GET_NODE_HEADER_DATA").toString(), headerData, getActivity(),getString(R.string.responseTimeOut)).execute();
     }
 
     public JSONObject getDashBoard(String servicetype) {

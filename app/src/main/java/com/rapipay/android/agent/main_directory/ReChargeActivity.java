@@ -114,7 +114,10 @@ public class ReChargeActivity extends BaseCompactActivity implements View.OnClic
                     } else if (select_operator.getText().toString().equalsIgnoreCase("Select Operator"))
                         select_operator.setError("Please enter mandatory field");
                     else
-                        new AsyncPostMethod(WebConfig.RECHARGE_URL, reCharge_request().toString(), headerData, ReChargeActivity.this).execute();
+                        new AsyncPostMethod(WebConfig.RECHARGENEW, reCharge_request().toString(), headerData, ReChargeActivity.this, "Response Time Out.Please Check your Transaction leadger or Contact Customer Support ... \\n\n" +
+                                "  Recharge Number  " + input_number.getText().toString() + "\n" +
+                                "  Amount " + input_amount.getText().toString() + "\n" +
+                                "  Operater " + select_operator + "\n").execute();
                 } else if (operator_clicked.equalsIgnoreCase("PRE") || operator_clicked.equalsIgnoreCase("POST") || operator_clicked.equalsIgnoreCase("MOBILE")) {
                     if (!ImageUtils.commonNumber(input_number.getText().toString(), 10)) {
                         input_number.setError("Please enter valid mobile number");
@@ -125,7 +128,10 @@ public class ReChargeActivity extends BaseCompactActivity implements View.OnClic
                     } else if (select_operator.getText().toString().equalsIgnoreCase("Select Operator"))
                         select_operator.setError("Please enter mandatory field");
                     else
-                        new AsyncPostMethod(WebConfig.RECHARGE_URL, reCharge_request().toString(), headerData, ReChargeActivity.this).execute();
+                        new AsyncPostMethod(WebConfig.RECHARGENEW, reCharge_request().toString(), headerData, ReChargeActivity.this, "Response Time Out.Please Check your Transaction leadger or Contact Customer Support ... \\n\n" +
+                                "  Recharge Number  " + input_number.getText().toString() + "\n" +
+                                "  Amount " + input_amount.getText().toString() + "\n" +
+                                "  Operater " + select_operator + "\n").execute();
                 }
                 break;
         }
@@ -146,6 +152,9 @@ public class ReChargeActivity extends BaseCompactActivity implements View.OnClic
             jsonObject.put("amount", input_amount.getText().toString());
             jsonObject.put("mobileNumber", input_number.getText().toString());
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
+            jsonObject.put("customerAccountNo", input_amount.getText().toString());
+            jsonObject.put("countryCode", "");
+            jsonObject.put("stdCode", "");
             jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
 
         } catch (Exception e) {
@@ -191,6 +200,7 @@ public class ReChargeActivity extends BaseCompactActivity implements View.OnClic
             e.printStackTrace();
         }
     }
+
     private void clear() {
         input_amount.setText("");
         input_number.setText("");

@@ -184,4 +184,6 @@
     <string name="flash_auto">Flash auto</string>
     <string name="flash_off">Flash off</string>
     <string name="flash_on">Flash on</string>
+    <string name="responseTimeOutTrans">Response Timeout. To check the transaction status please contact tech support."</string>
+    <string name="responseTimeOut">Response Timeout, Please try again..."</string>
 </resources>

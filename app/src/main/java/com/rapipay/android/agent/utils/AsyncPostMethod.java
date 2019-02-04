@@ -24,22 +24,34 @@ public class AsyncPostMethod extends AsyncTask<String, String, String> {
     RequestHandler handler;
     CustomProgessDialog dialog;
     Context context;
+    String responseData;
 
-    public AsyncPostMethod(String url, String xmlData, String strHeaderData, Context handler) {
+//    public AsyncPostMethod(String url, String xmlData, String strHeaderData, Context handler) {
+//        this.url = url;
+//        this.xmlData = xmlData;
+//        this.strHeaderData = strHeaderData;
+//        this.context = handler;
+//        this.handler = (RequestHandler) handler;
+//        dialog = new CustomProgessDialog(handler);
+//    }
+
+    public AsyncPostMethod(String url, String xmlData, String strHeaderData, Context handler,String responseData) {
         this.url = url;
         this.xmlData = xmlData;
         this.strHeaderData = strHeaderData;
         this.context = handler;
         this.handler = (RequestHandler) handler;
+        this.responseData = responseData;
         dialog = new CustomProgessDialog(handler);
     }
 
-    public AsyncPostMethod(String url, String xmlData, String strHeaderData, RequestHandler handler, Context context) {
+    public AsyncPostMethod(String url, String xmlData, String strHeaderData, RequestHandler handler, Context context,String responseData) {
         this.url = url;
         this.xmlData = xmlData;
         this.strHeaderData = strHeaderData;
         this.handler = handler;
         this.context = context;
+        this.responseData = responseData;
         dialog = new CustomProgessDialog(context);
     }
 
@@ -125,7 +137,7 @@ public class AsyncPostMethod extends AsyncTask<String, String, String> {
                     customDialog_Common("No Internet Connectivity");
                 }
             } else {
-                customDialog_Common("Connection TimeOut, Please Try Again!");
+                customDialog_Common(responseData);
             }
             dialog.hide_progress();
         } catch (Exception e) {

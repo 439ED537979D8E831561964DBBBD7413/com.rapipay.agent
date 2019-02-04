@@ -81,9 +81,9 @@ public class PendingRefundActivity extends BaseCompactActivity implements Reques
                 refundPosition = position;
                 LastTransactionPozo pozo = refundPozoArrayList.get(position);
                 if (!pozo.getServiceProviderTXNID().equalsIgnoreCase("DMT"))
-                    new AsyncPostMethod(WebConfig.BCRemittanceApp, getrefund_Validate(pozo.getRefundTxnId()).toString(), headerData, PendingRefundActivity.this).execute();
+                    new AsyncPostMethod(WebConfig.BCRemittanceApp, getrefund_Validate(pozo.getRefundTxnId()).toString(), headerData, PendingRefundActivity.this,getString(R.string.responseTimeOut)).execute();
                 else
-                    new AsyncPostMethod(WebConfig.WALLETTRANSFER_URL, getrefundDmt(pozo).toString(), headerData, PendingRefundActivity.this).execute();
+                    new AsyncPostMethod(WebConfig.WALLETTRANSFER_URL, getrefundDmt(pozo).toString(), headerData, PendingRefundActivity.this,getString(R.string.responseTimeOut)).execute();
             }
 
             @Override
@@ -97,7 +97,7 @@ public class PendingRefundActivity extends BaseCompactActivity implements Reques
             @Override
             public void onClick(View view, int position) {
                 LastTransactionPozo pozo = pendingPozoArrayList.get(position);
-                new AsyncPostMethod(WebConfig.BCRemittanceApp, getpending_Validate(pozo.getRefundTxnId()).toString(), headerData, PendingRefundActivity.this).execute();
+                new AsyncPostMethod(WebConfig.BCRemittanceApp, getpending_Validate(pozo.getRefundTxnId()).toString(), headerData, PendingRefundActivity.this,getString(R.string.responseTimeOut)).execute();
             }
 
             @Override
@@ -120,7 +120,7 @@ public class PendingRefundActivity extends BaseCompactActivity implements Reques
             @Override
             public void afterTextChanged(Editable s) {
                 if (s.length() == 10)
-                    new AsyncPostMethod(WebConfig.BCRemittanceApp, getSender_Validate(input_mobile.getText().toString()).toString(), headerData, PendingRefundActivity.this).execute();
+                    new AsyncPostMethod(WebConfig.BCRemittanceApp, getSender_Validate(input_mobile.getText().toString()).toString(), headerData, PendingRefundActivity.this,getString(R.string.responseTimeOut)).execute();
                 else
                     reset();
             }
@@ -424,9 +424,9 @@ public class PendingRefundActivity extends BaseCompactActivity implements Reques
             @Override
             public void onClick(View v) {
                 if (!text.getText().toString().isEmpty() && text.length() == 6 && !transactionId.equalsIgnoreCase("") && serviceType.equalsIgnoreCase("BC_Refund"))
-                    new AsyncPostMethod(WebConfig.BCRemittanceApp, add_OtpDetails(otpRefId, transactionId, text.getText().toString()).toString(), headerData, PendingRefundActivity.this).execute();
+                    new AsyncPostMethod(WebConfig.BCRemittanceApp, add_OtpDetails(otpRefId, transactionId, text.getText().toString()).toString(), headerData, PendingRefundActivity.this,getString(R.string.responseTimeOut)).execute();
                 else if (!text.getText().toString().isEmpty() && text.length() == 4 && transactionId.equalsIgnoreCase("") && serviceType.equalsIgnoreCase("REFUND_TXN"))
-                    new AsyncPostMethod(WebConfig.WALLETTRANSFER_URL, processOtp(text.getText().toString(), otpRefId).toString(), headerData, PendingRefundActivity.this).execute();
+                    new AsyncPostMethod(WebConfig.WALLETTRANSFER_URL, processOtp(text.getText().toString(), otpRefId).toString(), headerData, PendingRefundActivity.this,getString(R.string.responseTimeOut)).execute();
                 else
                     Toast.makeText(PendingRefundActivity.this, "Enter OTP", Toast.LENGTH_SHORT).show();
                 alertDialog.dismiss();
@@ -491,7 +491,7 @@ public class PendingRefundActivity extends BaseCompactActivity implements Reques
     @Override
     public void okClicked(String type, Object ob) {
         if (!type.equalsIgnoreCase("PENDINGREFUND") && !type.equalsIgnoreCase("KYCLAYOUT") && !type.equalsIgnoreCase("REFUNDTXN") && !type.equalsIgnoreCase("KYCLAYOUTS") && !type.equalsIgnoreCase("KYCLAYOUTSS"))
-            new AsyncPostMethod(WebConfig.BCRemittanceApp, getSender_Validate(type).toString(), headerData, PendingRefundActivity.this).execute();
+            new AsyncPostMethod(WebConfig.BCRemittanceApp, getSender_Validate(type).toString(), headerData, PendingRefundActivity.this,getString(R.string.responseTimeOut)).execute();
         else if (type.equalsIgnoreCase("REFUNDTXN")) {
             refundPozoArrayList.remove(refundPosition);
             adapter.notifyDataSetChanged();

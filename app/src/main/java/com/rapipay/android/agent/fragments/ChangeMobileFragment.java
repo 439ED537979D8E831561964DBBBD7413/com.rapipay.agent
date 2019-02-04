@@ -71,21 +71,21 @@ public class ChangeMobileFragment extends Fragment implements RequestHandler, Vi
                     newmobileno.setError("Please enter valid data");
                     newmobileno.requestFocus();
                 } else
-                    new AsyncPostMethod(WebConfig.LOGIN_URL, request_user().toString(), headerData, ChangeMobileFragment.this, getActivity()).execute();
+                    new AsyncPostMethod(WebConfig.LOGIN_URL, request_user().toString(), headerData, ChangeMobileFragment.this, getActivity(),getString(R.string.responseTimeOut)).execute();
                 break;
             case R.id.sub_btn_oldotp:
                 if (!ImageUtils.commonNumber(oldotp.getText().toString(), 6)) {
                     oldotp.setError("Please enter valid data");
                     oldotp.requestFocus();
                 } else
-                    new AsyncPostMethod(WebConfig.LOGIN_URL, oldRequest_user().toString(), headerData, ChangeMobileFragment.this, getActivity()).execute();
+                    new AsyncPostMethod(WebConfig.LOGIN_URL, oldRequest_user().toString(), headerData, ChangeMobileFragment.this, getActivity(),getString(R.string.responseTimeOut)).execute();
                 break;
             case R.id.sub_btn_newotp:
                 if (!ImageUtils.commonNumber(newotp.getText().toString(), 6)) {
                     newotp.setError("Please enter valid data");
                     newotp.requestFocus();
                 } else
-                    new AsyncPostMethod(WebConfig.LOGIN_URL, newRequest_user().toString(), headerData, ChangeMobileFragment.this, getActivity()).execute();
+                    new AsyncPostMethod(WebConfig.LOGIN_URL, newRequest_user().toString(), headerData, ChangeMobileFragment.this, getActivity(),getString(R.string.responseTimeOut)).execute();
                 break;
         }
     }

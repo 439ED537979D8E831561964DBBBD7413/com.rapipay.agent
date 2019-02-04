@@ -71,7 +71,7 @@ public class PassbookActivity extends BaseCompactActivity implements View.OnClic
                     date1_text.setError("Please enter mandatory field");
                     date1_text.requestFocus();
                 }else if (!date1_text.getText().toString().isEmpty() && !date2_text.getText().toString().isEmpty())
-                    new AsyncPostMethod(WebConfig.CommonReport, channel_request(0,5).toString(), headerData, PassbookActivity.this).execute();
+                    new AsyncPostMethod(WebConfig.CommonReport, channel_request(0,5).toString(), headerData, PassbookActivity.this,getString(R.string.responseTimeOut)).execute();
                 break;
         }
     }
