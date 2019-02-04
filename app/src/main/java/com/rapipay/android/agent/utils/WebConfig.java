@@ -4,11 +4,10 @@ public class WebConfig {
     public static String WEBMain = "http://192.168.1.105:8080/";
     public static String WEB = WEBMain + "RapiPayAPIHub/";
     public static String UAT = WEB + "HandsetRegistration";
-    public static String KYC_RAPIPAY_APP = "KYC_RAPIPAY_APP/";
+    public static String KYC_RAPIPAY_APP = WEBMain + "KYC_RAPIPAY_APP/";
     public static String EKYC = KYC_RAPIPAY_APP+"EKYCProcess";
+    public static String ProcessKYC = KYC_RAPIPAY_APP+"ProcessKyc";
     public static String EKYCFORWARD = KYC_RAPIPAY_APP+"kycforward";
-    public static String EKYC_FORWARD = WEBMain + EKYC;
-    public static String EKYC_FORWARD_POST = WEBMain + EKYCFORWARD;
     public static String BASIC_USERID = "1000000012";
 //    public static String BASIC_PASSWORD = "RapiLDAP#2018";
     public static String BASIC_PASSWORD = "Test@321";

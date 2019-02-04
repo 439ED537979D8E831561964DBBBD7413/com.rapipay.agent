@@ -1316,14 +1316,18 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
             @Override
             public void onClick(DialogInterface dialog, int item) {
                 if (items[item].equals("Capture Image")) {
-                    ContentValues values = new ContentValues();
-                    values.put(MediaStore.Images.Media.TITLE, "New Picture");
-                    values.put(MediaStore.Images.Media.DESCRIPTION, "From your Camera");
-                    imageUri = getContentResolver().insert(
-                            MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
-                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+                    Intent intent = new Intent(PMTRemittanceActivity.this, CameraKitActivity.class);
+                    intent.putExtra("ImageType", "pmtImage");
+                    intent.putExtra("REQUESTTYPE", CAMERA_REQUEST);
                     startActivityForResult(intent, CAMERA_REQUEST);
+//                    ContentValues values = new ContentValues();
+//                    values.put(MediaStore.Images.Media.TITLE, "New Picture");
+//                    values.put(MediaStore.Images.Media.DESCRIPTION, "From your Camera");
+//                    imageUri = getContentResolver().insert(
+//                            MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+//                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+//                    intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+//                    startActivityForResult(intent, CAMERA_REQUEST);
                 } else if (items[item].equals("Choose from Gallery")) {
                     Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                     intent.setType("image/*");
@@ -1359,20 +1363,20 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
         return result;
     }
 
-    private void setPic(String mCurrentPhotoPath) {
-        int targetW = image.getWidth();
-        int targetH = image.getHeight();
-        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-        bmOptions.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
-        int photoW = bmOptions.outWidth;
-        int photoH = bmOptions.outHeight;
-        int scaleFactor = Math.min(photoW / targetW, photoH / targetH);
-        bmOptions.inJustDecodeBounds = false;
-        bmOptions.inSampleSize = scaleFactor;
-        bmOptions.inPurgeable = true;
-        Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
-        imageBase64 = getBytesFromBitmap(addWaterMark(bitmap));
+    private void setPic(Bitmap mCurrentPhotoPath) {
+//        int targetW = image.getWidth();
+//        int targetH = image.getHeight();
+//        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+//        bmOptions.inJustDecodeBounds = true;
+//        BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
+//        int photoW = bmOptions.outWidth;
+//        int photoH = bmOptions.outHeight;
+//        int scaleFactor = Math.min(photoW / targetW, photoH / targetH);
+//        bmOptions.inJustDecodeBounds = false;
+//        bmOptions.inSampleSize = scaleFactor;
+//        bmOptions.inPurgeable = true;
+//        Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
+        imageBase64 = getBytesFromBitmap(addWaterMark(mCurrentPhotoPath));
         imgType = "jpg";
     }
 
@@ -1380,56 +1384,53 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
         super.onActivityResult(requestCode, resultCode, data);
         imageBase64 = "";
         image.setText("");
-        if (resultCode == RESULT_OK) {
-            if (requestCode == CAMERA_REQUEST) {
-                try {
-                    Bitmap thumbnails = MediaStore.Images.Media.getBitmap(
-                            getContentResolver(), imageUri);
-                    String imageurl = getRealPathFromURI(imageUri);
-                    String[] splits = imageurl.split("\\/");
-                    setPic(imageurl);
-                    image.setText(splits[5]);
-                    image.setError(null);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            } else if (requestCode == SELECT_FILE) {
-                Uri uri = data.getData();
-                Bitmap thumbnail = null;
-                InputStream is = null;
-                try {
-                    is = getContentResolver().openInputStream(uri);
-                    BitmapFactory.Options options = new BitmapFactory.Options();
-                    options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-                    options.inSampleSize = 2;
-                    options.inScreenDensity = DisplayMetrics.DENSITY_LOW;
-                    thumbnail = BitmapFactory.decodeStream(is, null, options);
-                    imageBase64 = getBytesFromBitmap(addWaterMark(thumbnail));
-                    imgType = "jpg";
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                Uri selectedImageUri = data.getData();
-                String[] projection = {MediaStore.MediaColumns.DATA};
-                CursorLoader cursorLoader = new CursorLoader(PMTRemittanceActivity.this, selectedImageUri, projection, null, null,
-                        null);
-                Cursor cursor = cursorLoader.loadInBackground();
-                int column_index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
-                cursor.moveToFirst();
-                filePath = cursor.getString(column_index);
-                String[] splits = filePath.split("\\/");
-                int len = splits.length;
-                image.setText(splits[len - 1]);
+        if (resultCode == CAMERA_REQUEST) {
+            try {
+                String path = data.getStringExtra("ImagePath");
+                String imageType = data.getStringExtra("ImageType");
+                Bitmap bitmap = loadImageFromStorage(imageType, path);
+                setPic(bitmap);
+                image.setText(imageType + ".jpg");
                 image.setError(null);
-            } else if (requestCode == SELECT_PDF_DIALOG) {
-                ArrayList<NormalFile> list = data.getParcelableArrayListExtra(Constant.RESULT_PICK_FILE);
-                imageBase64 = getStringFile(list.get(0).getPath());
-                image.setText(list.get(0).getName());
-                imgType = "pdf";
-            } else if (requestCode == CONTACT_PICKER_RESULT) {
-                reset();
-                contactRead(data, input_mobile);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
+        } else if (requestCode == SELECT_FILE) {
+            Uri uri = data.getData();
+            Bitmap thumbnail = null;
+            InputStream is = null;
+            try {
+                is = getContentResolver().openInputStream(uri);
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+                options.inSampleSize = 2;
+                options.inScreenDensity = DisplayMetrics.DENSITY_LOW;
+                thumbnail = BitmapFactory.decodeStream(is, null, options);
+                imageBase64 = getBytesFromBitmap(addWaterMark(thumbnail));
+                imgType = "jpg";
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            Uri selectedImageUri = data.getData();
+            String[] projection = {MediaStore.MediaColumns.DATA};
+            CursorLoader cursorLoader = new CursorLoader(PMTRemittanceActivity.this, selectedImageUri, projection, null, null,
+                    null);
+            Cursor cursor = cursorLoader.loadInBackground();
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
+            cursor.moveToFirst();
+            filePath = cursor.getString(column_index);
+            String[] splits = filePath.split("\\/");
+            int len = splits.length;
+            image.setText(splits[len - 1]);
+            image.setError(null);
+        } else if (requestCode == SELECT_PDF_DIALOG) {
+            ArrayList<NormalFile> list = data.getParcelableArrayListExtra(Constant.RESULT_PICK_FILE);
+            imageBase64 = getStringFile(list.get(0).getPath());
+            image.setText(list.get(0).getName());
+            imgType = "pdf";
+        } else if (requestCode == CONTACT_PICKER_RESULT) {
+            reset();
+            contactRead(data, input_mobile);
         }
     }
 

@@ -127,8 +127,8 @@ public class HttpConnector {
             urlConnection.setDoOutput(true);
             urlConnection.setRequestMethod("POST");
             urlConnection.setRequestProperty("Content-Type", "application/json");
-            urlConnection.setConnectTimeout(90000);
-            urlConnection.setReadTimeout(90000);
+            urlConnection.setConnectTimeout(150000);
+            urlConnection.setReadTimeout(150000);
             urlConnection.setRequestProperty("Content-Length", Integer.toString(xmlData.length()));
             urlConnection.setFixedLengthStreamingMode(xmlData.length());
             urlConnection.setUseCaches(false);

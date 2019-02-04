@@ -139,6 +139,15 @@ public class BaseCompactActivity extends AppCompatActivity {
         }
 
     }
+    protected Bitmap loadImageFromStorage(String name, String path) {
+        try {
+            File f = new File(path, name);
+            return BitmapFactory.decodeStream(new FileInputStream(f));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
     protected String getBase64(Bitmap bitmap) {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -1224,7 +1233,7 @@ public class BaseCompactActivity extends AppCompatActivity {
                 }
                 if (jsonObject.getString("displayType").equalsIgnoreCase("D")) {
                     if (jsonObject.getString("headerValue").equalsIgnoreCase("null"))
-                        bottom.add(new HeaderePozo(jsonObject.getString("headerText"), "NA"));
+                        bottom.add(new HeaderePozo(jsonObject.getString("headerText"), "NA", medium_value));
                     else
                         bottom.add(new HeaderePozo(jsonObject.getString("headerText"), jsonObject.getString("headerValue"), medium_value));
                 }

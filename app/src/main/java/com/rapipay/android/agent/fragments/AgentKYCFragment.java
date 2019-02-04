@@ -146,7 +146,7 @@ public class AgentKYCFragment extends BaseFragment implements RequestHandler, Vi
                     documentid.setError("Please enter valid data");
                     documentid.requestFocus();
                 } else
-                    new AsyncPostMethod(WebConfig.EKYC_FORWARD, request_user(customerType).toString(), headerData, AgentKYCFragment.this, getActivity()).execute();
+                    new AsyncPostMethod(WebConfig.EKYC, request_user(customerType).toString(), headerData, AgentKYCFragment.this, getActivity()).execute();
                 break;
             case R.id.scan_btn:
                 type = "SCAN";

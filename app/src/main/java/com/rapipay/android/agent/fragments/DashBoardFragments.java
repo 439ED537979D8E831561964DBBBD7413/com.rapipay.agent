@@ -24,6 +24,7 @@ import com.rapipay.android.agent.main_directory.CreditTabPage;
 import com.rapipay.android.agent.main_directory.DailyCommissionActivity;
 import com.rapipay.android.agent.main_directory.Fino_AEPS_BBPS_Activity;
 import com.rapipay.android.agent.main_directory.FundTransferActivity;
+import com.rapipay.android.agent.main_directory.IndoNepalPMTRemittance;
 import com.rapipay.android.agent.main_directory.MPOSRegistration;
 import com.rapipay.android.agent.main_directory.MainActivity;
 import com.rapipay.android.agent.main_directory.NetworkTab;

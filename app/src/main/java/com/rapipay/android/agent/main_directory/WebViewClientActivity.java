@@ -272,7 +272,7 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
             if (TYPE.equalsIgnoreCase("outside") || TYPE.equalsIgnoreCase("pending")) {
                 form = "<html>\n" +
                         "\t<body>\n" +
-                        "\t\t<form name=\"validatekyc\" id=\"validatekyc\" method=\"POST\" action=\"" + WebConfig.EKYC_FORWARD + "\">\n" +
+                        "\t\t<form name=\"validatekyc\" id=\"validatekyc\" method=\"POST\" action=\"" + WebConfig.EKYCFORWARD + "\">\n" +
                         "\t\t\t<input name=\"serviceType\" value=\"VALIDATE_KYC_PROCESS\" type=\"hidden\"/>\n" +
                         "\t\t\t<input name=\"requestType\" value=\"EKYC_CHANNEL\" type=\"hidden\"/>\n" +
                         "\t\t\t<input name=\"agentId\" value=\"" + parentId + "\" type=\"hidden\"/>\n" +
@@ -295,7 +295,7 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
             } else {
                 form = "<html>\n" +
                         "\t<body>\n" +
-                        "\t\t<form name=\"validatekyc\" id=\"validatekyc\" method=\"POST\" action=\"" + WebConfig.EKYC_FORWARD + "\">\n" +
+                        "\t\t<form name=\"validatekyc\" id=\"validatekyc\" method=\"POST\" action=\"" + WebConfig.EKYCFORWARD + "\">\n" +
                         "\t\t\t<input name=\"serviceType\" value=\"VALIDATE_KYC_PROCESS\" type=\"hidden\"/>\n" +
                         "\t\t\t<input name=\"requestType\" value=\"EKYC_CHANNEL\" type=\"hidden\"/>\n" +
                         "\t\t\t<input name=\"agentId\" value=\"" + parentId + "\" type=\"hidden\"/>\n" +

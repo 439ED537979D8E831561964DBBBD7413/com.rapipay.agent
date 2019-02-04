@@ -255,7 +255,7 @@ public class AEPS_BBPS_RegistrationActivity extends BaseCompactActivity implemen
             jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
             form = "<html>\n" +
                     "\t<body>\n" +
-                    "\t\t<form name=\"validatekyc\" id=\"validatekyc\" method=\"POST\" action=\"" + WebConfig.EKYC_FORWARD_POST + "\">\n" +
+                    "\t\t<form name=\"validatekyc\" id=\"validatekyc\" method=\"POST\" action=\"" + WebConfig.EKYCFORWARD + "\">\n" +
                     "\t\t\t<input name=\"requestedData\" value=\"" + getDataBase64(jsonObject.toString()) + "\" type=\"hidden\"/>\n" +
                     "\t\t\t<input type=\"submit\"/>\n" +
                     "\t\t</form>\n" +

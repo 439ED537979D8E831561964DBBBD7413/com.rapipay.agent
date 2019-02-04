@@ -3,7 +3,6 @@ package com.rapipay.android.agent.fragments;
 import android.Manifest;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
-import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -17,7 +16,6 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -46,6 +44,9 @@ import com.rapipay.android.agent.Database.RapipayDB;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -61,14 +62,13 @@ import com.rapipay.android.agent.adapter.CustomSpinnerAdapter;
 import com.rapipay.android.agent.adapter.PaymentAdapter;
 import com.rapipay.android.agent.interfaces.CustomInterface;
 import com.rapipay.android.agent.interfaces.RequestHandler;
+import com.rapipay.android.agent.main_directory.CameraKitActivity;
 import com.rapipay.android.agent.utils.AsyncPostMethod;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
 import com.rapipay.android.agent.utils.BaseFragment;
 import com.rapipay.android.agent.utils.GenerateChecksum;
 import com.rapipay.android.agent.utils.ImageUtils;
 import com.rapipay.android.agent.utils.WebConfig;
-
-import static android.app.Activity.RESULT_OK;
 
 public class CreditRequestFragment extends BaseFragment implements RequestHandler, View.OnClickListener, CustomInterface {
     final private static int PERMISSIONS_REQUEST_READ_PHONE_STATE = 0;
@@ -283,7 +283,6 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
         }
     }
 
-
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -382,13 +381,9 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
             @Override
             public void onClick(DialogInterface dialog, int item) {
                 if (items[item].equals("Capture Image")) {
-                    ContentValues values = new ContentValues();
-                    values.put(MediaStore.Images.Media.TITLE, "New Picture");
-                    values.put(MediaStore.Images.Media.DESCRIPTION, "From your Camera");
-                    imageUri = getActivity().getContentResolver().insert(
-                            MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
-                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+                    Intent intent = new Intent(getActivity(), CameraKitActivity.class);
+                    intent.putExtra("ImageType", "creditRequestImage");
+                    intent.putExtra("REQUESTTYPE", CAMERA_REQUEST);
                     startActivityForResult(intent, CAMERA_REQUEST);
                 } else if (items[item].equals("Choose from Gallery")) {
                     Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
@@ -420,70 +415,58 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
 
         return result;
     }
-    private void setPic(String mCurrentPhotoPath) {
-        int targetW = image.getWidth();
-        int targetH = image.getHeight();
-        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-        bmOptions.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
-        int photoW = bmOptions.outWidth;
-        int photoH = bmOptions.outHeight;
-        int scaleFactor = Math.min(photoW/targetW, photoH/targetH);
-        bmOptions.inJustDecodeBounds = false;
-        bmOptions.inSampleSize = scaleFactor;
-        bmOptions.inPurgeable = true;
-        Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
-        imageBase64 = getBytesFromBitmap(addWaterMark(bitmap));
+
+    private void setPic(Bitmap mCurrentPhotoPath) {
+        imageBase64 = getBytesFromBitmap(addWaterMark(mCurrentPhotoPath));
     }
+
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        imageBase64="";
+        imageBase64 = "";
         image.setText("");
-        if (resultCode == RESULT_OK) {
-            if (requestCode == CAMERA_REQUEST) {
-                try {
-                    Bitmap thumbnails = MediaStore.Images.Media.getBitmap(
-                            getActivity().getContentResolver(), imageUri);
-                    String imageurl = getRealPathFromURI(imageUri);
-                    String[] splits = imageurl.split("\\/");
-                    setPic(imageurl);
-                    image.setText(splits[5]);
-                    image.setError(null);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            } else if (requestCode == SELECT_FILE) {
-                Uri uri = data.getData();
-                Bitmap thumbnail = null;
-                try {
-                    thumbnail = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), uri);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                imageBase64 = getBytesFromBitmap(addWaterMark(thumbnail));
-                Uri selectedImageUri = data.getData();
-                String[] projection = {MediaStore.MediaColumns.DATA};
-                CursorLoader cursorLoader = new CursorLoader(getActivity(), selectedImageUri, projection, null, null,
-                        null);
-                Cursor cursor = cursorLoader.loadInBackground();
-                int column_index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
-                cursor.moveToFirst();
-                filePath = cursor.getString(column_index);
-                String[] splits = filePath.split("\\/");
-                int len = splits.length;
-                image.setText(splits[len - 1]);
+        if (requestCode == CAMERA_REQUEST) {
+            try {
+                String path = data.getStringExtra("ImagePath");
+                String imageType = data.getStringExtra("ImageType");
+                Bitmap bitmap = loadImageFromStorage(imageType, path);
+                setPic(bitmap);
+                image.setText(imageType + ".jpg");
                 image.setError(null);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
+        } else if (requestCode == SELECT_FILE) {
+            Uri uri = data.getData();
+            Bitmap thumbnail = null;
+            try {
+                thumbnail = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), uri);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            imageBase64 = getBytesFromBitmap(addWaterMark(thumbnail));
+            Uri selectedImageUri = data.getData();
+            String[] projection = {MediaStore.MediaColumns.DATA};
+            CursorLoader cursorLoader = new CursorLoader(getActivity(), selectedImageUri, projection, null, null,
+                    null);
+            Cursor cursor = cursorLoader.loadInBackground();
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
+            cursor.moveToFirst();
+            filePath = cursor.getString(column_index);
+            String[] splits = filePath.split("\\/");
+            int len = splits.length;
+            image.setText(splits[len - 1]);
+            image.setError(null);
         }
     }
 
-    public String getRealPathFromURI(Uri contentUri) {
-        String[] proj = {MediaStore.Images.Media.DATA};
-        Cursor cursor = getActivity().getContentResolver().query(contentUri, proj, null, null, null);
-        int column_index = cursor
-                .getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-        cursor.moveToFirst();
-        return cursor.getString(column_index);
+    protected Bitmap loadImageFromStorage(String name, String path) {
+        try {
+            File f = new File(path, name);
+            return BitmapFactory.decodeStream(new FileInputStream(f));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public JSONObject credit_request() {

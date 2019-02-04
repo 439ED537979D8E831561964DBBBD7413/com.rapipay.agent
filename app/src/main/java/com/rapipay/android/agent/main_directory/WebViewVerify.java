@@ -158,6 +158,8 @@ public class WebViewVerify extends BaseCompactActivity implements CustomInterfac
                                     startActivity(intent);
                                 }
                                 finish();
+                            }else {
+                                customDialog_Common("KYCLAYOUTSS", null, null, getResources().getString(R.string.Alert), null, object.getString("responseMessage"), WebViewVerify.this);
                             }
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -276,6 +278,9 @@ public class WebViewVerify extends BaseCompactActivity implements CustomInterfac
     public void okClicked(String type, Object ob) {
         if (type.equalsIgnoreCase("KYCLAYOUTS")) {
             db.deleteRow(mobileNo, "");
+            setBack_click(this);
+            finish();
+        }else if (type.equalsIgnoreCase("KYCLAYOUTSS")) {
             setBack_click(this);
             finish();
         }

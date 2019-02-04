@@ -11,7 +11,6 @@ import android.view.View;
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.fragments.AgentKYCFragment;
 import com.rapipay.android.agent.fragments.PendingKyc;
-import com.rapipay.android.agent.fragments.RegisterUserFragment;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
 
 public class RegisterKYCTab extends BaseCompactActivity implements View.OnClickListener{

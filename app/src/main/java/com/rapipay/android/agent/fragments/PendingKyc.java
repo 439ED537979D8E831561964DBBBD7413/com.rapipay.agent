@@ -110,11 +110,12 @@ public class PendingKyc extends BaseFragment implements RequestHandler {
             jsonObject.put("isreKYC", "Y");
             jsonObject.put("isAuto", "1");
             jsonObject.put("isEditable", "Y");
+            jsonObject.put("txnRef",ImageUtils.miliSeconds());
             jsonObject.put("listdata", kycMapData.toString());
             jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
             form = "<html>\n" +
                     "\t<body>\n" +
-                    "\t\t<form name=\"validatekyc\" id=\"validatekyc\" method=\"POST\" action=\"" + WebConfig.EKYC_FORWARD_POST + "\">\n" +
+                    "\t\t<form name=\"validatekyc\" id=\"validatekyc\" method=\"POST\" action=\"" + WebConfig.EKYCFORWARD + "\">\n" +
                     "\t\t\t<input name=\"requestedData\" value=\"" + getDataBase64(jsonObject.toString()) + "\" type=\"hidden\"/>\n" +
                     "\t\t\t<input type=\"submit\"/>\n" +
                     "\t\t</form>\n" +
@@ -131,7 +132,7 @@ public class PendingKyc extends BaseFragment implements RequestHandler {
     }
 
     private void loadApi() {
-        new AsyncPostMethod(WebConfig.EKYC_FORWARD, request_user().toString(), headerData, PendingKyc.this, getActivity()).execute();
+        new AsyncPostMethod(WebConfig.EKYC, request_user().toString(), headerData, PendingKyc.this, getActivity()).execute();
     }
 
     private String getDataBase64(String data) {
