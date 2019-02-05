@@ -11,12 +11,12 @@
         android:layout_height="match_parent"
         app:camera_facing="back"/>
 
-    <android.support.v7.widget.AppCompatButton
+    <ImageView
         android:id="@+id/photoButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:backgroundTint="@color/ColorPrimaryDark"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         android:text="Capture"
+        android:src="@drawable/cameraicon"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"/>

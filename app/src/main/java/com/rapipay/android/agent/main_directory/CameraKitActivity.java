@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 
 import com.camerakit.CameraKitView;
 import com.rapipay.android.agent.R;
@@ -16,7 +17,7 @@ import com.rapipay.android.agent.utils.BaseCompactActivity;
 public class CameraKitActivity extends BaseCompactActivity {
 
     private CameraKitView cameraKitView;
-    private Button photoButton;
+    private ImageView photoButton;
     String ImageType;
     int requestType;
     @Override

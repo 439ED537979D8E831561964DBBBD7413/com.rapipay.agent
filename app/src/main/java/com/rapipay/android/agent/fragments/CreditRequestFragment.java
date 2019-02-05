@@ -436,26 +436,28 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
                 e.printStackTrace();
             }
         } else if (requestCode == SELECT_FILE) {
-            Uri uri = data.getData();
-            Bitmap thumbnail = null;
-            try {
-                thumbnail = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), uri);
-            } catch (Exception e) {
-                e.printStackTrace();
+            if(data!=null) {
+                Uri uri = data.getData();
+                Bitmap thumbnail = null;
+                try {
+                    thumbnail = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), uri);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                imageBase64 = getBytesFromBitmap(addWaterMark(thumbnail));
+                Uri selectedImageUri = data.getData();
+                String[] projection = {MediaStore.MediaColumns.DATA};
+                CursorLoader cursorLoader = new CursorLoader(getActivity(), selectedImageUri, projection, null, null,
+                        null);
+                Cursor cursor = cursorLoader.loadInBackground();
+                int column_index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
+                cursor.moveToFirst();
+                filePath = cursor.getString(column_index);
+                String[] splits = filePath.split("\\/");
+                int len = splits.length;
+                image.setText(splits[len - 1]);
+                image.setError(null);
             }
-            imageBase64 = getBytesFromBitmap(addWaterMark(thumbnail));
-            Uri selectedImageUri = data.getData();
-            String[] projection = {MediaStore.MediaColumns.DATA};
-            CursorLoader cursorLoader = new CursorLoader(getActivity(), selectedImageUri, projection, null, null,
-                    null);
-            Cursor cursor = cursorLoader.loadInBackground();
-            int column_index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
-            cursor.moveToFirst();
-            filePath = cursor.getString(column_index);
-            String[] splits = filePath.split("\\/");
-            int len = splits.length;
-            image.setText(splits[len - 1]);
-            image.setError(null);
         }
     }
 

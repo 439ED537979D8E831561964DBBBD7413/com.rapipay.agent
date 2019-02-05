@@ -163,7 +163,7 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
         image = (AutofitTextView) findViewById(R.id.images);
         image.setOnClickListener(this);
         date1_text = (AutofitTextView) findViewById(R.id.date);
-        date1_text.setHint("Date Of Birth");
+        date1_text.setHint("Date Of Birth*");
         date1_text.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -656,7 +656,7 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
 
     private void getCity(JSONArray array) {
         nepalCityPozoArrayList = new ArrayList<>();
-        nepalCityPozoArrayList.add(new NepalCityPozo("", "Select City", "", "0", ""));
+        nepalCityPozoArrayList.add(new NepalCityPozo("", "Select Bank with City", "", "0", ""));
         try {
             for (int i = 0; i < array.length(); i++) {
                 JSONObject jsonObject = array.getJSONObject(i);
@@ -703,33 +703,24 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
                 break;
             case R.id.select_state:
                 ArrayList<String> list_state = db.getState_Details();
-                customSpinner((TextView) findViewById(R.id.select_state), "Select State", list_state);
+                customSpinner((TextView) findViewById(R.id.select_state), "Select State*", list_state);
                 break;
             case R.id.btn_submit:
                 if (input_name.getText().toString().isEmpty()) {
                     input_name.setError("Please enter valid name");
                     input_name.requestFocus();
-                } else if (sendercomname.getText().toString().isEmpty()) {
-                    sendercomname.setError("Please enter valid company name");
-                    sendercomname.requestFocus();
                 } else if (sendernation.getText().toString().isEmpty()) {
                     sendernation.setError("Please enter valid nationality");
                     sendernation.requestFocus();
                 } else if (address_name.getText().toString().isEmpty()) {
                     address_name.setError("Please enter valid address");
                     address_name.requestFocus();
-                } else if (district.getText().toString().isEmpty()) {
-                    district.setError("Please enter valid district");
-                    district.requestFocus();
-                } else if (city.getText().toString().isEmpty()) {
-                    city.setError("Please enter valid city");
-                    city.requestFocus();
-                } else if (docType.equalsIgnoreCase("")) {
+                } else if (docType.equalsIgnoreCase("Select Document Type")) {
                     Toast.makeText(PMTRemittanceActivity.this, "Please Select document type", Toast.LENGTH_SHORT).show();
                 } else if (documentid.getText().toString().isEmpty()) {
                     documentid.setError("Please enter valid document id");
                     documentid.requestFocus();
-                } else if (select_state.getText().toString().equalsIgnoreCase("Select State")) {
+                } else if (select_state.getText().toString().equalsIgnoreCase("Select State*")) {
                     select_state.setError("Please enter valid state");
                     select_state.requestFocus();
                 } else if (incomesource.getText().toString().isEmpty()) {
@@ -741,7 +732,7 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
                 } else if (image.getText().toString().isEmpty() || imageBase64 == null || imgType.equalsIgnoreCase("")) {
                     image.setError("Please Select document");
                     image.requestFocus();
-                } else if (selectGender.equalsIgnoreCase("")) {
+                } else if (selectGender.equalsIgnoreCase("Select Gender")) {
                     Toast.makeText(PMTRemittanceActivity.this, "Please Select Gender", Toast.LENGTH_SHORT).show();
                 } else {
                     new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, addSenderDetails().toString(), headerData, PMTRemittanceActivity.this,getString(R.string.responseTimeOutTrans)).execute();
@@ -1266,7 +1257,7 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
         sendernation.setText("");
         address_name.setText("");
         date1_text.setText("");
-        date1_text.setHint("Date Of Birth");
+        date1_text.setHint("Date Of Birth*");
         district.setText("");
         city.setText("");
         documentype.setText("");
@@ -1289,7 +1280,7 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
         state_update.setEnabled(true);
         state_update_top.setVisibility(View.GONE);
         select_state.setText("");
-        select_state.setHint("Select State");
+        select_state.setHint("Select State*");
         select_state.setVisibility(View.VISIBLE);
         image.setVisibility(View.VISIBLE);
         findViewById(R.id.btn_submit).setVisibility(View.VISIBLE);
@@ -1396,38 +1387,42 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
                 e.printStackTrace();
             }
         } else if (requestCode == SELECT_FILE) {
-            Uri uri = data.getData();
-            Bitmap thumbnail = null;
-            InputStream is = null;
-            try {
-                is = getContentResolver().openInputStream(uri);
-                BitmapFactory.Options options = new BitmapFactory.Options();
-                options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-                options.inSampleSize = 2;
-                options.inScreenDensity = DisplayMetrics.DENSITY_LOW;
-                thumbnail = BitmapFactory.decodeStream(is, null, options);
-                imageBase64 = getBytesFromBitmap(addWaterMark(thumbnail));
-                imgType = "jpg";
-            } catch (Exception e) {
-                e.printStackTrace();
+            if(data!=null) {
+                Uri uri = data.getData();
+                Bitmap thumbnail = null;
+                InputStream is = null;
+                try {
+                    is = getContentResolver().openInputStream(uri);
+                    BitmapFactory.Options options = new BitmapFactory.Options();
+                    options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+                    options.inSampleSize = 2;
+                    options.inScreenDensity = DisplayMetrics.DENSITY_LOW;
+                    thumbnail = BitmapFactory.decodeStream(is, null, options);
+                    imageBase64 = getBytesFromBitmap(addWaterMark(thumbnail));
+                    imgType = "jpg";
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                Uri selectedImageUri = data.getData();
+                String[] projection = {MediaStore.MediaColumns.DATA};
+                CursorLoader cursorLoader = new CursorLoader(PMTRemittanceActivity.this, selectedImageUri, projection, null, null,
+                        null);
+                Cursor cursor = cursorLoader.loadInBackground();
+                int column_index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
+                cursor.moveToFirst();
+                filePath = cursor.getString(column_index);
+                String[] splits = filePath.split("\\/");
+                int len = splits.length;
+                image.setText(splits[len - 1]);
+                image.setError(null);
             }
-            Uri selectedImageUri = data.getData();
-            String[] projection = {MediaStore.MediaColumns.DATA};
-            CursorLoader cursorLoader = new CursorLoader(PMTRemittanceActivity.this, selectedImageUri, projection, null, null,
-                    null);
-            Cursor cursor = cursorLoader.loadInBackground();
-            int column_index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
-            cursor.moveToFirst();
-            filePath = cursor.getString(column_index);
-            String[] splits = filePath.split("\\/");
-            int len = splits.length;
-            image.setText(splits[len - 1]);
-            image.setError(null);
         } else if (requestCode == SELECT_PDF_DIALOG) {
-            ArrayList<NormalFile> list = data.getParcelableArrayListExtra(Constant.RESULT_PICK_FILE);
-            imageBase64 = getStringFile(list.get(0).getPath());
-            image.setText(list.get(0).getName());
-            imgType = "pdf";
+            if(data!=null) {
+                ArrayList<NormalFile> list = data.getParcelableArrayListExtra(Constant.RESULT_PICK_FILE);
+                imageBase64 = getStringFile(list.get(0).getPath());
+                image.setText(list.get(0).getName());
+                imgType = "pdf";
+            }
         } else if (requestCode == CONTACT_PICKER_RESULT) {
             reset();
             contactRead(data, input_mobile);

@@ -586,8 +586,9 @@ public class BaseCompactActivity extends AppCompatActivity {
         } else if (selectedYear > year) {
             date1_text.setText(year + "-" + months + "-" + dayss);
             date1_text.setError(null);
-        } else
+        } else {
             date1_text.setError("Please select correct date");
+        }
     }
 
     protected View.OnClickListener toDateClicked = new View.OnClickListener() {

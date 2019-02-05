@@ -46,7 +46,7 @@
                     android:id="@+id/bc_bene_number"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Beneficiary Mobile Number"
+                    android:hint="Beneficiary Account Number"
                     android:inputType="number"
                     android:textSize="16dp" />
             </android.support.design.widget.TextInputLayout>
@@ -61,7 +61,7 @@
                     android:id="@+id/bc_con_bene_num"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Confirm Beneficiary Mobile Number"
+                    android:hint="Confirm Beneficiary Account Number"
                     android:inputType="number"
                     android:textSize="16dp" />
             </android.support.design.widget.TextInputLayout>

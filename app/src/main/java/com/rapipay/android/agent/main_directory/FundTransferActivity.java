@@ -480,13 +480,13 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
                     bank_select_bene.setError("Please enter mandatory field");
                     bank_select_bene.requestFocus();
                 } else if (!ImageUtils.commonAccount(bene_number.getText().toString(), 5, 30)) {
-                    bene_number.setError("Please enter valid beneficiary number");
+                    bene_number.setError("Please enter valid beneficiary account number");
                     bene_number.requestFocus();
                 } else if (bene_name.getText().toString().isEmpty()) {
                     bene_name.setError("Please enter valid data");
                     bene_name.requestFocus();
                 } else if (!ImageUtils.commonAccount(con_bene_number.getText().toString(), 5, 30)) {
-                    con_bene_number.setError("Please enter valid confirm beneficiary number");
+                    con_bene_number.setError("Please enter valid confirm beneficiary account number");
                     con_bene_number.requestFocus();
                 } else if (!bene_number.getText().toString().equalsIgnoreCase(con_bene_number.getText().toString())) {
                     con_bene_number.setError("Account number not matched");

@@ -243,10 +243,8 @@ public class MPOSRegistration extends BaseCompactActivity implements View.OnClic
                         if (response.equalsIgnoreCase("User Cancel The Request")) {
                             setBack_click(MPOSRegistration.this);
                             finish();
-                        } else if (response.contains("responseCode")) {
-                            JSONObject object = new JSONObject(response);
-                            if (object.getString("responseCode").equalsIgnoreCase("75161"))
-                                customDialog_Common("KYCLAYOUT", null, null, getResources().getString(R.string.Alert), null, object.getString("responseMessage"), MPOSRegistration.this);
+                        } else if (response.contains("75161")) {
+                                customDialog_Common("KYCLAYOUT", null, null, getResources().getString(R.string.Alert), null, response, MPOSRegistration.this);
                         } else
                             customDialog_Common("KYCLAYOUTS", null, null, getResources().getString(R.string.Alert), null, response, MPOSRegistration.this);
 

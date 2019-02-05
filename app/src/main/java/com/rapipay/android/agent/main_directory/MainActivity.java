@@ -87,7 +87,7 @@ public class MainActivity extends BaseCompactActivity
             ArrayList<ImagePozo> imagePozoArrayList = db.getImageDetails(condition);
             if (imagePozoArrayList.size() != 0) {
                 byteConvert(back_click, imagePozoArrayList.get(0).getImagePath());
-            }else {
+            } else {
                 if (BuildConfig.APPTYPE == 1)
                     back_click.setImageDrawable(getResources().getDrawable(R.drawable.rapipay_agent));
                 if (BuildConfig.APPTYPE == 2)
@@ -100,7 +100,7 @@ public class MainActivity extends BaseCompactActivity
     }
 
     private void url() {
-        new AsyncPostMethod(WebConfig.COMMONAPI, getDashBoard("GET_NODE_HEADER_DATA").toString(), headerData, MainActivity.this,getString(R.string.responseTimeOut)).execute();
+        new AsyncPostMethod(WebConfig.COMMONAPI, getDashBoard("GET_NODE_HEADER_DATA").toString(), headerData, MainActivity.this, getString(R.string.responseTimeOut)).execute();
         localStorage.setActivityState(LocalStorage.ROUTESTATE, "0");
     }
 
@@ -188,33 +188,17 @@ public class MainActivity extends BaseCompactActivity
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK) {
-            if (requestCode == CAMERA_REQUEST) {
-                Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
-                ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-                thumbnail.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-                SimpleDateFormat format = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
-                Date date = new Date();
-                File destination = new File(Environment.getExternalStorageDirectory(),
-                        format.format(date) + ".jpg");
-                filePath = destination.toString();
-                FileOutputStream fo;
-                try {
-                    destination.createNewFile();
-                    fo = new FileOutputStream(destination);
-                    fo.write(bytes.toByteArray());
-                    fo.close();
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                ivHeaderPhoto.setImageBitmap(thumbnail);
-                String imageName = "image" + ".jpg";
-                String path = saveToInternalStorage(thumbnail, imageName);
-                localStorage.setActivityState(LocalStorage.IMAGEPATH, path);
-                //SaveInDB(thumbnail);
-            } else if (requestCode == SELECT_FILE) {
+        if (requestCode == CAMERA_REQUEST) {
+            String path = data.getStringExtra("ImagePath");
+            String imageType = data.getStringExtra("ImageType");
+            Bitmap bitmap = loadImageFromStorage(imageType, path);
+            ivHeaderPhoto.setImageBitmap(bitmap);
+            String imageName = "image" + ".jpg";
+            String paths = saveToInternalStorage(bitmap, imageName);
+            localStorage.setActivityState(LocalStorage.IMAGEPATH, paths);
+            //SaveInDB(thumbnail);
+        } else if (requestCode == SELECT_FILE) {
+            if(data!=null) {
                 Uri selectedImageUri = data.getData();
                 String[] projection = {MediaStore.MediaColumns.DATA};
                 CursorLoader cursorLoader = new CursorLoader(this, selectedImageUri, projection, null, null,
@@ -302,7 +286,7 @@ public class MainActivity extends BaseCompactActivity
                 if (object.getString("serviceType").equalsIgnoreCase("GET_MASTER_DATA")) {
                     if (new MasterClass().getMasterData(object, db))
                         if (term.equalsIgnoreCase("N"))
-                            new AsyncPostMethod(WebConfig.NETWORKTRANSFER_URL, acknowledge(data, term).toString(), headerData, MainActivity.this,getString(R.string.responseTimeOut)).execute();
+                            new AsyncPostMethod(WebConfig.NETWORKTRANSFER_URL, acknowledge(data, term).toString(), headerData, MainActivity.this, getString(R.string.responseTimeOut)).execute();
                 } else if (object.getString("serviceType").equalsIgnoreCase("GET_NODE_HEADER_DATA")) {
                     if (object.has("headerList")) {
                         localStorage.setActivityState(LocalStorage.ROUTESTATE, "0");
@@ -336,7 +320,7 @@ public class MainActivity extends BaseCompactActivity
                         if (object.getString("headerData").equalsIgnoreCase("Y")) {
                             JSONObject object1 = array.getJSONObject(i + 1);
                             if (object1.getString("headerValue").equalsIgnoreCase("TCLINK")) {
-                                new AsyncPostMethod(object1.getString("headerData"), "", "", MainActivity.this,getString(R.string.responseTimeOut)).execute();
+                                new AsyncPostMethod(object1.getString("headerData"), "", "", MainActivity.this, getString(R.string.responseTimeOut)).execute();
                             }
                         }
                     }
@@ -366,7 +350,7 @@ public class MainActivity extends BaseCompactActivity
     private void callMasterDetails() {
         ArrayList<BankDetailsPozo> list = db.geBanktDetails("");
         if (list.size() == 0) {
-            new AsyncPostMethod(WebConfig.CommonReport, getMaster_Validate().toString(), headerData, MainActivity.this,getString(R.string.responseTimeOut)).execute();
+            new AsyncPostMethod(WebConfig.CommonReport, getMaster_Validate().toString(), headerData, MainActivity.this, getString(R.string.responseTimeOut)).execute();
         }
     }
 
@@ -433,7 +417,7 @@ public class MainActivity extends BaseCompactActivity
     public void okClicked(String type, Object ob) {
         super.onBackPressed();
         if (type.equalsIgnoreCase("TERMCONDITION")) {
-            new AsyncPostMethod(WebConfig.NETWORKTRANSFER_URL, acknowledge(data, term).toString(), headerData, MainActivity.this,getString(R.string.responseTimeOut)).execute();
+            new AsyncPostMethod(WebConfig.NETWORKTRANSFER_URL, acknowledge(data, term).toString(), headerData, MainActivity.this, getString(R.string.responseTimeOut)).execute();
         } else if (type.equalsIgnoreCase("SESSIONEXPIRE"))
             jumpPage();
         else
@@ -454,8 +438,12 @@ public class MainActivity extends BaseCompactActivity
             @Override
             public void onClick(DialogInterface dialog, int item) {
                 if (items[item].equals("Capture Image")) {
-                    Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    startActivityForResult(cameraIntent, CAMERA_REQUEST);
+                    Intent intent = new Intent(MainActivity.this, CameraKitActivity.class);
+                    intent.putExtra("ImageType", "profile");
+                    intent.putExtra("REQUESTTYPE", CAMERA_REQUEST);
+                    startActivityForResult(intent, CAMERA_REQUEST);
+//                    Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+//                    startActivityForResult(cameraIntent, CAMERA_REQUEST);
 
                 } else if (items[item].equals("Choose from Gallery")) {
                     Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);

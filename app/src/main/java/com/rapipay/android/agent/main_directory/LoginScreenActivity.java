@@ -179,6 +179,8 @@ public class LoginScreenActivity extends BaseCompactActivity implements View.OnC
                 customDialog_Common("KYCLAYOUTS", null, null, "RapiPay Login Failed", null, object.getString("responseMessage"), LoginScreenActivity.this);
             } else if (object.getString("responseCode").equalsIgnoreCase("75115")) {
                 customDialog_Common("KYCLAYOUTS", null, null, "RapiPay Login Failed", null, object.getString("responseMessage"), LoginScreenActivity.this);
+            }else if (object.getString("responseCode").equalsIgnoreCase("75077")) {
+                customDialog_Common("KYCLAYOUTS", null, null, "RapiPay Login Failed", null, object.getString("responseMessage"), LoginScreenActivity.this);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -197,7 +199,7 @@ public class LoginScreenActivity extends BaseCompactActivity implements View.OnC
             input_password.setText("");
         } else if (type.equalsIgnoreCase("KYCLAYOUTSS")) {
             Intent webIntent = new Intent(Intent.ACTION_VIEW,
-                    Uri.parse("https://play.google.com/store/apps/details?id=" + "com.rapipay.android.agents"));
+                    Uri.parse("https://play.google.com/store/apps/details?id=" + getPackageName()));
             startActivity(webIntent);
         }
     }

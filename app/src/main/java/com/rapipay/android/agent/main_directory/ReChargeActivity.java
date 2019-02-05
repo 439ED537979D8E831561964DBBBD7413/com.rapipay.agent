@@ -115,9 +115,9 @@ public class ReChargeActivity extends BaseCompactActivity implements View.OnClic
                         select_operator.setError("Please enter mandatory field");
                     else
                         new AsyncPostMethod(WebConfig.RECHARGENEW, reCharge_request().toString(), headerData, ReChargeActivity.this, "Response Time Out.Please Check your Transaction leadger or Contact Customer Support ... \\n\n" +
-                                "  Recharge Number  " + input_number.getText().toString() + "\n" +
-                                "  Amount " + input_amount.getText().toString() + "\n" +
-                                "  Operater " + select_operator + "\n").execute();
+                                "  Recharge Number  -" + input_number.getText().toString() + "\n" +
+                                "  Amount -" + input_amount.getText().toString() + "\n" +
+                                "  Operater -" + select_operator.getText().toString() + "\n").execute();
                 } else if (operator_clicked.equalsIgnoreCase("PRE") || operator_clicked.equalsIgnoreCase("POST") || operator_clicked.equalsIgnoreCase("MOBILE")) {
                     if (!ImageUtils.commonNumber(input_number.getText().toString(), 10)) {
                         input_number.setError("Please enter valid mobile number");
@@ -129,9 +129,9 @@ public class ReChargeActivity extends BaseCompactActivity implements View.OnClic
                         select_operator.setError("Please enter mandatory field");
                     else
                         new AsyncPostMethod(WebConfig.RECHARGENEW, reCharge_request().toString(), headerData, ReChargeActivity.this, "Response Time Out.Please Check your Transaction leadger or Contact Customer Support ... \\n\n" +
-                                "  Recharge Number  " + input_number.getText().toString() + "\n" +
-                                "  Amount " + input_amount.getText().toString() + "\n" +
-                                "  Operater " + select_operator + "\n").execute();
+                                "  Recharge Number  -" + input_number.getText().toString() + "\n" +
+                                "  Amount -" + input_amount.getText().toString() + "\n" +
+                                "  Operater -" + select_operator.getText().toString() + "\n").execute();
                 }
                 break;
         }
@@ -166,7 +166,7 @@ public class ReChargeActivity extends BaseCompactActivity implements View.OnClic
     @Override
     public void chechStatus(JSONObject object) {
         try {
-            if (object.getString("responseCode").equalsIgnoreCase("101")) {
+            if (object.getString("responseCode").equalsIgnoreCase("200")) {
                 if (object.getString("serviceType").equalsIgnoreCase("MOBILE_RECHARGE")) {
                     if (object.has("getTxnReceiptDataList"))
                         try {
@@ -195,6 +195,7 @@ public class ReChargeActivity extends BaseCompactActivity implements View.OnClic
                             customDialog_Common("KYCLAYOUTS", null, null, "POSTPAID BILL PAYMENT", "", "Cannot generate receipt now please try later!", ReChargeActivity.this);
                         }
                 }
+                clear();
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -134,7 +134,7 @@
                             android:id="@+id/gender"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="Gender"
+                            android:hint="Gender*"
                             android:inputType="textCapWords"
                             android:maxLength="6"
                             android:textSize="16dp" />
@@ -177,7 +177,7 @@
                             android:id="@+id/sendernation"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="Sender Nationality"
+                            android:hint="Sender Nationality*"
                             android:inputType="text"
                             android:textSize="16dp" />
                     </android.support.design.widget.TextInputLayout>
@@ -207,7 +207,7 @@
                             android:id="@+id/state_update"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="State"
+                            android:hint="State*"
                             android:inputType="textMultiLine"
                             android:textSize="16sp" />
                     </android.support.design.widget.TextInputLayout>
@@ -222,7 +222,7 @@
                             android:id="@+id/address_name"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="Address"
+                            android:hint="Address*"
                             android:inputType="textMultiLine"
                             android:textSize="16sp" />
                     </android.support.design.widget.TextInputLayout>
@@ -293,7 +293,7 @@
                             android:id="@+id/documentid"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="Document ID"
+                            android:hint="Document ID*"
                             android:inputType="text"
                             android:textSize="16sp" />
                     </android.support.design.widget.TextInputLayout>
@@ -308,7 +308,7 @@
                             android:id="@+id/incomesource"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="Income Source"
+                            android:hint="Income Source*"
                             android:inputType="text"
                             android:textSize="16sp" />
                     </android.support.design.widget.TextInputLayout>
@@ -320,7 +320,7 @@
                         android:background="@drawable/border_view"
                         android:clickable="true"
                         android:gravity="center"
-                        android:hint="Upload Document"
+                        android:hint="Upload Document*"
                         android:maxLines="1"
                         android:onClick="onClick"
                         android:padding="10dp"

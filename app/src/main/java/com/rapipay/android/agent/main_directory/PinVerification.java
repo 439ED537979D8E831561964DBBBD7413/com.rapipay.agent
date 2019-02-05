@@ -281,7 +281,7 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
             confirmpinView.setText("");
         else if (type.equalsIgnoreCase("KYCLAYOUTSS")) {
             Intent webIntent = new Intent(Intent.ACTION_VIEW,
-                    Uri.parse("https://play.google.com/store/apps/details?id=" + "com.rapipay.android.agents"));
+                    Uri.parse("https://play.google.com/store/apps/details?id=" + getPackageName()));
             startActivity(webIntent);
         } else if (type.equalsIgnoreCase("SESSIONEXPIRE"))
             jumpPage();

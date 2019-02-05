@@ -112,6 +112,7 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
     private Location mylocation;
     private final static int REQUEST_CHECK_SETTINGS_GPS = 0x5;
     private final static int REQUEST_ID_MULTIPLE_PERMISSIONS = 0x2;
+    private boolean isSubmitClicked = false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -583,8 +584,10 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
     }
 
     private void reDirectWebView() {
-        new AsyncPostMethod(WebConfig.ProcessKYC, getKycMapImage().toString(), headerData, KYCFormActivity.this,getString(R.string.responseTimeOut)).execute();
-//
+        if (!isSubmitClicked) {
+            new AsyncPostMethod(WebConfig.ProcessKYC, getKycMapImage().toString(), headerData, KYCFormActivity.this, getString(R.string.responseTimeOut)).execute();
+            isSubmitClicked = true;
+        }
     }
 
     public String getsession_ValidateKyc(String kycType, String tokenId) {
@@ -654,6 +657,7 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
     }
 
     private JSONObject getKycMapImage() {
+        CustomProgessDialog dialog = new CustomProgessDialog(KYCFormActivity.this);
         JSONObject jsonObject = new JSONObject();
         String passportPhoto = "", signPhoto = "", shopPhoto = "", pancardImg = "", kycImage = "";
         try {
@@ -691,6 +695,7 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
         } catch (Exception e) {
             e.printStackTrace();
         }
+        dialog.hide_progress();
         return jsonObject;
     }
 
@@ -747,6 +752,7 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
             input_name.requestFocus();
             return false;
         } else if (date1_text.getText().toString().isEmpty()) {
+            Toast.makeText(KYCFormActivity.this, "Please select valid date of birth", Toast.LENGTH_SHORT).show();
             date1_text.setError("Please enter valid date");
             date1_text.requestFocus();
             return false;
@@ -756,6 +762,7 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
             return false;
         } else if (customerType.equalsIgnoreCase("A")) {
             if (!printDifference(mainDate(date1_text.getText().toString()))) {
+                Toast.makeText(KYCFormActivity.this, "Please select valid date of birth", Toast.LENGTH_SHORT).show();
                 date1_text.setError("Please enter valid date");
                 date1_text.requestFocus();
                 return false;
@@ -949,18 +956,20 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
             Bitmap bitmap = loadImageFromStorage(imageType, path);
             inspect(bitmap, documentType, documentID, imageType, textView, view);
         } else if (id_2 == 1) {
-            InputStream is = null;
-            Bitmap bitmap = null;
-            try {
-                is = getContentResolver().openInputStream(data.getData());
-                BitmapFactory.Options options = new BitmapFactory.Options();
-                options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-                options.inSampleSize = 2;
-                options.inScreenDensity = DisplayMetrics.DENSITY_LOW;
-                bitmap = BitmapFactory.decodeStream(is, null, options);
-                inspect(bitmap, documentType, documentID, imageTypes, textView, view);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
+            if (data != null) {
+                InputStream is = null;
+                Bitmap bitmap = null;
+                try {
+                    is = getContentResolver().openInputStream(data.getData());
+                    BitmapFactory.Options options = new BitmapFactory.Options();
+                    options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+                    options.inSampleSize = 2;
+                    options.inScreenDensity = DisplayMetrics.DENSITY_LOW;
+                    bitmap = BitmapFactory.decodeStream(is, null, options);
+                    inspect(bitmap, documentType, documentID, imageTypes, textView, view);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
@@ -1237,6 +1246,7 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
         try {
             if (object.getString("responseCode").equalsIgnoreCase("200")) {
                 if (object.getString("serviceType").equalsIgnoreCase("VALIDATE_KYC_DETAILS")) {
+                    isSubmitClicked = false;
                     formData = "";
                     formData = getsession_ValidateKyc(customerType, object.getString("tokenId"));
                     Intent intent = new Intent(KYCFormActivity.this, WebViewVerify.class);
