@@ -281,7 +281,7 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
             confirmpinView.setText("");
         else if (type.equalsIgnoreCase("KYCLAYOUTSS")) {
             Intent webIntent = new Intent(Intent.ACTION_VIEW,
-                    Uri.parse("https://play.google.com/store/apps/details?id=" + getPackageName()));
+                    Uri.parse("https://play.google.com/store/apps/details?id=" + "com.rapipay.android.agents"));
             startActivity(webIntent);
         } else if (type.equalsIgnoreCase("SESSIONEXPIRE"))
             jumpPage();
@@ -403,23 +403,71 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
         recycler_view.setAdapter(new FooterAdapter(PinVerification.this, recycler_view, list));
     }
 
+//    @Override
+//    public void checkVersion(ArrayList<VersionPozo> list) {
+//        for (int i = 0; i < list.size(); i++) {
+//            if (list.get(i).getName() != null)
+//                if (list.get(i).getName().equalsIgnoreCase("APP_UPDATE_ST")) {
+//                    try {
+//                        PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+//                        String version = pInfo.versionName;
+//                        if (("F").equalsIgnoreCase(list.get(i + 1).getValue())) {
+//                            customDialog_Common("KYCLAYOUTSS", null, null, "Update Available", null, "You are running on lower version please update for new versions!.", PinVerification.this);
+//                        } else {
+//                            new AsyncPostMethod(WebConfig.LOGIN_URL, getJson_Validate(confirmpinView.getText().toString()).toString(), "", PinVerification.this,getString(R.string.responseTimeOut)).execute();
+//                        }
+//                    } catch (PackageManager.NameNotFoundException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//        }
+//    }
+
     @Override
     public void checkVersion(ArrayList<VersionPozo> list) {
+        ArrayList<String> stringArrayList = new ArrayList<>();
         for (int i = 0; i < list.size(); i++) {
             if (list.get(i).getName() != null)
-                if (list.get(i).getName().equalsIgnoreCase("APP_UPDATE_ST")) {
-                    try {
-                        PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-                        String version = pInfo.versionName;
-                        if (("F").equalsIgnoreCase(list.get(i + 1).getValue())) {
-                            customDialog_Common("KYCLAYOUTSS", null, null, "Update Available", null, "You are running on lower version please update for new versions!.", PinVerification.this);
-                        } else {
-                            new AsyncPostMethod(WebConfig.LOGIN_URL, getJson_Validate(confirmpinView.getText().toString()).toString(), "", PinVerification.this,getString(R.string.responseTimeOut)).execute();
-                        }
-                    } catch (PackageManager.NameNotFoundException e) {
-                        e.printStackTrace();
-                    }
+                if (list.get(i).getName().equalsIgnoreCase("PROD")) {
+                    stringArrayList.add(list.get(i + 1).getValue());
+//                    try {
+//                        PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+//                        String version = pInfo.versionName;
+//                        if (!version.equalsIgnoreCase(list.get(i + 1).getValue())) {
+//                            customDialog_Common("KYCLAYOUTSS", null, null, "Update Available", null, "You are running on lower version please update for new versions!.", LoginScreenActivity.this);
+//                        } else {
+//                            new AsyncPostMethod(WebConfig.LOGIN_URL, getJson_Validate().toString(), "", LoginScreenActivity.this, getString(R.string.responseTimeOut)).execute();
+//                        }
+//                    } catch (PackageManager.NameNotFoundException e) {
+//                        e.printStackTrace();
+//                    }
+                } else if (list.get(i).getName().equalsIgnoreCase("APP_UPDATE_ST")) {
+                    stringArrayList.add(list.get(i + 1).getValue());
+//                    try {
+//                        PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+//                        String version = pInfo.versionName;
+//                        if (("F").equalsIgnoreCase(list.get(i + 1).getValue())) {
+//                            customDialog_Common("KYCLAYOUTSS", null, null, "Update Available", null, "You are running on lower version please update for new versions!.", LoginScreenActivity.this);
+//                        } else {
+//                            new AsyncPostMethod(WebConfig.LOGIN_URL, getJson_Validate().toString(), "", LoginScreenActivity.this, getString(R.string.responseTimeOut)).execute();
+//                        }
+//                    } catch (PackageManager.NameNotFoundException e) {
+//                        e.printStackTrace();
+//                    }
                 }
+        }
+        if (stringArrayList.size() != 0) {
+            try {
+                PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+                String version = pInfo.versionName;
+                if (stringArrayList.get(0).equalsIgnoreCase(version) && (stringArrayList.get(1).equalsIgnoreCase("F") || stringArrayList.get(1).equalsIgnoreCase("N"))) {
+                    new AsyncPostMethod(WebConfig.LOGIN_URL, getJson_Validate(confirmpinView.getText().toString()).toString(), "", PinVerification.this,getString(R.string.responseTimeOut)).execute();
+                }else {
+                    customDialog_Common("KYCLAYOUTSS", null, null, "Update Available", null, "You are running on lower version please update for new versions!.", PinVerification.this);
+                }
+            } catch (PackageManager.NameNotFoundException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

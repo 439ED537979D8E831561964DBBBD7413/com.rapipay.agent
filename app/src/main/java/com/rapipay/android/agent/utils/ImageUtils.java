@@ -6,6 +6,8 @@ import android.text.format.Formatter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Random;
+
 import com.rapipay.android.agent.Model.ImagePozo;
 import com.rapipay.android.agent.R;
 
@@ -98,9 +100,11 @@ public class ImageUtils {
             return false;
     }
     public static String miliSeconds(){
+        Random rand = new Random();
+        int n = rand.nextInt(8) + 1;
         SimpleDateFormat df=new SimpleDateFormat("ssmmHHMMddSSS");
         Date date=new Date();
-        return df.format(date);
+        return "1"+n+df.format(date);
     }
     public static String ipAddress(Context context){
         WifiManager wm = (WifiManager) context.getApplicationContext().getSystemService(WIFI_SERVICE);

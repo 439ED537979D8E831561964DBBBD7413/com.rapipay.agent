@@ -77,8 +77,8 @@ public class LoginScreenActivity extends BaseCompactActivity implements View.OnC
             jsonObject.put("nodeAgentId", input_user.getText().toString());
             jsonObject.put("password", input_password.getText().toString());
             jsonObject.put("imeiNo", imei);
-            jsonObject.put("domainName",BuildConfig.DOMAINNAME);
-            jsonObject.put("clientRequestIP",ImageUtils.ipAddress(LoginScreenActivity.this));
+            jsonObject.put("domainName", BuildConfig.DOMAINNAME);
+            jsonObject.put("clientRequestIP", ImageUtils.ipAddress(LoginScreenActivity.this));
             jsonObject.put("checkSum", GenerateChecksum.checkSum(imei, jsonObject.toString()));
 
         } catch (Exception e) {
@@ -104,13 +104,13 @@ public class LoginScreenActivity extends BaseCompactActivity implements View.OnC
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     ActivityCompat.requestPermissions(LoginScreenActivity.this,
-                            new String[]{Manifest.permission.READ_PHONE_STATE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.CAMERA,Manifest.permission.READ_CONTACTS},
+                            new String[]{Manifest.permission.READ_PHONE_STATE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.CAMERA, Manifest.permission.READ_CONTACTS},
                             PERMISSIONS_REQUEST_READ_PHONE_STATE);
                     doPermissionGrantedStuffs();
                 }
             });
         } else {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.CAMERA,Manifest.permission.READ_CONTACTS},
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.CAMERA, Manifest.permission.READ_CONTACTS},
                     PERMISSIONS_REQUEST_READ_PHONE_STATE);
         }
     }
@@ -120,7 +120,7 @@ public class LoginScreenActivity extends BaseCompactActivity implements View.OnC
                                            @NonNull int[] grantResults) {
 
         if (requestCode == PERMISSIONS_REQUEST_READ_PHONE_STATE) {
-            if (grantResults.length == 7 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED && grantResults[2] == PackageManager.PERMISSION_GRANTED  && grantResults[3] == PackageManager.PERMISSION_GRANTED && grantResults[4] == PackageManager.PERMISSION_GRANTED && grantResults[5] == PackageManager.PERMISSION_GRANTED && grantResults[6] == PackageManager.PERMISSION_GRANTED) {
+            if (grantResults.length == 7 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED && grantResults[2] == PackageManager.PERMISSION_GRANTED && grantResults[3] == PackageManager.PERMISSION_GRANTED && grantResults[4] == PackageManager.PERMISSION_GRANTED && grantResults[5] == PackageManager.PERMISSION_GRANTED && grantResults[6] == PackageManager.PERMISSION_GRANTED) {
                 doPermissionGrantedStuffs();
             } else {
                 alertPerm(getString(R.string.permissions_not_granted_read_phone_state), new DialogInterface.OnClickListener() {
@@ -179,7 +179,7 @@ public class LoginScreenActivity extends BaseCompactActivity implements View.OnC
                 customDialog_Common("KYCLAYOUTS", null, null, "RapiPay Login Failed", null, object.getString("responseMessage"), LoginScreenActivity.this);
             } else if (object.getString("responseCode").equalsIgnoreCase("75115")) {
                 customDialog_Common("KYCLAYOUTS", null, null, "RapiPay Login Failed", null, object.getString("responseMessage"), LoginScreenActivity.this);
-            }else if (object.getString("responseCode").equalsIgnoreCase("75077")) {
+            } else if (object.getString("responseCode").equalsIgnoreCase("75077")) {
                 customDialog_Common("KYCLAYOUTS", null, null, "RapiPay Login Failed", null, object.getString("responseMessage"), LoginScreenActivity.this);
             }
         } catch (Exception e) {
@@ -211,21 +211,49 @@ public class LoginScreenActivity extends BaseCompactActivity implements View.OnC
 
     @Override
     public void checkVersion(ArrayList<VersionPozo> list) {
+        ArrayList<String> stringArrayList = new ArrayList<>();
         for (int i = 0; i < list.size(); i++) {
             if (list.get(i).getName() != null)
-                if (list.get(i).getName().equalsIgnoreCase("APP_UPDATE_ST")) {
-                    try {
-                        PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-                        String version = pInfo.versionName;
-                        if (("F").equalsIgnoreCase(list.get(i + 1).getValue())) {
-                            customDialog_Common("KYCLAYOUTSS", null, null, "Update Available", null, "You are running on lower version please update for new versions!.", LoginScreenActivity.this);
-                        } else {
-                            new AsyncPostMethod(WebConfig.LOGIN_URL, getJson_Validate().toString(), "", LoginScreenActivity.this,getString(R.string.responseTimeOut)).execute();
-                        }
-                    } catch (PackageManager.NameNotFoundException e) {
-                        e.printStackTrace();
-                    }
+                if (list.get(i).getName().equalsIgnoreCase("PROD")) {
+                    stringArrayList.add(list.get(i + 1).getValue());
+//                    try {
+//                        PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+//                        String version = pInfo.versionName;
+//                        if (!version.equalsIgnoreCase(list.get(i + 1).getValue())) {
+//                            customDialog_Common("KYCLAYOUTSS", null, null, "Update Available", null, "You are running on lower version please update for new versions!.", LoginScreenActivity.this);
+//                        } else {
+//                            new AsyncPostMethod(WebConfig.LOGIN_URL, getJson_Validate().toString(), "", LoginScreenActivity.this, getString(R.string.responseTimeOut)).execute();
+//                        }
+//                    } catch (PackageManager.NameNotFoundException e) {
+//                        e.printStackTrace();
+//                    }
+                } else if (list.get(i).getName().equalsIgnoreCase("APP_UPDATE_ST")) {
+                    stringArrayList.add(list.get(i + 1).getValue());
+//                    try {
+//                        PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+//                        String version = pInfo.versionName;
+//                        if (("F").equalsIgnoreCase(list.get(i + 1).getValue())) {
+//                            customDialog_Common("KYCLAYOUTSS", null, null, "Update Available", null, "You are running on lower version please update for new versions!.", LoginScreenActivity.this);
+//                        } else {
+//                            new AsyncPostMethod(WebConfig.LOGIN_URL, getJson_Validate().toString(), "", LoginScreenActivity.this, getString(R.string.responseTimeOut)).execute();
+//                        }
+//                    } catch (PackageManager.NameNotFoundException e) {
+//                        e.printStackTrace();
+//                    }
                 }
+        }
+        if (stringArrayList.size() != 0) {
+            try {
+                PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+                String version = pInfo.versionName;
+                if (stringArrayList.get(0).equalsIgnoreCase(version) && (stringArrayList.get(1).equalsIgnoreCase("F") || stringArrayList.get(1).equalsIgnoreCase("N"))) {
+                    new AsyncPostMethod(WebConfig.LOGIN_URL, getJson_Validate().toString(), "", LoginScreenActivity.this, getString(R.string.responseTimeOut)).execute();
+                }else {
+                    customDialog_Common("KYCLAYOUTSS", null, null, "Update Available", null, "You are running on lower version please update for new versions!.", LoginScreenActivity.this);
+                }
+            } catch (PackageManager.NameNotFoundException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
