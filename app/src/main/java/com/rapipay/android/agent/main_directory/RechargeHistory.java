@@ -99,7 +99,7 @@ public class RechargeHistory extends BaseCompactActivity implements View.OnClick
             @Override
             public void onClick(View view, int position) {
                 RechargePozo pozo = transactionPozoArrayList.get(position);
-                new AsyncPostMethod(WebConfig.WALLETTRANSFER_URL, receipt_request(pozo).toString(), headerData, RechargeHistory.this,getString(R.string.responseTimeOut)).execute();
+                new AsyncPostMethod(WebConfig.WALLETRECEIPTURL, receipt_request(pozo).toString(), headerData, RechargeHistory.this,getString(R.string.responseTimeOut)).execute();
             }
 
             @Override

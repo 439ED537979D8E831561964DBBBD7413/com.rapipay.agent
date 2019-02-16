@@ -9,8 +9,9 @@ public class ChannelHistoryPozo {
     String serviceProviderTXNID;
     String orgTxnid;
     String transferType;
+    String serviceType;
 
-    public ChannelHistoryPozo(String name, String account, String amount, String txnId, String date_id, String serviceProviderTXNID, String transferType, String orgTxnid) {
+    public ChannelHistoryPozo(String name, String account, String amount, String txnId, String date_id, String serviceProviderTXNID, String transferType, String orgTxnid,String serviceType) {
         this.name = name;
         this.account = account;
         this.amount = amount;
@@ -19,6 +20,15 @@ public class ChannelHistoryPozo {
         this.serviceProviderTXNID = serviceProviderTXNID;
         this.transferType = transferType;
         this.orgTxnid=orgTxnid;
+        this.serviceType=serviceType;
+    }
+
+    public String getServiceType() {
+        return serviceType;
+    }
+
+    public void setServiceType(String serviceType) {
+        this.serviceType = serviceType;
     }
 
     public String getServiceProviderTXNID() {

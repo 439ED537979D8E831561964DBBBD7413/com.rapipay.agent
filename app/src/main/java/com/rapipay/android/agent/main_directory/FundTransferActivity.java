@@ -130,7 +130,7 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
             @Override
             public void onClick(View view, int position) {
                 LastTransactionPozo pozo = transactionPozoArrayList.get(position);
-                new AsyncPostMethod(WebConfig.WALLETTRANSFER_URL, receipt_request(pozo).toString(), headerData, FundTransferActivity.this,getString(R.string.responseTimeOutTrans)).execute();
+                new AsyncPostMethod(WebConfig.WALLETRECEIPTURL, receipt_request(pozo).toString(), headerData, FundTransferActivity.this,getString(R.string.responseTimeOutTrans)).execute();
             }
 
             @Override

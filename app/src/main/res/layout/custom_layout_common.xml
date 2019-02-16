@@ -650,6 +650,19 @@
                 android:weightSum="800">
 
                 <android.support.v7.widget.AppCompatButton
+                    android:id="@+id/btn_regenerate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:background="@drawable/border_button"
+                    android:onClick="onClick"
+                    android:padding="5dp"
+                    android:text="Regenerate OTP"
+                    android:textColor="@color/white"
+                    android:textSize="12dp"
+                    android:visibility="gone"/>
+
+                <android.support.v7.widget.AppCompatButton
                     android:id="@+id/btn_cancel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -659,7 +672,7 @@
                     android:padding="5dp"
                     android:text="@string/cancel"
                     android:textColor="@color/white"
-                    android:textSize="16dp" />
+                    android:textSize="12dp" />
 
                 <android.support.v7.widget.AppCompatButton
                     android:id="@+id/btn_ok"
@@ -671,7 +684,7 @@
                     android:padding="5dp"
                     android:text="@string/ok"
                     android:textColor="@color/white"
-                    android:textSize="16dp" />
+                    android:textSize="12dp" />
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

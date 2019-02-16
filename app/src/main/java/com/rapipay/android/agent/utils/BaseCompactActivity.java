@@ -32,6 +32,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatButton;
 import android.text.Editable;
 import android.text.Html;
+import android.text.InputFilter;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Base64;
 import android.util.Log;
@@ -39,13 +41,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -127,8 +127,8 @@ public class BaseCompactActivity extends AppCompatActivity {
         if (db != null && db.getDetails_Rapi())
             list = db.getDetails();
     }
-    protected void loadImageFromStorage(String name, ImageView view, String path) {
 
+    protected void loadImageFromStorage(String name, ImageView view, String path) {
         try {
             File f = new File(path, name);
             Bitmap b = BitmapFactory.decodeStream(new FileInputStream(f));
@@ -139,6 +139,7 @@ public class BaseCompactActivity extends AppCompatActivity {
         }
 
     }
+
     protected Bitmap loadImageFromStorage(String name, String path) {
         try {
             File f = new File(path, name);
@@ -403,7 +404,10 @@ public class BaseCompactActivity extends AppCompatActivity {
         btn_sendname.setText(input);
         if (msg.equalsIgnoreCase("Confirm Money Transfer?")) {
             String condition = "where " + RapipayDB.COLOMN_IFSC + "='" + pozo.getIfsc() + "'";
-            btn_bank.setText(db.geBank(condition).get(0));
+            if (db.geBank(condition).size() != 0)
+                btn_bank.setText(db.geBank(condition).get(0));
+            else
+                btn_bank.setVisibility(View.GONE);
         } else
             btn_bank.setText(pozo.getBank());
         if (!pozo.getName().equalsIgnoreCase("null"))
@@ -495,7 +499,7 @@ public class BaseCompactActivity extends AppCompatActivity {
             btn_name.setText(pozo.getName());
         else
             btn_name.setText("NA");
-        if(pozo.getIfsc().equalsIgnoreCase("NOT-VEREFIED"))
+        if (pozo.getIfsc().equalsIgnoreCase("NOT-VEREFIED"))
             notverified.setVisibility(View.VISIBLE);
         else
             notverified.setVisibility(View.GONE);
@@ -523,6 +527,10 @@ public class BaseCompactActivity extends AppCompatActivity {
 
     protected void otpView(View alertLayout, JSONObject object) throws Exception {
         otpView = (TextView) alertLayout.findViewById(R.id.input_otp);
+        otpView.setInputType(InputType.TYPE_CLASS_NUMBER);
+        InputFilter[] filterArray = new InputFilter[1];
+        filterArray[0] = new InputFilter.LengthFilter(12);
+        otpView.setFilters(filterArray);
         dialog.setView(alertLayout);
     }
 
@@ -1460,7 +1468,7 @@ public class BaseCompactActivity extends AppCompatActivity {
     }
 
     protected void loadVersion(String emi) {
-        new AsyncPostMethod(WebConfig.LOGIN_URL, version(emi).toString(), headerData, BaseCompactActivity.this,getString(R.string.responseTimeOut)).execute();
+        new AsyncPostMethod(WebConfig.LOGIN_URL, version(emi).toString(), headerData, BaseCompactActivity.this, getString(R.string.responseTimeOut)).execute();
     }
 
     protected void versionDetails(JSONArray array, VersionListener listener) {

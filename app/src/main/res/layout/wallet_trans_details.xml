@@ -3,7 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:autofit="http://schemas.android.com/tools"
     android:elevation="10dp"
     android:layout_margin="5dp"
     app:cardBackgroundColor="@color/white">
@@ -26,20 +25,45 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="300"
                 android:inputType="text"
-                android:text="@string/sertype"
+                android:text="@string/p_beneficiaryId"
                 android:textSize="12sp" />
 
-            <me.grantland.widget.AutofitTextView
+            <TextView
                 android:id="@+id/btn_name"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="500"
+                android:layout_marginLeft="23dp"
+                android:text="@string/p_names"
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_margin="3sp"
+            android:weightSum="800">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="300"
+                android:inputType="text"
+                android:text="Bank Name"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/btn_account"
+                android:layout_marginLeft="3dp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="500"
                 android:text="@string/p_accountno"
+                android:inputType="textMultiLine"
                 android:textColor="@color/colorPrimaryDark"
-                android:textSize="12sp"
-                android:singleLine="true"
-                android:maxLines="1"
-                autofit:minTextSize="8sp" />
+                android:textSize="12sp" />
         </LinearLayout>
 
         <LinearLayout
@@ -54,23 +78,21 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="300"
                 android:inputType="text"
-                android:text="@string/txndate"
+                android:text="@string/p_accountId"
                 android:textSize="12sp" />
 
-            <me.grantland.widget.AutofitTextView
-                android:id="@+id/btn_p_amounts"
+            <TextView
+                android:id="@+id/btn_bank"
+                android:layout_marginLeft="5dp"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="500"
-                android:text="@string/p_amounts"
+                android:text="@string/p_bank"
                 android:textColor="@color/colorPrimaryDark"
-                android:textSize="12sp"
-                android:singleLine="true"
-                android:maxLines="1"
-                autofit:minTextSize="8sp" />
+                android:textSize="12sp" />
         </LinearLayout>
-
         <LinearLayout
+            android:id="@+id/accname"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -82,79 +104,42 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="300"
                 android:inputType="text"
-                android:text="@string/txncrdrAmount"
+                android:text="@string/p_accountName"
                 android:textSize="12sp" />
 
-            <me.grantland.widget.AutofitTextView
-                android:id="@+id/btn_p_transid"
+            <TextView
+                android:id="@+id/btn_accountname"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="500"
-                android:text="@string/p_transid"
+                android:text="@string/p_bank"
                 android:textColor="@color/colorPrimaryDark"
-                android:textSize="12sp"
-                android:singleLine="true"
-                android:maxLines="1"
-                autofit:minTextSize="8sp"/>
+                android:textSize="12sp" />
         </LinearLayout>
-
         <LinearLayout
+            android:id="@+id/amount_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_margin="3sp"
             android:weightSum="800">
 
-            <me.grantland.widget.AutofitTextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="300"
-                android:inputType="text"
-                android:text="@string/openingclosingBalance"
-                android:textSize="12sp"
-                android:singleLine="true"
-                android:maxLines="1"
-                autofit:minTextSize="8sp"/>
-
-            <me.grantland.widget.AutofitTextView
-                android:id="@+id/btn_p_bank"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="500"
-                android:text="@string/agentBalance"
-                android:textColor="@color/colorPrimaryDark"
-                android:textSize="12sp"
-                android:singleLine="true"
-                android:maxLines="1"
-                autofit:minTextSize="8sp"/>
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_margin="3sp"
-            android:weightSum="800"
-            android:visibility="gone">
-
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="300"
                 android:inputType="text"
-                android:text="@string/p_status"
+                android:text="@string/p_txnamounts"
                 android:textSize="12sp" />
 
-            <me.grantland.widget.AutofitTextView
-                android:id="@+id/status"
+            <TextView
+                android:id="@+id/btn_amount"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="500"
-                android:text="@string/agentBalance"
+                android:text="@string/p_bank"
                 android:textColor="@color/colorPrimaryDark"
-                android:textSize="12sp"
-                android:singleLine="true"
-                android:maxLines="1"
-                autofit:minTextSize="8sp"/>
+                android:textSize="12sp" />
         </LinearLayout>
     </LinearLayout>
 

@@ -4,6 +4,7 @@ public class WebConfig {
     public static String WEBMain = "https://rapipay.com/";
     public static String WEB = WEBMain + "RapiPayAPIHub/";
     public static String UAT = WEB + "HandsetRegistration";
+    public static String WALLET = WEBMain + "DMTWalletService/";
     public static String KYC_RAPIPAY_APP = WEBMain + "KYC_RAPIPAY_APP/";
     public static String EKYC = KYC_RAPIPAY_APP+"EKYCProcess";
     public static String ProcessKYC = KYC_RAPIPAY_APP+"ProcessKyc";
@@ -15,7 +16,8 @@ public class WebConfig {
     public static String FUNDTRANSFER_URL = WEB + "BCServices";
     public static String NETWORKTRANSFER_URL = WEB + "GetServiceProvider";
     public static String RECHARGE_URL = WEB + "UBPService";
-    public static String WALLETTRANSFER_URL = WEB + "DMTService";
+    public static String WALLETTRANSFER_URL = WALLET + "DMTService";
+    public static String WALLETRECEIPTURL = WEB + "DMTService";
     public static String RECHARGENEW = WEBMain+"UBPAPP/UBPServices";
     public static String CASHOUT_URL = WEBMain+"MposService/MposTxnServlet";
     public static String MPOSREG = WEBMain +"KYC_RAPIPAY_APP/EnrollmentFormService";
@@ -26,7 +28,7 @@ public class WebConfig {
     public static String PMTSERVICE_DETAILS=WEBMain+"IndoNepalFTAPP/PMTService";
     public static String BCRemittanceApp = WEBMain + "BCRemittanceApp/BCService";
     public static String AEPSReg = WEBMain + "KYC_RAPIPAY_APP/registrationForward";
-     public WebConfig(String main){
+    public WebConfig(String main){
          WEBMain = main;
      }
 }

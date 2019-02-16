@@ -54,7 +54,7 @@ public class ChannelHistoryActivity extends BaseCompactActivity implements View.
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 ChannelHistoryPozo pozo = transactionPozoArrayList.get(position);
-                new AsyncPostMethod(WebConfig.WALLETTRANSFER_URL, receipt_request(pozo).toString(), headerData, ChannelHistoryActivity.this,getString(R.string.responseTimeOut)).execute();
+                new AsyncPostMethod(WebConfig.WALLETRECEIPTURL, receipt_request(pozo).toString(), headerData, ChannelHistoryActivity.this,getString(R.string.responseTimeOut)).execute();
             }
         });
         findViewById(R.id.todate).setOnClickListener(toDateClicked);
@@ -172,7 +172,7 @@ public class ChannelHistoryActivity extends BaseCompactActivity implements View.
         try {
             for (int i = 0; i < array.length(); i++) {
                 JSONObject object = array.getJSONObject(i);
-                transactionPozoArrayList.add(new ChannelHistoryPozo(object.getString("senderName") + " ( " + object.getString("mobileNo") + " )", object.getString("accountNo") + " ( " + object.getString("bankName") + " )", object.getString("requestAmt"), object.getString("txnStatus"), object.getString("txnDateTime"), object.getString("serviceProviderTXNID"), object.getString("transferType"), object.getString("userTxnId")));
+                transactionPozoArrayList.add(new ChannelHistoryPozo(object.getString("senderName") + " ( " + object.getString("mobileNo") + " )", object.getString("accountNo") + " ( " + object.getString("bankName") + " )", object.getString("requestAmt"), object.getString("txnStatus"), object.getString("txnDateTime"), object.getString("serviceProviderTXNID"), object.getString("transferType"), object.getString("userTxnId"), object.getString("serviceType")));
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -191,11 +191,11 @@ public class PendingRefundActivity extends BaseCompactActivity implements Reques
                         customDialog_Ben(object.getString("responseMessage"), object.getString("otpRefId"), object.getString("transactionId"), object.getString("serviceType"));
                     else if (object.getString("serviceType").equalsIgnoreCase("BC_Refund"))
                         customDialog_Common("PENDINGREFUND", object, null, "BC Refund", input_mobile.getText().toString(), object.getString("responseMessage"), PendingRefundActivity.this);
-                    else if (object.getString("serviceType").equalsIgnoreCase("REFUND_TXN") && object.has("otpId"))
-                        customDialog_Ben("Initiate Refund", object.getString("otpId"), "", object.getString("serviceType"));
-                    else if (object.getString("serviceType").equalsIgnoreCase("REFUND_TXN")) {
-                        localStorage.setActivityState(LocalStorage.ROUTESTATE, "UPDATE");
-                        customDialog_Common("REFUNDTXN", object, null, "REFUND TXN", null, object.getString("output"), PendingRefundActivity.this);
+                    else if (object.getString("serviceType").equalsIgnoreCase("WALLET_REFUND") && object.has("otpRefId"))
+                        customDialog_Ben("Initiate Refund", object.getString("otpRefId"), "", object.getString("serviceType"));
+                    else if (object.getString("serviceType").equalsIgnoreCase("PROCESS_OTP")) {
+//                        localStorage.setActivityState(LocalStorage.ROUTESTATE, "UPDATE");
+                        customDialog_Common("REFUNDTXN", object, null, "REFUND TXN", null, object.getString("responseMessage"), PendingRefundActivity.this);
                     } else
                         change_View(object);
                 }
@@ -289,16 +289,15 @@ public class PendingRefundActivity extends BaseCompactActivity implements Reques
     public JSONObject getrefundDmt(LastTransactionPozo pozo) {
         JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put("serviceType", "REFUND_TXN");
+            jsonObject.put("serviceType", "WALLET_REFUND ");
             jsonObject.put("requestType", "DMT_CHANNEL");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("transactionId", pozo.getRefundTxnId());
+            jsonObject.put("fundtransactionID", pozo.getRefundTxnId());
             jsonObject.put("txnRef", ImageUtils.miliSeconds());
-            jsonObject.put("nodeAgentId", list.get(0).getMobilno());
-            jsonObject.put("agentId", list.get(0).getMobilno());
+            jsonObject.put("txnIP", ImageUtils.ipAddress(PendingRefundActivity.this));
+            jsonObject.put("agentID", list.get(0).getMobilno());
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
-            jsonObject.put("customerId", pozo.getTransferType());
-            jsonObject.put("mobileNo", input_mobile.getText().toString());
+            jsonObject.put("reqFor", "WALLET");
             jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
 
         } catch (Exception e) {
@@ -400,9 +399,9 @@ public class PendingRefundActivity extends BaseCompactActivity implements Reques
         TextView texttitle = (TextView) alertLayout.findViewById(R.id.dialog_title);
         texttitle.setText(msg);
         final EditText text = (EditText) alertLayout.findViewById(R.id.input_amount_ben);
-        if (serviceType.equalsIgnoreCase("REFUND_TXN")) {
-            maxLength = 4;
-            text.setHint("Enter 4 digit OTP for Refund");
+        if (serviceType.equalsIgnoreCase("WALLET_REFUND")) {
+            maxLength = 6;
+            text.setHint("Enter 6 digit OTP for Refund");
         } else if (serviceType.equalsIgnoreCase("BC_Refund")) {
             maxLength = 6;
             text.setHint("Enter 6 digit OTP for Refund");
@@ -423,13 +422,18 @@ public class PendingRefundActivity extends BaseCompactActivity implements Reques
         btn_ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!text.getText().toString().isEmpty() && text.length() == 6 && !transactionId.equalsIgnoreCase("") && serviceType.equalsIgnoreCase("BC_Refund"))
-                    new AsyncPostMethod(WebConfig.BCRemittanceApp, add_OtpDetails(otpRefId, transactionId, text.getText().toString()).toString(), headerData, PendingRefundActivity.this,getString(R.string.responseTimeOut)).execute();
-                else if (!text.getText().toString().isEmpty() && text.length() == 4 && transactionId.equalsIgnoreCase("") && serviceType.equalsIgnoreCase("REFUND_TXN"))
-                    new AsyncPostMethod(WebConfig.WALLETTRANSFER_URL, processOtp(text.getText().toString(), otpRefId).toString(), headerData, PendingRefundActivity.this,getString(R.string.responseTimeOut)).execute();
-                else
+                if (!text.getText().toString().isEmpty() && text.length() == 6 && !transactionId.equalsIgnoreCase("") && serviceType.equalsIgnoreCase("BC_Refund")) {
+                    new AsyncPostMethod(WebConfig.BCRemittanceApp, add_OtpDetails(otpRefId, transactionId, text.getText().toString()).toString(), headerData, PendingRefundActivity.this, getString(R.string.responseTimeOut)).execute();
+                    alertDialog.dismiss();
+                }else if (!text.getText().toString().isEmpty() && text.length() == 6 && transactionId.equalsIgnoreCase("") && serviceType.equalsIgnoreCase("WALLET_REFUND")) {
+                    new AsyncPostMethod(WebConfig.WALLETTRANSFER_URL, processOtp(text.getText().toString(), otpRefId).toString(), headerData, PendingRefundActivity.this, getString(R.string.responseTimeOut)).execute();
+                    alertDialog.dismiss();
+                }else {
+                    text.setError("Please Enter Otp");
+                    text.requestFocus();
                     Toast.makeText(PendingRefundActivity.this, "Enter OTP", Toast.LENGTH_SHORT).show();
-                alertDialog.dismiss();
+                }
+
             }
         });
         alertDialog = dialog.show();
@@ -442,12 +446,12 @@ public class PendingRefundActivity extends BaseCompactActivity implements Reques
             jsonObject.put("requestType", "DMT_CHANNEL");
             jsonObject.put("typeMobileWeb", "mobile");
             jsonObject.put("txnRef", ImageUtils.miliSeconds());
-            jsonObject.put("nodeAgentId", list.get(0).getMobilno());
-            jsonObject.put("agentId", list.get(0).getMobilno());
+            jsonObject.put("agentID", list.get(0).getMobilno());
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
-            jsonObject.put("mobileNo", input_mobile.getText().toString());
-            jsonObject.put("otpId", otpRefId);
+            jsonObject.put("senderMobileNo", input_mobile.getText().toString());
+            jsonObject.put("otpRefId", otpRefId);
             jsonObject.put("otp", otp);
+            jsonObject.put("reqFor", "WALLET");
             jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
         } catch (Exception e) {
             e.printStackTrace();

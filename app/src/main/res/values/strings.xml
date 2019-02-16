@@ -41,6 +41,7 @@
     <string name="btnfund">Fund Transfer</string>
     <string name="btnben">Add Beneficiary</string>
     <string name="btnverify">Verify/Add Account</string>
+    <string name="btnverifywal">Verify/Add Beneficiary</string>
     <string name="walletbtnverify">Verify Account</string>
     <string name="p_accounttr">Account Transfer</string>
     <string name="p_benaadd">Add New Beneficiary</string>
@@ -83,6 +84,7 @@
     <string name="p_travel">Travel and Insurance</string>
     <string name="p_mpos">MPOS</string>
     <string name="p_name">Enter Sender Name*</string>
+    <string name="p_namecust">Enter Customer Name*</string>
     <string name="p_benname">Enter Beneficiary Name</string>
     <string name="p_otp">Enter OTP</string>
     <string name="p_account">Enter Sender Account No.</string>

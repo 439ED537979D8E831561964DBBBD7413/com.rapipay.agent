@@ -20,7 +20,8 @@ public class PassbookAdapter  extends RecyclerView.Adapter<PassbookAdapter.ViewH
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
-        public AutofitTextView btn_p_bank,btn_name,p_transid,btn_p_amounts,status;
+        public AutofitTextView btn_p_bank,btn_name,p_transid,btn_p_amounts;
+//        ,status;
 
         public ViewHolder(View view) {
             super(view);
@@ -29,7 +30,7 @@ public class PassbookAdapter  extends RecyclerView.Adapter<PassbookAdapter.ViewH
             btn_p_amounts = (AutofitTextView) view.findViewById(R.id.btn_p_amounts);
             p_transid = (AutofitTextView) view.findViewById(R.id.btn_p_transid);
             btn_p_bank = (AutofitTextView)view.findViewById(R.id.btn_p_bank);
-            status = (AutofitTextView)view.findViewById(R.id.status);
+//            status = (AutofitTextView)view.findViewById(R.id.status);
         }
     }
 
@@ -51,7 +52,7 @@ public class PassbookAdapter  extends RecyclerView.Adapter<PassbookAdapter.ViewH
         holder.btn_name.setText(mValues.get(position).getServiceName());
         holder.p_transid.setText(mValues.get(position).getTxncrdrAmount());
         holder.btn_p_bank.setText(mValues.get(position).getOpeningclosingBalance());
-        holder.status.setText(mValues.get(position).getTransactionStatus());
+//        holder.status.setText(mValues.get(position).getTransactionStatus());
     }
 
     @Override

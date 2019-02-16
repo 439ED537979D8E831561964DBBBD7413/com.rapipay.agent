@@ -72,6 +72,17 @@
             android:singleLine="true"
             android:maxLines="1"
             autofit:minTextSize="10sp"/>
+        <me.grantland.widget.AutofitTextView
+            android:id="@+id/transferType"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="500"
+            android:text="@string/agentBalance"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="14sp"
+            android:singleLine="true"
+            android:maxLines="1"
+            autofit:minTextSize="10sp"/>
     </LinearLayout>
 
 </android.support.v7.widget.CardView>

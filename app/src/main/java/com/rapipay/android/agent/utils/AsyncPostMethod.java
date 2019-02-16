@@ -25,15 +25,18 @@ public class AsyncPostMethod extends AsyncTask<String, String, String> {
     CustomProgessDialog dialog;
     Context context;
     String responseData;
+    String hitFrom;
 
-//    public AsyncPostMethod(String url, String xmlData, String strHeaderData, Context handler) {
-//        this.url = url;
-//        this.xmlData = xmlData;
-//        this.strHeaderData = strHeaderData;
-//        this.context = handler;
-//        this.handler = (RequestHandler) handler;
-//        dialog = new CustomProgessDialog(handler);
-//    }
+    public AsyncPostMethod(String url, String xmlData, String strHeaderData, Context handler,String responseData,String hitFrom) {
+        this.url = url;
+        this.xmlData = xmlData;
+        this.strHeaderData = strHeaderData;
+        this.context = handler;
+        this.handler = (RequestHandler) handler;
+        this.responseData = responseData;
+        this.hitFrom = hitFrom;
+        dialog = new CustomProgessDialog(handler);
+    }
 
     public AsyncPostMethod(String url, String xmlData, String strHeaderData, Context handler,String responseData) {
         this.url = url;

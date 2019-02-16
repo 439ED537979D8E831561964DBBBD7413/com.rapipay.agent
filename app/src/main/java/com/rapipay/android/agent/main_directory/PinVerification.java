@@ -79,11 +79,11 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
     }
 
     private void loadApi() {
-        new AsyncPostMethod(WebConfig.NETWORKTRANSFER_URL, getFooterData().toString(), headerData, PinVerification.this,getString(R.string.responseTimeOut)).execute();
+        new AsyncPostMethod(WebConfig.NETWORKTRANSFER_URL, getFooterData().toString(), headerData, PinVerification.this, getString(R.string.responseTimeOut)).execute();
     }
 
     private void loadMaster() {
-        new AsyncPostMethod(WebConfig.LOGIN_URL, getMaster().toString(), headerData, PinVerification.this,getString(R.string.responseTimeOut)).execute();
+        new AsyncPostMethod(WebConfig.LOGIN_URL, getMaster().toString(), headerData, PinVerification.this, getString(R.string.responseTimeOut)).execute();
     }
 
     private void initialize() {
@@ -183,8 +183,8 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
                 jsonObject.put("deviceName", Build.MANUFACTURER);
                 jsonObject.put("sessionRefNo", list.get(0).getSessionRefNo());
                 jsonObject.put("osType", "ANDROID");
-                jsonObject.put("domainName",BuildConfig.DOMAINNAME);
-                jsonObject.put("clientRequestIP",ImageUtils.ipAddress(PinVerification.this));
+                jsonObject.put("domainName", BuildConfig.DOMAINNAME);
+                jsonObject.put("clientRequestIP", ImageUtils.ipAddress(PinVerification.this));
                 jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getSession(), jsonObject.toString()));
 
             } catch (Exception e) {
@@ -460,9 +460,13 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
             try {
                 PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
                 String version = pInfo.versionName;
-                if (stringArrayList.get(0).equalsIgnoreCase(version) && (stringArrayList.get(1).equalsIgnoreCase("F") || stringArrayList.get(1).equalsIgnoreCase("N"))) {
-                    new AsyncPostMethod(WebConfig.LOGIN_URL, getJson_Validate(confirmpinView.getText().toString()).toString(), "", PinVerification.this,getString(R.string.responseTimeOut)).execute();
-                }else {
+                if (stringArrayList.get(0).equalsIgnoreCase(version) && stringArrayList.get(1).equalsIgnoreCase("F")) {
+                    new AsyncPostMethod(WebConfig.LOGIN_URL, getJson_Validate(confirmpinView.getText().toString()).toString(), "", PinVerification.this, getString(R.string.responseTimeOut)).execute();
+                } else if (!stringArrayList.get(0).equalsIgnoreCase(version) && stringArrayList.get(1).equalsIgnoreCase("F")) {
+                    customDialog_Common("KYCLAYOUTSS", null, null, "Update Available", null, "You are running on lower version please update for new versions!.", PinVerification.this);
+                } else if (!stringArrayList.get(0).equalsIgnoreCase(version) && stringArrayList.get(1).equalsIgnoreCase("N")) {
+                    new AsyncPostMethod(WebConfig.LOGIN_URL, getJson_Validate(confirmpinView.getText().toString()).toString(), "", PinVerification.this, getString(R.string.responseTimeOut)).execute();
+                } else {
                     customDialog_Common("KYCLAYOUTSS", null, null, "Update Available", null, "You are running on lower version please update for new versions!.", PinVerification.this);
                 }
             } catch (PackageManager.NameNotFoundException e) {

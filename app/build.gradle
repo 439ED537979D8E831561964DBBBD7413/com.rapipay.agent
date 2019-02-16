@@ -7,8 +7,8 @@ android {
 //        applicationId "com.rapipay.android.agent"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 22
-        versionName "0.22"
+        versionCode 25
+        versionName "0.25"
         multiDexEnabled true
         buildConfigField "int", "APPTYPE", "2"
         buildConfigField "String", "USERTYPE", "\"Other\""
@@ -25,6 +25,7 @@ android {
         exclude 'META-INF/LICENSE'
         exclude 'META-INF/ASL2.0'
         exclude 'VERSION.txt'
+        exclude 'ic_launcher_background.png'
     }
 
     dataBinding {

@@ -95,13 +95,13 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Sender Name" />
+                            android:text="Customer Name" />
 
                         <TextView
                             android:id="@+id/input_name"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="@string/p_name"
+                            android:hint="@string/p_namecust"
                             android:inputType="text"
                             android:textSize="16dp" />
                     </LinearLayout>
@@ -173,6 +173,7 @@
                     android:visibility="gone">
 
                     <TextView
+                        android:id="@+id/text_ben"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@color/colorPrimaryDark"
@@ -203,7 +204,7 @@
                             android:id="@+id/input_account"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="@string/p_recaccount"
+                            android:hint="@string/p_benaccount"
                             android:inputType="number"
                             android:textSize="16dp" />
                     </android.support.design.widget.TextInputLayout>
@@ -238,7 +239,7 @@
                             android:background="@drawable/border_button"
                             android:onClick="onClick"
                             android:clickable="true"
-                            android:text="@string/walletbtnverify"
+                            android:text="@string/btnverifywal"
                             android:textColor="@color/white"
                             android:textSize="10dp" />
 
@@ -251,7 +252,7 @@
                             android:background="@drawable/border_button"
                             android:onClick="onClick"
                             android:clickable="true"
-                            android:text="@string/p_addPayee"
+                            android:text="@string/p_bendd"
                             android:textColor="@color/white"
                             android:textSize="10dp" />
                     </LinearLayout>
@@ -294,7 +295,6 @@
                     android:visibility="gone">
 
                     <TextView
-                        android:id="@+id/text_ben"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@color/colorPrimaryDark"

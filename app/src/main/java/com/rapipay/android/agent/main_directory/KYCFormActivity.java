@@ -120,7 +120,7 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
         setContentView(R.layout.kyc_personal_detail);
         setUpGClient();
         initialize();
-        loadCamera();
+//        loadCamera();
     }
 
     private void initialize() {
