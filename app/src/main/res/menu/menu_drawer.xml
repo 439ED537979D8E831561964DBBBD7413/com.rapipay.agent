@@ -18,9 +18,17 @@
             android:id="@+id/nav_Cmobile"
             android:title="Change Mobile" />
         <item
+            android:id="@+id/settle_Cmobile"
+            android:title="Settlement Bank" />
+        <item
+            android:id="@+id/payload_Cmobile"
+            android:title="Payload Bank" />
+        <item
+            android:id="@+id/lien_Cmobile"
+            android:title="Lien History" />
+        <item
             android:id="@+id/nav_faq"
             android:title="FAQ" />
-
         <item
             android:id="@+id/nav_contactus"
             android:title="Contact US " />

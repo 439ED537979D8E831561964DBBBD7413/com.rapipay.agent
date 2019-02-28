@@ -81,9 +81,9 @@ public class PendingRefundActivity extends BaseCompactActivity implements Reques
                 refundPosition = position;
                 LastTransactionPozo pozo = refundPozoArrayList.get(position);
                 if (!pozo.getServiceProviderTXNID().equalsIgnoreCase("DMT"))
-                    new AsyncPostMethod(WebConfig.BCRemittanceApp, getrefund_Validate(pozo.getRefundTxnId()).toString(), headerData, PendingRefundActivity.this,getString(R.string.responseTimeOut)).execute();
+                    new AsyncPostMethod(WebConfig.BCRemittanceApp, getrefund_Validate(pozo.getRefundTxnId()).toString(), headerData, PendingRefundActivity.this, getString(R.string.responseTimeOut)).execute();
                 else
-                    new AsyncPostMethod(WebConfig.WALLETTRANSFER_URL, getrefundDmt(pozo).toString(), headerData, PendingRefundActivity.this,getString(R.string.responseTimeOut)).execute();
+                    new AsyncPostMethod(WebConfig.WALLETTRANSFER_URL, getrefundDmt(pozo).toString(), headerData, PendingRefundActivity.this, getString(R.string.responseTimeOut)).execute();
             }
 
             @Override
@@ -97,7 +97,7 @@ public class PendingRefundActivity extends BaseCompactActivity implements Reques
             @Override
             public void onClick(View view, int position) {
                 LastTransactionPozo pozo = pendingPozoArrayList.get(position);
-                new AsyncPostMethod(WebConfig.BCRemittanceApp, getpending_Validate(pozo.getRefundTxnId()).toString(), headerData, PendingRefundActivity.this,getString(R.string.responseTimeOut)).execute();
+                new AsyncPostMethod(WebConfig.BCRemittanceApp, getpending_Validate(pozo.getRefundTxnId()).toString(), headerData, PendingRefundActivity.this, getString(R.string.responseTimeOut)).execute();
             }
 
             @Override
@@ -120,7 +120,7 @@ public class PendingRefundActivity extends BaseCompactActivity implements Reques
             @Override
             public void afterTextChanged(Editable s) {
                 if (s.length() == 10)
-                    new AsyncPostMethod(WebConfig.BCRemittanceApp, getSender_Validate(input_mobile.getText().toString()).toString(), headerData, PendingRefundActivity.this,getString(R.string.responseTimeOut)).execute();
+                    new AsyncPostMethod(WebConfig.BCRemittanceApp, getSender_Validate(input_mobile.getText().toString()).toString(), headerData, PendingRefundActivity.this, getString(R.string.responseTimeOut)).execute();
                 else
                     reset();
             }
@@ -155,13 +155,11 @@ public class PendingRefundActivity extends BaseCompactActivity implements Reques
                 }
                 if (object.has("pendingTxnList")) {
                     if (Integer.parseInt(object.getString("pendingTxnCount")) > 0) {
-                        pending_tran_layout.setVisibility(View.VISIBLE);
                         insertPendingTransDetails(object.getJSONArray("pendingTxnList"));
                     }
                 }
                 if (object.has("beneListDetail")) {
                     if (Integer.parseInt(object.getString("beneCount")) > 0) {
-                        beneficiary_layout.setVisibility(View.VISIBLE);
                         insertBenfDetails(object.getJSONArray("beneListDetail"));
                     }
                 }
@@ -311,13 +309,16 @@ public class PendingRefundActivity extends BaseCompactActivity implements Reques
         try {
             for (int i = 0; i < array.length(); i++) {
                 JSONObject object = array.getJSONObject(i);
-                beneficiaryDetailsPozoslist.add(new BeneficiaryDetailsPozo(object.getString("bank_ACCOUNT_NAME"), object.getString("account_NUMBER"), object.getString("account_IFSC"), object.getString("bank_Name"), object.getString("bc_BENE_ID")));
+                if (!object.getString("bc_BENE_ID").isEmpty() && !object.getString("bc_BENE_ID").equalsIgnoreCase("null"))
+                    beneficiaryDetailsPozoslist.add(new BeneficiaryDetailsPozo(object.getString("bank_ACCOUNT_NAME"), object.getString("account_NUMBER"), object.getString("account_IFSC"), object.getString("bank_Name"), object.getString("bc_BENE_ID")));
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (beneficiaryDetailsPozoslist.size() != 0)
+        if (beneficiaryDetailsPozoslist.size() != 0) {
+            beneficiary_layout.setVisibility(View.VISIBLE);
             initializeBenAdapter(beneficiaryDetailsPozoslist);
+        }
     }
 
     private void insertLastTransDetails(JSONArray array) {
@@ -380,8 +381,10 @@ public class PendingRefundActivity extends BaseCompactActivity implements Reques
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (pendingPozoArrayList.size() != 0)
+        if (pendingPozoArrayList.size() != 0) {
+            pending_tran_layout.setVisibility(View.VISIBLE);
             initializePendingAdapter(pendingPozoArrayList);
+        }
     }
 
     private void initializePendingAdapter(ArrayList<LastTransactionPozo> list) {
@@ -425,10 +428,10 @@ public class PendingRefundActivity extends BaseCompactActivity implements Reques
                 if (!text.getText().toString().isEmpty() && text.length() == 6 && !transactionId.equalsIgnoreCase("") && serviceType.equalsIgnoreCase("BC_Refund")) {
                     new AsyncPostMethod(WebConfig.BCRemittanceApp, add_OtpDetails(otpRefId, transactionId, text.getText().toString()).toString(), headerData, PendingRefundActivity.this, getString(R.string.responseTimeOut)).execute();
                     alertDialog.dismiss();
-                }else if (!text.getText().toString().isEmpty() && text.length() == 6 && transactionId.equalsIgnoreCase("") && serviceType.equalsIgnoreCase("WALLET_REFUND")) {
+                } else if (!text.getText().toString().isEmpty() && text.length() == 6 && transactionId.equalsIgnoreCase("") && serviceType.equalsIgnoreCase("WALLET_REFUND")) {
                     new AsyncPostMethod(WebConfig.WALLETTRANSFER_URL, processOtp(text.getText().toString(), otpRefId).toString(), headerData, PendingRefundActivity.this, getString(R.string.responseTimeOut)).execute();
                     alertDialog.dismiss();
-                }else {
+                } else {
                     text.setError("Please Enter Otp");
                     text.requestFocus();
                     Toast.makeText(PendingRefundActivity.this, "Enter OTP", Toast.LENGTH_SHORT).show();
@@ -495,7 +498,7 @@ public class PendingRefundActivity extends BaseCompactActivity implements Reques
     @Override
     public void okClicked(String type, Object ob) {
         if (!type.equalsIgnoreCase("PENDINGREFUND") && !type.equalsIgnoreCase("KYCLAYOUT") && !type.equalsIgnoreCase("REFUNDTXN") && !type.equalsIgnoreCase("KYCLAYOUTS") && !type.equalsIgnoreCase("KYCLAYOUTSS"))
-            new AsyncPostMethod(WebConfig.BCRemittanceApp, getSender_Validate(type).toString(), headerData, PendingRefundActivity.this,getString(R.string.responseTimeOut)).execute();
+            new AsyncPostMethod(WebConfig.BCRemittanceApp, getSender_Validate(type).toString(), headerData, PendingRefundActivity.this, getString(R.string.responseTimeOut)).execute();
         else if (type.equalsIgnoreCase("REFUNDTXN")) {
             refundPozoArrayList.remove(refundPosition);
             adapter.notifyDataSetChanged();

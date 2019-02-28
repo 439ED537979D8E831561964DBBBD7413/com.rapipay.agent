@@ -41,7 +41,6 @@ import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.gson.Gson;
 import com.pnsol.sdk.auth.AccountValidator;
-import com.pnsol.sdk.interfaces.DeviceCommunicationMode;
 import com.pnsol.sdk.interfaces.DeviceType;
 import com.pnsol.sdk.interfaces.PaymentTransactionConstants;
 import com.pnsol.sdk.miura.emv.tlv.ISOUtil;
@@ -54,7 +53,8 @@ import com.rapipay.android.agent.adapter.AcquirerBanksListAdapter;
 import com.rapipay.android.agent.adapter.EMITenureAdapter;
 import com.rapipay.android.agent.interfaces.CustomInterface;
 import com.rapipay.android.agent.interfaces.RequestHandler;
-import com.rapipay.android.agent.utils.AsyncPostMethod;
+import com.rapipay.android.agent.interfaces.WalletRequestHandler;
+import com.rapipay.android.agent.utils.WalletAsyncMethod;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
 import com.rapipay.android.agent.utils.CustomProgessDialog;
 import com.rapipay.android.agent.utils.GenerateChecksum;
@@ -82,21 +82,17 @@ import static com.pnsol.sdk.interfaces.PaymentTransactionConstants.SWIP_TRANSACT
 import static com.pnsol.sdk.interfaces.PaymentTransactionConstants.TRANSACTION_FAILED;
 import static com.pnsol.sdk.interfaces.PaymentTransactionConstants.TRANSACTION_PENDING;
 
-public class CashOutClass extends BaseCompactActivity implements View.OnClickListener, RequestHandler, GoogleApiClient.ConnectionCallbacks,
+public class CashOutClass extends BaseCompactActivity implements View.OnClickListener, WalletRequestHandler, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener, CustomInterface {
     Handler handler;
     EditText input_mobile, input_amount;
-    AppCompatButton btn_fund, receipt_details;
+    AppCompatButton btn_fund_mpos, receipt_details;
     ArrayList<AcquirerEmiDetailsVO> arrayLists;
     AccountValidator validator;
-    String typeput;
-    private Location mylocation;
-    private final static int REQUEST_CHECK_SETTINGS_GPS = 0x5;
-    private final static int REQUEST_ID_MULTIPLE_PERMISSIONS = 0x2;
+    String serviceType, requestChannel, requestType, reqFor, typeput;
     String tid = "", mid = "", orderID = "";
-    private BluetoothAdapter btAdapter;
-    private static int REQUEST_BLUETOOTH = 101;
+    JSONObject requestData = null;
     HostResponse type = null;
     String sign;
     private PaymentInitialization initialization;
@@ -114,6 +110,10 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.cashout_layout);
         typeput = getIntent().getStringExtra("typeput");
+        serviceType = getIntent().getStringExtra("serviceType");
+        requestChannel = getIntent().getStringExtra("requestChannel");
+        requestType = getIntent().getStringExtra("requestType");
+        reqFor = getIntent().getStringExtra("reqFor");
         setUpGClient();
         initialize_hanlder();
         initialize();
@@ -136,7 +136,7 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                             try {
                                 Gson gson = new Gson();
                                 String json = gson.toJson(type);
-                                new AsyncPostMethod(WebConfig.CASHOUT_URL, updateCashOutDetails(json).toString(), headerData, CashOutClass.this,getString(R.string.responseTimeOut)).execute();
+                                new WalletAsyncMethod(WebConfig.CASHOUT_URL, updateCashOutDetails(json).toString(), headerData, CashOutClass.this, getString(R.string.responseTimeOut), "UPDATE_MPOS").execute();
                             } catch (Exception e) {
 
                             }
@@ -150,7 +150,7 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                                     AcquirerBanksListAdapter(CashOutClass.this, acquirerBanksList);
                             select_bank.setVisibility(View.VISIBLE);
                             select_bank.setAdapter(adapter);
-                            findViewById(R.id.btn_fund).setVisibility(View.GONE);
+                            findViewById(R.id.btn_fund_mpos).setVisibility(View.GONE);
                             findViewById(R.id.getEmidetails).setVisibility(View.GONE);
                         } else if (check.equalsIgnoreCase("EMIDETAILS")) {
                             progessDialog.hide_progress();
@@ -165,16 +165,20 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                         }
                     } else if (!typeput.equalsIgnoreCase("EMI")) {
                         if (!transactionFlag) {
-                            initialization = new PaymentInitialization(CashOutClass.this);
-                            if (typeput.equalsIgnoreCase("CASHOUT"))
-                                initialization.initiateTransaction(handler, DeviceType.ME30S, accessBluetoothDetails(), input_amount.getText().toString() + ".00", PaymentTransactionConstants.CASH_AT_POS, PaymentTransactionConstants.DEBIT,
-                                        input_mobile.getText().toString(), mylocation.getLatitude(), mylocation.getLongitude(), orderID, null, DeviceCommunicationMode.BLUETOOTHCOMMUNICATION);
-                            else if (typeput.equalsIgnoreCase("SALE"))
-                                initialization.initiateTransaction(handler, DeviceType.ME30S, accessBluetoothDetails(), input_amount.getText().toString() + ".00", PaymentTransactionConstants.SALE, PaymentTransactionConstants.DEBIT,
-                                        input_mobile.getText().toString(), mylocation.getLatitude(), mylocation.getLongitude(), orderID, null, DeviceCommunicationMode.BLUETOOTHCOMMUNICATION);
-                            else if (typeput.equalsIgnoreCase("EMI"))
-                                initialization.initiateTransaction(handler, DeviceType.ME30S, accessBluetoothDetails(), input_amount.getText().toString() + ".00", PaymentTransactionConstants.EMI, PaymentTransactionConstants.CREDIT,
-                                        input_mobile.getText().toString(), mylocation.getLatitude(), mylocation.getLongitude(), orderID, null, acquirerEmiDetailsVO, DeviceCommunicationMode.BLUETOOTHCOMMUNICATION);
+                            try {
+                                initialization = new PaymentInitialization(CashOutClass.this);
+                                if (typeput.equalsIgnoreCase("CASHOUT"))
+                                    initialization.initiateTransaction(handler, requestData.getInt("DEVICE_TYPE"), requestData.getString("BLUE_TOOTH_ID"), requestData.getString("TXN_AMOUNT") + ".00", requestData.getString("CAS_AT_POS"), requestData.getString("PAYMENT_TXN_CONST"),
+                                            requestData.getString("AGENT_MOIBLE"), requestData.getDouble("LONGTITUDE"), requestData.getDouble("LATITUDE"), requestData.getString("ORDER_ID"), null, requestData.getInt("DEVICE_COM_MODE"));
+                                else if (typeput.equalsIgnoreCase("SALE"))
+                                    initialization.initiateTransaction(handler, requestData.getInt("DEVICE_TYPE"), requestData.getString("BLUE_TOOTH_ID"), requestData.getString("TXN_AMOUNT") + ".00", requestData.getString("CAS_AT_POS"), requestData.getString("PAYMENT_TXN_CONST"),
+                                            requestData.getString("AGENT_MOIBLE"), requestData.getDouble("LONGTITUDE"), requestData.getDouble("LATITUDE"), requestData.getString("ORDER_ID"), null, requestData.getInt("DEVICE_COM_MODE"));
+                                else if (typeput.equalsIgnoreCase("EMI"))
+                                    initialization.initiateTransaction(handler, requestData.getInt("DEVICE_TYPE"), requestData.getString("BLUE_TOOTH_ID"), requestData.getString("TXN_AMOUNT") + ".00", requestData.getString("CAS_AT_POS"), requestData.getString("PAYMENT_TXN_CONST"),
+                                            requestData.getString("AGENT_MOIBLE"), requestData.getDouble("LONGTITUDE"), requestData.getDouble("LATITUDE"), requestData.getString("ORDER_ID"), null, acquirerEmiDetailsVO, requestData.getInt("DEVICE_COM_MODE"));
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         }
                         if (transactionFlag) {
                             progessDialog.hide_progress();
@@ -183,7 +187,7 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                                     type = (HostResponse) msg.obj;
                                     Gson gson = new Gson();
                                     String json = gson.toJson(type);
-                                    new AsyncPostMethod(WebConfig.CASHOUT_URL, updateCashOutDetails(json).toString(), headerData, CashOutClass.this,getString(R.string.responseTimeOut)).execute();
+                                    new WalletAsyncMethod(WebConfig.CASHOUT_URL, updateCashOutDetails(json).toString(), headerData, CashOutClass.this, getString(R.string.responseTimeOut), "UPDATE_MPOS").execute();
                                 } else
                                     Toast.makeText(CashOutClass.this, "Please pair device through bluetooth", Toast.LENGTH_SHORT).show();
                             } catch (Exception e) {
@@ -192,8 +196,7 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                         }
                     }
                 }
-                if (msg.what == FAIL)
-                {
+                if (msg.what == FAIL) {
                     try {
                         clear();
                         progessDialog.hide_progress();
@@ -203,7 +206,7 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                             JSONObject object = new JSONObject();
                             object.put("responseCode", msg.what);
                             object.put("responseValue", msg.obj);
-                            new AsyncPostMethod(WebConfig.CASHOUT_URL, updateCashOutDetails(object.toString()).toString(), headerData, CashOutClass.this,getString(R.string.responseTimeOut)).execute();
+                            new WalletAsyncMethod(WebConfig.CASHOUT_URL, updateCashOutDetails(object.toString()).toString(), headerData, CashOutClass.this, getString(R.string.responseTimeOut), "UPDATE_MPOS").execute();
                         } else
                             Toast.makeText(CashOutClass.this, "Please pair device through bluetooth", Toast.LENGTH_SHORT).show();
                     } catch (Exception e) {
@@ -221,7 +224,7 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                             JSONObject object = new JSONObject();
                             object.put("responseCode", msg.what);
                             object.put("responseValue", msg.obj);
-                            new AsyncPostMethod(WebConfig.CASHOUT_URL, updateCashOutDetails(object.toString()).toString(), headerData, CashOutClass.this,getString(R.string.responseTimeOut)).execute();
+                            new WalletAsyncMethod(WebConfig.CASHOUT_URL, updateCashOutDetails(object.toString()).toString(), headerData, CashOutClass.this, getString(R.string.responseTimeOut), "UPDATE_MPOS").execute();
                         } else
                             Toast.makeText(CashOutClass.this, "Please pair device through bluetooth", Toast.LENGTH_SHORT).show();
                     } catch (Exception e) {
@@ -261,7 +264,7 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                             JSONObject object = new JSONObject();
                             object.put("responseCode", msg.what);
                             object.put("responseValue", msg.obj);
-                            new AsyncPostMethod(WebConfig.CASHOUT_URL, updateCashOutDetails(object.toString()).toString(), headerData, CashOutClass.this,getString(R.string.responseTimeOut)).execute();
+                            new WalletAsyncMethod(WebConfig.CASHOUT_URL, updateCashOutDetails(object.toString()).toString(), headerData, CashOutClass.this, getString(R.string.responseTimeOut), "UPDATE_MPOS").execute();
                         } else
                             Toast.makeText(CashOutClass.this, "Please pair device through bluetooth", Toast.LENGTH_SHORT).show();
                     } catch (Exception e) {
@@ -279,7 +282,7 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                             JSONObject object = new JSONObject();
                             object.put("responseCode", msg.what);
                             object.put("responseValue", msg.obj);
-                            new AsyncPostMethod(WebConfig.CASHOUT_URL, updateCashOutDetails(object.toString()).toString(), headerData, CashOutClass.this,getString(R.string.responseTimeOut)).execute();
+                            new WalletAsyncMethod(WebConfig.CASHOUT_URL, updateCashOutDetails(object.toString()).toString(), headerData, CashOutClass.this, getString(R.string.responseTimeOut), "UPDATE_MPOS").execute();
                         } else
                             Toast.makeText(CashOutClass.this, "Please pair device through bluetooth", Toast.LENGTH_SHORT).show();
                     } catch (Exception e) {
@@ -296,7 +299,7 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                             JSONObject object = new JSONObject();
                             object.put("responseCode", msg.what);
                             object.put("responseValue", msg.obj);
-                            new AsyncPostMethod(WebConfig.CASHOUT_URL, updateCashOutDetails(object.toString()).toString(), headerData, CashOutClass.this,getString(R.string.responseTimeOut)).execute();
+                            new WalletAsyncMethod(WebConfig.CASHOUT_URL, updateCashOutDetails(object.toString()).toString(), headerData, CashOutClass.this, getString(R.string.responseTimeOut), "UPDATE_MPOS").execute();
                         } else
                             Toast.makeText(CashOutClass.this, "Please pair device through bluetooth", Toast.LENGTH_SHORT).show();
                     } catch (Exception e) {
@@ -320,7 +323,7 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
         findViewById(R.id.inflate_main).setVisibility(View.GONE);
         findViewById(R.id.getdetails).setVisibility(View.GONE);
         findViewById(R.id.getEmidetails).setVisibility(View.GONE);
-        findViewById(R.id.btn_fund).setVisibility(View.VISIBLE);
+        findViewById(R.id.btn_fund_mpos).setVisibility(View.VISIBLE);
     }
 
     AcquirerEmiDetailsVO acquirerEmiDetailsVO = null;
@@ -335,10 +338,10 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
             heading.setText(typeput);
         input_mobile = (EditText) findViewById(R.id.input_mobile);
         input_amount = (EditText) findViewById(R.id.input_amount);
-        btn_fund = (AppCompatButton) findViewById(R.id.btn_fund);
+        btn_fund_mpos = (AppCompatButton) findViewById(R.id.btn_fund_mpos);
         receipt_details = (AppCompatButton) findViewById(R.id.reciept_details);
         receipt_details.setOnClickListener(this);
-        btn_fund.setOnClickListener(this);
+        btn_fund_mpos.setOnClickListener(this);
         select_bank = (Spinner) findViewById(R.id.select_bank);
         inflate_tenureee = (LinearLayout) findViewById(R.id.inflate_tenureee);
         lv_imflate = (ListView) findViewById(R.id.lv_imflate);
@@ -379,7 +382,7 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
             case R.id.btn_contact:
                 loadIMEI();
                 break;
-            case R.id.btn_fund:
+            case R.id.btn_fund_mpos:
                 hideKeyboard(CashOutClass.this);
                 if (!ImageUtils.commonAmount(input_mobile.getText().toString())) {
                     input_mobile.setError("Please enter mobile number");
@@ -389,7 +392,7 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                     input_amount.requestFocus();
                 } else {
                     if (accessBluetoothDetails() != null)
-                        new AsyncPostMethod(WebConfig.CASHOUT_URL, getCashOutDetails(input_mobile.getText().toString(), input_amount.getText().toString()).toString(), headerData, CashOutClass.this,getString(R.string.responseTimeOut)).execute();
+                        new WalletAsyncMethod(WebConfig.CASHOUT_URL, getCashOutDetails(input_mobile.getText().toString(), input_amount.getText().toString(), serviceType, requestChannel, reqFor, requestType, accessBluetoothDetails()).toString(), headerData, CashOutClass.this, getString(R.string.responseTimeOut), typeput).execute();
                     else
                         Toast.makeText(CashOutClass.this, "Please pair device through bluetooth", Toast.LENGTH_SHORT).show();
                 }
@@ -426,35 +429,10 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
     }
 
     boolean transactionFlag = false;
+
     @Override
     protected void onResume() {
         super.onResume();
-    }
-
-    public JSONObject getCashOutDetails(String mobile, String txnAmmount) {
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("serviceType", "Initiate_Mpos_Txn");
-            jsonObject.put("requestType", "HANDSET_CHANNEL");
-            jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("transactionID", ImageUtils.miliSeconds());
-            jsonObject.put("nodeAgentId", list.get(0).getMobilno());
-            jsonObject.put("agentMobile", list.get(0).getMobilno());
-            jsonObject.put("customerMobile", mobile);
-            jsonObject.put("senderName", "RapiPay");
-            jsonObject.put("txnAmount", txnAmmount);
-            jsonObject.put("bluetoothAddress", accessBluetoothDetails().replaceAll(":", ""));
-            jsonObject.put("deviceType", "ME30S");
-            jsonObject.put("latitude", String.valueOf(mylocation.getLatitude()));
-            jsonObject.put("langitude", String.valueOf(mylocation.getLongitude()));
-            jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
-            jsonObject.put("txnType", "MPOS-" + typeput);
-            jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return jsonObject;
     }
 
     @Override
@@ -468,7 +446,7 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("serviceType", "Update_Mpos_Txn");
-            jsonObject.put("requestType", "HANDSET_CHANNEL");
+            jsonObject.put("requestChannel", requestChannel);
             jsonObject.put("typeMobileWeb", "mobile");
             jsonObject.put("transactionID", ImageUtils.miliSeconds());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
@@ -476,7 +454,7 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
             jsonObject.put("responseData", hostResponse);
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
             jsonObject.put("orderID", orderID);
-            jsonObject.put("txnType", "MPOS-" + typeput);
+            jsonObject.put("requestType", requestType);
             jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
 
         } catch (Exception e) {
@@ -486,12 +464,40 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
     }
 
     @Override
-    public void chechStat(String object) {
+    public void chechStat(String object, String hitfrom) {
+        if (hitfrom.equalsIgnoreCase("UPDATE_MPOS"))
+            generateReceipt(object);
+    }
 
+    private void generateReceipt(String object){
+        try{
+            ArrayList<String> left = new ArrayList<>();
+            left.add("DATE:" + " " + type.getDate());
+            left.add("MID:" + " " + mid);
+            left.add("BATCH No:" + " " + type.getBatchNo());
+            ArrayList<String> right = new ArrayList<>();
+            right.add("TIME:" + " " + type.getDate());
+            right.add("TID:" + " " + tid);
+            right.add("INVOICE No:" + " " + type.getInvoiceNo());
+            ArrayList<String> bottom = new ArrayList<>();
+            bottom.add("CARD NUM : " + "XXXX-XXXX-XXXX-" + type.getCardNumber());
+            bottom.add("CARD BRAND :" + type.getCardBrand() + "  " + "CARD TYPE :" + type.getCardType());
+            bottom.add("RRN : " + type.getRRN() + "  " + "Transaction Id : " + type.getTransactionId());
+            bottom.add("AID : " + type.getAID() + "  " + "TC : " + type.getTC());
+            ArrayList<String> medium = new ArrayList<>();
+            medium.add(typeput);
+            medium.add(type.getCardBrand());
+            transactionFlag = false;
+            customReceiptCastSaleOut(list.get(0).getAgentName(), left, right, bottom, medium, String.valueOf(type.getAmount()), type.getCardHolderName(), CashOutClass.this);
+            clear();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     @Override
-    public void chechStatus(JSONObject object) {
+    public void chechStatus(JSONObject object, String hitfrom) {
+        requestData = null;
         try {
             if (object.has("apiCommonResposne")) {
                 JSONObject object1 = object.getJSONObject("apiCommonResposne");
@@ -499,8 +505,12 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                 heading.setText(typeput + " (Balance : Rs." + format(balance) + ")");
             }
             if (object.getString("responseCode").equalsIgnoreCase("200")) {
-                if (object.getString("serviceType").equalsIgnoreCase("Initiate_Mpos_Txn")) {
+                if (object.getString("serviceType").equalsIgnoreCase(serviceType)) {
                     JSONArray array = object.getJSONArray("objMposData");
+                    requestData = new JSONObject(object.getString("requestData"));
+                    tid = requestData.getString("TERMINAL_ID");
+                    mid = requestData.getString("MERCHANT_ID");
+                    orderID = requestData.getString("ORDER_ID");
                     if (array.length() != 0)
                         customReceipt("Transaction Details", object, CashOutClass.this);
                 }
@@ -518,6 +528,7 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
     }
 
     int i = 0;
+
     private void generateReceipt(JSONArray array) {
         i = 0;
         try {
@@ -734,33 +745,34 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
     }
 
     private String accessBluetoothDetails() {
-        if (btAdapter.getBondedDevices().size() > 0) {
-            Set<BluetoothDevice> pairedDevices = btAdapter.getBondedDevices();
-            ArrayList<String> devices = new ArrayList<>();
-            boolean isPosPaired = false;
-            for (BluetoothDevice device : pairedDevices) {
-                if (device.getName().startsWith("C-ME30S")) {
-                    isPosPaired = true;
-                    String bluetoothName = device.getName();
-                    String bluetoothAddress = device.getAddress();
-                    Log.d("GoPosActivity",
-                            "bluetoothName: "
-                                    + bluetoothName
-                                    + " ,bluetoothAddress:"
-                                    + bluetoothAddress);
-                    if (!TextUtils.isEmpty(bluetoothAddress)) {
-                        return bluetoothAddress;
+        if (btAdapter.getBondedDevices() != null)
+            if (btAdapter.getBondedDevices().size() > 0) {
+                Set<BluetoothDevice> pairedDevices = btAdapter.getBondedDevices();
+                ArrayList<String> devices = new ArrayList<>();
+                boolean isPosPaired = false;
+                for (BluetoothDevice device : pairedDevices) {
+                    if (device.getName().startsWith("C-ME30S")) {
+                        isPosPaired = true;
+                        String bluetoothName = device.getName();
+                        String bluetoothAddress = device.getAddress();
+                        Log.d("GoPosActivity",
+                                "bluetoothName: "
+                                        + bluetoothName
+                                        + " ,bluetoothAddress:"
+                                        + bluetoothAddress);
+                        if (!TextUtils.isEmpty(bluetoothAddress)) {
+                            return bluetoothAddress;
+                        }
+                    } else {
+                        isPosPaired = false;
                     }
-                } else {
-                    isPosPaired = false;
                 }
-            }
-            if (!isPosPaired) {
+                if (!isPosPaired) {
+                    return "";
+                }
+            } else {
                 return "";
             }
-        } else {
-            return "";
-        }
         return "";
     }
 
@@ -788,7 +800,6 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                 e.printStackTrace();
             }
         }
-
     }
 
     @Override

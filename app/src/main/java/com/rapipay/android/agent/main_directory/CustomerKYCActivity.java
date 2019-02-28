@@ -141,7 +141,7 @@ public class CustomerKYCActivity extends BaseCompactActivity implements RequestH
                     documentid.setError("Please enter valid data");
                     documentid.requestFocus();
                 } else
-                    new AsyncPostMethod(WebConfig.EKYC, request_user(customerType).toString(), headerData, CustomerKYCActivity.this,getString(R.string.responseTimeOut)).execute();
+                    new AsyncPostMethod(WebConfig.EKYC, request_user(customerType).toString(), headerData, CustomerKYCActivity.this,getString(R.string.responseTimeOut),"CUSTOMERVALIDATEUSER").execute();
                 break;
             case R.id.scan_btn:
                 type = "SCAN";

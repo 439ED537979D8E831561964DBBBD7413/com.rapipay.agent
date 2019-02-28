@@ -2,6 +2,8 @@ package com.rapipay.android.agent.main_directory;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -49,7 +51,10 @@ import com.rapipay.android.agent.fragments.ChangeMobileFragment;
 import com.rapipay.android.agent.fragments.ChangePassword;
 import com.rapipay.android.agent.fragments.ChangePinFragment;
 import com.rapipay.android.agent.fragments.DashBoardFragments;
+import com.rapipay.android.agent.fragments.LienHistory;
+import com.rapipay.android.agent.fragments.PayloadBankFragment;
 import com.rapipay.android.agent.fragments.ProfileFragment;
+import com.rapipay.android.agent.fragments.SettlementBankFragment;
 import com.rapipay.android.agent.interfaces.CustomInterface;
 import com.rapipay.android.agent.interfaces.RequestHandler;
 import com.rapipay.android.agent.utils.AsyncPostMethod;
@@ -74,6 +79,8 @@ public class MainActivity extends BaseCompactActivity
     String data, term = null;
     TextView tv;
     ImageView back_click;
+    private static final int dpPhoto1 = 2001;
+    private static final int dpPhoto2 = 2002;
 
     public static ArrayList<HeaderePozo> pozoArrayList;
 
@@ -88,7 +95,7 @@ public class MainActivity extends BaseCompactActivity
             if (imagePozoArrayList.size() != 0) {
                 byteConvert(back_click, imagePozoArrayList.get(0).getImagePath());
             } else {
-                if (BuildConfig.APPTYPE == 1)
+                if (BuildConfig.APPTYPE == 1 || BuildConfig.APPTYPE == 3)
                     back_click.setImageDrawable(getResources().getDrawable(R.drawable.rapipay_agent));
                 if (BuildConfig.APPTYPE == 2)
                     back_click.setImageDrawable(getResources().getDrawable(R.drawable.rapipay_parter));
@@ -100,7 +107,7 @@ public class MainActivity extends BaseCompactActivity
     }
 
     private void url() {
-        new AsyncPostMethod(WebConfig.COMMONAPI, getDashBoard("GET_NODE_HEADER_DATA").toString(), headerData, MainActivity.this, getString(R.string.responseTimeOut)).execute();
+        new AsyncPostMethod(WebConfig.COMMONAPI, getDashBoard("GET_NODE_HEADER_DATA").toString(), headerData, MainActivity.this, getString(R.string.responseTimeOut),"NODEHEADERDATA").execute();
         localStorage.setActivityState(LocalStorage.ROUTESTATE, "0");
     }
 
@@ -167,6 +174,12 @@ public class MainActivity extends BaseCompactActivity
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         View headerLayout = navigationView.inflateHeaderView(R.layout.nav_header_main);
+        TextView verionName = navigationView.findViewById(R.id.btn_sing_in);
+        try {
+            verionName.setText("Version - "+getPackageManager().getPackageInfo(getPackageName(), 0).versionName);
+        }catch (PackageManager.NameNotFoundException e){
+            e.printStackTrace();
+        }
         ivHeaderPhoto = (ImageView) headerLayout.findViewById(R.id.imageView);
         if (!localStorage.getActivityState(LocalStorage.IMAGEPATH).equalsIgnoreCase("0"))
             loadImageFromStorage("image.jpg", ivHeaderPhoto, localStorage.getActivityState(LocalStorage.IMAGEPATH));
@@ -175,7 +188,7 @@ public class MainActivity extends BaseCompactActivity
         ivHeaderPhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                selectImage();
+                selectImage(dpPhoto1,dpPhoto2,"DPPHOTO");
             }
         });
     }
@@ -185,47 +198,86 @@ public class MainActivity extends BaseCompactActivity
         super.onResume();
         invalidateOptionsMenu();
     }
-
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == CAMERA_REQUEST) {
-            String path = data.getStringExtra("ImagePath");
-            String imageType = data.getStringExtra("ImageType");
-            Bitmap bitmap = loadImageFromStorage(imageType, path);
-            ivHeaderPhoto.setImageBitmap(bitmap);
-            String imageName = "image" + ".jpg";
-            String paths = saveToInternalStorage(bitmap, imageName);
-            localStorage.setActivityState(LocalStorage.IMAGEPATH, paths);
-            //SaveInDB(thumbnail);
-        } else if (requestCode == SELECT_FILE) {
+        if (requestCode == dpPhoto1) {
+            try {
+                String path = data.getStringExtra("ImagePath");
+                String imageType = data.getStringExtra("ImageType");
+                Bitmap bitmap = loadImageFromStorage(imageType, path);
+                ivHeaderPhoto.setImageBitmap(bitmap);
+                String imageName = "image" + ".jpg";
+                String paths = saveToInternalStorage(bitmap, imageName);
+                localStorage.setActivityState(LocalStorage.IMAGEPATH, paths);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else if (requestCode == dpPhoto2) {
             if(data!=null) {
+                Uri uri = data.getData();
+                Bitmap thumbnail = null;
+                try {
+                    thumbnail = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 Uri selectedImageUri = data.getData();
                 String[] projection = {MediaStore.MediaColumns.DATA};
-                CursorLoader cursorLoader = new CursorLoader(this, selectedImageUri, projection, null, null,
+                CursorLoader cursorLoader = new CursorLoader(MainActivity.this, selectedImageUri, projection, null, null,
                         null);
                 Cursor cursor = cursorLoader.loadInBackground();
                 int column_index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
                 cursor.moveToFirst();
-                String selectedImagePath = cursor.getString(column_index);
-                Bitmap bm;
-                BitmapFactory.Options options = new BitmapFactory.Options();
-                options.inJustDecodeBounds = true;
-                BitmapFactory.decodeFile(selectedImagePath, options);
-                final int REQUIRED_SIZE = 150;
-                int scale = 1;
-                while (options.outWidth / scale / 2 >= REQUIRED_SIZE
-                        && options.outHeight / scale / 2 >= REQUIRED_SIZE)
-                    scale *= 2;
-                options.inSampleSize = scale;
-                options.inJustDecodeBounds = false;
-                bm = BitmapFactory.decodeFile(selectedImagePath, options);
-                ivHeaderPhoto.setImageBitmap(bm);
+                filePath = cursor.getString(column_index);
+                String[] splits = filePath.split("\\/");
+                ivHeaderPhoto.setImageBitmap(thumbnail);
                 String imageName = "image" + ".jpg";
-                String path = saveToInternalStorage(bm, imageName);
+                String path = saveToInternalStorage(thumbnail, imageName);
                 localStorage.setActivityState(LocalStorage.IMAGEPATH, path);
             }
         }
     }
+//
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//        if (requestCode == CAMERA_REQUEST) {
+//            String path = data.getStringExtra("ImagePath");
+//            String imageType = data.getStringExtra("ImageType");
+//            Bitmap bitmap = loadImageFromStorage(imageType, path);
+//            ivHeaderPhoto.setImageBitmap(bitmap);
+//            String imageName = "image" + ".jpg";
+//            String paths = saveToInternalStorage(bitmap, imageName);
+//            localStorage.setActivityState(LocalStorage.IMAGEPATH, paths);
+//            //SaveInDB(thumbnail);
+//        } else if (requestCode == SELECT_FILE) {
+//            if(data!=null) {
+//                Uri selectedImageUri = data.getData();
+//                String[] projection = {MediaStore.MediaColumns.DATA};
+//                CursorLoader cursorLoader = new CursorLoader(this, selectedImageUri, projection, null, null,
+//                        null);
+//                Cursor cursor = cursorLoader.loadInBackground();
+//                int column_index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
+//                cursor.moveToFirst();
+//                String selectedImagePath = cursor.getString(column_index);
+//                Bitmap bm;
+//                BitmapFactory.Options options = new BitmapFactory.Options();
+//                options.inJustDecodeBounds = true;
+//                BitmapFactory.decodeFile(selectedImagePath, options);
+//                final int REQUIRED_SIZE = 150;
+//                int scale = 1;
+//                while (options.outWidth / scale / 2 >= REQUIRED_SIZE
+//                        && options.outHeight / scale / 2 >= REQUIRED_SIZE)
+//                    scale *= 2;
+//                options.inSampleSize = scale;
+//                options.inJustDecodeBounds = false;
+//                bm = BitmapFactory.decodeFile(selectedImagePath, options);
+//                ivHeaderPhoto.setImageBitmap(bm);
+//                String imageName = "image" + ".jpg";
+//                String path = saveToInternalStorage(bm, imageName);
+//                localStorage.setActivityState(LocalStorage.IMAGEPATH, path);
+//            }
+//        }
+//    }
 
 
     @Override
@@ -259,6 +311,21 @@ public class MainActivity extends BaseCompactActivity
         } else if (id == R.id.nav_Cmobile) {
             reset.setVisibility(View.GONE);
             fragment = new ChangeMobileFragment();
+        }else if (id == R.id.settle_Cmobile) {
+            reset.setVisibility(View.GONE);
+            Bundle bundle=new Bundle();
+            bundle.putString("message", "S");
+            fragment = new SettlementBankFragment();
+            fragment.setArguments(bundle);
+        }else if (id == R.id.payload_Cmobile) {
+            reset.setVisibility(View.GONE);
+            Bundle bundle=new Bundle();
+            bundle.putString("message", "P");
+            fragment = new SettlementBankFragment();
+            fragment.setArguments(bundle);
+        } else if (id == R.id.lien_Cmobile) {
+            reset.setVisibility(View.GONE);
+            fragment = new LienHistory();
         } else if (fragment == null)
             Toast.makeText(MainActivity.this, "Under Process", Toast.LENGTH_SHORT).show();
         if (fragment != null)
@@ -286,7 +353,7 @@ public class MainActivity extends BaseCompactActivity
                 if (object.getString("serviceType").equalsIgnoreCase("GET_MASTER_DATA")) {
                     if (new MasterClass().getMasterData(object, db))
                         if (term.equalsIgnoreCase("N"))
-                            new AsyncPostMethod(WebConfig.NETWORKTRANSFER_URL, acknowledge(data, term).toString(), headerData, MainActivity.this, getString(R.string.responseTimeOut)).execute();
+                            new AsyncPostMethod(WebConfig.NETWORKTRANSFER_URL, acknowledge(data, term).toString(), headerData, MainActivity.this, getString(R.string.responseTimeOut),"DOWMLOADDATA").execute();
                 } else if (object.getString("serviceType").equalsIgnoreCase("GET_NODE_HEADER_DATA")) {
                     if (object.has("headerList")) {
                         localStorage.setActivityState(LocalStorage.ROUTESTATE, "0");
@@ -350,7 +417,7 @@ public class MainActivity extends BaseCompactActivity
     private void callMasterDetails() {
         ArrayList<BankDetailsPozo> list = db.geBanktDetails("");
         if (list.size() == 0) {
-            new AsyncPostMethod(WebConfig.CommonReport, getMaster_Validate().toString(), headerData, MainActivity.this, getString(R.string.responseTimeOut)).execute();
+            new AsyncPostMethod(WebConfig.CommonReport, getMaster_Validate().toString(), headerData, MainActivity.this, getString(R.string.responseTimeOut),"GETMASTERDATA").execute();
         }
     }
 
@@ -417,7 +484,7 @@ public class MainActivity extends BaseCompactActivity
     public void okClicked(String type, Object ob) {
         super.onBackPressed();
         if (type.equalsIgnoreCase("TERMCONDITION")) {
-            new AsyncPostMethod(WebConfig.NETWORKTRANSFER_URL, acknowledge(data, term).toString(), headerData, MainActivity.this, getString(R.string.responseTimeOut)).execute();
+            new AsyncPostMethod(WebConfig.NETWORKTRANSFER_URL, acknowledge(data, term).toString(), headerData, MainActivity.this, getString(R.string.responseTimeOut),"DOWMLOADDATA").execute();
         } else if (type.equalsIgnoreCase("SESSIONEXPIRE"))
             jumpPage();
         else
@@ -429,33 +496,5 @@ public class MainActivity extends BaseCompactActivity
         alertDialog.dismiss();
     }
 
-    private void selectImage() {
-        final CharSequence[] items = {"Capture Image", "Choose from Gallery", "Cancel"};
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(MainActivity.this);
-        builder.setIcon(R.drawable.camera);
-        builder.setTitle("Add Photo!");
-        builder.setItems(items, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int item) {
-                if (items[item].equals("Capture Image")) {
-                    Intent intent = new Intent(MainActivity.this, CameraKitActivity.class);
-                    intent.putExtra("ImageType", "profile");
-                    intent.putExtra("REQUESTTYPE", CAMERA_REQUEST);
-                    startActivityForResult(intent, CAMERA_REQUEST);
-//                    Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//                    startActivityForResult(cameraIntent, CAMERA_REQUEST);
-
-                } else if (items[item].equals("Choose from Gallery")) {
-                    Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    intent.setType("image/*");
-                    startActivityForResult(Intent.createChooser(intent, "Select File"), SELECT_FILE);
-
-                } else if (items[item].equals("Cancel")) {
-                    dialog.dismiss();
-                }
-            }
-        });
-        builder.show();
-    }
 }
 

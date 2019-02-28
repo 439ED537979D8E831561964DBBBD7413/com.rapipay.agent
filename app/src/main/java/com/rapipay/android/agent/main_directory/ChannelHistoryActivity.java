@@ -54,7 +54,7 @@ public class ChannelHistoryActivity extends BaseCompactActivity implements View.
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 ChannelHistoryPozo pozo = transactionPozoArrayList.get(position);
-                new AsyncPostMethod(WebConfig.WALLETRECEIPTURL, receipt_request(pozo).toString(), headerData, ChannelHistoryActivity.this,getString(R.string.responseTimeOut)).execute();
+                new AsyncPostMethod(WebConfig.WALLETRECEIPTURL, receipt_request(pozo).toString(), headerData, ChannelHistoryActivity.this,getString(R.string.responseTimeOut),"RECEIPTREQUEST").execute();
             }
         });
         findViewById(R.id.todate).setOnClickListener(toDateClicked);
@@ -78,7 +78,7 @@ public class ChannelHistoryActivity extends BaseCompactActivity implements View.
                 if (totalItemCount != 0 && totalItemCount == last && lastInScreen == totalItemCount && !isLoading) {
                     first = last + 1;
                     last += 25;
-                    new AsyncPostMethod(WebConfig.CommonReport, channel_request(first, last).toString(), headerData, ChannelHistoryActivity.this,getString(R.string.responseTimeOut)).execute();
+                    new AsyncPostMethod(WebConfig.CommonReport, channel_request(first, last).toString(), headerData, ChannelHistoryActivity.this,getString(R.string.responseTimeOut),"TRANSACTIONHISTORY").execute();
                     isLoading = true;
                 }
             }
@@ -120,7 +120,7 @@ public class ChannelHistoryActivity extends BaseCompactActivity implements View.
                     date1_text.setError("Please enter mandatory field");
                     Toast.makeText(this, "Please enter mandatory field", Toast.LENGTH_SHORT).show();
                 } else if (!date1_text.getText().toString().isEmpty() && !date2_text.getText().toString().isEmpty())
-                    new AsyncPostMethod(WebConfig.CommonReport, channel_request(first, last).toString(), headerData, ChannelHistoryActivity.this,getString(R.string.responseTimeOut)).execute();
+                    new AsyncPostMethod(WebConfig.CommonReport, channel_request(first, last).toString(), headerData, ChannelHistoryActivity.this,getString(R.string.responseTimeOut),"TRANSACTIONHISTORY").execute();
                 break;
         }
     }

@@ -87,6 +87,9 @@ public class AEPS_BBPS_RegistrationActivity extends BaseCompactActivity implemen
                 } else if (typeput.equalsIgnoreCase("BBPS")) {
                     jsonObject.put("serviceType", "BBPS_REGISTRATION");
                     jsonObject.put("requestType", "BBPS_CHANNEL");
+                } else if (typeput.equalsIgnoreCase("MATM")) {
+                    jsonObject.put("serviceType", "MATM_REGISTRATION");
+                    jsonObject.put("requestType", "MATM_CHANNEL");
                 }
                 jsonObject.put("typeMobileWeb", "mobile");
                 jsonObject.put("transactionID", ImageUtils.miliSeconds());

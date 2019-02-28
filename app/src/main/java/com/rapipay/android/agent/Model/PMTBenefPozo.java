@@ -17,6 +17,11 @@ public class PMTBenefPozo {
         this.bank_Details = bank_Details;
     }
 
+    public PMTBenefPozo(String account_Number, String bank_Details) {
+        this.account_Number = account_Number;
+        this.bank_Details = bank_Details;
+    }
+
     public String getReceiver_Mobile() {
         return receiver_Mobile;
     }

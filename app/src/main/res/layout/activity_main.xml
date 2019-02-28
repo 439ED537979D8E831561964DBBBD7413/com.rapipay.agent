@@ -18,9 +18,20 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:choiceMode="singleChoice"
         android:background="@color/white"
-        app:itemTextColor="@color/colorPrimaryDark"
+        android:choiceMode="singleChoice"
         android:fitsSystemWindows="true"
-        app:menu="@menu/menu_drawer" />
+        app:itemTextColor="@color/colorPrimaryDark"
+        app:menu="@menu/menu_drawer">
+
+        <TextView
+            android:id="@+id/btn_sing_in"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_gravity="bottom"
+            android:gravity="center"
+            android:textSize="14dp"
+            android:text="Version"
+            android:textColor="@color/black"/>
+    </android.support.design.widget.NavigationView>
 </android.support.v4.widget.DrawerLayout>

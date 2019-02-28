@@ -42,6 +42,22 @@ public class ImageUtils {
         list.add(new ImagePozo(4, "EMI", R.drawable.mposemi));
         return list;
     }
+    public static ArrayList<ImagePozo> getSeventhImageUrl() {
+        ArrayList<ImagePozo> list = new ArrayList<>();
+        list.clear();
+        list.add(new ImagePozo(2,"Cash Withdrawal ",R.drawable.mposcash));
+        list.add(new ImagePozo(3, "Balance Enquiry", R.drawable.mposale));
+        list.add(new ImagePozo(4, "Transaction Status", R.drawable.mposemi));
+        return list;
+    }
+    public static ArrayList<ImagePozo> getEigthImageUrl() {
+        ArrayList<ImagePozo> list = new ArrayList<>();
+        list.clear();
+        list.add(new ImagePozo(2,"Cash Withdrawal ",R.drawable.mposcash));
+        list.add(new ImagePozo(3, "Balance Enquiry", R.drawable.mposale));
+        list.add(new ImagePozo(4, "Transaction Status", R.drawable.mposemi));
+        return list;
+    }
 
     public static ArrayList<ImagePozo> getSecondImageUrl() {
         ArrayList<ImagePozo> list = new ArrayList<>();
@@ -58,7 +74,7 @@ public class ImageUtils {
         list.add(new ImagePozo(1,"MPOS Registration",R.drawable.mposreg));
         list.add(new ImagePozo(2, "AEPS Registration", R.drawable.aeps));
         list.add(new ImagePozo(3, "BBPS Registration", R.drawable.bbps));
-//        list.add(new ImagePozo(4, "Fino", R.drawable.bbps));
+        list.add(new ImagePozo(4, "MATM Registration", R.drawable.matm));
         return list;
     }
 
@@ -69,8 +85,8 @@ public class ImageUtils {
         else
             return false;
     }
-    public static boolean commonAddress(String value) {
-        String regex = "^[a-zA-Z0-9\\\\s ()&#_',./-]*$";
+    public static boolean commonAddress(String value,int length) {
+        String regex = "^[a-zA-Z0-9\\\\s ()&#_',./-]{1," + length + "}$";
         if (value.matches(regex))
             return true;
         else

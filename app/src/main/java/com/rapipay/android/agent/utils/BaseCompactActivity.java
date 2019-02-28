@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.ContextWrapper;
@@ -16,6 +17,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -85,13 +87,18 @@ import com.rapipay.android.agent.adapter.BottomAdapter;
 import com.rapipay.android.agent.adapter.CustomSpinnerAdapter;
 import com.rapipay.android.agent.interfaces.CustomInterface;
 import com.rapipay.android.agent.interfaces.VersionListener;
+import com.rapipay.android.agent.main_directory.CameraKitActivity;
+import com.rapipay.android.agent.main_directory.KYCFormActivity;
 import com.rapipay.android.agent.main_directory.LoginScreenActivity;
 import com.rapipay.android.agent.main_directory.MainActivity;
 import com.rapipay.android.agent.main_directory.PinVerification;
 
 public class BaseCompactActivity extends AppCompatActivity {
     protected GoogleApiClient googleApiClient;
+    protected final static int REQUEST_CHECK_SETTINGS_GPS = 0x5;
+    protected final static int REQUEST_ID_MULTIPLE_PERMISSIONS = 0x2;
     protected String imei;
+    protected Location mylocation;
     protected ImageView delete_all;
     protected ArrayList<VersionPozo> versionPozoArrayList;
     protected AutofitTextView date2_text, date1_text;
@@ -100,6 +107,8 @@ public class BaseCompactActivity extends AppCompatActivity {
     protected static final int CONTACT_PICKER_RESULT = 1;
     protected TextView heading;
     public static RapipayDB db;
+    protected BluetoothAdapter btAdapter;
+    protected static int REQUEST_BLUETOOTH = 101;
     protected ArrayList<RapiPayPozo> list;
     final protected static int PERMISSIONS_REQUEST_READ_PHONE_STATE = 0;
     final protected static int PERMISSIONS_REQUEST_CAMERA_STATE = 1;
@@ -116,6 +125,7 @@ public class BaseCompactActivity extends AppCompatActivity {
     protected static final String TAG = MainActivity.class.getSimpleName();
     protected ArrayList<String> listPath = new ArrayList<>();
     protected String TYPE = "";
+    protected String transactionIDAEPS;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -465,16 +475,19 @@ public class BaseCompactActivity extends AppCompatActivity {
         btn_amount_servide.setText(object.getString("txnAmount"));
         if (ob != null) {
             PMTBenefPozo pozo = (PMTBenefPozo) ob;
-            if (pozo.getAccount_Number().equalsIgnoreCase("null") || pozo.getAccount_Number().equalsIgnoreCase(""))
+            if (!pozo.getAccount_Number().equalsIgnoreCase("null") || !pozo.getAccount_Number().equalsIgnoreCase(""))
                 btn_account.setText(pozo.getAccount_Number());
             else
                 alertLayout.findViewById(R.id.layout_account).setVisibility(View.GONE);
-            if (pozo.getBank_Details().equalsIgnoreCase("null") || pozo.getBank_Details().equalsIgnoreCase(""))
+            if (!pozo.getBank_Details().equalsIgnoreCase("null") || !pozo.getBank_Details().equalsIgnoreCase(""))
                 btn_bank.setText(pozo.getBank_Details());
             else
                 alertLayout.findViewById(R.id.layout_bank).setVisibility(View.GONE);
         }
-        btn_sendname.setText(input);
+        if (input.equalsIgnoreCase("null"))
+            alertLayout.findViewById(R.id.senderno).setVisibility(View.GONE);
+        else
+            btn_sendname.setText(input);
         if (name != null)
             btn_name.setText(name);
         dialog.setView(alertLayout);
@@ -747,32 +760,34 @@ public class BaseCompactActivity extends AppCompatActivity {
     };
 
     protected void contactRead(Intent data, TextView input_number) {
-        Uri contactData = data.getData();
-        Cursor c = getContentResolver().query(contactData, null, null, null, null);
-        if (c.moveToFirst()) {
-            String contactId = c.getString(c.getColumnIndex(ContactsContract.Contacts._ID));
-            String phoneNumber = c.getString(c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-            if (phoneNumber.contains(" "))
-                phoneNumber = phoneNumber.replaceAll(" ", "");
-            if (phoneNumber.startsWith("+")) {
-                if (phoneNumber.length() == 13) {
-                    String str_getMOBILE = phoneNumber.substring(3);
-                    input_number.setText(str_getMOBILE);
-                } else if (phoneNumber.length() == 11) {
-                    String str_getMOBILE = phoneNumber.substring(1);
-                    input_number.setText(str_getMOBILE);
+        if(data!=null) {
+            Uri contactData = data.getData();
+            Cursor c = getContentResolver().query(contactData, null, null, null, null);
+            if (c.moveToFirst()) {
+                String contactId = c.getString(c.getColumnIndex(ContactsContract.Contacts._ID));
+                String phoneNumber = c.getString(c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                if (phoneNumber.contains(" "))
+                    phoneNumber = phoneNumber.replaceAll(" ", "");
+                if (phoneNumber.startsWith("+")) {
+                    if (phoneNumber.length() == 13) {
+                        String str_getMOBILE = phoneNumber.substring(3);
+                        input_number.setText(str_getMOBILE);
+                    } else if (phoneNumber.length() == 11) {
+                        String str_getMOBILE = phoneNumber.substring(1);
+                        input_number.setText(str_getMOBILE);
+                    } else if (phoneNumber.length() == 10) {
+                        input_number.setText(phoneNumber);
+                    }
+                } else if (phoneNumber.startsWith("0")) {
+                    if (phoneNumber.length() == 11) {
+                        String str_getMOBILE = phoneNumber.substring(1);
+                        input_number.setText(str_getMOBILE);
+                    }
                 } else if (phoneNumber.length() == 10) {
                     input_number.setText(phoneNumber);
+                } else {
+                    Toast.makeText(this, "Please select valid number.", Toast.LENGTH_SHORT).show();
                 }
-            } else if (phoneNumber.startsWith("0")) {
-                if (phoneNumber.length() == 11) {
-                    String str_getMOBILE = phoneNumber.substring(1);
-                    input_number.setText(str_getMOBILE);
-                }
-            } else if (phoneNumber.length() == 10) {
-                input_number.setText(phoneNumber);
-            } else {
-                Toast.makeText(this, "Please select valid number.", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -1696,4 +1711,66 @@ public class BaseCompactActivity extends AppCompatActivity {
         }
         return null;
     }
+
+    protected JSONObject getCashOutDetails(String mobile, String txnAmmount,String serviceType,String requestChannel,String reqFor,String requestType,String blueToothAddress) {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            transactionIDAEPS  = ImageUtils.miliSeconds();
+            jsonObject.put("serviceType", serviceType);
+            jsonObject.put("requestChannel", requestChannel);
+            jsonObject.put("typeMobileWeb", "mobile");
+            jsonObject.put("transactionID", transactionIDAEPS);
+            jsonObject.put("agentMobile", list.get(0).getMobilno());
+            jsonObject.put("customerMobile", mobile);
+            jsonObject.put("senderName", "RapiPay");
+            jsonObject.put("txnAmount", txnAmmount);
+            jsonObject.put("bluetoothAddress", blueToothAddress.replaceAll(":", ""));
+            jsonObject.put("reqFor", reqFor);
+            jsonObject.put("latitude", String.valueOf(mylocation.getLatitude()));
+            jsonObject.put("langitude", String.valueOf(mylocation.getLongitude()));
+            jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
+            jsonObject.put("requestType", requestType);
+            jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return jsonObject;
+    }
+
+    protected void selectImage(final int id1, final int id2, final String imageType) {
+        final CharSequence[] items = {"Capture Image", "Choose from Gallery", "Cancel"};
+        AlertDialog.Builder builder = new AlertDialog.Builder(BaseCompactActivity.this);
+        builder.setIcon(R.drawable.camera);
+        builder.setTitle("Add Photo!");
+        builder.setItems(items, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int item) {
+                if (items[item].equals("Capture Image")) {
+                    Intent intent = new Intent(BaseCompactActivity.this, CameraKitActivity.class);
+                    intent.putExtra("ImageType", imageType);
+                    intent.putExtra("REQUESTTYPE", id1);
+                    startActivityForResult(intent, id1);
+//                    String filename = System.currentTimeMillis() + ".jpg";
+//
+//                    ContentValues values = new ContentValues();
+//                    values.put(MediaStore.Images.Media.TITLE, filename);
+//                    values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
+//                    imageUri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+//
+//                    Intent intent = new Intent();
+//                    intent.setAction(MediaStore.ACTION_IMAGE_CAPTURE);
+//                    intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+//                    startActivityForResult(intent, id1);
+                } else if (items[item].equals("Choose from Gallery")) {
+                    Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    intent.setType("image/*");
+                    startActivityForResult(Intent.createChooser(intent, "Select File"), id2);
+                } else if (items[item].equals("Cancel")) {
+                    dialog.dismiss();
+                }
+            }
+        });
+        builder.show();
+    }
+
 }

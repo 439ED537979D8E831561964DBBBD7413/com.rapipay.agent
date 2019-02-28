@@ -51,7 +51,7 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
     EditText input_account, input_mobile, input_otp, input_ben_name;
     TextView input_name;
     Spinner spinner;
-    AppCompatButton btn_otpsubmit, btn_payee;
+    AppCompatButton btn_otpsubmit;
     LinearLayout sender_layout, otp_layout, fundlayout, beneficiary_layout, last_tran_layout;
     String otpRefId, ifsc_code;
     TextView bank_select;
@@ -66,6 +66,8 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
     String TYPE, mobileNo;
     static String transactionID;
     String isVerifyAccount = "";
+    int limit;
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -103,14 +105,15 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
         sender_layout = (LinearLayout) findViewById(R.id.sender_layout);
         otp_layout = (LinearLayout) findViewById(R.id.otp_layout);
         btn_otpsubmit = (AppCompatButton) findViewById(R.id.btn_otpsubmit);
+        btn_otpsubmit.setOnClickListener(this);
         fundlayout = (LinearLayout) findViewById(R.id.fundlayout);
         beneficiary_layout = (LinearLayout) findViewById(R.id.beneficiary_layout);
         beneficiary_details = (RecyclerView) findViewById(R.id.beneficiary_details);
-        btn_payee = (AppCompatButton) findViewById(R.id.btn_payee);
-        btn_payee.setOnClickListener(this);
+        findViewById(R.id.btn_payee).setOnClickListener(this);
+        findViewById(R.id.reset).setOnClickListener(this);
         last_tran_layout = (LinearLayout) findViewById(R.id.last_tran_layout);
         trans_details = (RecyclerView) findViewById(R.id.trans_details);
-
+        findViewById(R.id.btn_verify).setOnClickListener(this);
         bank_select = (TextView) findViewById(R.id.bank_select);
         bank_select.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -300,7 +303,6 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
                     input_ben_name.requestFocus();
                 } else
                     new WalletAsyncMethod(WebConfig.WALLETTRANSFER_URL, processPayee("N", "N").toString(), headerData, WalletDetailsActivity.this, getString(R.string.responseTimeOutTrans), "ADDBENEFICIARY").execute();
-
                 break;
             case R.id.reset:
                 reset();
@@ -396,7 +398,8 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
                         btn_sender.setVisibility(View.GONE);
                         input_name.setText(object.getString("customerName"));
                         isVerifyAccount = object.getString("isVerifyAccount");
-                        text_ben.setText("Add Beneficiary  Transfer Limit" + "\n" + "Daily : Rs " + format(object.getString("dailyRemLimit")) + "\n" + "Monthly : Rs " + format(object.getString("monthlyRemLimit")));
+                        limit = Integer.valueOf(object.getInt("dailyRemLimit"));
+                        text_ben.setText("Add Beneficiary  Transfer Limit" + "\n" + "Daily : Rs " + limit + "\n" + "Monthly : Rs " + format(object.getString("monthlyRemLimit")));
                         if (object.has("beneficiaryDetailList")) {
                             if (Integer.parseInt(object.getString("numberOfBenCount")) > 0) {
                                 beneficiary_layout.setVisibility(View.VISIBLE);
@@ -705,7 +708,13 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
                 } else if (!ImageUtils.commonAmount(ben_amount.getText().toString())) {
                     ben_amount.setError("Please enter valid amount.");
                     ben_amount.requestFocus();
-                } else if (value.equalsIgnoreCase("NEFT") && input_ifsc.getText().toString().isEmpty()) {
+                }else if(Integer.parseInt(ben_amount.getText().toString())>=25001){
+                    ben_amount.setError("Maximum transfer amount would be 25000.");
+                    ben_amount.requestFocus();
+                }else if(Integer.parseInt(ben_amount.getText().toString())>=limit+1){
+                    ben_amount.setError("Maximum transfer amount would be "+limit+".");
+                    ben_amount.requestFocus();
+                }else if (value.equalsIgnoreCase("NEFT") && input_ifsc.getText().toString().isEmpty()) {
                     input_ifsc.setError("Please enter ifsc code.");
                     input_ifsc.requestFocus();
                 } else {

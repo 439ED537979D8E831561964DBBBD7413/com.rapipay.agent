@@ -24,11 +24,11 @@
                 android:orientation="horizontal">
 
                 <android.support.v7.widget.RecyclerView
-                    android:layout_marginTop="3dp"
                     android:id="@+id/recycler_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
+                    android:layout_marginTop="3dp"
                     android:gravity="center_horizontal" />
             </LinearLayout>
 
@@ -40,19 +40,21 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="2dp"
                 android:gravity="center_horizontal" />
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="1.5dp"
-                android:background="@color/colorbackground"/>
+                android:background="@color/colorbackground" />
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:padding="2dp"
                 android:text="@string/p_moneytransfer"
-                android:textStyle="bold"
                 android:textColor="@color/colorPrimaryDark"
-                android:textSize="12dp" />
+                android:textSize="12dp"
+                android:textStyle="bold" />
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/recycler_view4"
@@ -61,10 +63,11 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="2dp"
                 android:gravity="center_horizontal" />
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="1.5dp"
-                android:background="@color/colorbackground"/>
+                android:background="@color/colorbackground" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -72,9 +75,9 @@
                 android:gravity="center"
                 android:padding="2dp"
                 android:text="@string/p_recharge"
-                android:textStyle="bold"
                 android:textColor="@color/colorPrimaryDark"
-                android:textSize="12dp" />
+                android:textSize="12dp"
+                android:textStyle="bold" />
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/recycler_view2"
@@ -82,21 +85,23 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="2dp"
-                android:scrollbars="horizontal"
-                android:gravity="center_horizontal" />
+                android:gravity="center_horizontal"
+                android:scrollbars="horizontal" />
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="1.5dp"
-                android:background="@color/colorbackground"/>
+                android:background="@color/colorbackground" />
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center"
                 android:padding="2dp"
                 android:text="@string/p_mpos"
-                android:textStyle="bold"
                 android:textColor="@color/colorPrimaryDark"
-                android:textSize="12dp" />
+                android:textSize="12dp"
+                android:textStyle="bold" />
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/recycler_view6"
@@ -105,10 +110,73 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="2dp"
                 android:gravity="center_horizontal" />
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="1.5dp"
-                android:background="@color/colorbackground"/>
+                android:background="@color/colorbackground" />
+
+            <LinearLayout
+                android:id="@+id/matm"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:padding="2dp"
+                    android:text="MATM"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="12dp"
+                    android:textStyle="bold" />
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/recycler_view7"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="2dp"
+                    android:gravity="center_horizontal" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="1.5dp"
+                    android:background="@color/colorbackground" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/aeps"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:padding="2dp"
+                    android:text="AEPS"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="12dp"
+                    android:textStyle="bold" />
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/recycler_view8"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="2dp"
+                    android:gravity="center_horizontal" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="1.5dp"
+                    android:background="@color/colorbackground" />
+            </LinearLayout>
 
             <TextView
                 android:layout_width="match_parent"
@@ -116,9 +184,9 @@
                 android:gravity="center"
                 android:padding="2dp"
                 android:text="Registration's"
-                android:textStyle="bold"
                 android:textColor="@color/colorPrimaryDark"
-                android:textSize="12dp"/>
+                android:textSize="12dp"
+                android:textStyle="bold" />
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/recycler_view3"
@@ -127,10 +195,11 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="2dp"
                 android:gravity="center_horizontal" />
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="1.5dp"
-                android:background="@color/colorbackground"/>
+                android:background="@color/colorbackground" />
 
         </LinearLayout>
     </LinearLayout>

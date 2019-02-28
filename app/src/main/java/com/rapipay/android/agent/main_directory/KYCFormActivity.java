@@ -473,10 +473,17 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
                             getAddressDetails();
                         parseAddressJson(scandata);
                         if (type.equalsIgnoreCase("SCAN")) {
-                            if (customerType.equalsIgnoreCase("C"))
-                                kycMapImage.put("kycImage", getBase64(CustomerKYCActivity.bitmap_trans, 100));
-                            else if (customerType.equalsIgnoreCase("A"))
-                                kycMapImage.put("kycImage", getBase64(AgentKYCFragment.bitmap_trans, 100));
+                            if (customerType.equalsIgnoreCase("C")) {
+                                if (CustomerKYCActivity.bitmap_trans != null)
+                                    kycMapImage.put("kycImage", getBase64(CustomerKYCActivity.bitmap_trans, 100));
+                                else
+                                    kycMapImage.put("kycImage", null);
+                            } else if (customerType.equalsIgnoreCase("A")) {
+                                if (AgentKYCFragment.bitmap_trans != null)
+                                    kycMapImage.put("kycImage", getBase64(AgentKYCFragment.bitmap_trans, 100));
+                                else
+                                    kycMapImage.put("kycImage", null);
+                            }
                         }
                         if (getIntent().getStringExtra("localPersonal").equalsIgnoreCase("false"))
                             insertPersonal(kycMapData, kycMapImage, input_name.getText().toString(), documentID, documentType, customerType);
@@ -789,11 +796,11 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
     }
 
     private Boolean addressValidation() {
-        if (!ImageUtils.commonAddress(input_address.getText().toString())) {
+        if (!ImageUtils.commonAddress(input_address.getText().toString(), 250)) {
             input_address.setError("Please enter valid address");
             input_address.requestFocus();
             return false;
-        } else if (!ImageUtils.commonRegex(city_name.getText().toString(), 150, ". ")) {
+        } else if (!ImageUtils.commonAddress(city_name.getText().toString(), 250)) {
             city_name.setError("Please enter valid city");
             city_name.requestFocus();
             return false;
@@ -868,84 +875,52 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
         return true;
     }
 
-    private void selectImage(final int id1, final int id2, final String imageType) {
-        final CharSequence[] items = {"Capture Image", "Choose from Gallery", "Cancel"};
-        AlertDialog.Builder builder = new AlertDialog.Builder(KYCFormActivity.this);
-        builder.setIcon(R.drawable.camera);
-        builder.setTitle("Add Photo!");
-        builder.setItems(items, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int item) {
-                if (items[item].equals("Capture Image")) {
-                    Intent intent = new Intent(KYCFormActivity.this, CameraKitActivity.class);
-                    intent.putExtra("ImageType", imageType);
-                    intent.putExtra("REQUESTTYPE", id1);
-                    startActivityForResult(intent, id1);
-//                    String filename = System.currentTimeMillis() + ".jpg";
-//
-//                    ContentValues values = new ContentValues();
-//                    values.put(MediaStore.Images.Media.TITLE, filename);
-//                    values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
-//                    imageUri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
-//
-//                    Intent intent = new Intent();
-//                    intent.setAction(MediaStore.ACTION_IMAGE_CAPTURE);
-//                    intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-//                    startActivityForResult(intent, id1);
-                } else if (items[item].equals("Choose from Gallery")) {
-                    Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    intent.setType("image/*");
-                    startActivityForResult(Intent.createChooser(intent, "Select File"), id2);
-                } else if (items[item].equals("Cancel")) {
-                    dialog.dismiss();
-                }
-            }
-        });
-        builder.show();
-    }
-
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == passportphoto1 || requestCode == passportphoto2) {
-            if (requestCode == passportphoto1)
-                setImage((ImageView) findViewById(R.id.passportphotoimage), 1, 0, data, "passportPhoto", (TextView) findViewById(R.id.passportphoto));
-            else if (requestCode == passportphoto2)
-                setImage((ImageView) findViewById(R.id.passportphotoimage), 0, 1, data, "passportPhoto", (TextView) findViewById(R.id.passportphoto));
-        } else if (requestCode == DOCUMENT_FRONT1 || requestCode == DOCUMENT_FRONT2) {
-            if (requestCode == DOCUMENT_FRONT1)
-                setImage((ImageView) findViewById(R.id.documentfrontimage), 1, 0, data, "uploadFront", (TextView) findViewById(R.id.documentfront));
-            else if (requestCode == DOCUMENT_FRONT2)
-                setImage((ImageView) findViewById(R.id.documentfrontimage), 0, 1, data, "uploadFront", (TextView) findViewById(R.id.documentfront));
-        } else if (requestCode == DOCUMENT_BACK1 || requestCode == DOCUMENT_BACK2) {
-            if (requestCode == DOCUMENT_BACK1)
-                setImage((ImageView) findViewById(R.id.documentbackimage), 1, 0, data, "uploadBack", (TextView) findViewById(R.id.documentback));
-            else if (requestCode == DOCUMENT_BACK2)
-                setImage((ImageView) findViewById(R.id.documentbackimage), 0, 1, data, "uploadBack", (TextView) findViewById(R.id.documentback));
-        } else if (requestCode == PANPIC1 || requestCode == PANPIC2) {
-            if (requestCode == PANPIC1)
-                setImage((ImageView) findViewById(R.id.panphoto), 1, 0, data, "pancardImg", (TextView) findViewById(R.id.pan_photo));
-            else if (requestCode == PANPIC2)
-                setImage((ImageView) findViewById(R.id.panphoto), 0, 1, data, "pancardImg", (TextView) findViewById(R.id.pan_photo));
-        } else if (requestCode == SHOPPIC1 || requestCode == SHOPPIC2) {
-            if (requestCode == SHOPPIC1)
-                setImage((ImageView) findViewById(R.id.shopphoto), 1, 0, data, "shopPhoto", (TextView) findViewById(R.id.shop_photo));
-            else if (requestCode == SHOPPIC2)
-                setImage((ImageView) findViewById(R.id.shopphoto), 0, 1, data, "shopPhoto", (TextView) findViewById(R.id.shop_photo));
-        } else if (requestCode == CUSTPANPIC1 || requestCode == CUSTPANPIC2) {
-            if (requestCode == CUSTPANPIC1)
-                setImage((ImageView) findViewById(R.id.cust_panphoto), 1, 0, data, "custpanphoto", (TextView) findViewById(R.id.cust_pan_photo));
-            else if (requestCode == CUSTPANPIC2)
-                setImage((ImageView) findViewById(R.id.cust_panphoto), 0, 1, data, "custpanphoto", (TextView) findViewById(R.id.cust_pan_photo));
-        } else if (requestCode == selfphoto1 || requestCode == selfphoto2) {
-            if (requestCode == selfphoto1)
-                setImage((ImageView) findViewById(R.id.selfphoto), 1, 0, data, "selfPhoto", (TextView) findViewById(R.id.self_photo));
-            else if (requestCode == selfphoto2)
-                setImage((ImageView) findViewById(R.id.selfphoto), 0, 1, data, "selfPhoto", (TextView) findViewById(R.id.self_photo));
-        } else if (requestCode == signphoto1 || requestCode == signphoto2) {
-            if (requestCode == signphoto1)
-                setImage((ImageView) findViewById(R.id.signphoto), 1, 0, data, "signPhoto", (TextView) findViewById(R.id.sign_photo));
-            else if (requestCode == signphoto2)
-                setImage((ImageView) findViewById(R.id.signphoto), 0, 1, data, "signPhoto", (TextView) findViewById(R.id.sign_photo));
+        if (data != null) {
+            if (requestCode == passportphoto1 || requestCode == passportphoto2) {
+                if (requestCode == passportphoto1)
+                    setImage((ImageView) findViewById(R.id.passportphotoimage), 1, 0, data, "passportPhoto", (TextView) findViewById(R.id.passportphoto));
+                else if (requestCode == passportphoto2)
+                    setImage((ImageView) findViewById(R.id.passportphotoimage), 0, 1, data, "passportPhoto", (TextView) findViewById(R.id.passportphoto));
+            } else if (requestCode == DOCUMENT_FRONT1 || requestCode == DOCUMENT_FRONT2) {
+                if (requestCode == DOCUMENT_FRONT1)
+                    setImage((ImageView) findViewById(R.id.documentfrontimage), 1, 0, data, "uploadFront", (TextView) findViewById(R.id.documentfront));
+                else if (requestCode == DOCUMENT_FRONT2)
+                    setImage((ImageView) findViewById(R.id.documentfrontimage), 0, 1, data, "uploadFront", (TextView) findViewById(R.id.documentfront));
+            } else if (requestCode == DOCUMENT_BACK1 || requestCode == DOCUMENT_BACK2) {
+                if (requestCode == DOCUMENT_BACK1)
+                    setImage((ImageView) findViewById(R.id.documentbackimage), 1, 0, data, "uploadBack", (TextView) findViewById(R.id.documentback));
+                else if (requestCode == DOCUMENT_BACK2)
+                    setImage((ImageView) findViewById(R.id.documentbackimage), 0, 1, data, "uploadBack", (TextView) findViewById(R.id.documentback));
+            } else if (requestCode == PANPIC1 || requestCode == PANPIC2) {
+                if (requestCode == PANPIC1)
+                    setImage((ImageView) findViewById(R.id.panphoto), 1, 0, data, "pancardImg", (TextView) findViewById(R.id.pan_photo));
+                else if (requestCode == PANPIC2)
+                    setImage((ImageView) findViewById(R.id.panphoto), 0, 1, data, "pancardImg", (TextView) findViewById(R.id.pan_photo));
+            } else if (requestCode == SHOPPIC1 || requestCode == SHOPPIC2) {
+                if (requestCode == SHOPPIC1)
+                    setImage((ImageView) findViewById(R.id.shopphoto), 1, 0, data, "shopPhoto", (TextView) findViewById(R.id.shop_photo));
+                else if (requestCode == SHOPPIC2)
+                    setImage((ImageView) findViewById(R.id.shopphoto), 0, 1, data, "shopPhoto", (TextView) findViewById(R.id.shop_photo));
+            } else if (requestCode == CUSTPANPIC1 || requestCode == CUSTPANPIC2) {
+                if (requestCode == CUSTPANPIC1)
+                    setImage((ImageView) findViewById(R.id.cust_panphoto), 1, 0, data, "custpanphoto", (TextView) findViewById(R.id.cust_pan_photo));
+                else if (requestCode == CUSTPANPIC2)
+                    setImage((ImageView) findViewById(R.id.cust_panphoto), 0, 1, data, "custpanphoto", (TextView) findViewById(R.id.cust_pan_photo));
+            } else if (requestCode == selfphoto1 || requestCode == selfphoto2) {
+                if (requestCode == selfphoto1)
+                    setImage((ImageView) findViewById(R.id.selfphoto), 1, 0, data, "selfPhoto", (TextView) findViewById(R.id.self_photo));
+                else if (requestCode == selfphoto2)
+                    setImage((ImageView) findViewById(R.id.selfphoto), 0, 1, data, "selfPhoto", (TextView) findViewById(R.id.self_photo));
+            } else if (requestCode == signphoto1 || requestCode == signphoto2) {
+                if (requestCode == signphoto1)
+                    setImage((ImageView) findViewById(R.id.signphoto), 1, 0, data, "signPhoto", (TextView) findViewById(R.id.sign_photo));
+                else if (requestCode == signphoto2)
+                    setImage((ImageView) findViewById(R.id.signphoto), 0, 1, data, "signPhoto", (TextView) findViewById(R.id.sign_photo));
+            }
+        } else {
+            Toast.makeText(KYCFormActivity.this, "Please upload clear and same document image as mentioned before, or Do change camera rotation", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -976,22 +951,24 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
 
     private void updateImage(Bitmap thumbnail, ImageView view, TextView textView, String imageType) {
         try {
-            Bitmap bitmap = getResizedBitmap(thumbnail, 1500);
-            int fileSizeInBytes = byteSizeOf(bitmap);
-            long fileSizeInKB = fileSizeInBytes / 1024;
-            long fileSizeInMB = fileSizeInKB / 1024;
-            if (fileSizeInMB > 10)
-                Toast.makeText(KYCFormActivity.this, "Length Should be less than 10 MB", Toast.LENGTH_SHORT).show();
-            else if (fileSizeInKB > 500 && fileSizeInMB < 10) {
-                view.setImageBitmap(bitmap);
-                view.setVisibility(View.VISIBLE);
-                textView.setError(null);
-                kycMapImage.put(imageType, getBase64(addWaterMark(bitmap), 100));
-            } else {
-                view.setImageBitmap(bitmap);
-                view.setVisibility(View.VISIBLE);
-                textView.setError(null);
-                kycMapImage.put(imageType, getBase64(addWaterMark(bitmap), 100));
+            if (thumbnail != null) {
+                Bitmap bitmap = getResizedBitmap(thumbnail, 1500);
+                int fileSizeInBytes = byteSizeOf(bitmap);
+                long fileSizeInKB = fileSizeInBytes / 1024;
+                long fileSizeInMB = fileSizeInKB / 1024;
+                if (fileSizeInMB > 10)
+                    Toast.makeText(KYCFormActivity.this, "Length Should be less than 10 MB", Toast.LENGTH_SHORT).show();
+                else if (fileSizeInKB > 500 && fileSizeInMB < 10) {
+                    view.setImageBitmap(bitmap);
+                    view.setVisibility(View.VISIBLE);
+                    textView.setError(null);
+                    kycMapImage.put(imageType, getBase64(addWaterMark(bitmap), 100));
+                } else {
+                    view.setImageBitmap(bitmap);
+                    view.setVisibility(View.VISIBLE);
+                    textView.setError(null);
+                    kycMapImage.put(imageType, getBase64(addWaterMark(bitmap), 100));
+                }
             }
         } catch (Exception e) {
         }

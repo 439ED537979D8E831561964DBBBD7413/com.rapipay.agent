@@ -7,8 +7,8 @@ android {
 //        applicationId "com.rapipay.android.agent"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 25
-        versionName "0.25"
+        versionCode 27
+        versionName "0.27"
         multiDexEnabled true
         buildConfigField "int", "APPTYPE", "2"
         buildConfigField "String", "USERTYPE", "\"Other\""
@@ -36,13 +36,19 @@ android {
             flavorDimensions "default"
             resValue "string", "app_name", "Rapid Payments"
             buildConfigField("String", "ROLL", "\"Partner\"")
-                applicationId "com.rapipay.android.partner"
+            applicationId "com.rapipay.android.partner"
         }
         Agent {
             flavorDimensions "default"
             buildConfigField("String", "ROLL", "\"Agent\"")
             resValue "string", "app_name", "RapiPay Agent App"
             applicationId "com.rapipay.android.agents"
+        }
+        FinoAEPS {
+            flavorDimensions "default"
+            buildConfigField("String", "ROLL", "\"Agent\"")
+            resValue "string", "app_name", "RapiPay Agent App"
+            applicationId "com.rapipay.android.agentfino"
         }
     }
     useLibrary 'org.apache.http.legacy'
@@ -52,7 +58,7 @@ repositories {
 }
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation files('libs/finosdk.aar')
+//    implementation files('libs/finosdk.aar')
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.android.support.constraint:constraint-layout:1.1.2'
     testImplementation 'junit:junit:4.12'
@@ -82,10 +88,10 @@ dependencies {
     implementation files('libs/meSdk-1.3.10-release.jar')
     implementation files('libs/sun.misc.BASE64Decoder.jar')
     implementation files('libs/mpaysdk-release-v.1.0.34.jar')
-    implementation 'de.greenrobot:greendao:2.1.0'
-    implementation 'org.greenrobot:eventbus:3.0.0'
+//    implementation 'de.greenrobot:greendao:2.1.0'
+//    implementation 'org.greenrobot:eventbus:3.0.0'
     implementation 'com.android.support:multidex:1.0.0'
     implementation 'com.camerakit:camerakit:1.0.0-beta1'
+    implementation 'com.google.firebase:firebase-messaging:17.3.4'
 }
 apply plugin: 'com.google.gms.google-services'
-

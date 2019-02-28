@@ -14,13 +14,19 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatButton;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 import com.rapipay.android.agent.BuildConfig;
 import com.rapipay.android.agent.Model.VersionPozo;
 import com.rapipay.android.agent.R;
@@ -55,7 +61,7 @@ public class LoginScreenActivity extends BaseCompactActivity implements View.OnC
 
     private void initialize() {
         image_app = (ImageView) findViewById(R.id.image_app);
-        if (BuildConfig.APPTYPE == 1)
+        if (BuildConfig.APPTYPE == 1 || BuildConfig.APPTYPE == 3)
             image_app.setImageDrawable(getResources().getDrawable(R.drawable.rapipay_agent));
         if (BuildConfig.APPTYPE == 2)
             image_app.setImageDrawable(getResources().getDrawable(R.drawable.rapipay_parter));
@@ -160,6 +166,25 @@ public class LoginScreenActivity extends BaseCompactActivity implements View.OnC
                 else if (input_password.getText().toString().isEmpty())
                     input_password.setError("Please enter mandatory field");
                 else
+//                    FirebaseInstanceId.getInstance().getInstanceId()
+//                            .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+//                                @Override
+//                                public void onComplete(@NonNull Task<InstanceIdResult> task) {
+//                                    if (!task.isSuccessful()) {
+//                                        Log.w(TAG, "getInstanceId failed", task.getException());
+//                                        return;
+//                                    }
+//
+//                                    // Get new Instance ID token
+//                                    String token = task.getResult().getToken();
+//
+//                                    // Log and toast
+//                                    String msg = getString(R.string.msg_token_fmt, token);
+//                                    Log.d(TAG, msg);
+//                                    Toast.makeText(LoginScreenActivity.this, msg, Toast.LENGTH_SHORT).show();
+//                                }
+//                            });
+
                     loadVersion(imei);
                 break;
         }
@@ -246,7 +271,7 @@ public class LoginScreenActivity extends BaseCompactActivity implements View.OnC
             try {
                 PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
                 String version = pInfo.versionName;
-                if (stringArrayList.get(0).equalsIgnoreCase(version) && stringArrayList.get(1).equalsIgnoreCase("F")) {
+                if (stringArrayList.get(0).equalsIgnoreCase(version) && (stringArrayList.get(1).equalsIgnoreCase("F") || stringArrayList.get(1).equalsIgnoreCase("N"))) {
                     new AsyncPostMethod(WebConfig.LOGIN_URL, getJson_Validate().toString(), "", LoginScreenActivity.this, getString(R.string.responseTimeOut)).execute();
                 } else if (!stringArrayList.get(0).equalsIgnoreCase(version) && stringArrayList.get(1).equalsIgnoreCase("F")) {
                     customDialog_Common("KYCLAYOUTSS", null, null, "Update Available", null, "You are running on lower version please update for new versions!.", LoginScreenActivity.this);

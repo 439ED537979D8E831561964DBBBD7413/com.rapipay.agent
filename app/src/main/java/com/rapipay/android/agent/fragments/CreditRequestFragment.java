@@ -75,10 +75,8 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
     Spinner select_mode;
     TextView bank_select;
     ArrayList<PaymentModePozo> list_payment;
-    DatePickerDialog pickerDialog;
     TextView input_account, input_remark, input_transid, input_amount, input_code;
     AutofitTextView date1_text, image;
-    SimpleDateFormat dateFormatter;
     private static final int CAMERA_REQUEST = 1888;
     private int SELECT_FILE = 1;
     private String filePath = "", paymode = "", imageBase64 = "", headerData;
@@ -93,7 +91,6 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         rv = (View) inflater.inflate(R.layout.credit_request_layout, container, false);
         initialize(rv);
-        headerData = (WebConfig.BASIC_USERID + ":" + WebConfig.BASIC_PASSWORD);
         if (BaseCompactActivity.db != null && BaseCompactActivity.db.getDetails_Rapi())
             list = BaseCompactActivity.db.getDetails();
         else
@@ -121,7 +118,7 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
             public void onClick(View v) {
                 String condition = "where " + RapipayDB.COLOMN_CREDITBANK + "='Y'";
                 ArrayList<String> list_bank = BaseCompactActivity.db.geBankDetails(condition);
-                customSpinner(bank_select, "Select Bank", list_bank);
+                customSpinner(bank_select, "Select Bank", list_bank,null);
             }
         });
         list_payment = BaseCompactActivity.db.getPaymenttDetails();
@@ -370,55 +367,6 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
             dialog.show();
         }
     };
-    Uri imageUri;
-
-    private void selectImage() {
-        final CharSequence[] items = {"Capture Image", "Choose from Gallery", "Cancel"};
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(getActivity());
-        builder.setIcon(R.drawable.camera);
-        builder.setTitle("Add Photo!");
-        builder.setItems(items, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int item) {
-                if (items[item].equals("Capture Image")) {
-                    Intent intent = new Intent(getActivity(), CameraKitActivity.class);
-                    intent.putExtra("ImageType", "creditRequestImage");
-                    intent.putExtra("REQUESTTYPE", CAMERA_REQUEST);
-                    startActivityForResult(intent, CAMERA_REQUEST);
-                } else if (items[item].equals("Choose from Gallery")) {
-                    Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    intent.setType("image/*");
-                    startActivityForResult(Intent.createChooser(intent, "Select File"), SELECT_FILE);
-
-                } else if (items[item].equals("Cancel")) {
-                    dialog.dismiss();
-                }
-            }
-        });
-        builder.show();
-    }
-
-    private Bitmap addWaterMark(Bitmap src) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
-        String currentDateandTime = sdf.format(new Date());
-        int w = src.getWidth();
-        int h = src.getHeight();
-        Bitmap result = Bitmap.createBitmap(w, h, src.getConfig());
-        Canvas canvas = new Canvas(result);
-        canvas.drawBitmap(src, 0, 0, null);
-        Paint paint = new Paint();
-        paint.setColor(Color.WHITE); // Text Color
-        paint.setTextSize(10);
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_OVER)); // Text Overlapping Pattern
-        Bitmap waterMark = BitmapFactory.decodeResource(getResources(), R.drawable.rapipay);
-        canvas.drawText(currentDateandTime, w / 4, h - 10, paint);
-
-        return result;
-    }
-
-    private void setPic(Bitmap mCurrentPhotoPath) {
-        imageBase64 = getBytesFromBitmap(addWaterMark(mCurrentPhotoPath));
-    }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -461,15 +409,6 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
         }
     }
 
-    protected Bitmap loadImageFromStorage(String name, String path) {
-        try {
-            File f = new File(path, name);
-            return BitmapFactory.decodeStream(new FileInputStream(f));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
 
     public JSONObject credit_request() {
         JSONObject jsonObject = new JSONObject();
@@ -517,61 +456,6 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
     @Override
     public void chechStat(String object) {
 
-    }
-
-    CustomSpinnerAdapter adapter = null;
-    ArrayList<String> spinner_list;
-    AlertDialog.Builder dialog;
-
-    protected void customSpinner(final TextView viewText, final String type, final ArrayList<String> list_spinner) {
-
-        spinner_list = list_spinner;
-        dialog = new AlertDialog.Builder(getActivity());
-        LayoutInflater inflater = getActivity().getLayoutInflater();
-        View alertLayout = inflater.inflate(R.layout.custom_spinner_layout, null);
-        TextView text = (TextView) alertLayout.findViewById(R.id.spinner_title);
-        final EditText search = (EditText) alertLayout.findViewById(R.id.input_search);
-        text.setText(type);
-        search.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                String text = search.getText().toString().toLowerCase(Locale.getDefault());
-                adapter.filter(text);
-            }
-        });
-        ListView listLeft = (ListView) alertLayout.findViewById(R.id.list_view);
-        AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
-        if (spinner_list.size() != 0) {
-            adapter = new CustomSpinnerAdapter(spinner_list, getActivity());
-            listLeft.setAdapter(adapter);
-        }
-        listLeft.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                viewText.setText(list_spinner.get(position));
-                viewText.setError(null);
-                alertDialog.dismiss();
-            }
-        });
-        dialog.setCancelable(false);
-        dialog.setView(alertLayout);
-        btn_ok.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                alertDialog.dismiss();
-            }
-        });
-        alertDialog = dialog.show();
     }
 
 }

@@ -108,10 +108,12 @@ public class BarcodeActivity extends BaseCompactActivity implements VersionListe
                                         @Override
                                         public void onPictureTaken(byte[] bytes) {
                                             Bitmap decodedByte = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                                            if (TYPE.equalsIgnoreCase("outside"))
-                                                AgentKYCFragment.bitmap_trans = getResizedBitmap(decodedByte, 600);
-                                            else
-                                                CustomerKYCActivity.bitmap_trans = getResizedBitmap(decodedByte, 600);
+                                            if(decodedByte!=null) {
+                                                if (TYPE.equalsIgnoreCase("outside"))
+                                                    AgentKYCFragment.bitmap_trans = getResizedBitmap(decodedByte, 600);
+                                                else
+                                                    CustomerKYCActivity.bitmap_trans = getResizedBitmap(decodedByte, 600);
+                                            }
                                             setResult(RESULT_OK, intent);
                                             finish();
                                         }

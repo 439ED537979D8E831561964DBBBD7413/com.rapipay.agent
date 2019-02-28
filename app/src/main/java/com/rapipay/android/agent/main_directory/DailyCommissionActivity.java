@@ -40,7 +40,7 @@ public class DailyCommissionActivity extends BaseCompactActivity implements Requ
     }
 
     private void loadApi() {
-        new AsyncPostMethod(WebConfig.CommonReport, getNetwork_Validate(first, last).toString(), headerData, DailyCommissionActivity.this,getString(R.string.responseTimeOut)).execute();
+        new AsyncPostMethod(WebConfig.CommonReport, getNetwork_Validate(first, last).toString(), headerData, DailyCommissionActivity.this,getString(R.string.responseTimeOut),type).execute();
     }
 
     private void initialize() {
@@ -66,7 +66,7 @@ public class DailyCommissionActivity extends BaseCompactActivity implements Requ
                 if (totalItemCount != 0 && totalItemCount == last && lastInScreen == totalItemCount && !isLoading) {
                     first = last + 1;
                     last += 25;
-                    new AsyncPostMethod(WebConfig.CommonReport, getNetwork_Validate(first, last).toString(), headerData, DailyCommissionActivity.this,getString(R.string.responseTimeOut)).execute();
+                    new AsyncPostMethod(WebConfig.CommonReport, getNetwork_Validate(first, last).toString(), headerData, DailyCommissionActivity.this,getString(R.string.responseTimeOut),type).execute();
                     isLoading = true;
                 }
             }

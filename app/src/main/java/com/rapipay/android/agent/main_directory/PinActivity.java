@@ -100,7 +100,7 @@ public class PinActivity extends BaseCompactActivity implements View.OnClickList
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_login:
-                new AsyncPostMethod(WebConfig.LOGIN_URL, getJson_Validate().toString(), "", PinActivity.this,"Response Timeout. To check the transaction status please contact tech support.").execute();
+                new AsyncPostMethod(WebConfig.LOGIN_URL, getJson_Validate().toString(), "", PinActivity.this,getString(R.string.responseTimeOut)).execute();
                 break;
         }
     }
@@ -215,7 +215,7 @@ public class PinActivity extends BaseCompactActivity implements View.OnClickList
     private void callBankDetails() {
         boolean bank_flag = db.getDetails_Bank();
         if (bank_flag == false) {
-            new AsyncPostMethod(WebConfig.CommonReport, getMaster_Validate().toString(), headerData, PinActivity.this,"Response Timeout. To check the transaction status please contact tech support.").execute();
+            new AsyncPostMethod(WebConfig.CommonReport, getMaster_Validate().toString(), headerData, PinActivity.this,getString(R.string.responseTimeOut)).execute();
         }
     }
 

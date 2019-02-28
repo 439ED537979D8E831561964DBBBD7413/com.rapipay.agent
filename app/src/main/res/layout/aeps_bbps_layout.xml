@@ -180,7 +180,7 @@
                 android:weightSum="800">
 
                 <android.support.v7.widget.AppCompatButton
-                    android:id="@+id/btn_fund_mpos"
+                    android:id="@+id/btn_submit_aeps"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
