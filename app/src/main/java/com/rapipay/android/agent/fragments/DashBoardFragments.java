@@ -105,16 +105,19 @@ public class DashBoardFragments extends Fragment {
                 } else if (position == 1) {
                     Intent intent = new Intent(getActivity(), AEPS_BBPS_RegistrationActivity.class);
                     intent.putExtra("typeput", "AEPS");
+                    intent.putExtra("persons", "pending");
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                 } else if (position == 2) {
                     Intent intent = new Intent(getActivity(), AEPS_BBPS_RegistrationActivity.class);
                     intent.putExtra("typeput", "BBPS");
+                    intent.putExtra("persons", "pending");
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                 } else if (position == 3) {
                     Intent intent = new Intent(getActivity(), AEPS_BBPS_RegistrationActivity.class);
                     intent.putExtra("typeput", "MATM");
+                    intent.putExtra("persons", "pending");
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                 }
@@ -208,7 +211,7 @@ public class DashBoardFragments extends Fragment {
 //                    intent.putExtra("serviceType", "AEPS_CASHOUT");
 //                    intent.putExtra("updateServiceType", "UPDATE_AEPS_CASHOUT");
 //                    intent.putExtra("requestChannel", "AEPS_CHANNEL");
-//                    intent.putExtra("requestType", "AEPS-BE");
+//                    intent.putExtra("requestType", "AEPS_CASHOUT");
 //                    intent.putExtra("reqFor", "AEPS");
 //                } else if (position == 1) {
 //                    intent = new Intent(getActivity(), MICRO_AEPS_Activity.class);
@@ -248,18 +251,20 @@ public class DashBoardFragments extends Fragment {
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                 } else if (position == 0) {
-                    for (int i = 0; i < MainActivity.pozoArrayList.size(); i++) {
-                        if (MainActivity.pozoArrayList.get(i).getHeaderID().equalsIgnoreCase("10"))
-                            if (MainActivity.pozoArrayList.get(i).getHeaderData().equalsIgnoreCase("Retailer")) {
-                                Toast.makeText(getActivity(), "Not Authorized to create New User!.", Toast.LENGTH_SHORT).show();
-                            } else {
-                                Intent intent = new Intent(getActivity(), RegisterKYCTab.class);
-                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                intent.putExtra("type", "outside");
-                                intent.putExtra("customerType", "A");
-                                intent.putExtra("mobileNo", "");
-                                startActivity(intent);
-                            }
+                    if(MainActivity.pozoArrayList.size()!=0) {
+                        for (int i = 0; i < MainActivity.pozoArrayList.size(); i++) {
+                            if (MainActivity.pozoArrayList.get(i).getHeaderID().equalsIgnoreCase("10"))
+                                if (MainActivity.pozoArrayList.get(i).getHeaderData().equalsIgnoreCase("Retailer")) {
+                                    Toast.makeText(getActivity(), "Not Authorized to create New User!.", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Intent intent = new Intent(getActivity(), RegisterKYCTab.class);
+                                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                    intent.putExtra("type", "outside");
+                                    intent.putExtra("customerType", "A");
+                                    intent.putExtra("mobileNo", "");
+                                    startActivity(intent);
+                                }
+                        }
                     }
                 } else if (position == 3) {
                     Intent intent = new Intent(getActivity(), PassbookActivity.class);

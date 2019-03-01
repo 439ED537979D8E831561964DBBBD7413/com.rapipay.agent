@@ -63,6 +63,7 @@ public class AEPS_BBPS_RegistrationActivity extends BaseCompactActivity implemen
         else if (typeput.equalsIgnoreCase("BBPS"))
             heading.setText("BBPS Registration");
         web = (WebView) findViewById(R.id.webview01);
+        TYPE = getIntent().getStringExtra("persons");
         WebSettings webSettings = web.getSettings();
         webSettings.setAppCacheEnabled(true);
         webSettings.setCacheMode(webSettings.LOAD_CACHE_ELSE_NETWORK);

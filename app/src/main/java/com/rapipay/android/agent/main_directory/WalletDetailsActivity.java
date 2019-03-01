@@ -399,7 +399,7 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
                         input_name.setText(object.getString("customerName"));
                         isVerifyAccount = object.getString("isVerifyAccount");
                         limit = Integer.valueOf(object.getInt("dailyRemLimit"));
-                        text_ben.setText("Add Beneficiary  Transfer Limit" + "\n" + "Daily : Rs " + limit + "\n" + "Monthly : Rs " + format(object.getString("monthlyRemLimit")));
+                        text_ben.setText("Add Beneficiary  Transfer Limit" + "\n" + "Monthly : Rs " + format(object.getString("monthlyRemLimit")));
                         if (object.has("beneficiaryDetailList")) {
                             if (Integer.parseInt(object.getString("numberOfBenCount")) > 0) {
                                 beneficiary_layout.setVisibility(View.VISIBLE);

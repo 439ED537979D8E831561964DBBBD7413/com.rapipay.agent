@@ -56,7 +56,7 @@ public class BaseFragment extends Fragment {
     protected  boolean scan = false;
     protected  String TYPE,customerType;
     protected ArrayList<RapiPayPozo> list;
-    protected String headerData = (WebConfig.BASIC_USERID + ":" + WebConfig.BASIC_PASSWORD),imageBase64 = "";
+    protected String imageBase64 = "";
     protected static final int CAMERA_REQUEST = 1888;
     protected int SELECT_FILE = 1;
     @Nullable

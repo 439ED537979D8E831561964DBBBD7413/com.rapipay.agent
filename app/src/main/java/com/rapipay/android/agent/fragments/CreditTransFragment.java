@@ -42,7 +42,7 @@ public class CreditTransFragment extends BaseFragment implements RequestHandler,
     AutofitTextView date1_text, date2_text;
     RecyclerView trans_details;
     ArrayList<CreditHistoryPozo> transactionPozoArrayList;
-    private String headerData;
+    protected String headerData = (WebConfig.BASIC_USERID + ":" + WebConfig.BASIC_PASSWORD);
     View rv;
     protected ArrayList<RapiPayPozo> list;
     TextView heading;

@@ -1,16 +1,12 @@
 package com.rapipay.android.agent.main_directory;
 
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.StrictMode;
 import android.provider.MediaStore;
 import android.support.design.widget.NavigationView;
@@ -31,14 +27,7 @@ import android.widget.Toast;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 
 import com.rapipay.android.agent.BuildConfig;
 import com.rapipay.android.agent.Database.RapipayDB;
@@ -52,7 +41,6 @@ import com.rapipay.android.agent.fragments.ChangePassword;
 import com.rapipay.android.agent.fragments.ChangePinFragment;
 import com.rapipay.android.agent.fragments.DashBoardFragments;
 import com.rapipay.android.agent.fragments.LienHistory;
-import com.rapipay.android.agent.fragments.PayloadBankFragment;
 import com.rapipay.android.agent.fragments.ProfileFragment;
 import com.rapipay.android.agent.fragments.SettlementBankFragment;
 import com.rapipay.android.agent.interfaces.CustomInterface;
@@ -200,6 +188,7 @@ public class MainActivity extends BaseCompactActivity
     }
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if(data!=null) {
         if (requestCode == dpPhoto1) {
             try {
                 String path = data.getStringExtra("ImagePath");
@@ -213,7 +202,6 @@ public class MainActivity extends BaseCompactActivity
                 e.printStackTrace();
             }
         } else if (requestCode == dpPhoto2) {
-            if(data!=null) {
                 Uri uri = data.getData();
                 Bitmap thumbnail = null;
                 try {
@@ -229,7 +217,6 @@ public class MainActivity extends BaseCompactActivity
                 int column_index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
                 cursor.moveToFirst();
                 filePath = cursor.getString(column_index);
-                String[] splits = filePath.split("\\/");
                 ivHeaderPhoto.setImageBitmap(thumbnail);
                 String imageName = "image" + ".jpg";
                 String path = saveToInternalStorage(thumbnail, imageName);
@@ -237,49 +224,6 @@ public class MainActivity extends BaseCompactActivity
             }
         }
     }
-//
-//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//        if (requestCode == CAMERA_REQUEST) {
-//            String path = data.getStringExtra("ImagePath");
-//            String imageType = data.getStringExtra("ImageType");
-//            Bitmap bitmap = loadImageFromStorage(imageType, path);
-//            ivHeaderPhoto.setImageBitmap(bitmap);
-//            String imageName = "image" + ".jpg";
-//            String paths = saveToInternalStorage(bitmap, imageName);
-//            localStorage.setActivityState(LocalStorage.IMAGEPATH, paths);
-//            //SaveInDB(thumbnail);
-//        } else if (requestCode == SELECT_FILE) {
-//            if(data!=null) {
-//                Uri selectedImageUri = data.getData();
-//                String[] projection = {MediaStore.MediaColumns.DATA};
-//                CursorLoader cursorLoader = new CursorLoader(this, selectedImageUri, projection, null, null,
-//                        null);
-//                Cursor cursor = cursorLoader.loadInBackground();
-//                int column_index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
-//                cursor.moveToFirst();
-//                String selectedImagePath = cursor.getString(column_index);
-//                Bitmap bm;
-//                BitmapFactory.Options options = new BitmapFactory.Options();
-//                options.inJustDecodeBounds = true;
-//                BitmapFactory.decodeFile(selectedImagePath, options);
-//                final int REQUIRED_SIZE = 150;
-//                int scale = 1;
-//                while (options.outWidth / scale / 2 >= REQUIRED_SIZE
-//                        && options.outHeight / scale / 2 >= REQUIRED_SIZE)
-//                    scale *= 2;
-//                options.inSampleSize = scale;
-//                options.inJustDecodeBounds = false;
-//                bm = BitmapFactory.decodeFile(selectedImagePath, options);
-//                ivHeaderPhoto.setImageBitmap(bm);
-//                String imageName = "image" + ".jpg";
-//                String path = saveToInternalStorage(bm, imageName);
-//                localStorage.setActivityState(LocalStorage.IMAGEPATH, path);
-//            }
-//        }
-//    }
-
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         return true;

@@ -44,9 +44,10 @@ public class NetworkHistoryFragment extends BaseFragment implements RequestHandl
     AutofitTextView date2_text, date1_text;
     ListView trans_details;
     protected ArrayList<RapiPayPozo> list;
-    private String headerData, payee;
+    private String payee;
     Spinner select_state;
     ArrayList<String> list_state;
+    protected String headerData = (WebConfig.BASIC_USERID + ":" + WebConfig.BASIC_PASSWORD);
     ArrayList<NetworkHistoryPozo> transactionPozoArrayList;
     private int selectedDate, selectedMonth, selectedYear;
     String months = null, dayss = null;

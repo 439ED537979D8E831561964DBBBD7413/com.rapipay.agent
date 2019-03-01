@@ -33,6 +33,7 @@ public class LienHistory extends BaseFragment implements WalletRequestHandler, V
     ListView trans_details;
     ArrayList<LienHistoryPozo> lienHistoryArrayList;
     LienAdapter lienAdapter;
+    protected String headerData = (WebConfig.BASIC_USERID + ":" + WebConfig.BASIC_PASSWORD);
 
     @Nullable
     @Override

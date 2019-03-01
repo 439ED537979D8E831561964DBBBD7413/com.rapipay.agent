@@ -166,7 +166,7 @@ public class ReChargeActivity extends BaseCompactActivity implements View.OnClic
     @Override
     public void chechStatus(JSONObject object) {
         try {
-            if (object.getString("responseCode").equalsIgnoreCase("200")) {
+            if (object.getString("responseCode").equalsIgnoreCase("200") || object.getString("responseCode").equalsIgnoreCase("101")) {
                 if (object.getString("serviceType").equalsIgnoreCase("MOBILE_RECHARGE")) {
                     if (object.has("getTxnReceiptDataList"))
                         try {

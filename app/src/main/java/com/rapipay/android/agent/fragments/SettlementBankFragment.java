@@ -55,6 +55,7 @@ public class SettlementBankFragment extends BaseFragment implements WalletReques
     ArrayList<SettlementPozo> activeAccountList, deleteAccountList;
     CardView activeaccounts, deleteaccounts;
     boolean accountAdded = false;
+    protected String headerData = (WebConfig.BASIC_USERID + ":" + WebConfig.BASIC_PASSWORD);
 
     @Nullable
     @Override

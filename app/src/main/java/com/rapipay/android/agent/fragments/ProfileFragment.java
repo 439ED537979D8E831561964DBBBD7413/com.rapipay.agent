@@ -50,6 +50,7 @@ public class ProfileFragment extends Fragment implements RequestHandler, View.On
     HashMap<String, String> headerePozoArrayList;
     private int selectedDate, selectedMonth, selectedYear;
     String months = null, dayss = null;
+    protected String headerData = (WebConfig.BASIC_USERID + ":" + WebConfig.BASIC_PASSWORD);
 
     @Nullable
     @Override

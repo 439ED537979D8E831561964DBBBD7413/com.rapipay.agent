@@ -111,7 +111,7 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
     String amount = "", selectGender = "", docType = "", imgType = "";
     MovableFloatingActionButton fab;
     boolean isFabClick = false;
-    String[] items = new String[]{"Select Document Type", "Aadhaar Card", "Voter Id Card", "Driving License", "Passport"};
+    String[] items = new String[]{"Select Document Type", "Aadhaar Card", "Voter ID", "Driving License", "Passport", "Nepalese Citizenship", "Rasan Card", "Pan Card", "Indian Citizenship"};
     ArrayAdapter<String> adapter_doc;
     ArrayList<PaymentModePozo> list_gender = null;
 
@@ -1379,19 +1379,19 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
         super.onActivityResult(requestCode, resultCode, data);
         imageBase64 = "";
         image.setText("");
-        if (resultCode == CAMERA_REQUEST) {
-            try {
-                String path = data.getStringExtra("ImagePath");
-                String imageType = data.getStringExtra("ImageType");
-                Bitmap bitmap = loadImageFromStorage(imageType, path);
-                setPic(bitmap);
-                image.setText(imageType + ".jpg");
-                image.setError(null);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } else if (requestCode == SELECT_FILE) {
-            if (data != null) {
+        if (data != null) {
+            if (resultCode == CAMERA_REQUEST) {
+                try {
+                    String path = data.getStringExtra("ImagePath");
+                    String imageType = data.getStringExtra("ImageType");
+                    Bitmap bitmap = loadImageFromStorage(imageType, path);
+                    setPic(bitmap);
+                    image.setText(imageType + ".jpg");
+                    image.setError(null);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else if (requestCode == SELECT_FILE) {
                 Uri uri = data.getData();
                 Bitmap thumbnail = null;
                 InputStream is = null;
@@ -1421,12 +1421,10 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
                 image.setError(null);
             }
         } else if (requestCode == SELECT_PDF_DIALOG) {
-            if (data != null) {
-                ArrayList<NormalFile> list = data.getParcelableArrayListExtra(Constant.RESULT_PICK_FILE);
-                imageBase64 = getStringFile(list.get(0).getPath());
-                image.setText(list.get(0).getName());
-                imgType = "pdf";
-            }
+            ArrayList<NormalFile> list = data.getParcelableArrayListExtra(Constant.RESULT_PICK_FILE);
+            imageBase64 = getStringFile(list.get(0).getPath());
+            image.setText(list.get(0).getName());
+            imgType = "pdf";
         } else if (requestCode == CONTACT_PICKER_RESULT) {
             reset();
             contactRead(data, input_mobile);

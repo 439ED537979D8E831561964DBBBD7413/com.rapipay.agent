@@ -57,7 +57,8 @@ public class NetworkTransFragment extends BaseFragment implements RequestHandler
     LinearLayout last_tran_layout;
     TextView header;
     ArrayList<NetworkTransferPozo> transactionPozoArrayList;
-    String clickedId = "0", headerData;
+    String clickedId = "0";
+    protected String headerData = (WebConfig.BASIC_USERID + ":" + WebConfig.BASIC_PASSWORD);
     ArrayList<NetworkManagePozo> logList = new ArrayList<NetworkManagePozo>();
     View rv;
     protected ArrayList<RapiPayPozo> list;

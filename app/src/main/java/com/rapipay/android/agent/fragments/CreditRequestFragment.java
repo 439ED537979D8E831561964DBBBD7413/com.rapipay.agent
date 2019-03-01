@@ -79,7 +79,8 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
     AutofitTextView date1_text, image;
     private static final int CAMERA_REQUEST = 1888;
     private int SELECT_FILE = 1;
-    private String filePath = "", paymode = "", imageBase64 = "", headerData;
+    private String filePath = "", paymode = "";
+    protected String headerData = (WebConfig.BASIC_USERID + ":" + WebConfig.BASIC_PASSWORD);
     View rv;
     protected ArrayList<RapiPayPozo> list;
     AppCompatButton btn_fund;
@@ -160,9 +161,10 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
 
     @Override
     public void okClicked(String type, Object ob) {
-        if (type.equalsIgnoreCase("SESSIONEXPIRE"))
+        if (type.equalsIgnoreCase("SESSIONEXPIRE")) {
             jumpPage();
-        clear();
+            clear();
+        }
     }
 
     @Override
