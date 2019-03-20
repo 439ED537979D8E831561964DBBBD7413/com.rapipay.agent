@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import com.rapipay.android.agent.BuildConfig;
 import com.rapipay.android.agent.Database.RapipayDB;
 import com.rapipay.android.agent.Model.BankDetailsPozo;
+import com.rapipay.android.agent.Model.DeviceDetailsPozo;
 import com.rapipay.android.agent.Model.HeaderePozo;
 import com.rapipay.android.agent.Model.ImagePozo;
 import com.rapipay.android.agent.Model.RapiPayPozo;
@@ -58,19 +59,17 @@ public class MainActivity extends BaseCompactActivity
 
     public static ImageView ivHeaderPhoto;
     NavigationView navigationView;
-    private static final int CAMERA_REQUEST = 1888;
-    private int SELECT_FILE = 1;
     private static String filePath;
-    private static final String TAG = "Contacts";
-
     DrawerLayout drawer;
     String data, term = null;
     TextView tv;
     ImageView back_click;
     private static final int dpPhoto1 = 2001;
     private static final int dpPhoto2 = 2002;
-
+    public static String bankdetails=null;
+    public static String regBankDetails=null;
     public static ArrayList<HeaderePozo> pozoArrayList;
+    public static ArrayList<DeviceDetailsPozo> deviceDetailsPozoArrayList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,13 +88,39 @@ public class MainActivity extends BaseCompactActivity
                     back_click.setImageDrawable(getResources().getDrawable(R.drawable.rapipay_parter));
             }
             loadUrl();
+            loadMasterData();
         } else {
             dbNull(MainActivity.this);
         }
     }
 
+    private void loadMasterData() {
+        new AsyncPostMethod(WebConfig.CASHOUT_URL, getDeviceDetails().toString(), headerData, MainActivity.this, getString(R.string.responseTimeOut), "NODEHEADERDATA").execute();
+    }
+
+    public JSONObject getDeviceDetails() {
+        JSONObject jsonObject = new JSONObject();
+        if (list.size() != 0) {
+            try {
+                jsonObject.put("serviceType", "GET_MASTER_DEVICE_DETAILS");
+                jsonObject.put("requestChannel", "MPOS_CHANNEL");
+                jsonObject.put("typeMobileWeb", "mobile");
+                jsonObject.put("transactionID", ImageUtils.miliSeconds());
+                jsonObject.put("agentMobile", list.get(0).getMobilno());
+                jsonObject.put("nodeAgentId", list.get(0).getMobilno());
+                jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
+                jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            Toast.makeText(this, "User Data is null", Toast.LENGTH_SHORT).show();
+        }
+        return jsonObject;
+    }
+
     private void url() {
-        new AsyncPostMethod(WebConfig.COMMONAPI, getDashBoard("GET_NODE_HEADER_DATA").toString(), headerData, MainActivity.this, getString(R.string.responseTimeOut),"NODEHEADERDATA").execute();
+        new AsyncPostMethod(WebConfig.COMMONAPI, getDashBoard("GET_NODE_HEADER_DATA").toString(), headerData, MainActivity.this, getString(R.string.responseTimeOut), "NODEHEADERDATA").execute();
         localStorage.setActivityState(LocalStorage.ROUTESTATE, "0");
     }
 
@@ -164,8 +189,8 @@ public class MainActivity extends BaseCompactActivity
         View headerLayout = navigationView.inflateHeaderView(R.layout.nav_header_main);
         TextView verionName = navigationView.findViewById(R.id.btn_sing_in);
         try {
-            verionName.setText("Version - "+getPackageManager().getPackageInfo(getPackageName(), 0).versionName);
-        }catch (PackageManager.NameNotFoundException e){
+            verionName.setText("Version - " + getPackageManager().getPackageInfo(getPackageName(), 0).versionName);
+        } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
         ivHeaderPhoto = (ImageView) headerLayout.findViewById(R.id.imageView);
@@ -176,7 +201,7 @@ public class MainActivity extends BaseCompactActivity
         ivHeaderPhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                selectImage(dpPhoto1,dpPhoto2,"DPPHOTO");
+                selectImage(dpPhoto1, dpPhoto2, "DPPHOTO");
             }
         });
     }
@@ -186,22 +211,23 @@ public class MainActivity extends BaseCompactActivity
         super.onResume();
         invalidateOptionsMenu();
     }
+
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(data!=null) {
-        if (requestCode == dpPhoto1) {
-            try {
-                String path = data.getStringExtra("ImagePath");
-                String imageType = data.getStringExtra("ImageType");
-                Bitmap bitmap = loadImageFromStorage(imageType, path);
-                ivHeaderPhoto.setImageBitmap(bitmap);
-                String imageName = "image" + ".jpg";
-                String paths = saveToInternalStorage(bitmap, imageName);
-                localStorage.setActivityState(LocalStorage.IMAGEPATH, paths);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } else if (requestCode == dpPhoto2) {
+        if (data != null) {
+            if (requestCode == dpPhoto1) {
+                try {
+                    String path = data.getStringExtra("ImagePath");
+                    String imageType = data.getStringExtra("ImageType");
+                    Bitmap bitmap = loadImageFromStorage(imageType, path);
+                    ivHeaderPhoto.setImageBitmap(bitmap);
+                    String imageName = "image" + ".jpg";
+                    String paths = saveToInternalStorage(bitmap, imageName);
+                    localStorage.setActivityState(LocalStorage.IMAGEPATH, paths);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else if (requestCode == dpPhoto2) {
                 Uri uri = data.getData();
                 Bitmap thumbnail = null;
                 try {
@@ -224,6 +250,7 @@ public class MainActivity extends BaseCompactActivity
             }
         }
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         return true;
@@ -255,15 +282,15 @@ public class MainActivity extends BaseCompactActivity
         } else if (id == R.id.nav_Cmobile) {
             reset.setVisibility(View.GONE);
             fragment = new ChangeMobileFragment();
-        }else if (id == R.id.settle_Cmobile) {
+        } else if (id == R.id.settle_Cmobile) {
             reset.setVisibility(View.GONE);
-            Bundle bundle=new Bundle();
+            Bundle bundle = new Bundle();
             bundle.putString("message", "S");
             fragment = new SettlementBankFragment();
             fragment.setArguments(bundle);
-        }else if (id == R.id.payload_Cmobile) {
+        } else if (id == R.id.payload_Cmobile) {
             reset.setVisibility(View.GONE);
-            Bundle bundle=new Bundle();
+            Bundle bundle = new Bundle();
             bundle.putString("message", "P");
             fragment = new SettlementBankFragment();
             fragment.setArguments(bundle);
@@ -297,7 +324,7 @@ public class MainActivity extends BaseCompactActivity
                 if (object.getString("serviceType").equalsIgnoreCase("GET_MASTER_DATA")) {
                     if (new MasterClass().getMasterData(object, db))
                         if (term.equalsIgnoreCase("N"))
-                            new AsyncPostMethod(WebConfig.NETWORKTRANSFER_URL, acknowledge(data, term).toString(), headerData, MainActivity.this, getString(R.string.responseTimeOut),"DOWMLOADDATA").execute();
+                            new AsyncPostMethod(WebConfig.NETWORKTRANSFER_URL, acknowledge(data, term).toString(), headerData, MainActivity.this, getString(R.string.responseTimeOut), "DOWMLOADDATA").execute();
                 } else if (object.getString("serviceType").equalsIgnoreCase("GET_NODE_HEADER_DATA")) {
                     if (object.has("headerList")) {
                         localStorage.setActivityState(LocalStorage.ROUTESTATE, "0");
@@ -307,9 +334,25 @@ public class MainActivity extends BaseCompactActivity
                     }
                 } else if (object.getString("serviceType").equalsIgnoreCase("UPDATE_DOWNLAOD_DATA_STATUS")) {
                     loadUrl();
+                } else if (object.getString("serviceType").equalsIgnoreCase("GET_MASTER_DEVICE_DETAILS")) {
+                    if (object.has("deviceList")) {
+                        deviceDetails(object.getJSONArray("deviceList"));
+                    }
                 }
             }
         } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void deviceDetails(JSONArray array){
+        deviceDetailsPozoArrayList = new ArrayList<>();
+        try{
+            for (int i = 0; i < array.length(); i++) {
+                JSONObject object = array.getJSONObject(i);
+                deviceDetailsPozoArrayList.add(new DeviceDetailsPozo(object.getString("deviceID"), object.getString("deviceType"), object.getString("bluetoothID")));
+            }
+        }catch (Exception e){
             e.printStackTrace();
         }
     }
@@ -325,6 +368,12 @@ public class MainActivity extends BaseCompactActivity
                 else if (object.getString("headerValue").equalsIgnoreCase("Notice")) {
                     tv.setText(object.getString("headerData"));
                     tv.setVisibility(View.VISIBLE);
+                } else if (object.getString("headerValue").equalsIgnoreCase("BANK_LIVE_ST")) {
+                    bankdetails = object.getString("headerData").replace(",","\n");
+//                    customDialog_Common("KYCLAYOUTS", null, null, "Banl Update", "", object.getString("headerData").replace(",","\n"), MainActivity.this);
+                }else if (object.getString("headerValue").equalsIgnoreCase("MPAB_FLAG")) {
+//                    regBankDetails = object.getString("headerData");
+//                    customDialog_Common("KYCLAYOUTS", null, null, "Banl Update", "", object.getString("headerData").replace(",","\n"), MainActivity.this);
                 } else {
                     if (object.getString("headerValue").equalsIgnoreCase("TnC")) {
                         term = object.getString("headerData");
@@ -361,7 +410,7 @@ public class MainActivity extends BaseCompactActivity
     private void callMasterDetails() {
         ArrayList<BankDetailsPozo> list = db.geBanktDetails("");
         if (list.size() == 0) {
-            new AsyncPostMethod(WebConfig.CommonReport, getMaster_Validate().toString(), headerData, MainActivity.this, getString(R.string.responseTimeOut),"GETMASTERDATA").execute();
+            new AsyncPostMethod(WebConfig.CommonReport, getMaster_Validate().toString(), headerData, MainActivity.this, getString(R.string.responseTimeOut), "GETMASTERDATA").execute();
         }
     }
 
@@ -428,10 +477,11 @@ public class MainActivity extends BaseCompactActivity
     public void okClicked(String type, Object ob) {
         super.onBackPressed();
         if (type.equalsIgnoreCase("TERMCONDITION")) {
-            new AsyncPostMethod(WebConfig.NETWORKTRANSFER_URL, acknowledge(data, term).toString(), headerData, MainActivity.this, getString(R.string.responseTimeOut),"DOWMLOADDATA").execute();
+            new AsyncPostMethod(WebConfig.NETWORKTRANSFER_URL, acknowledge(data, term).toString(), headerData, MainActivity.this, getString(R.string.responseTimeOut), "DOWMLOADDATA").execute();
         } else if (type.equalsIgnoreCase("SESSIONEXPIRE"))
             jumpPage();
-        else
+        else if (type.equalsIgnoreCase("KYCLAYOUTS")) {
+        }else
             finish();
     }
 

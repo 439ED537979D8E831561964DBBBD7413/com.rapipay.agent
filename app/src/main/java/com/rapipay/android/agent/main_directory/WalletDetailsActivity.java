@@ -654,6 +654,7 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
         AlertDialog.Builder dialog = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
         final View alertLayout = inflater.inflate(R.layout.custom_fundtransfer_layout, null);
+        alertLayout.setKeepScreenOn(true);
         TextView texts = (TextView) alertLayout.findViewById(R.id.dialog_title);
         input_ifsc = (TextView) alertLayout.findViewById(R.id.input_ifsc);
         texts.setText(title);
@@ -758,6 +759,7 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
             dialog = new AlertDialog.Builder(this);
             LayoutInflater inflater = getLayoutInflater();
             View alertLayout = inflater.inflate(R.layout.custom_layout_common, null);
+            alertLayout.setKeepScreenOn(true);
             TextView text = (TextView) alertLayout.findViewById(R.id.dialog_title);
             TextView dialog_cancel = (TextView) alertLayout.findViewById(R.id.dialog_cancel);
             text.setText(msg);

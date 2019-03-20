@@ -818,6 +818,7 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
         dialog = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
         final View alertLayout = inflater.inflate(R.layout.custom_layout_common, null);
+        alertLayout.setKeepScreenOn(true);
         TextView text = (TextView) alertLayout.findViewById(R.id.dialog_title);
         TextView dialog_cancel = (TextView) alertLayout.findViewById(R.id.dialog_cancel);
         text.setText(msg);
@@ -872,6 +873,7 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
         dialog = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
         final View alertLayout = inflater.inflate(R.layout.custom_layout_common, null);
+        alertLayout.setKeepScreenOn(true);
         TextView text = (TextView) alertLayout.findViewById(R.id.dialog_title);
         TextView dialog_cancel = (TextView) alertLayout.findViewById(R.id.dialog_cancel);
         text.setText(msg);
@@ -1049,6 +1051,7 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
         dialog = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
         final View alertLayout = inflater.inflate(R.layout.custom_layout_common, null);
+        alertLayout.setKeepScreenOn(true);
         TextView text = (TextView) alertLayout.findViewById(R.id.dialog_title);
         TextView dialog_cancel = (TextView) alertLayout.findViewById(R.id.dialog_cancel);
         text.setText(msg);

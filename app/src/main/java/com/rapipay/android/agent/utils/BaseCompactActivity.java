@@ -23,6 +23,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Environment;
+import android.os.PowerManager;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -48,6 +49,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -126,6 +128,8 @@ public class BaseCompactActivity extends AppCompatActivity {
     protected ArrayList<String> listPath = new ArrayList<>();
     protected String TYPE = "";
     protected String transactionIDAEPS;
+    protected PowerManager mPowerManager;
+    protected PowerManager.WakeLock mWakeLock;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -231,7 +235,12 @@ public class BaseCompactActivity extends AppCompatActivity {
         }
         return jsonObject;
     }
-
+//    public void turnOnScreen(){
+//        // turn on screen
+//        Log.v("ProximityActivity", "ON!");
+//        mWakeLock = mPowerManager.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "tag");
+//        mWakeLock.acquire();
+//    }
     public void hideKeyboard(Activity activity) {
         InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
         View view = activity.getCurrentFocus();
@@ -303,6 +312,7 @@ public class BaseCompactActivity extends AppCompatActivity {
         dialog = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
         View alertLayout = inflater.inflate(R.layout.custom_layout_common, null);
+        alertLayout.setKeepScreenOn(true);
         TextView text = (TextView) alertLayout.findViewById(R.id.dialog_title);
         TextView dialog_cancel = (TextView) alertLayout.findViewById(R.id.dialog_cancel);
         text.setText(msg);
@@ -760,7 +770,7 @@ public class BaseCompactActivity extends AppCompatActivity {
     };
 
     protected void contactRead(Intent data, TextView input_number) {
-        if(data!=null) {
+        if (data != null) {
             Uri contactData = data.getData();
             Cursor c = getContentResolver().query(contactData, null, null, null, null);
             if (c.moveToFirst()) {
@@ -884,6 +894,7 @@ public class BaseCompactActivity extends AppCompatActivity {
         dialog = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
         View alertLayout = inflater.inflate(R.layout.receipt_layout, null);
+        alertLayout.setKeepScreenOn(true);
         TextView text = (TextView) alertLayout.findViewById(R.id.dialog_title);
         text.setText(type);
         ListView listbottom = (ListView) alertLayout.findViewById(R.id.listbottom);
@@ -917,6 +928,7 @@ public class BaseCompactActivity extends AppCompatActivity {
         dialog = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
         View alertLayout = inflater.inflate(R.layout.custom_spinner_layout, null);
+        alertLayout.setKeepScreenOn(true);
         TextView text = (TextView) alertLayout.findViewById(R.id.spinner_title);
         final EditText search = (EditText) alertLayout.findViewById(R.id.input_search);
         text.setText(type);
@@ -967,6 +979,7 @@ public class BaseCompactActivity extends AppCompatActivity {
         dialog = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
         View alertLayout = inflater.inflate(R.layout.cashout_receipt, null);
+        alertLayout.setKeepScreenOn(true);
         ImageView receipt_logo = (ImageView) alertLayout.findViewById(R.id.receipt_logo);
         String condition = "where " + RapipayDB.IMAGE_NAME + "='invoiceLogo.jpg'";
         ArrayList<ImagePozo> imagePozoArrayList = db.getImageDetails(condition);
@@ -981,6 +994,9 @@ public class BaseCompactActivity extends AppCompatActivity {
         main_layout.buildDrawingCache(true);
         TextView text = (TextView) alertLayout.findViewById(R.id.agent_name);
         TextView custom_name = (TextView) alertLayout.findViewById(R.id.custom_name);
+        RelativeLayout amount_layout = (RelativeLayout)alertLayout.findViewById(R.id.amount_layout);
+        if(amount.equalsIgnoreCase("MATM_BALANCE_ENQ") || amount.equalsIgnoreCase("AEPS_BALANCE_ENQ"))
+            amount_layout.setVisibility(View.GONE);
         TextView amounts = (TextView) alertLayout.findViewById(R.id.amount);
         amounts.setText("Rs  " + amount);
         custom_name.setText(name);
@@ -1109,6 +1125,7 @@ public class BaseCompactActivity extends AppCompatActivity {
         dialog = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
         View alertLayout = inflater.inflate(R.layout.receipt_layout_new, null);
+        alertLayout.setKeepScreenOn(true);
         ImageView receipt_logo = (ImageView) alertLayout.findViewById(R.id.receipt_logo);
         String condition = "where " + RapipayDB.IMAGE_NAME + "='invoiceLogo.jpg'";
         ArrayList<ImagePozo> imagePozoArrayList = db.getImageDetails(condition);
@@ -1268,6 +1285,7 @@ public class BaseCompactActivity extends AppCompatActivity {
         dialog = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
         View alertLayout = inflater.inflate(R.layout.pmt_receipt_layout, null);
+        alertLayout.setKeepScreenOn(true);
         ImageView receipt_logo = (ImageView) alertLayout.findViewById(R.id.receipt_logo);
         String condition = "where " + RapipayDB.IMAGE_NAME + "='invoiceLogo.jpg'";
         ArrayList<ImagePozo> imagePozoArrayList = db.getImageDetails(condition);
@@ -1712,10 +1730,10 @@ public class BaseCompactActivity extends AppCompatActivity {
         return null;
     }
 
-    protected JSONObject getCashOutDetails(String mobile, String txnAmmount,String serviceType,String requestChannel,String reqFor,String requestType,String blueToothAddress) {
+    protected JSONObject getCashOutDetails(String mobile, String txnAmmount, String serviceType, String requestChannel, String reqFor, String requestType, String blueToothAddress) {
         JSONObject jsonObject = new JSONObject();
         try {
-            transactionIDAEPS  = ImageUtils.miliSeconds();
+            transactionIDAEPS = ImageUtils.miliSeconds();
             jsonObject.put("serviceType", serviceType);
             jsonObject.put("requestChannel", requestChannel);
             jsonObject.put("typeMobileWeb", "mobile");
@@ -1724,7 +1742,10 @@ public class BaseCompactActivity extends AppCompatActivity {
             jsonObject.put("customerMobile", mobile);
             jsonObject.put("senderName", "RapiPay");
             jsonObject.put("txnAmount", txnAmmount);
-            jsonObject.put("bluetoothAddress", blueToothAddress.replaceAll(":", ""));
+            if (reqFor.equalsIgnoreCase("AEPS")) {
+                jsonObject.put("bluetoothAddress", blueToothAddress);
+            } else
+                jsonObject.put("bluetoothAddress", blueToothAddress.replaceAll(":", ""));
             jsonObject.put("reqFor", reqFor);
             jsonObject.put("latitude", String.valueOf(mylocation.getLatitude()));
             jsonObject.put("langitude", String.valueOf(mylocation.getLongitude()));

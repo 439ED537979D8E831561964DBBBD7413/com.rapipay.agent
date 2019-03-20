@@ -7,13 +7,16 @@ android {
 //        applicationId "com.rapipay.android.agent"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 28
-        versionName "0.28"
+        versionCode 32
+        versionName "0.32"
         multiDexEnabled true
-        buildConfigField "int", "APPTYPE", "2"
-        buildConfigField "String", "USERTYPE", "\"Other\""
-        buildConfigField "String", "DOMAINNAME", "\"partner.rapipay.com\""
+        buildConfigField "int", "APPTYPE", "3"
+        buildConfigField "String", "USERTYPE", "\"RapiPay\""
+        buildConfigField "String", "DOMAINNAME", "\"agent.rapipay.com\""
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        ndk{
+            abiFilters "armeabi-v7a", "x86"
+        }
     }
     buildTypes {
         release {
@@ -52,7 +55,9 @@ repositories {
 }
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-//    implementation files('libs/finosdk.aar')
+    //
+    implementation files('libs/finosdk.aar')
+    //
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.android.support.constraint:constraint-layout:1.1.2'
     testImplementation 'junit:junit:4.12'
@@ -82,8 +87,10 @@ dependencies {
     implementation files('libs/meSdk-1.3.10-release.jar')
     implementation files('libs/sun.misc.BASE64Decoder.jar')
     implementation files('libs/mpaysdk-release-v.1.0.34.jar')
-//    implementation 'de.greenrobot:greendao:2.1.0'
-//    implementation 'org.greenrobot:eventbus:3.0.0'
+    //
+    implementation 'de.greenrobot:greendao:2.1.0'
+    implementation 'org.greenrobot:eventbus:3.0.0'
+    //
     implementation 'com.android.support:multidex:1.0.0'
     implementation 'com.camerakit:camerakit:1.0.0-beta1'
     implementation 'com.google.firebase:firebase-messaging:17.3.4'

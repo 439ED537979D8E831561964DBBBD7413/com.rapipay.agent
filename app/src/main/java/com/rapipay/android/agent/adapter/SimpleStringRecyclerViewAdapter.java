@@ -37,8 +37,8 @@ public class SimpleStringRecyclerViewAdapter extends RecyclerView.Adapter<Simple
     }
 
     public SimpleStringRecyclerViewAdapter(Context context, RecyclerView recyclerView, ArrayList<ImagePozo> items, String type) {
-        mValues = items;
-        mRecyclerView = recyclerView;
+        this.mValues = items;
+        this.mRecyclerView = recyclerView;
         this.context = context;
         this.type = type;
     }

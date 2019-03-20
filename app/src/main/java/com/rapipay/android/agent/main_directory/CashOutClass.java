@@ -201,7 +201,8 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                         clear();
                         progessDialog.hide_progress();
                         transactionFlag = false;
-                        Toast.makeText(CashOutClass.this, (String) msg.obj, Toast.LENGTH_SHORT).show();
+                        customDialog_Common("KYCLAYOUTS", null, null, "Alert", "", (String) msg.obj, CashOutClass.this);
+//                        Toast.makeText(CashOutClass.this, (String) msg.obj, Toast.LENGTH_SHORT).show();
                         if (accessBluetoothDetails() != null) {
                             JSONObject object = new JSONObject();
                             object.put("responseCode", msg.what);
@@ -219,7 +220,8 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                         progessDialog.hide_progress();
                         transactionFlag = false;
                         clear();
-                        Toast.makeText(CashOutClass.this, (String) msg.obj, Toast.LENGTH_SHORT).show();
+                        customDialog_Common("KYCLAYOUTS", null, null, "Alert", "", (String) msg.obj, CashOutClass.this);
+//                        Toast.makeText(CashOutClass.this, (String) msg.obj, Toast.LENGTH_SHORT).show();
                         if (accessBluetoothDetails() != null) {
                             JSONObject object = new JSONObject();
                             object.put("responseCode", msg.what);
@@ -257,9 +259,11 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                         transactionFlag = false;
                         clear();
                         if (msg.what == 1032)
-                            Toast.makeText(CashOutClass.this, ((TransactionVO) msg.obj).getStatus(), Toast.LENGTH_SHORT).show();
+                            customDialog_Common("KYCLAYOUTS", null, null, "Alert", "", ((TransactionVO) msg.obj).getStatus(), CashOutClass.this);
+//                            Toast.makeText(CashOutClass.this, ((TransactionVO) msg.obj).getStatus(), Toast.LENGTH_SHORT).show();
                         else
-                            Toast.makeText(CashOutClass.this, (String) msg.obj, Toast.LENGTH_SHORT).show();
+                            customDialog_Common("KYCLAYOUTS", null, null, "Alert", "", (String) msg.obj, CashOutClass.this);
+//                            Toast.makeText(CashOutClass.this, (String) msg.obj, Toast.LENGTH_SHORT).show();
                         if (accessBluetoothDetails() != null) {
                             JSONObject object = new JSONObject();
                             object.put("responseCode", msg.what);
@@ -277,7 +281,8 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                         progessDialog.hide_progress();
                         transactionFlag = false;
                         clear();
-                        Toast.makeText(CashOutClass.this, (String) msg.obj, Toast.LENGTH_SHORT).show();
+                        customDialog_Common("KYCLAYOUTS", null, null, "Alert", "", (String) msg.obj, CashOutClass.this);
+//                        Toast.makeText(CashOutClass.this, (String) msg.obj, Toast.LENGTH_SHORT).show();
                         if (accessBluetoothDetails() != null) {
                             JSONObject object = new JSONObject();
                             object.put("responseCode", msg.what);
@@ -294,7 +299,8 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                         progessDialog.hide_progress();
                         transactionFlag = false;
                         clear();
-                        Toast.makeText(CashOutClass.this, (String) msg.obj, Toast.LENGTH_SHORT).show();
+                        customDialog_Common("KYCLAYOUTS", null, null, "Alert", "", (String) msg.obj, CashOutClass.this);
+//                        Toast.makeText(CashOutClass.this, (String) msg.obj, Toast.LENGTH_SHORT).show();
                         if (accessBluetoothDetails() != null) {
                             JSONObject object = new JSONObject();
                             object.put("responseCode", msg.what);
@@ -307,8 +313,9 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                 } else if (msg.what == DISPLAY_STATUS)
 
                 {
-                    Toast.makeText(CashOutClass.this,
-                            (String) msg.obj, Toast.LENGTH_SHORT).show();
+                    customDialog_Common("KYCLAYOUTS", null, null, "Alert", "", (String) msg.obj, CashOutClass.this);
+//                    Toast.makeText(CashOutClass.this,
+//                            (String) msg.obj, Toast.LENGTH_SHORT).show();
                 } else if (msg.what == QPOS_EMV_MULITPLE_APPLICATION)
 
                 {
@@ -384,6 +391,7 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                 break;
             case R.id.btn_fund_mpos:
                 hideKeyboard(CashOutClass.this);
+                type=null;
                 if (!ImageUtils.commonAmount(input_mobile.getText().toString())) {
                     input_mobile.setError("Please enter mobile number");
                     input_mobile.requestFocus();
@@ -469,28 +477,32 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
             generateReceipt(object);
     }
 
-    private void generateReceipt(String object){
-        try{
-            ArrayList<String> left = new ArrayList<>();
-            left.add("DATE:" + " " + type.getDate());
-            left.add("MID:" + " " + mid);
-            left.add("BATCH No:" + " " + type.getBatchNo());
-            ArrayList<String> right = new ArrayList<>();
-            right.add("TIME:" + " " + type.getDate());
-            right.add("TID:" + " " + tid);
-            right.add("INVOICE No:" + " " + type.getInvoiceNo());
-            ArrayList<String> bottom = new ArrayList<>();
-            bottom.add("CARD NUM : " + "XXXX-XXXX-XXXX-" + type.getCardNumber());
-            bottom.add("CARD BRAND :" + type.getCardBrand() + "  " + "CARD TYPE :" + type.getCardType());
-            bottom.add("RRN : " + type.getRRN() + "  " + "Transaction Id : " + type.getTransactionId());
-            bottom.add("AID : " + type.getAID() + "  " + "TC : " + type.getTC());
-            ArrayList<String> medium = new ArrayList<>();
-            medium.add(typeput);
-            medium.add(type.getCardBrand());
-            transactionFlag = false;
-            customReceiptCastSaleOut(list.get(0).getAgentName(), left, right, bottom, medium, String.valueOf(type.getAmount()), type.getCardHolderName(), CashOutClass.this);
+    private void generateReceipt(String object) {
+        try {
+            if (type != null) {
+                ArrayList<String> left = new ArrayList<>();
+                left.add("DATE:" + " " + type.getDate());
+                left.add("MID:" + " " + mid);
+                left.add("BATCH No:" + " " + type.getBatchNo());
+                ArrayList<String> right = new ArrayList<>();
+                right.add("TIME:" + " " + type.getDate());
+                right.add("TID:" + " " + tid);
+                right.add("INVOICE No:" + " " + type.getInvoiceNo());
+                ArrayList<String> bottom = new ArrayList<>();
+                bottom.add("CARD NUM : " + "XXXX-XXXX-XXXX-" + type.getCardNumber());
+                bottom.add("CARD BRAND :" + type.getCardBrand() + "  " + "CARD TYPE :" + type.getCardType());
+                bottom.add("RRN : " + type.getRRN() + "  " + "Transaction Id : " + type.getTransactionId());
+                bottom.add("AID : " + type.getAID() + "  " + "TC : " + type.getTC());
+                ArrayList<String> medium = new ArrayList<>();
+                medium.add(typeput);
+                medium.add(type.getCardBrand());
+                transactionFlag = false;
+                customReceiptCastSaleOut(list.get(0).getAgentName(), left, right, bottom, medium, String.valueOf(type.getAmount()), type.getCardHolderName(), CashOutClass.this);
+            }
+//            else
+//                Toast.makeText(CashOutClass.this, new JSONObject(object).getJSONObject("responseData").getString("responseValue"), Toast.LENGTH_SHORT).show();
             clear();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

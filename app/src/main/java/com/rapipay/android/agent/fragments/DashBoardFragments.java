@@ -8,9 +8,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
-
-import java.util.ArrayList;
 
 import com.rapipay.android.agent.BuildConfig;
 import com.rapipay.android.agent.Model.HeaderePozo;
@@ -23,9 +22,9 @@ import com.rapipay.android.agent.main_directory.CashOutClass;
 import com.rapipay.android.agent.main_directory.ChannelHistoryActivity;
 import com.rapipay.android.agent.main_directory.CreditTabPage;
 import com.rapipay.android.agent.main_directory.DailyCommissionActivity;
-//import com.rapipay.android.agent.main_directory.Fino_AEPS_BBPS_Activity;
+import com.rapipay.android.agent.main_directory.Fino_AEPS_BBPS_Activity;
 import com.rapipay.android.agent.main_directory.FundTransferActivity;
-//import com.rapipay.android.agent.main_directory.MICRO_AEPS_Activity;
+import com.rapipay.android.agent.main_directory.MICRO_AEPS_Activity;
 import com.rapipay.android.agent.main_directory.MPOSRegistration;
 import com.rapipay.android.agent.main_directory.MainActivity;
 import com.rapipay.android.agent.main_directory.NetworkTab;
@@ -40,9 +39,15 @@ import com.rapipay.android.agent.main_directory.WalletDetailsActivity;
 import com.rapipay.android.agent.utils.ImageUtils;
 import com.rapipay.android.agent.utils.RecyclerTouchListener;
 
+import java.util.ArrayList;
+
+//import com.rapipay.android.agent.main_directory.Fino_AEPS_BBPS_Activity;
+//import com.rapipay.android.agent.main_directory.MICRO_AEPS_Activity;
+
 public class DashBoardFragments extends Fragment {
-    RecyclerView recycler_view, recycler_view2, recycler_view3, recycler_view4, recycler_view5, recycler_view6,recycler_view7,recycler_view8;
+    RecyclerView recycler_view, recycler_view2, recycler_view3, recycler_view4, recycler_view5, recycler_view6, recycler_view7, recycler_view8;
     View rv;
+    TextView bankdetails;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -69,7 +74,15 @@ public class DashBoardFragments extends Fragment {
         recycler_view6 = (RecyclerView) view.findViewById(R.id.recycler_view6);
         recycler_view7 = (RecyclerView) view.findViewById(R.id.recycler_view7);
         recycler_view8 = (RecyclerView) view.findViewById(R.id.recycler_view8);
-        if(BuildConfig.APPTYPE==3){
+        bankdetails = (TextView) view.findViewById(R.id.bankdetails);
+        bankdetails.setVisibility(View.VISIBLE);
+        bankdetails.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                bankdetails.setVisibility(View.GONE);
+            }
+        });
+        if (BuildConfig.APPTYPE == 3) {
             view.findViewById(R.id.matm).setVisibility(View.VISIBLE);
             view.findViewById(R.id.aeps).setVisibility(View.VISIBLE);
         }
@@ -81,7 +94,32 @@ public class DashBoardFragments extends Fragment {
         recycler_view2.setAdapter(new SimpleStringRecyclerViewAdapter(getActivity(), recycler_view2, ImageUtils.getSecondImageUrl(), "second"));
         LinearLayoutManager layoutManager3 = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
         recycler_view3.setLayoutManager(layoutManager3);
-        recycler_view3.setAdapter(new SimpleStringRecyclerViewAdapter(getActivity(), recycler_view3, ImageUtils.getThirdImageUrl(), "third"));
+
+
+
+
+
+
+//        if (MainActivity.regBankDetails != null) {
+//            String splitReg[] = MainActivity.regBankDetails.split("\\|");
+//            ArrayList<ImagePozo> imagePozoArrayList = ImageUtils.getThirdImageUrl();
+//            for (int j = 0; j < imagePozoArrayList.size(); j++) {
+//                for (int i = 0; i < splitReg.length; i++) {
+//                    if(imagePozoArrayList.get(j).getImageTagName().equalsIgnoreCase(splitReg[i])){
+//                        imagePozoArrayList.remove(j);
+//                    }
+//                }
+//            }
+//            if(imagePozoArrayList.size()!=0)
+//                recycler_view3.setAdapter(new SimpleStringRecyclerViewAdapter(getActivity(), recycler_view3, imagePozoArrayList, "third"));
+//            else {
+//                view.findViewById(R.id.regss).setVisibility(View.GONE);
+//                recycler_view3.setVisibility(View.GONE);
+//            }
+//        }else {
+            recycler_view3.setAdapter(new SimpleStringRecyclerViewAdapter(getActivity(), recycler_view3, ImageUtils.getThirdImageUrl(), "third"));
+//        }
+
         LinearLayoutManager layoutManager4 = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
         recycler_view4.setLayoutManager(layoutManager4);
         recycler_view4.setAdapter(new SimpleStringRecyclerViewAdapter(getActivity(), recycler_view4, ImageUtils.getFourthImageUrl(), "fourth"));
@@ -167,31 +205,31 @@ public class DashBoardFragments extends Fragment {
             @Override
             public void onClick(View view, int position) {
                 Intent intent = null;
-//                if (position == 0) {
-//                    intent = new Intent(getActivity(), MICRO_AEPS_Activity.class);
-//                    intent.putExtra("typeput", "Cash Withdrawal");
-//                    intent.putExtra("serviceType", "MATM_CASHOUT");
-//                    intent.putExtra("updateServiceType", "UPDATE_MATM_CASHOUT");
-//                    intent.putExtra("requestChannel", "MATM_CHANNEL");
-//                    intent.putExtra("requestType", "MATM-BE");
-//                    intent.putExtra("reqFor", "MATM");
-//                } else if (position == 1) {
-//                    intent = new Intent(getActivity(), MICRO_AEPS_Activity.class);
-//                    intent.putExtra("typeput", "Balance Enquiry");
-//                    intent.putExtra("serviceType", "MATM_BALANCE_ENQ");
-//                    intent.putExtra("updateServiceType", "UPDATE_MATM_BALANCE_ENQ");
-//                    intent.putExtra("requestChannel", "MATM_CHANNEL");
-//                    intent.putExtra("requestType", "MATM-BE");
-//                    intent.putExtra("reqFor", "MATM");
-//                } else if (position == 2) {
-//                    intent = new Intent(getActivity(), Fino_AEPS_BBPS_Activity.class);
-//                    intent.putExtra("typeput", "EMI");
-//                    intent.putExtra("serviceType", "MPOS_EMI");
-//                    intent.putExtra("updateServiceType", "MATM_CASHOUT");
-//                    intent.putExtra("requestChannel", "MPOS_CHANNEL");
-//                    intent.putExtra("requestType", "MPOS_EMI");
-//                    intent.putExtra("reqFor", "MPOS");
-//                }
+                if (position == 0) {
+                    intent = new Intent(getActivity(), MICRO_AEPS_Activity.class);
+                    intent.putExtra("typeput", "Cash Withdrawal");
+                    intent.putExtra("serviceType", "MATM_CASHOUT");
+                    intent.putExtra("updateServiceType", "UPDATE_MATM_CASHOUT");
+                    intent.putExtra("requestChannel", "MATM_CHANNEL");
+                    intent.putExtra("requestType", "MATM-CASHOUT");
+                    intent.putExtra("reqFor", "MATM");
+                } else if (position == 1) {
+                    intent = new Intent(getActivity(), MICRO_AEPS_Activity.class);
+                    intent.putExtra("typeput", "Balance Enquiry");
+                    intent.putExtra("serviceType", "MATM_BALANCE_ENQ");
+                    intent.putExtra("updateServiceType", "UPDATE_MATM_BALANCE_ENQ");
+                    intent.putExtra("requestChannel", "MATM_CHANNEL");
+                    intent.putExtra("requestType", "MATM-BE");
+                    intent.putExtra("reqFor", "MATM");
+                } else if (position == 2) {
+                    intent = new Intent(getActivity(), Fino_AEPS_BBPS_Activity.class);
+                    intent.putExtra("typeput", "EMI");
+                    intent.putExtra("serviceType", "MPOS_EMI");
+                    intent.putExtra("updateServiceType", "MATM_CASHOUT");
+                    intent.putExtra("requestChannel", "MPOS_CHANNEL");
+                    intent.putExtra("requestType", "MPOS_EMI");
+                    intent.putExtra("reqFor", "MPOS");
+                }
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
             }
@@ -205,30 +243,30 @@ public class DashBoardFragments extends Fragment {
             @Override
             public void onClick(View view, int position) {
                 Intent intent = null;
-//                if (position == 0) {
-//                    intent = new Intent(getActivity(), MICRO_AEPS_Activity.class);
-//                    intent.putExtra("typeput", "Cash Withdrawal");
-//                    intent.putExtra("serviceType", "AEPS_CASHOUT");
-//                    intent.putExtra("updateServiceType", "UPDATE_AEPS_CASHOUT");
-//                    intent.putExtra("requestChannel", "AEPS_CHANNEL");
-//                    intent.putExtra("requestType", "AEPS_CASHOUT");
-//                    intent.putExtra("reqFor", "AEPS");
-//                } else if (position == 1) {
-//                    intent = new Intent(getActivity(), MICRO_AEPS_Activity.class);
-//                    intent.putExtra("typeput", "Balance Enquiry");
-//                    intent.putExtra("serviceType", "AEPS_BALANCE_ENQ");
-//                    intent.putExtra("updateServiceType", "UPDATE_AEPS_BALANCE_ENQ");
-//                    intent.putExtra("requestChannel", "AEPS_CHANNEL");
-//                    intent.putExtra("requestType", "AEPS-BE");
-//                    intent.putExtra("reqFor", "AEPS");
-//                } else if (position == 2) {
-//                    intent = new Intent(getActivity(), Fino_AEPS_BBPS_Activity.class);
-//                    intent.putExtra("typeput", "EMI");
-//                    intent.putExtra("serviceType", "MPOS_EMI");
-//                    intent.putExtra("requestChannel", "MPOS_CHANNEL");
-//                    intent.putExtra("requestType", "MPOS_EMI");
-//                    intent.putExtra("reqFor", "MPOS");
-//                }
+                if (position == 0) {
+                    intent = new Intent(getActivity(), MICRO_AEPS_Activity.class);
+                    intent.putExtra("typeput", "Cash Withdrawal");
+                    intent.putExtra("serviceType", "AEPS_CASHOUT");
+                    intent.putExtra("updateServiceType", "UPDATE_AEPS_CASHOUT");
+                    intent.putExtra("requestChannel", "AEPS_CHANNEL");
+                    intent.putExtra("requestType", "AEPS-CASHOUT");
+                    intent.putExtra("reqFor", "AEPS");
+                } else if (position == 1) {
+                    intent = new Intent(getActivity(), MICRO_AEPS_Activity.class);
+                    intent.putExtra("typeput", "Balance Enquiry");
+                    intent.putExtra("serviceType", "AEPS_BALANCE_ENQ");
+                    intent.putExtra("updateServiceType", "UPDATE_AEPS_BALANCE_ENQ");
+                    intent.putExtra("requestChannel", "AEPS_CHANNEL");
+                    intent.putExtra("requestType", "AEPS-BE");
+                    intent.putExtra("reqFor", "AEPS");
+                } else if (position == 2) {
+                    intent = new Intent(getActivity(), Fino_AEPS_BBPS_Activity.class);
+                    intent.putExtra("typeput", "EMI");
+                    intent.putExtra("serviceType", "MPOS_EMI");
+                    intent.putExtra("requestChannel", "MPOS_CHANNEL");
+                    intent.putExtra("requestType", "MPOS_EMI");
+                    intent.putExtra("reqFor", "MPOS");
+                }
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
             }
@@ -251,7 +289,7 @@ public class DashBoardFragments extends Fragment {
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                 } else if (position == 0) {
-                    if(MainActivity.pozoArrayList.size()!=0) {
+                    if (MainActivity.pozoArrayList.size() != 0) {
                         for (int i = 0; i < MainActivity.pozoArrayList.size(); i++) {
                             if (MainActivity.pozoArrayList.get(i).getHeaderID().equalsIgnoreCase("10"))
                                 if (MainActivity.pozoArrayList.get(i).getHeaderData().equalsIgnoreCase("Retailer")) {
@@ -385,6 +423,12 @@ public class DashBoardFragments extends Fragment {
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
         recycler_view5.setLayoutManager(layoutManager);
         recycler_view5.setAdapter(new HeaderAdapter(getActivity(), recycler_view5, list));
+        if (MainActivity.bankdetails == null || MainActivity.bankdetails.isEmpty()) {
+            bankdetails.setVisibility(View.GONE);
+        } else {
+            bankdetails.setText(MainActivity.bankdetails);
+            bankdetails.setVisibility(View.VISIBLE);
+        }
     }
 
 

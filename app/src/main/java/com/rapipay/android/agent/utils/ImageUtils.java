@@ -45,17 +45,17 @@ public class ImageUtils {
     public static ArrayList<ImagePozo> getSeventhImageUrl() {
         ArrayList<ImagePozo> list = new ArrayList<>();
         list.clear();
-        list.add(new ImagePozo(2,"Cash Withdrawal ",R.drawable.mposcash));
-        list.add(new ImagePozo(3, "Balance Enquiry", R.drawable.mposale));
-        list.add(new ImagePozo(4, "Transaction Status", R.drawable.mposemi));
+        list.add(new ImagePozo(2,"MATM Cash Withdrawal ",R.drawable.mposcash));
+        list.add(new ImagePozo(3, "MATM Balance Enquiry", R.drawable.mposale));
+//        list.add(new ImagePozo(4, "Transaction Status", R.drawable.mposemi));
         return list;
     }
     public static ArrayList<ImagePozo> getEigthImageUrl() {
         ArrayList<ImagePozo> list = new ArrayList<>();
         list.clear();
-        list.add(new ImagePozo(2,"Cash Withdrawal ",R.drawable.mposcash));
-        list.add(new ImagePozo(3, "Balance Enquiry", R.drawable.mposale));
-        list.add(new ImagePozo(4, "Transaction Status", R.drawable.mposemi));
+        list.add(new ImagePozo(2,"AEPS Cash Withdrawal ",R.drawable.mposcash));
+        list.add(new ImagePozo(3, "AEPS Balance Enquiry", R.drawable.mposale));
+//        list.add(new ImagePozo(4, "Transaction Status", R.drawable.mposemi));
         return list;
     }
 
@@ -71,10 +71,10 @@ public class ImageUtils {
     public static ArrayList<ImagePozo> getThirdImageUrl() {
         ArrayList<ImagePozo> list = new ArrayList<>();
         list.clear();
-        list.add(new ImagePozo(1,"MPOS Registration",R.drawable.mposreg));
-        list.add(new ImagePozo(2, "AEPS Registration", R.drawable.aeps));
-        list.add(new ImagePozo(3, "BBPS Registration", R.drawable.bbps));
-        list.add(new ImagePozo(4, "MATM Registration", R.drawable.matm));
+        list.add(new ImagePozo("MP","MPOS Registration",R.drawable.mposreg));
+        list.add(new ImagePozo("AE", "AEPS Registration", R.drawable.aeps));
+        list.add(new ImagePozo("BB", "BBPS Registration", R.drawable.bbps));
+        list.add(new ImagePozo("MA", "MATM Registration", R.drawable.matm));
         return list;
     }
 

@@ -1,6 +1,7 @@
 package com.rapipay.android.agent.utils;
 
 public class WebConfig {
+ //   public static String WEBMain = "http://192.168.1.110:8080/";
     public static String WEBMain = "https://rapipay.com/";
     public static String WEB = WEBMain + "RapiPayAPIHub/";
     public static String UAT = WEB + "HandsetRegistration";
@@ -19,7 +20,7 @@ public class WebConfig {
     public static String WALLETTRANSFER_URL = WALLET + "DMTService";
     public static String WALLETRECEIPTURL = WEB + "DMTService";
     public static String RECHARGENEW = WEBMain+"UBPAPP/UBPServices";
-    public static String CASHOUT_URL = WEBMain+"MposService/MposTxnServlet";
+    public static String CASHOUT_URL =  WEBMain +"MposService/MposTxnServlet";
     public static String MPOSREG = WEBMain +"KYC_RAPIPAY_APP/EnrollmentFormService";
     public static String CRNF = WEBMain +"CRNFApp/CRNFService";
     public static String CommonReport = WEBMain+"TxnReportingApp/CommonReport";
