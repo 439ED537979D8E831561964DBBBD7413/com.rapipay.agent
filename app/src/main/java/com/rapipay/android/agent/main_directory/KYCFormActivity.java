@@ -540,17 +540,17 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
                         getBusinessDetails();
                     if (personalValidation())
                         if (addressValidation())
-                            if (buisnessValidation())
-                                if (oursValidation()) {
-                                    if (getIntent().hasExtra("localVerify")) {
-                                        if (getIntent().getStringExtra("localVerify").equalsIgnoreCase("false"))
-                                            insertVerify(kycMapData, kycMapImage, documentID, documentType, customerType);
-                                    } else if (clicked.equalsIgnoreCase("business")) {
+                            if (buisnessValidation()){
+//                                if (oursValidation()) {
+                                if (getIntent().hasExtra("localVerify")) {
+                                    if (getIntent().getStringExtra("localVerify").equalsIgnoreCase("false"))
                                         insertVerify(kycMapData, kycMapImage, documentID, documentType, customerType);
-                                        clicked = "verify";
-                                    }
-                                    reDirectWebView();
+                                } else if (clicked.equalsIgnoreCase("business")) {
+                                    insertVerify(kycMapData, kycMapImage, documentID, documentType, customerType);
+                                    clicked = "verify";
                                 }
+                                reDirectWebView();
+                            }
                     break;
             }
         } catch (Exception e) {
@@ -630,7 +630,7 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
             jsonObject.put("isreKYC", "N");
             jsonObject.put("tokenId", tokenId);
             jsonObject.put("isMobileKYC", "Y");
-            if (documentType.equalsIgnoreCase("Aadhar Card") && customerType.equalsIgnoreCase("C") && type.equalsIgnoreCase("SCAN"))
+            if (documentType.equalsIgnoreCase("Aadhar Card")&& (customerType.equalsIgnoreCase("A") || customerType.equalsIgnoreCase("C")) && type.equalsIgnoreCase("SCAN"))
                 jsonObject.put("isAuto", "2");
             else
                 jsonObject.put("isAuto", "1");
@@ -767,27 +767,28 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
             date1_text.setError("Please enter valid date");
             date1_text.requestFocus();
             return false;
-        } else if (customerType.equalsIgnoreCase("A")) {
-            if (!printDifference(mainDate(date1_text.getText().toString()))) {
-                Toast.makeText(KYCFormActivity.this, "Please select valid date of birth", Toast.LENGTH_SHORT).show();
-                date1_text.setError("Please enter valid date");
-                date1_text.requestFocus();
-                return false;
-            } else
-                return true;
-        } else if (persons.equalsIgnoreCase("outside")) {
-            if (passportphotoimage.getDrawable() == null) {
-                TextView self_photo = (TextView) findViewById(R.id.passportphoto);
-                self_photo.setError("Please upload valid passport size image");
-                self_photo.requestFocus();
-                return false;
-            } else if (!Patterns.EMAIL_ADDRESS.matcher(input_email.getText().toString()).matches()) {
+        }  else if (persons.equalsIgnoreCase("outside")) {
+//            if (passportphotoimage.getDrawable() == null) {
+//                TextView self_photo = (TextView) findViewById(R.id.passportphoto);
+//                self_photo.setError("Please upload valid passport size image");
+//                self_photo.requestFocus();
+//                return false;
+//            } else
+            if (!Patterns.EMAIL_ADDRESS.matcher(input_email.getText().toString()).matches()) {
                 input_email.setError("Please enter valid email address");
                 input_email.requestFocus();
                 return false;
             } else if (!ImageUtils.commonRegex(input_comp.getText().toString(), 150, "0-9 .&")) {
                 input_comp.setError("Please enter valid company name");
                 input_comp.requestFocus();
+                return false;
+            } else
+                return true;
+        }else if (customerType.equalsIgnoreCase("A")) {
+            if (!printDifference(mainDate(date1_text.getText().toString()))) {
+                Toast.makeText(KYCFormActivity.this, "Please select valid date of birth", Toast.LENGTH_SHORT).show();
+                date1_text.setError("Please enter valid date");
+                date1_text.requestFocus();
                 return false;
             } else
                 return true;
@@ -831,7 +832,7 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
     }
 
     private Boolean buisnessValidation() {
-        if (persons.equalsIgnoreCase("outside")) {
+        if (persons.equalsIgnoreCase("outside") || persons.equalsIgnoreCase("internal")) {
             if (!pan_no.getText().toString().matches("^[A-Za-z]{5}[0-9]{4}[A-Za-z]{1}$")) {
                 pan_no.setError("Please enter valid pancard number");
                 pan_no.requestFocus();
@@ -841,11 +842,11 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
                 pan_photo.setError("Please upload valid pancard image");
                 pan_photo.requestFocus();
                 return false;
-            } else if (shopPhoto.getDrawable() == null) {
-                TextView shop_photo = (TextView) findViewById(R.id.shop_photo);
-                shop_photo.setError("Please upload valid data");
-                shop_photo.requestFocus();
-                return false;
+//            } else if (shopPhoto.getDrawable() == null) {
+//                TextView shop_photo = (TextView) findViewById(R.id.shop_photo);
+//                shop_photo.setError("Please upload valid data");
+//                shop_photo.requestFocus();
+//                return false;
             } else if (gsin_no.getText().toString().length() != 0) {
                 if (!gsin_no.getText().toString().matches("^[0-9]{2}[a-zA-Z]{5}[0-9]{4}[a-zA-Z]{1}[0-9]{1}[a-zA-Z]{1}[a-z0-9A-Z]{1}$")) {
                     gsin_no.setError("Please upload valid data");
@@ -854,24 +855,25 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
                 }
             } else
                 return true;
-        } else if (persons.equalsIgnoreCase("internal")) {
-            if (pan_no.getText().toString().length() != 0) {
-                if (!pan_no.getText().toString().matches("^[A-Za-z]{5}[0-9]{4}[A-Za-z]{1}$")) {
-                    pan_no.setError("Please upload valid pancard number");
-                    pan_no.requestFocus();
-                    return false;
-                } else if (pan_no.getText().toString().matches("^[A-Za-z]{5}[0-9]{4}[A-Za-z]{1}$")) {
-                    if (panphoto.getDrawable() == null) {
-                        TextView pan_photo = (TextView) findViewById(R.id.pan_photo);
-                        pan_photo.setError("Please upload valid pancard image");
-                        pan_photo.requestFocus();
-                        return false;
-                    } else
-                        return true;
-                }
-            } else
-                return true;
         }
+//        else if (persons.equalsIgnoreCase("internal")) {
+//            if (pan_no.getText().toString().length() != 0) {
+//                if (!pan_no.getText().toString().matches("^[A-Za-z]{5}[0-9]{4}[A-Za-z]{1}$")) {
+//                    pan_no.setError("Please upload valid pancard number");
+//                    pan_no.requestFocus();
+//                    return false;
+//                } else if (pan_no.getText().toString().matches("^[A-Za-z]{5}[0-9]{4}[A-Za-z]{1}$")) {
+//                    if (panphoto.getDrawable() == null) {
+//                        TextView pan_photo = (TextView) findViewById(R.id.pan_photo);
+//                        pan_photo.setError("Please upload valid pancard image");
+//                        pan_photo.requestFocus();
+//                        return false;
+//                    } else
+//                        return true;
+//                }
+//            } else
+//                return true;
+//        }
         return true;
     }
 

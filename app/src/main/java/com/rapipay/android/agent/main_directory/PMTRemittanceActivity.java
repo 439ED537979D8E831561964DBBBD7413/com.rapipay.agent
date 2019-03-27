@@ -355,6 +355,10 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
                 jsonObject.put("paymentMode", mode);
                 jsonObject.put("beneficiaryId", pozo.getPmt_Bene_Id());
                 jsonObject.put("reqFor", "BC3");
+                if (newtpin.getText().toString().isEmpty())
+                    jsonObject.put("tPin", "");
+                else
+                    jsonObject.put("tPin", newtpin.getText().toString());
                 jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
             } catch (Exception e) {
                 e.printStackTrace();

@@ -13,6 +13,7 @@ import org.json.JSONObject;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Locale;
 
 import me.grantland.widget.AutofitTextView;
@@ -31,7 +32,6 @@ public class PassbookActivity extends BaseCompactActivity implements View.OnClic
     RecyclerView trans_details;
     TextView heading;
     ArrayList<PassbookPozo> transactionPozoArrayList;
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,10 +40,16 @@ public class PassbookActivity extends BaseCompactActivity implements View.OnClic
     }
 
     private void initialize() {
+        Calendar calendar = Calendar.getInstance();
+        selectedDate = calendar.get(Calendar.DAY_OF_MONTH);
+        selectedMonth = calendar.get(Calendar.MONTH);
+        selectedYear = calendar.get(Calendar.YEAR);
         heading = (TextView) findViewById(R.id.toolbar_title);
         heading.setText("Agent Ledger History");
         date2_text = (AutofitTextView) findViewById(R.id.date2);
         date1_text = (AutofitTextView) findViewById(R.id.date1);
+        date2_text.setText(selectedYear + "-" + selectedMonth + "-" + selectedDate);
+        date1_text.setText(selectedYear + "-" + selectedMonth + "-" + selectedDate);
         trans_details = (RecyclerView) findViewById(R.id.trans_details);
         findViewById(R.id.todate).setOnClickListener(toDateClicked);
         findViewById(R.id.date1).setOnClickListener(toDateClicked);

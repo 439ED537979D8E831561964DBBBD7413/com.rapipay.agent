@@ -62,7 +62,7 @@ public class MainActivity extends BaseCompactActivity
     private static String filePath;
     DrawerLayout drawer;
     String data, term = null;
-    TextView tv;
+    TextView tv,bankde;
     ImageView back_click;
     private static final int dpPhoto1 = 2001;
     private static final int dpPhoto2 = 2002;
@@ -139,6 +139,11 @@ public class MainActivity extends BaseCompactActivity
                 tv.setText("");
                 tv.setVisibility(View.GONE);
                 break;
+            case R.id.bankde:
+                Intent intent = new Intent(MainActivity.this, BankDetails.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                break;
         }
     }
 
@@ -162,6 +167,8 @@ public class MainActivity extends BaseCompactActivity
     private void initialization() {
         reset = (ImageView) findViewById(R.id.reset);
         reset.setOnClickListener(this);
+        bankde = (TextView) findViewById(R.id.bankde);
+        bankde.setVisibility(View.VISIBLE);
         back_click = (ImageView) findViewById(R.id.back_click);
         tv = (TextView) this.findViewById(R.id.mywidget);
         tv.setSelected(true);
@@ -373,6 +380,12 @@ public class MainActivity extends BaseCompactActivity
 //                    customDialog_Common("KYCLAYOUTS", null, null, "Banl Update", "", object.getString("headerData").replace(",","\n"), MainActivity.this);
                 }else if (object.getString("headerValue").equalsIgnoreCase("MPAB_FLAG")) {
 //                    regBankDetails = object.getString("headerData");
+//                    customDialog_Common("KYCLAYOUTS", null, null, "Banl Update", "", object.getString("headerData").replace(",","\n"), MainActivity.this);
+                }else if (object.getString("headerValue").equalsIgnoreCase("ENABLE_TPIN")) {
+                    ENABLE_TPIN = object.getString("headerData");
+//                    customDialog_Common("KYCLAYOUTS", null, null, "Banl Update", "", object.getString("headerData").replace(",","\n"), MainActivity.this);
+                }else if (object.getString("headerValue").equalsIgnoreCase("IS_CRIMAGE_REQUIRED")) {
+                    IS_CRIMAGE_REQUIRED = object.getString("headerData");
 //                    customDialog_Common("KYCLAYOUTS", null, null, "Banl Update", "", object.getString("headerData").replace(",","\n"), MainActivity.this);
                 } else {
                     if (object.getString("headerValue").equalsIgnoreCase("TnC")) {

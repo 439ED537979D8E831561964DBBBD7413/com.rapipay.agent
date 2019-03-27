@@ -101,10 +101,13 @@ public class BaseCompactActivity extends AppCompatActivity {
     protected final static int REQUEST_ID_MULTIPLE_PERMISSIONS = 0x2;
     protected String imei;
     protected Location mylocation;
+    protected EditText newtpin;
+    protected static String ENABLE_TPIN = null;
     protected ImageView delete_all;
     protected ArrayList<VersionPozo> versionPozoArrayList;
     protected AutofitTextView date2_text, date1_text;
     protected FirebaseAnalytics mFirebaseAnalytics;
+    public static String IS_CRIMAGE_REQUIRED = null;
     protected static String balance = null;
     protected static final int CONTACT_PICKER_RESULT = 1;
     protected TextView heading;
@@ -116,7 +119,7 @@ public class BaseCompactActivity extends AppCompatActivity {
     final protected static int PERMISSIONS_REQUEST_CAMERA_STATE = 1;
     protected LocalStorage localStorage;
     protected String headerData = (WebConfig.BASIC_USERID + ":" + WebConfig.BASIC_PASSWORD);
-    private int selectedDate, selectedMonth, selectedYear;
+    protected int selectedDate, selectedMonth, selectedYear;
     protected ImageView reset;
     String months = null, dayss = null;
     protected ImageView toimage, fromimage;
@@ -361,6 +364,14 @@ public class BaseCompactActivity extends AppCompatActivity {
                     alertDialog.dismiss();
                 } else if (type.equalsIgnoreCase("OTPLAYOUT")) {
                     anInterface.okClicked(type, ob);
+                } else if (type.equalsIgnoreCase("Fund Transfer Confirmation")){
+                    if(BaseCompactActivity.ENABLE_TPIN !=null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && (newtpin.getText().toString().isEmpty() || newtpin.getText().toString().length()!=4)){
+                        newtpin.setError("Please enter TPIN");
+                        newtpin.requestFocus();
+                    }else {
+                        anInterface.okClicked(type, ob);
+                        alertDialog.dismiss();
+                    }
                 } else {
                     anInterface.okClicked(type, ob);
                     alertDialog.dismiss();
@@ -434,6 +445,9 @@ public class BaseCompactActivity extends AppCompatActivity {
             btn_name.setText(pozo.getName());
         else
             btn_name.setText("NA");
+        newtpin = (EditText)alertLayout.findViewById(R.id.newtpin);
+        if(BaseCompactActivity.ENABLE_TPIN!=null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y"))
+            newtpin.setVisibility(View.VISIBLE);
         dialog.setView(alertLayout);
     }
 
@@ -500,6 +514,9 @@ public class BaseCompactActivity extends AppCompatActivity {
             btn_sendname.setText(input);
         if (name != null)
             btn_name.setText(name);
+        newtpin = (EditText)alertLayout.findViewById(R.id.newtpin);
+        if(BaseCompactActivity.ENABLE_TPIN!=null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y"))
+            newtpin.setVisibility(View.VISIBLE);
         dialog.setView(alertLayout);
     }
 

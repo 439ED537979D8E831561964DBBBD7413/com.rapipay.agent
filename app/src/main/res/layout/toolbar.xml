@@ -52,7 +52,7 @@
     <ImageView
         android:id="@+id/reset"
         android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_height="match_parent"
         android:layout_gravity="right|center"
         android:layout_marginRight="5dp"
         android:onClick="onClick"

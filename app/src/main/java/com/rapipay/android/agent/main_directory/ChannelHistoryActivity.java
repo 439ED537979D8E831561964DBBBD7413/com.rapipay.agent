@@ -13,6 +13,7 @@ import android.widget.Toast;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import me.grantland.widget.AutofitTextView;
 import com.rapipay.android.agent.Model.ChannelHistoryPozo;
@@ -43,12 +44,18 @@ public class ChannelHistoryActivity extends BaseCompactActivity implements View.
     }
 
     private void initialize() {
+        Calendar calendar = Calendar.getInstance();
+        selectedDate = calendar.get(Calendar.DAY_OF_MONTH);
+        selectedMonth = calendar.get(Calendar.MONTH);
+        selectedYear = calendar.get(Calendar.YEAR);
         heading = (TextView) findViewById(R.id.toolbar_title);
         heading.setText("Transaction History");
         btn_fund = (ImageView) findViewById(R.id.btn_fund);
         btn_fund.setOnClickListener(this);
         date2_text = (AutofitTextView) findViewById(R.id.date2);
         date1_text = (AutofitTextView) findViewById(R.id.date1);
+        date2_text.setText(selectedYear + "-" + selectedMonth + "-" + selectedDate);
+        date1_text.setText(selectedYear + "-" + selectedMonth + "-" + selectedDate);
         trans_details = (ListView) findViewById(R.id.trans_details);
         trans_details.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

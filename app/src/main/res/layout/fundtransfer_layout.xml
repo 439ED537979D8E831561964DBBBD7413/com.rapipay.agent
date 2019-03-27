@@ -198,7 +198,15 @@
                             android:inputType="number"
                             android:textSize="16dp" />
                     </android.support.design.widget.TextInputLayout>
-
+                    <EditText
+                        android:id="@+id/newtpin"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Enter TPIN"
+                        android:inputType="number"
+                        android:maxLength="4"
+                        android:textSize="16dp"
+                        android:visibility="gone"/>
                     <!--  Password Label -->
                     <android.support.design.widget.TextInputLayout
                         android:layout_width="match_parent"

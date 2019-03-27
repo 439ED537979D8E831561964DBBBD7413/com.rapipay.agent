@@ -870,8 +870,16 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
                             customFund_Transfer((BeneficiaryDetailsPozo) ob, "RapiPay", "FUNDTRANSFER");
                             alertDialog.dismiss();
                         } else if (type.equalsIgnoreCase("Fund Transfer Confirmation")) {
-                            new WalletAsyncMethod(WebConfig.WALLETTRANSFER_URL, fund_transfer(beneficiaryDetailsPozoslist.get(benePosition), value, ben_amount.getText().toString()).toString(), headerData, WalletDetailsActivity.this, getString(R.string.responseTimeOutTrans), hitFrom).execute();
-                            alertDialog.dismiss();
+                            if(BaseCompactActivity.ENABLE_TPIN !=null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && newtpin.getText().toString().length()==4) {
+                                new WalletAsyncMethod(WebConfig.WALLETTRANSFER_URL, fund_transfer(beneficiaryDetailsPozoslist.get(benePosition), value, ben_amount.getText().toString()).toString(), headerData, WalletDetailsActivity.this, getString(R.string.responseTimeOutTrans), hitFrom).execute();
+                                alertDialog.dismiss();
+                            }else if(BaseCompactActivity.ENABLE_TPIN !=null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && (newtpin.getText().toString().isEmpty() || newtpin.getText().toString().length()!=4)){
+                                newtpin.setError("Please enter TPIN");
+                                newtpin.requestFocus();
+                            }else if(BaseCompactActivity.ENABLE_TPIN !=null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("N")){
+                                new WalletAsyncMethod(WebConfig.WALLETTRANSFER_URL, fund_transfer(beneficiaryDetailsPozoslist.get(benePosition), value, ben_amount.getText().toString()).toString(), headerData, WalletDetailsActivity.this, getString(R.string.responseTimeOutTrans), hitFrom).execute();
+                                alertDialog.dismiss();
+                            }
                         } else if (type.equalsIgnoreCase("KYCLAYOUTLAY")) {
                             if (object.getString("serviceType").equalsIgnoreCase("WLT_RE_REGISTRATION_PROCESS"))
                                 new WalletAsyncMethod(WebConfig.WALLETTRANSFER_URL, getSender_Validate("").toString(), headerData, WalletDetailsActivity.this, getString(R.string.responseTimeOutTrans), "WALLETSTATUS").execute();

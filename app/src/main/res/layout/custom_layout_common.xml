@@ -599,6 +599,15 @@
                         android:textColor="@color/colorPrimaryDark"
                         android:textSize="12sp" />
                 </LinearLayout>
+                <EditText
+                    android:id="@+id/newtpin"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Enter TPIN"
+                    android:inputType="number"
+                    android:maxLength="4"
+                    android:textSize="16dp"
+                    android:visibility="gone"/>
             </LinearLayout>
 
             <include

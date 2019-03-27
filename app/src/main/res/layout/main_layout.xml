@@ -1,26 +1,27 @@
-<android.support.v7.widget.Toolbar
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/toolbar"
     android:layout_width="match_parent"
     android:layout_height="?attr/actionBarSize"
     android:background="@color/white"
-    app:popupTheme="@style/AppTheme.PopupOverlay"
     app:contentInsetEnd="0dp"
-    app:contentInsetStart="0dp">
+    app:contentInsetStart="0dp"
+    app:popupTheme="@style/AppTheme.PopupOverlay">
 
-    <ImageView android:id="@+id/back_click"
+    <ImageView
+        android:id="@+id/back_click"
         android:layout_width="100dp"
         android:layout_height="50dp"
-        android:layout_marginTop="8dp"
-        android:onClick="onClick"
-        android:clickable="true"
         android:layout_gravity="center|left"
         android:layout_marginLeft="10dp"
-        android:scaleType="fitStart"/>
+        android:layout_marginTop="12dp"
+        android:clickable="true"
+        android:onClick="onClick"
+        android:scaleType="fitStart" />
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="10dp"
         android:layout_gravity="center"
         android:textSize="16dp"
         android:gravity="left"
@@ -29,14 +30,41 @@
         android:textColor="@color/colorPrimaryDark"
         android:id="@+id/toolbar_title"
         android:visibility="gone"/>
-    <ImageView android:id="@+id/reset"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_gravity="right|center"
-        android:scaleType="fitStart"
-        android:layout_marginRight="5dp"
-        android:onClick="onClick"
-        android:clickable="true"
-        android:src="@drawable/reset"
-        android:visibility="gone"/>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_gravity="right|center">
+
+        <ImageView
+            android:id="@+id/reset"
+            android:layout_width="50dp"
+            android:layout_height="45dp"
+            android:layout_marginTop="8dp"
+            android:layout_alignParentRight="true"
+            android:layout_gravity="right|center"
+            android:layout_marginRight="5dp"
+            android:clickable="true"
+            android:onClick="onClick"
+            android:gravity="center"
+            android:scaleType="fitStart"
+            android:src="@drawable/reset"
+            android:visibility="gone"/>
+
+        <TextView
+            android:id="@+id/bankde"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true"
+            android:layout_marginRight="15dp"
+            android:layout_toLeftOf="@+id/reset"
+            android:gravity="center"
+            android:text="Credit Banks"
+            android:clickable="true"
+            android:onClick="onClick"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="16dp"
+            android:textStyle="bold"
+            android:visibility="gone"/>
+
+    </RelativeLayout>
 </android.support.v7.widget.Toolbar>

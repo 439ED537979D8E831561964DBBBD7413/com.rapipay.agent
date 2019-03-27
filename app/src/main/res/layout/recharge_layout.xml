@@ -112,7 +112,15 @@
                 android:padding="10dp"
                 android:spinnerMode="dropdown"
                 android:text="Select Operator" />
-
+            <EditText
+                android:id="@+id/newtpin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Enter TPIN"
+                android:inputType="number"
+                android:maxLength="4"
+                android:textSize="16dp"
+                android:visibility="gone"/>
             <android.support.v7.widget.AppCompatButton
                 android:id="@+id/btn_submit"
                 android:layout_width="match_parent"

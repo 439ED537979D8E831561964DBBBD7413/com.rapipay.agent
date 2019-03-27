@@ -106,7 +106,9 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
         beneficiary_details = (RecyclerView) findViewById(R.id.beneficiary_details);
         last_tran_layout = (LinearLayout) findViewById(R.id.last_tran_layout);
         trans_details = (RecyclerView) findViewById(R.id.trans_details);
-
+        newtpin = (EditText) findViewById(R.id.newtpin);
+        if (BaseCompactActivity.ENABLE_TPIN!=null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y"))
+            newtpin.setVisibility(View.VISIBLE);
         bank_select = (TextView) findViewById(R.id.bank_select);
         bank_select.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -118,7 +120,7 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
         beneficiary_details.addOnItemTouchListener(new RecyclerTouchListener(this, beneficiary_details, new ClickListener() {
             @Override
             public void onClick(View view, int position) {
-                if(beneficiaryDetailsPozoslist.size()!=0) {
+                if (beneficiaryDetailsPozoslist.size() != 0) {
                     pozo = beneficiaryDetailsPozoslist.get(position);
                     customDialog_Common("Fund Transfer", null, pozo, "Sure you want to Transfer?", "");
                 }
@@ -132,7 +134,7 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
         trans_details.addOnItemTouchListener(new RecyclerTouchListener(this, trans_details, new ClickListener() {
             @Override
             public void onClick(View view, int position) {
-                if(transactionPozoArrayList.size()!=0) {
+                if (transactionPozoArrayList.size() != 0) {
                     LastTransactionPozo pozo = transactionPozoArrayList.get(position);
                     new AsyncPostMethod(WebConfig.WALLETRECEIPTURL, receipt_request(pozo).toString(), headerData, FundTransferActivity.this, getString(R.string.responseTimeOutTrans)).execute();
                 }
@@ -361,7 +363,8 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
                     fundlayout.setVisibility(View.VISIBLE);
                     clear();
                     input_name.setText(object.getString("senderName"));
-                    limit = Integer.valueOf(object.getInt("remainingLimit"));
+                    if (object.has("remainingLimit") && !object.getString("remainingLimit").equalsIgnoreCase("null"))
+                        limit = Integer.valueOf(object.getInt("remainingLimit"));
                     text_ben.setText("Beneficiary Details (Available Limit : Rs " + limit + ")");
                     if (object.has("oldTxnList")) {
                         if (Integer.parseInt(object.getString("oldTxnCount")) > 0) {
@@ -434,6 +437,9 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
                 } else if (!ImageUtils.commonAccount(input_account.getText().toString(), 5, 30)) {
                     input_account.setError("Please enter valid account number.");
                     input_account.requestFocus();
+                }else if (BaseCompactActivity.ENABLE_TPIN !=null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && (newtpin.getText().toString().isEmpty() || newtpin.getText().toString().length() != 4)) {
+                    newtpin.setError("Please enter TPIN");
+                    newtpin.requestFocus();
                 } else if (input_amount.getText().toString().isEmpty()) {
                     new AsyncPostMethod(WebConfig.BCRemittanceApp, verify_Account().toString(), headerData, FundTransferActivity.this, getString(R.string.responseTimeOutTrans)).execute();
                 } else {
@@ -562,6 +568,10 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
             jsonObject.put("mobileNumber", input_mobile.getText().toString());
             jsonObject.put("txnAmmount", "1");
             jsonObject.put("reqFor", "BC1");
+            if (newtpin.getText().toString().isEmpty())
+                jsonObject.put("tPin", "");
+            else
+                jsonObject.put("tPin", newtpin.getText().toString());
             jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
 
         } catch (Exception e) {
@@ -646,6 +656,10 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
             jsonObject.put("mobileNumber", input_mobile.getText().toString());
             jsonObject.put("beneficiaryId", beneficiaryId);
             jsonObject.put("reqFor", "BC1");
+            if (newtpin.getText().toString().isEmpty())
+                jsonObject.put("tPin", "");
+            else
+                jsonObject.put("tPin", newtpin.getText().toString());
             jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
 
         } catch (Exception e) {
@@ -704,11 +718,21 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
                 hideKeyboard(FundTransferActivity.this);
                 if (type.equalsIgnoreCase("Fund Transfer Confirmation"))
                     try {
-                        if (!object.getString("subType").equalsIgnoreCase("Money_Transfer"))
-                            new AsyncPostMethod(WebConfig.BCRemittanceApp, getMoney_Validate(ben_amount.getText().toString(), pozo.getBeneficiaryId()).toString(), headerData, FundTransferActivity.this, getString(R.string.responseTimeOutTrans)).execute();
-                        else
+                        if (!object.getString("subType").equalsIgnoreCase("Money_Transfer")) {
+                            if (BaseCompactActivity.ENABLE_TPIN !=null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && newtpin.getText().toString().length() == 4) {
+                                new AsyncPostMethod(WebConfig.BCRemittanceApp, getMoney_Validate(ben_amount.getText().toString(), pozo.getBeneficiaryId()).toString(), headerData, FundTransferActivity.this, getString(R.string.responseTimeOutTrans)).execute();
+                                alertDialog.dismiss();
+                            } else if (BaseCompactActivity.ENABLE_TPIN !=null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && (newtpin.getText().toString().isEmpty() || newtpin.getText().toString().length() != 4)) {
+                                newtpin.setError("Please enter TPIN");
+                                newtpin.requestFocus();
+                            } else if (BaseCompactActivity.ENABLE_TPIN !=null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("N")) {
+                                new AsyncPostMethod(WebConfig.BCRemittanceApp, getMoney_Validate(ben_amount.getText().toString(), pozo.getBeneficiaryId()).toString(), headerData, FundTransferActivity.this, getString(R.string.responseTimeOutTrans)).execute();
+                                alertDialog.dismiss();
+                            }
+                        } else {
                             new AsyncPostMethod(WebConfig.FUNDTRANSFER_URL, getJson_Validate().toString(), headerData, FundTransferActivity.this, getString(R.string.responseTimeOutTrans)).execute();
-                        alertDialog.dismiss();
+                            alertDialog.dismiss();
+                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -719,7 +743,7 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
                     } else if (Integer.parseInt(ben_amount.getText().toString()) >= 25001) {
                         ben_amount.setError("Maximum transfer amount would be 25000.");
                         ben_amount.requestFocus();
-                    } else if (Integer.parseInt(ben_amount.getText().toString()) >= limit+1) {
+                    } else if (Integer.parseInt(ben_amount.getText().toString()) >= limit + 1) {
                         ben_amount.setError("Maximum transfer amount would be " + limit + ".");
                         ben_amount.requestFocus();
                     } else {
@@ -729,6 +753,7 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
                 } else if (type.equalsIgnoreCase("Money Transfer") || type.equalsIgnoreCase("Account Verify Details") || type.equalsIgnoreCase("Cannot generate receipt now please try later!")) {
                     input_account.setText("");
                     input_amount.setText("");
+                    newtpin.setText("");
                     bank_select.setText("Select Bank");
                     alertDialog.dismiss();
                     if (type.equalsIgnoreCase("Account Verify Details")) {
@@ -745,6 +770,10 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
         btn_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                bank_select.setText("Select Bank");
+                newtpin.setText("");
+                input_account.setText("");
+                input_amount.setText("");
                 alertDialog.dismiss();
             }
         });

@@ -49,6 +49,9 @@ public class ReChargeActivity extends BaseCompactActivity implements View.OnClic
         input_amount = (EditText) findViewById(R.id.input_amount);
         input_number = (EditText) findViewById(R.id.input_number);
         btn_contact = (ImageView) findViewById(R.id.btn_contact);
+        newtpin = (EditText) findViewById(R.id.newtpin);
+        if (BaseCompactActivity.ENABLE_TPIN !=null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y"))
+            newtpin.setVisibility(View.VISIBLE);
         if (operator_clicked.equalsIgnoreCase("DTH")) {
             btn_contact.setVisibility(View.GONE);
             serviceType = "DTH_RECHARGE";
@@ -113,7 +116,10 @@ public class ReChargeActivity extends BaseCompactActivity implements View.OnClic
                         input_amount.requestFocus();
                     } else if (select_operator.getText().toString().equalsIgnoreCase("Select Operator"))
                         select_operator.setError("Please enter mandatory field");
-                    else
+                    else if (BaseCompactActivity.ENABLE_TPIN !=null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && (newtpin.getText().toString().isEmpty() || newtpin.getText().toString().length() != 4)) {
+                        newtpin.setError("Please enter TPIN");
+                        newtpin.requestFocus();
+                    } else if (BaseCompactActivity.ENABLE_TPIN !=null && (BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && newtpin.getText().toString().length() == 4) || BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("N"))
                         new AsyncPostMethod(WebConfig.RECHARGENEW, reCharge_request().toString(), headerData, ReChargeActivity.this, "Response Time Out.Please Check your Transaction leadger or Contact Customer Support ... \\n\n" +
                                 "  Recharge Number  -" + input_number.getText().toString() + "\n" +
                                 "  Amount -" + input_amount.getText().toString() + "\n" +
@@ -127,7 +133,10 @@ public class ReChargeActivity extends BaseCompactActivity implements View.OnClic
                         input_amount.requestFocus();
                     } else if (select_operator.getText().toString().equalsIgnoreCase("Select Operator"))
                         select_operator.setError("Please enter mandatory field");
-                    else
+                    else if (BaseCompactActivity.ENABLE_TPIN !=null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && (newtpin.getText().toString().isEmpty() || newtpin.getText().toString().length() != 4)) {
+                        newtpin.setError("Please enter TPIN");
+                        newtpin.requestFocus();
+                    } else if (BaseCompactActivity.ENABLE_TPIN !=null && (BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && newtpin.getText().toString().length() == 4) || BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("N"))
                         new AsyncPostMethod(WebConfig.RECHARGENEW, reCharge_request().toString(), headerData, ReChargeActivity.this, "Response Time Out.Please Check your Transaction leadger or Contact Customer Support ... \\n\n" +
                                 "  Recharge Number  -" + input_number.getText().toString() + "\n" +
                                 "  Amount -" + input_amount.getText().toString() + "\n" +

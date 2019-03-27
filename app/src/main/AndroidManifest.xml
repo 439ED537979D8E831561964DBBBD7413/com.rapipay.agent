@@ -67,6 +67,10 @@
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden" />
         <activity
+            android:name=".main_directory.BankDetails"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
             android:name=".main_directory.CreditTabPage"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden" />
