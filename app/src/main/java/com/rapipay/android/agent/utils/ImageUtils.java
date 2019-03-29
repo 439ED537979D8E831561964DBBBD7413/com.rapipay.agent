@@ -3,6 +3,11 @@ package com.rapipay.android.agent.utils;
 import android.content.Context;
 import android.net.wifi.WifiManager;
 import android.text.format.Formatter;
+import android.util.Base64;
+
+import java.io.IOException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -125,5 +130,26 @@ public class ImageUtils {
     public static String ipAddress(Context context){
         WifiManager wm = (WifiManager) context.getApplicationContext().getSystemService(WIFI_SERVICE);
         return Formatter.formatIpAddress(wm.getConnectionInfo().getIpAddress());
+    }
+    public static String encodeSHA256(String password) throws NoSuchAlgorithmException, IOException {
+        StringBuilder hexStrBuilder = new StringBuilder();
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        digest.reset();
+        byte[] btPass = digest.digest(password.getBytes("UTF-8"));
+        for (int i = 0; i < btPass.length; i++) {
+            hexStrBuilder.append(Integer.toHexString(0xFF & btPass[i]));
+        }
+//        String encodedPassword = null;
+//
+//        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+//        digest.reset();
+//
+//        byte[] btPass = digest.digest(password.getBytes("UTF-8"));
+//        for (int i = 0; i < 5; i++) {
+//            digest.reset();
+//            btPass = digest.digest(btPass);
+//        }
+//        encodedPassword = Base64.encodeToString(btPass, Base64.DEFAULT);
+        return hexStrBuilder.toString();
     }
 }

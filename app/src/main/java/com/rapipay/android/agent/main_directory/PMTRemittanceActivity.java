@@ -358,7 +358,7 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
                 if (newtpin.getText().toString().isEmpty())
                     jsonObject.put("tPin", "");
                 else
-                    jsonObject.put("tPin", newtpin.getText().toString());
+                    jsonObject.put("tPin", ImageUtils.encodeSHA256(newtpin.getText().toString()));
                 jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
             } catch (Exception e) {
                 e.printStackTrace();

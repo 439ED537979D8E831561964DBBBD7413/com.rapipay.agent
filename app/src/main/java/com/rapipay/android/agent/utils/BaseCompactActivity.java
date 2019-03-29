@@ -90,7 +90,6 @@ import com.rapipay.android.agent.adapter.CustomSpinnerAdapter;
 import com.rapipay.android.agent.interfaces.CustomInterface;
 import com.rapipay.android.agent.interfaces.VersionListener;
 import com.rapipay.android.agent.main_directory.CameraKitActivity;
-import com.rapipay.android.agent.main_directory.KYCFormActivity;
 import com.rapipay.android.agent.main_directory.LoginScreenActivity;
 import com.rapipay.android.agent.main_directory.MainActivity;
 import com.rapipay.android.agent.main_directory.PinVerification;

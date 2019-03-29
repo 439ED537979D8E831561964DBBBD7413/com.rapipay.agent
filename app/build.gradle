@@ -7,12 +7,12 @@ android {
 //        applicationId "com.rapipay.android.agent"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 33
-        versionName "0.33"
+        versionCode 35
+        versionName "0.35"
         multiDexEnabled true
-        buildConfigField "int", "APPTYPE", "2"
-        buildConfigField "String", "USERTYPE", "\"Other\""
-        buildConfigField "String", "DOMAINNAME", "\"partner.rapipay.com\""
+        buildConfigField "int", "APPTYPE", "3"
+        buildConfigField "String", "USERTYPE", "\"RapiPay\""
+        buildConfigField "String", "DOMAINNAME", "\"agent.rapipay.com\""
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         ndk{
             abiFilters "armeabi-v7a", "x86"

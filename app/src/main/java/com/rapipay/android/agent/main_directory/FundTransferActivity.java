@@ -571,7 +571,7 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
             if (newtpin.getText().toString().isEmpty())
                 jsonObject.put("tPin", "");
             else
-                jsonObject.put("tPin", newtpin.getText().toString());
+                jsonObject.put("tPin", ImageUtils.encodeSHA256(newtpin.getText().toString()));
             jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
 
         } catch (Exception e) {
@@ -659,7 +659,7 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
             if (newtpin.getText().toString().isEmpty())
                 jsonObject.put("tPin", "");
             else
-                jsonObject.put("tPin", newtpin.getText().toString());
+                jsonObject.put("tPin", ImageUtils.encodeSHA256(newtpin.getText().toString()));
             jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
 
         } catch (Exception e) {

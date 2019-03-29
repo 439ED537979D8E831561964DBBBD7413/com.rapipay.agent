@@ -197,11 +197,11 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                     }
                 }
                 if (msg.what == FAIL) {
-                    try {
-                        clear();
-                        progessDialog.hide_progress();
-                        transactionFlag = false;
-                        customDialog_Common("KYCLAYOUTS", null, null, "Alert", "", (String) msg.obj, CashOutClass.this);
+                            try {
+                                clear();
+                                progessDialog.hide_progress();
+                                transactionFlag = false;
+                                customDialog_Common("KYCLAYOUTS", null, null, "Alert", "", (String) msg.obj, CashOutClass.this);
 //                        Toast.makeText(CashOutClass.this, (String) msg.obj, Toast.LENGTH_SHORT).show();
                         if (accessBluetoothDetails() != null) {
                             JSONObject object = new JSONObject();
@@ -313,9 +313,9 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                 } else if (msg.what == DISPLAY_STATUS)
 
                 {
-                    customDialog_Common("KYCLAYOUTS", null, null, "Alert", "", (String) msg.obj, CashOutClass.this);
-//                    Toast.makeText(CashOutClass.this,
-//                            (String) msg.obj, Toast.LENGTH_SHORT).show();
+//                    customDialog_Common("KYCLAYOUTS", null, null, "Alert", "", (String) msg.obj, CashOutClass.this);
+                    Toast.makeText(CashOutClass.this,
+                            (String) msg.obj, Toast.LENGTH_SHORT).show();
                 } else if (msg.what == QPOS_EMV_MULITPLE_APPLICATION)
 
                 {
