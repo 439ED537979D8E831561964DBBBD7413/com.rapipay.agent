@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -42,7 +43,7 @@ public class PassbookActivity extends BaseCompactActivity implements View.OnClic
     private void initialize() {
         Calendar calendar = Calendar.getInstance();
         selectedDate = calendar.get(Calendar.DAY_OF_MONTH);
-        selectedMonth = calendar.get(Calendar.MONTH);
+        selectedMonth = calendar.get(Calendar.MONTH)+1;
         selectedYear = calendar.get(Calendar.YEAR);
         heading = (TextView) findViewById(R.id.toolbar_title);
         heading.setText("Agent Ledger History");
@@ -76,8 +77,10 @@ public class PassbookActivity extends BaseCompactActivity implements View.OnClic
                 }else if (date1_text.getText().toString().isEmpty()) {
                     date1_text.setError("Please enter mandatory field");
                     date1_text.requestFocus();
-                }else if (!date1_text.getText().toString().isEmpty() && !date2_text.getText().toString().isEmpty())
+                } else if (printDifference(mainDate(date2_text.getText().toString()),mainDate(date1_text.getText().toString())))
                     new AsyncPostMethod(WebConfig.CommonReport, channel_request(0,5).toString(), headerData, PassbookActivity.this,getString(R.string.responseTimeOut)).execute();
+                else
+                    Toast.makeText(PassbookActivity.this,"Please select correct date",Toast.LENGTH_SHORT).show();
                 break;
         }
     }

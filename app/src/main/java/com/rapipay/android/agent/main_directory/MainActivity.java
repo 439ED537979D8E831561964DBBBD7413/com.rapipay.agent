@@ -69,6 +69,7 @@ public class MainActivity extends BaseCompactActivity
     public static String bankdetails=null;
     public static String regBankDetails=null;
     public static ArrayList<HeaderePozo> pozoArrayList;
+    public static boolean relailerDetails = false;
     public static ArrayList<DeviceDetailsPozo> deviceDetailsPozoArrayList;
 
     @Override
@@ -370,6 +371,8 @@ public class MainActivity extends BaseCompactActivity
         try {
             for (int i = 0; i < array.length(); i++) {
                 JSONObject object = array.getJSONObject(i);
+                if(object.getString("headerValue").equalsIgnoreCase("Retailer"))
+                    relailerDetails = true;
                 if (object.getString("displayFlag").equalsIgnoreCase("D"))
                     pozoArrayList.add(new HeaderePozo(object.getString("headerValue"), object.getString("headerData"), object.getString("headerId"), object.getString("displayFlag")));
                 else if (object.getString("headerValue").equalsIgnoreCase("Notice")) {

@@ -658,7 +658,7 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
                 } else if (!ImageUtils.commonAmount(input_amount.getText().toString())) {
                     input_amount.setError("Please enter amount");
                     input_amount.requestFocus();
-                }else if ((reqFor.equalsIgnoreCase("MATM") || reqFor.equalsIgnoreCase("AEPS")) && !input_amount.getText().toString().isEmpty() && (Integer.valueOf(input_amount.getText().toString())%100!=0)) {
+                }else if (reqFor.equalsIgnoreCase("MATM") && !input_amount.getText().toString().isEmpty() && (Integer.valueOf(input_amount.getText().toString())%100!=0)) {
                     input_amount.setError("Please enter amount in multiple of hundred");
                     input_amount.requestFocus();
                 } else {

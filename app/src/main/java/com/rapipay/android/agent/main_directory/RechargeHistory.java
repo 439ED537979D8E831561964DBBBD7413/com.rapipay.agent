@@ -59,7 +59,7 @@ public class RechargeHistory extends BaseCompactActivity implements View.OnClick
     private void initialize() {
         Calendar calendar = Calendar.getInstance();
         selectedDate = calendar.get(Calendar.DAY_OF_MONTH);
-        selectedMonth = calendar.get(Calendar.MONTH);
+        selectedMonth = calendar.get(Calendar.MONTH)+1;
         selectedYear = calendar.get(Calendar.YEAR);
         select_state = (Spinner) findViewById(R.id.select_state);
         select_state.setVisibility(View.VISIBLE);
@@ -152,8 +152,10 @@ public class RechargeHistory extends BaseCompactActivity implements View.OnClick
                 } else if (date1_text.getText().toString().isEmpty()) {
                     date1_text.setError("Please enter mandatory field");
                     date1_text.requestFocus();
-                } else
+                } else if (printDifference(mainDate(date2_text.getText().toString()),mainDate(date1_text.getText().toString())))
                     new AsyncPostMethod(WebConfig.RECHARGE_URL, channel_request(0, 5).toString(), headerData, RechargeHistory.this,getString(R.string.responseTimeOut)).execute();
+                else
+                    Toast.makeText(RechargeHistory.this,"Please select correct date",Toast.LENGTH_SHORT).show();
                 break;
         }
     }

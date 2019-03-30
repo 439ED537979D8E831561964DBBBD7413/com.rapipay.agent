@@ -241,10 +241,7 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 documentid.setText("");
-                if (position != 0)
-                    docType = items[position];
-                else
-                    docType = "";
+                docType = items[position];
                 if (position == 1) {
                     documentid.setInputType(InputType.TYPE_CLASS_NUMBER);
                     InputFilter[] filterArray = new InputFilter[1];

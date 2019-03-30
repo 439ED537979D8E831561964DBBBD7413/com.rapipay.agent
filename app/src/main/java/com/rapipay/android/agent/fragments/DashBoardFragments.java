@@ -96,10 +96,6 @@ public class DashBoardFragments extends Fragment {
         recycler_view3.setLayoutManager(layoutManager3);
 
 
-
-
-
-
 //        if (MainActivity.regBankDetails != null) {
 //            String splitReg[] = MainActivity.regBankDetails.split("\\|");
 //            ArrayList<ImagePozo> imagePozoArrayList = ImageUtils.getThirdImageUrl();
@@ -117,7 +113,7 @@ public class DashBoardFragments extends Fragment {
 //                recycler_view3.setVisibility(View.GONE);
 //            }
 //        }else {
-            recycler_view3.setAdapter(new SimpleStringRecyclerViewAdapter(getActivity(), recycler_view3, ImageUtils.getThirdImageUrl(), "third"));
+        recycler_view3.setAdapter(new SimpleStringRecyclerViewAdapter(getActivity(), recycler_view3, ImageUtils.getThirdImageUrl(), "third"));
 //        }
 
         LinearLayoutManager layoutManager4 = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
@@ -289,21 +285,21 @@ public class DashBoardFragments extends Fragment {
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                 } else if (position == 0) {
-                    if (MainActivity.pozoArrayList.size() != 0) {
-                        for (int i = 0; i < MainActivity.pozoArrayList.size(); i++) {
-                            if (MainActivity.pozoArrayList.get(i).getHeaderID().equalsIgnoreCase("10"))
-                                if (MainActivity.pozoArrayList.get(i).getHeaderData().equalsIgnoreCase("Retailer")) {
-                                    Toast.makeText(getActivity(), "Not Authorized to create New User!.", Toast.LENGTH_SHORT).show();
-                                } else {
-                                    Intent intent = new Intent(getActivity(), RegisterKYCTab.class);
-                                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                    intent.putExtra("type", "outside");
-                                    intent.putExtra("customerType", "A");
-                                    intent.putExtra("mobileNo", "");
-                                    startActivity(intent);
-                                }
+//                    if (MainActivity.pozoArrayList.size() != 0) {
+//                        for (int i = 0; i < MainActivity.pozoArrayList.size(); i++) {
+//                            if (MainActivity.pozoArrayList.get(i).getHeaderID().equalsIgnoreCase("10"))
+                        if (!MainActivity.relailerDetails) {
+                            Toast.makeText(getActivity(), "Not Authorized to create New User!.", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Intent intent = new Intent(getActivity(), RegisterKYCTab.class);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            intent.putExtra("type", "outside");
+                            intent.putExtra("customerType", "A");
+                            intent.putExtra("mobileNo", "");
+                            startActivity(intent);
                         }
-                    }
+//                        }
+//                    }
                 } else if (position == 3) {
                     Intent intent = new Intent(getActivity(), PassbookActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -353,28 +349,28 @@ public class DashBoardFragments extends Fragment {
         recycler_view5.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), recycler_view5, new ClickListener() {
             @Override
             public void onClick(View view, int position) {
-                String id = MainActivity.pozoArrayList.get(position).getHeaderID();
-                if (id.equalsIgnoreCase("3")) {
+                String id = MainActivity.pozoArrayList.get(position).getHeaderValue();
+                if (id.equalsIgnoreCase("My Network")) {
                     Intent intent = new Intent(getActivity(), NetworkTransferActivity.class);
                     intent.putExtra("CLICKED", "1");
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
-                } else if (id.equalsIgnoreCase("2")) {
+                } else if (id.equalsIgnoreCase("Network Balance")) {
                     Intent intent = new Intent(getActivity(), NetworkTransferActivity.class);
                     intent.putExtra("CLICKED", "2");
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
-                } else if (id.equalsIgnoreCase("4")) {
+                } else if (id.equalsIgnoreCase("Daily Commission")) {
                     Intent intent = new Intent(getActivity(), DailyCommissionActivity.class);
                     intent.putExtra("TYPE", "D");
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
-                } else if (id.equalsIgnoreCase("5")) {
+                } else if (id.equalsIgnoreCase("Monthly Commission")) {
                     Intent intent = new Intent(getActivity(), DailyCommissionActivity.class);
                     intent.putExtra("TYPE", "M");
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
-                } else if (id.equalsIgnoreCase("6")) {
+                } else if (id.equalsIgnoreCase("USTD Commission")) {
                     Intent intent = new Intent(getActivity(), DailyCommissionActivity.class);
                     intent.putExtra("TYPE", "U");
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

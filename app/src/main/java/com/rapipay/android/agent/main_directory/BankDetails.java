@@ -27,11 +27,12 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class BankDetails extends BaseCompactActivity implements RequestHandler,View.OnClickListener {
+public class BankDetails extends BaseCompactActivity implements RequestHandler, View.OnClickListener {
 
     ArrayList<BankDetailPozo> detailPozoArrayList;
     RecyclerView recycler_view;
-    TextView note1,note2;
+    TextView note1, note2;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,13 +56,15 @@ public class BankDetails extends BaseCompactActivity implements RequestHandler,V
         setBack_click(this);
         finish();
     }
+
     private void initialize() {
         heading = (TextView) findViewById(R.id.toolbar_title);
-        heading.setText("Bank Details");
+        heading.setText("Bank Details for Deposit");
         recycler_view = (RecyclerView) findViewById(R.id.recycler_view);
-        note1 = (TextView)findViewById(R.id.note1);
-        note2 = (TextView)findViewById(R.id.note2);
+        note1 = (TextView) findViewById(R.id.note1);
+        note2 = (TextView) findViewById(R.id.note2);
     }
+
     private void url() {
         new AsyncPostMethod(WebConfig.LOGIN_URL, getWLDetails().toString(), headerData, BankDetails.this, getString(R.string.responseTimeOut)).execute();
     }
@@ -110,22 +113,25 @@ public class BankDetails extends BaseCompactActivity implements RequestHandler,V
         }
     }
 
-    private void parseBankDetails(JSONObject objects){
+    private void parseBankDetails(JSONObject objects) {
         detailPozoArrayList = new ArrayList<>();
         try {
-            if(objects.has("NOTE1"))
+            if (objects.has("NOTE1"))
                 note1.setText(" Note1 : " + objects.getString("NOTE1"));
-            if(objects.has("NOTE2"))
+            if (objects.has("NOTE2"))
                 note2.setText(" Note2 : " + objects.getString("NOTE2"));
             JSONArray array = objects.getJSONArray("BANK_DETAILS");
-            for(int i=0;i<array.length();i++){
+            for (int i = 0; i < array.length(); i++) {
                 JSONObject object = array.getJSONObject(i);
-                detailPozoArrayList.add(new BankDetailPozo(object.getString("BANK"),object.getString("NAME"),object.getString("AC NO."),object.getString("BRANCH"),object.getString("IFSC"),object.getString("DEPOSIT"),object.getString("ECOL")));
+                if (object.getString("ECOL").equalsIgnoreCase("Y"))
+                    detailPozoArrayList.add(new BankDetailPozo(object.getString("BANK"), object.getString("NAME"), object.getString("AC NO.")+list.get(0).getMobilno(), object.getString("BRANCH"), object.getString("IFSC"), object.getString("DEPOSIT"), object.getString("ECOL")));
+                else
+                    detailPozoArrayList.add(new BankDetailPozo(object.getString("BANK"), object.getString("NAME"), object.getString("AC NO."), object.getString("BRANCH"), object.getString("IFSC"), object.getString("DEPOSIT"), object.getString("ECOL")));
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        if(detailPozoArrayList.size()!=0){
+        if (detailPozoArrayList.size() != 0) {
             LinearLayoutManager layoutManager = new LinearLayoutManager(BankDetails.this, LinearLayoutManager.VERTICAL, false);
             recycler_view.setLayoutManager(layoutManager);
             recycler_view.setAdapter(new BankDetailAdapter(BankDetails.this, detailPozoArrayList));

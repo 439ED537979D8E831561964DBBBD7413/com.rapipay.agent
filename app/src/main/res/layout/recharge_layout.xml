@@ -97,7 +97,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/p_amount"
-                    android:inputType="numberDecimal"
+                    android:inputType="number"
                     android:maxLength="13"
                     android:textSize="16dp" />
             </android.support.design.widget.TextInputLayout>

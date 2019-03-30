@@ -46,7 +46,7 @@ public class ChannelHistoryActivity extends BaseCompactActivity implements View.
     private void initialize() {
         Calendar calendar = Calendar.getInstance();
         selectedDate = calendar.get(Calendar.DAY_OF_MONTH);
-        selectedMonth = calendar.get(Calendar.MONTH);
+        selectedMonth = calendar.get(Calendar.MONTH)+1;
         selectedYear = calendar.get(Calendar.YEAR);
         heading = (TextView) findViewById(R.id.toolbar_title);
         heading.setText("Transaction History");
@@ -126,8 +126,10 @@ public class ChannelHistoryActivity extends BaseCompactActivity implements View.
                 } else if (date1_text.getText().toString().isEmpty()) {
                     date1_text.setError("Please enter mandatory field");
                     Toast.makeText(this, "Please enter mandatory field", Toast.LENGTH_SHORT).show();
-                } else if (!date1_text.getText().toString().isEmpty() && !date2_text.getText().toString().isEmpty())
+                } else if (printDifference(mainDate(date2_text.getText().toString()),mainDate(date1_text.getText().toString())))
                     new AsyncPostMethod(WebConfig.CommonReport, channel_request(first, last).toString(), headerData, ChannelHistoryActivity.this,getString(R.string.responseTimeOut),"TRANSACTIONHISTORY").execute();
+                else
+                    Toast.makeText(ChannelHistoryActivity.this,"Please select correct date",Toast.LENGTH_SHORT).show();
                 break;
         }
     }
