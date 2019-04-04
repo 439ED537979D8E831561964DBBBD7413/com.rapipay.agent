@@ -271,11 +271,11 @@ public class LoginScreenActivity extends BaseCompactActivity implements View.OnC
             try {
                 PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
                 String version = pInfo.versionName;
-                if (stringArrayList.get(0).equalsIgnoreCase(version) && (stringArrayList.get(1).equalsIgnoreCase("F") || stringArrayList.get(1).equalsIgnoreCase("N"))) {
+                if (Double.valueOf(version)>=Double.valueOf(stringArrayList.get(0)) && (stringArrayList.get(1).equalsIgnoreCase("F") || stringArrayList.get(1).equalsIgnoreCase("N"))) {
                     new AsyncPostMethod(WebConfig.LOGIN_URL, getJson_Validate().toString(), "", LoginScreenActivity.this, getString(R.string.responseTimeOut)).execute();
-                } else if (!stringArrayList.get(0).equalsIgnoreCase(version) && stringArrayList.get(1).equalsIgnoreCase("F")) {
+                } else if (Double.valueOf(version)<Double.valueOf(stringArrayList.get(0)) && stringArrayList.get(1).equalsIgnoreCase("F")) {
                     customDialog_Common("KYCLAYOUTSS", null, null, "Update Available", null, "You are running on lower version please update for new versions!.", LoginScreenActivity.this);
-                } else if (!stringArrayList.get(0).equalsIgnoreCase(version) && stringArrayList.get(1).equalsIgnoreCase("N")) {
+                } else if (Double.valueOf(stringArrayList.get(0))!=Double.valueOf(version) && stringArrayList.get(1).equalsIgnoreCase("N")) {
                     new AsyncPostMethod(WebConfig.LOGIN_URL, getJson_Validate().toString(), "", LoginScreenActivity.this, getString(R.string.responseTimeOut)).execute();
                 } else {
                     customDialog_Common("KYCLAYOUTSS", null, null, "Update Available", null, "You are running on lower version please update for new versions!.", LoginScreenActivity.this);

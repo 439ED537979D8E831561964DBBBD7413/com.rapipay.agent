@@ -296,6 +296,8 @@ public class WebViewVerify extends BaseCompactActivity implements CustomInterfac
         switch (v.getId()) {
             case R.id.back_click:
                 setBack_click(this);
+                Intent intent = new Intent();
+                setResult(2,intent);
                 finish();
                 break;
         }
@@ -303,6 +305,8 @@ public class WebViewVerify extends BaseCompactActivity implements CustomInterfac
 
     @Override
     public void onBackPressed() {
+        Intent intent = new Intent();
+        setResult(2,intent);
         finish();
     }
 }

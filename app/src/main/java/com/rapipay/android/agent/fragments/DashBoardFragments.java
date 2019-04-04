@@ -82,10 +82,8 @@ public class DashBoardFragments extends Fragment {
                 bankdetails.setVisibility(View.GONE);
             }
         });
-        if (BuildConfig.APPTYPE == 3) {
             view.findViewById(R.id.matm).setVisibility(View.VISIBLE);
             view.findViewById(R.id.aeps).setVisibility(View.VISIBLE);
-        }
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
         recycler_view.setLayoutManager(layoutManager);
         recycler_view.setAdapter(new SimpleStringRecyclerViewAdapter(getActivity(), recycler_view, ImageUtils.getFirstImageUrl(), "first"));
@@ -288,7 +286,7 @@ public class DashBoardFragments extends Fragment {
 //                    if (MainActivity.pozoArrayList.size() != 0) {
 //                        for (int i = 0; i < MainActivity.pozoArrayList.size(); i++) {
 //                            if (MainActivity.pozoArrayList.get(i).getHeaderID().equalsIgnoreCase("10"))
-                        if (!MainActivity.relailerDetails) {
+                        if (MainActivity.relailerDetails) {
                             Toast.makeText(getActivity(), "Not Authorized to create New User!.", Toast.LENGTH_SHORT).show();
                         } else {
                             Intent intent = new Intent(getActivity(), RegisterKYCTab.class);

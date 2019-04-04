@@ -23,7 +23,17 @@
         android:fitsSystemWindows="true"
         app:itemTextColor="@color/colorPrimaryDark"
         app:menu="@menu/menu_drawer">
-
+        <TextView
+            android:id="@+id/contactus"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginBottom="50dp"
+            android:layout_gravity="bottom"
+            android:gravity="center"
+            android:textSize="14dp"
+            android:text="Contact US @ 011-47822261"
+            android:textColor="@color/black"
+            android:visibility="visible"/>
         <TextView
             android:id="@+id/btn_sing_in"
             android:layout_width="match_parent"

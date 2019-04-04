@@ -62,12 +62,12 @@ public class MainActivity extends BaseCompactActivity
     private static String filePath;
     DrawerLayout drawer;
     String data, term = null;
-    TextView tv,bankde;
+    TextView tv, bankde;
     ImageView back_click;
     private static final int dpPhoto1 = 2001;
     private static final int dpPhoto2 = 2002;
-    public static String bankdetails=null;
-    public static String regBankDetails=null;
+    public static String bankdetails = null;
+    public static String regBankDetails = null;
     public static ArrayList<HeaderePozo> pozoArrayList;
     public static boolean relailerDetails = false;
     public static ArrayList<DeviceDetailsPozo> deviceDetailsPozoArrayList;
@@ -196,6 +196,11 @@ public class MainActivity extends BaseCompactActivity
         navigationView.setNavigationItemSelectedListener(this);
         View headerLayout = navigationView.inflateHeaderView(R.layout.nav_header_main);
         TextView verionName = navigationView.findViewById(R.id.btn_sing_in);
+        TextView contactus = navigationView.findViewById(R.id.contactus);
+        if (BuildConfig.APPTYPE == 1 || BuildConfig.APPTYPE == 3)
+            contactus.setVisibility(View.VISIBLE);
+        else if (BuildConfig.APPTYPE == 2)
+            contactus.setVisibility(View.GONE);
         try {
             verionName.setText("Version - " + getPackageManager().getPackageInfo(getPackageName(), 0).versionName);
         } catch (PackageManager.NameNotFoundException e) {
@@ -255,6 +260,8 @@ public class MainActivity extends BaseCompactActivity
                 String imageName = "image" + ".jpg";
                 String path = saveToInternalStorage(thumbnail, imageName);
                 localStorage.setActivityState(LocalStorage.IMAGEPATH, path);
+            } else if (requestCode == 2) {
+                url();
             }
         }
     }
@@ -353,14 +360,14 @@ public class MainActivity extends BaseCompactActivity
         }
     }
 
-    private void deviceDetails(JSONArray array){
+    private void deviceDetails(JSONArray array) {
         deviceDetailsPozoArrayList = new ArrayList<>();
-        try{
+        try {
             for (int i = 0; i < array.length(); i++) {
                 JSONObject object = array.getJSONObject(i);
                 deviceDetailsPozoArrayList.add(new DeviceDetailsPozo(object.getString("deviceID"), object.getString("deviceType"), object.getString("bluetoothID")));
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -371,7 +378,7 @@ public class MainActivity extends BaseCompactActivity
         try {
             for (int i = 0; i < array.length(); i++) {
                 JSONObject object = array.getJSONObject(i);
-                if(object.getString("headerValue").equalsIgnoreCase("Retailer"))
+                if (object.getString("headerData").equalsIgnoreCase("Retailer") && object.getString("headerValue").equalsIgnoreCase("CATEGORY"))
                     relailerDetails = true;
                 if (object.getString("displayFlag").equalsIgnoreCase("D"))
                     pozoArrayList.add(new HeaderePozo(object.getString("headerValue"), object.getString("headerData"), object.getString("headerId"), object.getString("displayFlag")));
@@ -379,15 +386,18 @@ public class MainActivity extends BaseCompactActivity
                     tv.setText(object.getString("headerData"));
                     tv.setVisibility(View.VISIBLE);
                 } else if (object.getString("headerValue").equalsIgnoreCase("BANK_LIVE_ST")) {
-                    bankdetails = object.getString("headerData").replace(",","\n");
+                    bankdetails = object.getString("headerData").replace(",", "\n");
 //                    customDialog_Common("KYCLAYOUTS", null, null, "Banl Update", "", object.getString("headerData").replace(",","\n"), MainActivity.this);
-                }else if (object.getString("headerValue").equalsIgnoreCase("MPAB_FLAG")) {
+                } else if (object.getString("headerValue").equalsIgnoreCase("MPAB_FLAG")) {
 //                    regBankDetails = object.getString("headerData");
 //                    customDialog_Common("KYCLAYOUTS", null, null, "Banl Update", "", object.getString("headerData").replace(",","\n"), MainActivity.this);
-                }else if (object.getString("headerValue").equalsIgnoreCase("ENABLE_TPIN")) {
+                } else if (object.getString("headerValue").equalsIgnoreCase("ENABLE_TPIN")) {
                     ENABLE_TPIN = object.getString("headerData");
 //                    customDialog_Common("KYCLAYOUTS", null, null, "Banl Update", "", object.getString("headerData").replace(",","\n"), MainActivity.this);
-                }else if (object.getString("headerValue").equalsIgnoreCase("IS_CRIMAGE_REQUIRED")) {
+//                }else if (object.getString("headerValue").equalsIgnoreCase("IS_KYC_COMPLETED") && object.getString("headerData").equalsIgnoreCase("N")) {
+//                    customDialog_Common("KYCNEWLAYOUT", null, null, "Warning", null, "Your KYC is not updated, Kindly Proceed to update complete KYC.", MainActivity.this);
+//                    customDialog_Common("KYCLAYOUTS", null, null, "Banl Update", "", object.getString("headerData").replace(",","\n"), MainActivity.this);
+                } else if (object.getString("headerValue").equalsIgnoreCase("IS_CRIMAGE_REQUIRED")) {
                     IS_CRIMAGE_REQUIRED = object.getString("headerData");
 //                    customDialog_Common("KYCLAYOUTS", null, null, "Banl Update", "", object.getString("headerData").replace(",","\n"), MainActivity.this);
                 } else {
@@ -497,7 +507,14 @@ public class MainActivity extends BaseCompactActivity
         } else if (type.equalsIgnoreCase("SESSIONEXPIRE"))
             jumpPage();
         else if (type.equalsIgnoreCase("KYCLAYOUTS")) {
-        }else
+        }else if (type.equalsIgnoreCase("KYCNEWLAYOUT")) {
+            String formData = getUserKyc();
+            Intent intent = new Intent(MainActivity.this, WebViewVerify.class);
+            intent.putExtra("persons", "pending");
+            intent.putExtra("mobileNo", list.get(0).getMobilno());
+            intent.putExtra("formData", formData);
+            startActivityForResult(intent,2);
+        } else
             finish();
     }
 
@@ -505,6 +522,35 @@ public class MainActivity extends BaseCompactActivity
     public void cancelClicked(String type, Object ob) {
         alertDialog.dismiss();
     }
-
+    public String getUserKyc() {
+        JSONObject jsonObject = new JSONObject();
+        String form = null;
+        try {
+            jsonObject.put("serviceType", "UPDATE_KYC_DETAILS");
+            jsonObject.put("requestType", "EKYC_CHANNEL");
+            jsonObject.put("typeMobileWeb", "mobile");
+            jsonObject.put("responseUrl", "");
+            jsonObject.put("nodeAgentId", list.get(0).getMobilno());
+            jsonObject.put("txnRef",ImageUtils.miliSeconds());
+            jsonObject.put("mobileNo", list.get(0).getMobilno());
+            jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
+            jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
+            form = "<html>\n" +
+                    "\t<body>\n" +
+                    "\t\t<form name=\"validatekyc\" id=\"validatekyc\" method=\"POST\" action=\"" + WebConfig.EKYCFORWARD + "\">\n" +
+                    "\t\t\t<input name=\"requestedData\" value=\"" + getDataBase64(jsonObject.toString()) + "\" type=\"hidden\"/>\n" +
+                    "\t\t\t<input type=\"submit\"/>\n" +
+                    "\t\t</form>\n" +
+                    "\t\t<script language=\"JavaScript\" type=\"text/javascript\">\n" +
+                    "\t\t\t\t\tdocument.getElementById(\"validatekyc\").submit();\n" +
+                    "\t\t</script>\n" +
+                    "\t</body>\n" +
+                    "</html>";
+            return form;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }
 

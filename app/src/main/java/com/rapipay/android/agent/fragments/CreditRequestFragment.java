@@ -305,15 +305,20 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
                     bank_select.setError("Please enter valid data");
                 else if (paymode.isEmpty())
                     Toast.makeText(getActivity(), "Please select payment mode.", Toast.LENGTH_SHORT).show();
-                else if (BaseCompactActivity.IS_CRIMAGE_REQUIRED != null && BaseCompactActivity.IS_CRIMAGE_REQUIRED.equalsIgnoreCase("Y") && image.getText().toString().isEmpty()) {
+                else if (BaseCompactActivity.IS_CRIMAGE_REQUIRED == null && image.getText().toString().isEmpty()) {
+                    image.setError("Please Select Image");
+                    image.requestFocus();
+                } else if (BaseCompactActivity.IS_CRIMAGE_REQUIRED != null && BaseCompactActivity.IS_CRIMAGE_REQUIRED.equalsIgnoreCase("Y") && image.getText().toString().isEmpty()) {
                     image.setError("Please Select Image");
                     image.requestFocus();
                 } else if (date1_text.getText().toString().isEmpty()) {
                     date1_text.setError("Please select date");
                     date1_text.requestFocus();
-                } else if ((!paymode.isEmpty() && BaseCompactActivity.IS_CRIMAGE_REQUIRED != null && BaseCompactActivity.IS_CRIMAGE_REQUIRED.equalsIgnoreCase("Y") && !imageBase64.isEmpty()) || !filePath.isEmpty())
+                } else if (!paymode.isEmpty() && BaseCompactActivity.IS_CRIMAGE_REQUIRED == null && !imageBase64.isEmpty())
                     new AsyncPostMethod(WebConfig.CRNF, credit_request().toString(), headerData, CreditRequestFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
-                else if (!paymode.isEmpty() && (BaseCompactActivity.IS_CRIMAGE_REQUIRED != null && BaseCompactActivity.IS_CRIMAGE_REQUIRED.equalsIgnoreCase("N")))
+                else if (!paymode.isEmpty() && BaseCompactActivity.IS_CRIMAGE_REQUIRED != null && BaseCompactActivity.IS_CRIMAGE_REQUIRED.equalsIgnoreCase("Y") && !imageBase64.isEmpty())
+                    new AsyncPostMethod(WebConfig.CRNF, credit_request().toString(), headerData, CreditRequestFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
+                else if (!paymode.isEmpty() && BaseCompactActivity.IS_CRIMAGE_REQUIRED != null && BaseCompactActivity.IS_CRIMAGE_REQUIRED.equalsIgnoreCase("N"))
                     new AsyncPostMethod(WebConfig.CRNF, credit_request().toString(), headerData, CreditRequestFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
                 else
                     Toast.makeText(getActivity(), "Please select mandatory fields", Toast.LENGTH_SHORT).show();
@@ -376,19 +381,19 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
         super.onActivityResult(requestCode, resultCode, data);
         imageBase64 = "";
         image.setText("");
-        if (requestCode == CAMERA_REQUEST) {
-            try {
-                String path = data.getStringExtra("ImagePath");
-                String imageType = data.getStringExtra("ImageType");
-                Bitmap bitmap = loadImageFromStorage(imageType, path);
-                setPic(bitmap);
-                image.setText(imageType + ".jpg");
-                image.setError(null);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } else if (requestCode == SELECT_FILE) {
-            if (data != null) {
+        if (data != null) {
+            if (requestCode == CAMERA_REQUEST) {
+                try {
+                    String path = data.getStringExtra("ImagePath");
+                    String imageType = data.getStringExtra("ImageType");
+                    Bitmap bitmap = loadImageFromStorage(imageType, path);
+                    setPic(bitmap);
+                    image.setText(imageType + ".jpg");
+                    image.setError(null);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else if (requestCode == SELECT_FILE) {
                 Uri uri = data.getData();
                 Bitmap thumbnail = null;
                 try {
@@ -396,7 +401,6 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                imageBase64 = getBytesFromBitmap(addWaterMark(thumbnail));
                 Uri selectedImageUri = data.getData();
                 String[] projection = {MediaStore.MediaColumns.DATA};
                 CursorLoader cursorLoader = new CursorLoader(getActivity(), selectedImageUri, projection, null, null,
@@ -405,6 +409,7 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
                 int column_index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
                 cursor.moveToFirst();
                 filePath = cursor.getString(column_index);
+                imageBase64 = getBytesFromBitmap(addWaterMark(thumbnail));
                 String[] splits = filePath.split("\\/");
                 int len = splits.length;
                 image.setText(splits[len - 1]);

@@ -363,6 +363,7 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
                     fundlayout.setVisibility(View.VISIBLE);
                     clear();
                     input_name.setText(object.getString("senderName"));
+                    input_name.setEnabled(false);
                     if (object.has("remainingLimit") && !object.getString("remainingLimit").equalsIgnoreCase("null"))
                         limit = Integer.valueOf(object.getInt("remainingLimit"));
                     text_ben.setText("Beneficiary Details (Available Limit : Rs " + limit + ")");
@@ -786,6 +787,10 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
             clear();
         else if (type.equalsIgnoreCase("KYCLAYOUTS"))
             new AsyncPostMethod(WebConfig.BCRemittanceApp, getSender_Validate().toString(), headerData, FundTransferActivity.this, getString(R.string.responseTimeOutTrans)).execute();
+        else if (type.equalsIgnoreCase("Fund Transfer Details")) {
+            setBack_click(FundTransferActivity.this);
+            finish();
+        }
     }
 
     @Override

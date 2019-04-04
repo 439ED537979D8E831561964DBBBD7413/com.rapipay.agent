@@ -139,6 +139,9 @@ public class AgentKYCFragment extends BaseFragment implements RequestHandler, Vi
                 else if (spinner_value.equalsIgnoreCase("Aadhar Card") && (documentid.getText().toString().isEmpty() || documentid.getText().toString().length() != 12)) {
                         documentid.setError("Please enter valid data");
                         documentid.requestFocus();
+                }else if (spinner_value.equalsIgnoreCase("Aadhar Card") && !ImageUtils.validateVerhoeff(documentid.getText().toString())) {
+                    documentid.setError("Please enter valid Aadhar Number");
+                    documentid.requestFocus();
                 } else if (spinner_value.equalsIgnoreCase("Voter Id Card") && (documentid.getText().toString().isEmpty() || documentid.getText().toString().length() != 10)) {
                         documentid.setError("Please enter valid data");
                         documentid.requestFocus();
