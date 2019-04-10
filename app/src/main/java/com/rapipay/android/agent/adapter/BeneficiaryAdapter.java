@@ -7,16 +7,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-
 import com.rapipay.android.agent.Model.BeneficiaryDetailsPozo;
 import com.rapipay.android.agent.R;
+
+import java.util.ArrayList;
+import java.util.Locale;
 
 public class BeneficiaryAdapter extends RecyclerView.Adapter<BeneficiaryAdapter.ViewHolder> {
 
     private ArrayList<BeneficiaryDetailsPozo> mValues;
     private Context context;
-
+    private ArrayList<BeneficiaryDetailsPozo> arraylist = null;
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
         public final TextView btn_name, btn_account, btn_bank, isverified;
@@ -34,6 +35,8 @@ public class BeneficiaryAdapter extends RecyclerView.Adapter<BeneficiaryAdapter.
     public BeneficiaryAdapter(Context context, ArrayList<BeneficiaryDetailsPozo> items) {
         mValues = items;
         this.context = context;
+        this.arraylist = new ArrayList<BeneficiaryDetailsPozo>();
+        this.arraylist.addAll(mValues);
     }
 
     @Override
@@ -57,6 +60,21 @@ public class BeneficiaryAdapter extends RecyclerView.Adapter<BeneficiaryAdapter.
     @Override
     public int getItemCount() {
         return mValues.size();
+    }
+
+    public void filter(String charText) {
+        charText = charText.toLowerCase(Locale.getDefault());
+        mValues.clear();
+        if (charText.length() == 0) {
+            mValues.addAll(arraylist);
+        } else {
+            for (BeneficiaryDetailsPozo wp : arraylist) {
+                if (wp.getName().toLowerCase(Locale.getDefault()).contains(charText)||wp.getBank().toLowerCase(Locale.getDefault()).contains(charText)||wp.getAccountno().toLowerCase(Locale.getDefault()).contains(charText)) {
+                    mValues.add(wp);
+                }
+            }
+        }
+        notifyDataSetChanged();
     }
 }
 

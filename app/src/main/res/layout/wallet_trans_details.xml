@@ -35,7 +35,7 @@
                 android:layout_weight="500"
                 android:layout_marginLeft="23dp"
                 android:text="@string/p_names"
-                android:textColor="@color/colorPrimaryDark"
+                android:textColor="@color/black"
                 android:textSize="12sp" />
         </LinearLayout>
 
@@ -62,7 +62,7 @@
                 android:layout_weight="500"
                 android:text="@string/p_accountno"
                 android:inputType="textMultiLine"
-                android:textColor="@color/colorPrimaryDark"
+                android:textColor="@color/black"
                 android:textSize="12sp" />
         </LinearLayout>
 
@@ -88,7 +88,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="500"
                 android:text="@string/p_bank"
-                android:textColor="@color/colorPrimaryDark"
+                android:textColor="@color/black"
                 android:textSize="12sp" />
         </LinearLayout>
         <LinearLayout
@@ -113,7 +113,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="500"
                 android:text="@string/p_bank"
-                android:textColor="@color/colorPrimaryDark"
+                android:textColor="@color/black"
                 android:textSize="12sp" />
         </LinearLayout>
         <LinearLayout
@@ -138,7 +138,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="500"
                 android:text="@string/p_bank"
-                android:textColor="@color/colorPrimaryDark"
+                android:textColor="@color/black"
                 android:textSize="12sp" />
         </LinearLayout>
     </LinearLayout>

@@ -17,14 +17,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.XML;
-
-import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
-import java.util.Random;
-
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.interfaces.CustomInterface;
 import com.rapipay.android.agent.interfaces.RequestHandler;
@@ -33,6 +25,14 @@ import com.rapipay.android.agent.utils.BaseCompactActivity;
 import com.rapipay.android.agent.utils.GenerateChecksum;
 import com.rapipay.android.agent.utils.ImageUtils;
 import com.rapipay.android.agent.utils.WebConfig;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.XML;
+
+import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.Random;
 
 public class RegisterUserActivity extends BaseCompactActivity implements RequestHandler, View.OnClickListener, CustomInterface {
     final private static int PERMISSIONS_REQUEST_READ_PHONE_STATE = 0;

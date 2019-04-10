@@ -10,11 +10,6 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.json.JSONObject;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import com.rapipay.android.agent.BuildConfig;
 import com.rapipay.android.agent.Database.RapipayDB;
 import com.rapipay.android.agent.R;
@@ -29,6 +24,11 @@ import com.rapipay.android.agent.utils.MasterClass;
 import com.rapipay.android.agent.utils.RouteClass;
 import com.rapipay.android.agent.utils.WebConfig;
 import com.rapipay.android.agent.view.PinEntryEditText;
+
+import org.json.JSONObject;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class PinActivity extends BaseCompactActivity implements View.OnClickListener, RequestHandler, CustomInterface {
 
@@ -135,7 +135,6 @@ public class PinActivity extends BaseCompactActivity implements View.OnClickList
                         new AsyncPostMethod(WebConfig.NETWORKTRANSFER_URL, acknowledge().toString(), headerData, PinActivity.this,getString(R.string.responseTimeOut)).execute();
                 } else if (object.getString("serviceType").equalsIgnoreCase("UPDATE_DOWNLAOD_DATA_STATUS")) {
                     new AsyncPostMethod(WebConfig.LOGIN_URL, getWLDetails().toString(), headerData, PinActivity.this,getString(R.string.responseTimeOut)).execute();
-
                 } else if (object.getString("serviceType").equalsIgnoreCase("WL_DOMAIN_DETAILS")) {
                     if (object.has("invoiceLogo"))
                         insertImages("invoiceLogo", object);

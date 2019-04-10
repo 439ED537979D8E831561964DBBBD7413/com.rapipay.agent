@@ -63,7 +63,15 @@
                     android:textColor="@color/white"
                     android:textSize="14dp" />
             </LinearLayout>
-
+            <EditText
+                android:id="@+id/search_data"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="left"
+                android:padding="10dp"
+                android:hint="Search Details"
+                android:textColor="@color/colorPrimaryDark"
+                android:visibility="gone" />
             <ListView
                 android:id="@+id/trans_details"
                 android:layout_width="match_parent"

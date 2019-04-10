@@ -12,6 +12,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.barcode.Barcode;
@@ -21,6 +22,7 @@ import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.fragments.AgentKYCFragment;
 import com.rapipay.android.agent.interfaces.VersionListener;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
+
 import java.io.IOException;
 import java.util.ArrayList;
 

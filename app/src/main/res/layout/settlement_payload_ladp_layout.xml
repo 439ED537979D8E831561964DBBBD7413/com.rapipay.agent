@@ -21,7 +21,7 @@
             android:gravity="center"
             android:inputType="textMultiLine"
             android:text="@string/p_accountno"
-            android:textColor="@color/colorPrimaryDark"
+            android:textColor="@color/black"
             android:textSize="10sp" />
         <TextView
             android:id="@+id/bank_account_name"
@@ -31,7 +31,7 @@
             android:gravity="center"
             android:inputType="textMultiLine"
             android:text="@string/p_accountno"
-            android:textColor="@color/colorPrimaryDark"
+            android:textColor="@color/black"
             android:textSize="10sp" />
         <TextView
             android:id="@+id/account_number"
@@ -41,7 +41,7 @@
             android:inputType="textMultiLine"
             android:gravity="center"
             android:text="@string/p_accountno"
-            android:textColor="@color/colorPrimaryDark"
+            android:textColor="@color/black"
             android:textSize="10sp" />
         <TextView
             android:id="@+id/account_status"
@@ -51,7 +51,7 @@
             android:inputType="textMultiLine"
             android:gravity="center"
             android:text="@string/p_accountno"
-            android:textColor="@color/colorPrimaryDark"
+            android:textColor="@color/black"
             android:textSize="10sp" />
         <Button
             android:id="@+id/account_button"
@@ -59,7 +59,7 @@
             android:layout_height="match_parent"
             android:layout_weight="200"
             android:inputType="textMultiLine"
-            android:background="@color/colorPrimaryDark"
+            android:background="@color/black"
             android:text="DEACTIVATE"
             android:textColor="@color/white"
             android:textSize="10sp" />

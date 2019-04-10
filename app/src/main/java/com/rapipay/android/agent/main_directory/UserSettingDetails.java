@@ -6,14 +6,14 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.json.JSONObject;
-
-import me.grantland.widget.AutofitTextView;
-
 import com.rapipay.android.agent.Model.NetworkTransferPozo;
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.interfaces.RequestHandler;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
+
+import org.json.JSONObject;
+
+import me.grantland.widget.AutofitTextView;
 
 public class UserSettingDetails extends BaseCompactActivity implements RequestHandler, View.OnClickListener {
 

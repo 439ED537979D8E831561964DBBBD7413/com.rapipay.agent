@@ -3,23 +3,17 @@ package com.rapipay.android.agent.adapter;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Parcelable;
 import android.support.v4.view.PagerAdapter;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
-
-import java.util.ArrayList;
-import java.util.NoSuchElementException;
 
 import com.rapipay.android.agent.Model.HeaderePozo;
 import com.rapipay.android.agent.R;
+
+import java.util.ArrayList;
 
 public class SlidingImage_Adapter extends PagerAdapter {
 

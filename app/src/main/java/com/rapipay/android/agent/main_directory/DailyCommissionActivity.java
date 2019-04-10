@@ -6,9 +6,6 @@ import android.view.View;
 import android.widget.AbsListView;
 import android.widget.ListView;
 import android.widget.TextView;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import java.util.ArrayList;
 
 import com.rapipay.android.agent.Model.CommissionPozo;
 import com.rapipay.android.agent.R;
@@ -19,6 +16,11 @@ import com.rapipay.android.agent.utils.BaseCompactActivity;
 import com.rapipay.android.agent.utils.GenerateChecksum;
 import com.rapipay.android.agent.utils.ImageUtils;
 import com.rapipay.android.agent.utils.WebConfig;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 public class DailyCommissionActivity extends BaseCompactActivity implements RequestHandler,View.OnClickListener {
 

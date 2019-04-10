@@ -11,11 +11,6 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-
 import com.rapipay.android.agent.Model.NetworkManagePozo;
 import com.rapipay.android.agent.Model.NetworkTransferPozo;
 import com.rapipay.android.agent.R;
@@ -28,8 +23,12 @@ import com.rapipay.android.agent.utils.GenerateChecksum;
 import com.rapipay.android.agent.utils.ImageUtils;
 import com.rapipay.android.agent.utils.WebConfig;
 
-public class
-NetworkTransferActivity extends BaseCompactActivity implements RequestHandler, View.OnClickListener, CustomInterface {
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+
+public class NetworkTransferActivity extends BaseCompactActivity implements RequestHandler, View.OnClickListener, CustomInterface {
 
     private int first = 1, last = 25;
     private boolean isLoading;
@@ -56,7 +55,7 @@ NetworkTransferActivity extends BaseCompactActivity implements RequestHandler, V
 
     private void loadApi() {
         logList.add(new NetworkManagePozo(list.get(0).getMobilno(), list.get(0).getMobilno()));
-        new AsyncPostMethod(WebConfig.CommonReport, getNetwork_Validate("GET_MY_NODE_DETAILS", list.get(0).getMobilno(), first, last).toString(), headerData, NetworkTransferActivity.this,getString(R.string.responseTimeOut),"GETNODEDETAILS").execute();
+        new AsyncPostMethod(WebConfig.CommonReport, getNetwork_Validate("GET_MY_NODE_DETAILS", list.get(0).getMobilno(), first, last).toString(), headerData, NetworkTransferActivity.this, getString(R.string.responseTimeOut), "GETNODEDETAILS").execute();
     }
 
     private void initialize() {
@@ -92,7 +91,7 @@ NetworkTransferActivity extends BaseCompactActivity implements RequestHandler, V
                 if (totalItemCount != 0 && totalItemCount == last && lastInScreen == totalItemCount && !isLoading) {
                     first = last + 1;
                     last += 25;
-                    new AsyncPostMethod(WebConfig.CommonReport, getNetwork_Validate("GET_MY_NODE_DETAILS", list.get(0).getMobilno(), first, last).toString(), headerData, NetworkTransferActivity.this,getString(R.string.responseTimeOut),"GETNODEDETAILS").execute();
+                    new AsyncPostMethod(WebConfig.CommonReport, getNetwork_Validate("GET_MY_NODE_DETAILS", list.get(0).getMobilno(), first, last).toString(), headerData, NetworkTransferActivity.this, getString(R.string.responseTimeOut), "GETNODEDETAILS").execute();
                     isLoading = true;
                 }
             }
@@ -180,6 +179,12 @@ NetworkTransferActivity extends BaseCompactActivity implements RequestHandler, V
         finish();
     }
 
+    private void serviceActivity(NetworkTransferPozo pozo) {
+        Intent intent = new Intent(NetworkTransferActivity.this, GetAllServicesActivity.class);
+        intent.putExtra("OBJECT", pozo);
+        startActivity(intent);
+    }
+
     private void reDirect_Activity(NetworkTransferPozo pozo) {
         Intent intent = new Intent(NetworkTransferActivity.this, UserSettingDetails.class);
         intent.putExtra("OBJECT", pozo);
@@ -195,7 +200,7 @@ NetworkTransferActivity extends BaseCompactActivity implements RequestHandler, V
                 break;
             case R.id.back_clicked:
                 if (logList.size() != 0) {
-                    new AsyncPostMethod(WebConfig.CommonReport, getNetwork_Validate("GET_MY_NODE_DETAILS", logList.get(logList.size() - 2).getBackMaintain(), first, last).toString(), headerData, NetworkTransferActivity.this,getString(R.string.responseTimeOut),"GETNODEDETAILS").execute();
+                    new AsyncPostMethod(WebConfig.CommonReport, getNetwork_Validate("GET_MY_NODE_DETAILS", logList.get(logList.size() - 2).getBackMaintain(), first, last).toString(), headerData, NetworkTransferActivity.this, getString(R.string.responseTimeOut), "GETNODEDETAILS").execute();
                     logList.remove(logList.size() - 1);
                     if (logList.size() == 1)
                         back_click.setVisibility(View.GONE);
@@ -213,8 +218,10 @@ NetworkTransferActivity extends BaseCompactActivity implements RequestHandler, V
     public void okClicked(String type, Object ob) {
         if (type.equalsIgnoreCase("NETWORKLAYOUT"))
             reDirect_Activity((NetworkTransferPozo) ob);
-        else  if (type.equalsIgnoreCase("SESSIONEXPIRE"))
+        else if (type.equalsIgnoreCase("SESSIONEXPIRE"))
             jumpPage();
+//        else if (type.equalsIgnoreCase("DETAILS"))
+//            serviceActivity((NetworkTransferPozo) ob);
     }
 
     @Override
@@ -222,7 +229,7 @@ NetworkTransferActivity extends BaseCompactActivity implements RequestHandler, V
         if (type.equalsIgnoreCase("NETWORKLAYOUT")) {
             NetworkTransferPozo pozo = (NetworkTransferPozo) ob;
             back_click.setVisibility(View.VISIBLE);
-            new AsyncPostMethod(WebConfig.CommonReport, getNetwork_Validate("GET_MY_NODE_DETAILS", pozo.getMobileNo(), first, last).toString(), headerData, NetworkTransferActivity.this,getString(R.string.responseTimeOut),"GETNODEDETAILS").execute();
+            new AsyncPostMethod(WebConfig.CommonReport, getNetwork_Validate("GET_MY_NODE_DETAILS", pozo.getMobileNo(), first, last).toString(), headerData, NetworkTransferActivity.this, getString(R.string.responseTimeOut), "GETNODEDETAILS").execute();
         }
     }
 }

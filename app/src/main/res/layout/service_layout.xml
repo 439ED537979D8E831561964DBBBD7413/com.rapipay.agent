@@ -25,7 +25,7 @@
             android:layout_weight="570"
             android:onClick="onClick"
             android:text="@string/p_names"
-            android:textColor="@color/colorPrimaryDark"
+            android:textColor="@color/black"
             android:textSize="12sp" />
     </LinearLayout>
 

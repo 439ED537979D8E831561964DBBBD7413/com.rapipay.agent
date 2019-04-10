@@ -7,13 +7,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.rapipay.android.agent.Model.CreditHistoryPozo;
+import com.rapipay.android.agent.R;
+
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Locale;
 
 import me.grantland.widget.AutofitTextView;
-import com.rapipay.android.agent.Model.CreditHistoryPozo;
-import com.rapipay.android.agent.R;
 
 public class CreditHistoryAdapter extends RecyclerView.Adapter<CreditHistoryAdapter.ViewHolder> {
 

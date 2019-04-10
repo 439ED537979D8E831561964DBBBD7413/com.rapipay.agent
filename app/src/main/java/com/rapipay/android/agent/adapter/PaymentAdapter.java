@@ -7,10 +7,10 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-
 import com.rapipay.android.agent.Model.PaymentModePozo;
 import com.rapipay.android.agent.R;
+
+import java.util.ArrayList;
 
 public class PaymentAdapter extends BaseAdapter {
     Context context;

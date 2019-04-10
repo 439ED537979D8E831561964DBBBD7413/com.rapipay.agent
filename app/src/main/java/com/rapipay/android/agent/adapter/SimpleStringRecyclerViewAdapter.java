@@ -8,11 +8,12 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import com.rapipay.android.agent.Model.ImagePozo;
+import com.rapipay.android.agent.R;
+
 import java.util.ArrayList;
 
 import me.grantland.widget.AutofitTextView;
-import com.rapipay.android.agent.Model.ImagePozo;
-import com.rapipay.android.agent.R;
 
 public class SimpleStringRecyclerViewAdapter extends RecyclerView.Adapter<SimpleStringRecyclerViewAdapter.ViewHolder> {
 

@@ -60,7 +60,7 @@
                 android:gravity="left"
                 android:padding="5dp"
                 android:text="@string/app_name"
-                android:textColor="@color/colorPrimaryDark"
+                android:textColor="@color/black"
                 android:textSize="18dp"
                 android:visibility="gone" />
 
@@ -145,7 +145,7 @@
                             android:layout_weight="570"
                             android:onClick="onClick"
                             android:text="@string/p_accountno"
-                            android:textColor="@color/colorPrimaryDark"
+                            android:textColor="@color/black"
                             android:textSize="12sp" />
                     </LinearLayout>
 
@@ -171,7 +171,7 @@
                             android:layout_weight="570"
                             android:onClick="onClick"
                             android:text="@string/p_names"
-                            android:textColor="@color/colorPrimaryDark"
+                            android:textColor="@color/black"
                             android:textSize="12sp" />
                     </LinearLayout>
 
@@ -197,7 +197,7 @@
                             android:layout_weight="570"
                             android:onClick="onClick"
                             android:text="@string/p_bank"
-                            android:textColor="@color/colorPrimaryDark"
+                            android:textColor="@color/black"
                             android:textSize="12sp" />
                     </LinearLayout>
                 </LinearLayout>
@@ -294,7 +294,7 @@
                         android:maxLines="1"
                         android:singleLine="true"
                         android:text="@string/p_transid"
-                        android:textColor="@color/colorPrimaryDark"
+                        android:textColor="@color/black"
                         android:textSize="12sp"
                         autofit:minTextSize="8sp" />
                 </LinearLayout>
@@ -314,7 +314,7 @@
                         android:maxLines="1"
                         android:singleLine="true"
                         android:text="@string/p_accountno"
-                        android:textColor="@color/colorPrimaryDark"
+                        android:textColor="@color/black"
                         android:textSize="12sp"
                         autofit:minTextSize="8sp" />
                 </LinearLayout>
@@ -334,7 +334,7 @@
                         android:maxLines="1"
                         android:singleLine="true"
                         android:text="@string/agentBalance"
-                        android:textColor="@color/colorPrimaryDark"
+                        android:textColor="@color/black"
                         android:textSize="12sp"
                         autofit:minTextSize="8sp" />
                 </LinearLayout>
@@ -384,7 +384,7 @@
                         android:layout_weight="570"
                         android:onClick="onClick"
                         android:text="@string/p_names"
-                        android:textColor="@color/colorPrimaryDark"
+                        android:textColor="@color/black"
                         android:textSize="12sp" />
                 </LinearLayout>
 
@@ -410,7 +410,7 @@
                         android:layout_weight="570"
                         android:onClick="onClick"
                         android:text="@string/p_names"
-                        android:textColor="@color/colorPrimaryDark"
+                        android:textColor="@color/black"
                         android:textSize="12sp" />
                 </LinearLayout>
 
@@ -437,7 +437,7 @@
                         android:layout_weight="570"
                         android:onClick="onClick"
                         android:text="@string/p_bank"
-                        android:textColor="@color/colorPrimaryDark"
+                        android:textColor="@color/black"
                         android:textSize="12sp" />
                 </LinearLayout>
 
@@ -464,7 +464,7 @@
                         android:layout_weight="570"
                         android:onClick="onClick"
                         android:text="@string/p_accountno"
-                        android:textColor="@color/colorPrimaryDark"
+                        android:textColor="@color/black"
                         android:textSize="12sp" />
                 </LinearLayout>
 
@@ -490,7 +490,7 @@
                         android:layout_weight="570"
                         android:onClick="onClick"
                         android:text="@string/p_bank"
-                        android:textColor="@color/colorPrimaryDark"
+                        android:textColor="@color/black"
                         android:textSize="12sp" />
                 </LinearLayout>
 
@@ -517,7 +517,7 @@
                         android:layout_weight="570"
                         android:onClick="onClick"
                         android:text="@string/p_names"
-                        android:textColor="@color/colorPrimaryDark"
+                        android:textColor="@color/black"
                         android:textSize="12sp" />
                 </LinearLayout>
 
@@ -543,7 +543,7 @@
                         android:layout_weight="570"
                         android:onClick="onClick"
                         android:text="@string/p_accountno"
-                        android:textColor="@color/colorPrimaryDark"
+                        android:textColor="@color/black"
                         android:textSize="12sp" />
                 </LinearLayout>
 
@@ -569,7 +569,7 @@
                         android:layout_weight="570"
                         android:onClick="onClick"
                         android:text="@string/p_bank"
-                        android:textColor="@color/colorPrimaryDark"
+                        android:textColor="@color/black"
                         android:textSize="12sp" />
 
                 </LinearLayout>
@@ -596,18 +596,19 @@
                         android:layout_weight="570"
                         android:onClick="onClick"
                         android:text="@string/p_bank"
-                        android:textColor="@color/colorPrimaryDark"
+                        android:textColor="@color/black"
                         android:textSize="12sp" />
                 </LinearLayout>
-                <EditText
-                    android:id="@+id/newtpin"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Enter TPIN"
-                    android:inputType="number"
-                    android:maxLength="4"
-                    android:textSize="16dp"
-                    android:visibility="gone"/>
+
+                    <EditText
+                        android:id="@+id/newtpin"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Enter TPIN"
+                        android:inputType="number"
+                        android:maxLength="4"
+                        android:textSize="16dp"
+                        android:visibility="gone"/>
             </LinearLayout>
 
             <include

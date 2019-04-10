@@ -12,14 +12,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.Calendar;
-
-import me.grantland.widget.AutofitTextView;
-
 import com.rapipay.android.agent.Database.RapipayDB;
 import com.rapipay.android.agent.Model.RechargePozo;
 import com.rapipay.android.agent.R;
@@ -33,6 +25,14 @@ import com.rapipay.android.agent.utils.GenerateChecksum;
 import com.rapipay.android.agent.utils.ImageUtils;
 import com.rapipay.android.agent.utils.RecyclerTouchListener;
 import com.rapipay.android.agent.utils.WebConfig;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+
+import me.grantland.widget.AutofitTextView;
 
 public class RechargeHistory extends BaseCompactActivity implements View.OnClickListener, RequestHandler, CustomInterface {
 

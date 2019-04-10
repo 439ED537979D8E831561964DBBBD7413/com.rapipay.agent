@@ -49,9 +49,27 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.firebase.analytics.FirebaseAnalytics;
+import com.rapipay.android.agent.Database.RapipayDB;
+import com.rapipay.android.agent.Model.BeneficiaryDetailsPozo;
+import com.rapipay.android.agent.Model.HeaderePozo;
+import com.rapipay.android.agent.Model.ImagePozo;
+import com.rapipay.android.agent.Model.PMTBenefPozo;
+import com.rapipay.android.agent.Model.RapiPayPozo;
+import com.rapipay.android.agent.Model.VersionPozo;
+import com.rapipay.android.agent.R;
+import com.rapipay.android.agent.adapter.BottomAdapter;
+import com.rapipay.android.agent.adapter.CustomSpinnerAdapter;
+import com.rapipay.android.agent.interfaces.CustomInterface;
+import com.rapipay.android.agent.interfaces.VersionListener;
+import com.rapipay.android.agent.main_directory.CameraKitActivity;
+import com.rapipay.android.agent.main_directory.LoginScreenActivity;
+import com.rapipay.android.agent.main_directory.MainActivity;
+import com.rapipay.android.agent.main_directory.PinVerification;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -75,38 +93,16 @@ import java.util.Locale;
 
 import me.grantland.widget.AutofitTextView;
 
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.firebase.analytics.FirebaseAnalytics;
-import com.rapipay.android.agent.Database.RapipayDB;
-import com.rapipay.android.agent.Model.BeneficiaryDetailsPozo;
-import com.rapipay.android.agent.Model.HeaderePozo;
-import com.rapipay.android.agent.Model.ImagePozo;
-import com.rapipay.android.agent.Model.PMTBenefPozo;
-import com.rapipay.android.agent.Model.RapiPayPozo;
-import com.rapipay.android.agent.Model.VersionPozo;
-import com.rapipay.android.agent.R;
-import com.rapipay.android.agent.adapter.BottomAdapter;
-import com.rapipay.android.agent.adapter.CustomSpinnerAdapter;
-import com.rapipay.android.agent.interfaces.CustomInterface;
-import com.rapipay.android.agent.interfaces.VersionListener;
-import com.rapipay.android.agent.main_directory.CameraKitActivity;
-import com.rapipay.android.agent.main_directory.LoginScreenActivity;
-import com.rapipay.android.agent.main_directory.MainActivity;
-import com.rapipay.android.agent.main_directory.PinVerification;
-
 public class BaseCompactActivity extends AppCompatActivity {
     protected GoogleApiClient googleApiClient;
     protected final static int REQUEST_CHECK_SETTINGS_GPS = 0x5;
     protected final static int REQUEST_ID_MULTIPLE_PERMISSIONS = 0x2;
     protected String imei;
     protected Location mylocation;
-    protected EditText newtpin;
-    protected static String ENABLE_TPIN = null;
     protected ImageView delete_all;
     protected ArrayList<VersionPozo> versionPozoArrayList;
     protected AutofitTextView date2_text, date1_text;
     protected FirebaseAnalytics mFirebaseAnalytics;
-    public static String IS_CRIMAGE_REQUIRED = null;
     protected static String balance = null;
     protected static final int CONTACT_PICKER_RESULT = 1;
     protected TextView heading;
@@ -132,6 +128,8 @@ public class BaseCompactActivity extends AppCompatActivity {
     protected String transactionIDAEPS;
     protected PowerManager mPowerManager;
     protected PowerManager.WakeLock mWakeLock;
+    public static String ENABLE_TPIN = null;
+    public static String IS_CRIMAGE_REQUIRED = null;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -143,7 +141,42 @@ public class BaseCompactActivity extends AppCompatActivity {
         if (db != null && db.getDetails_Rapi())
             list = db.getDetails();
     }
+    public boolean printDifference(Date startDate,Date endDate) {
+        //milliseconds
+        try {
+//            Calendar c = Calendar.getInstance();
+//            System.out.println("Current time => " + c.getTime());
+//
+//            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+//            Date endDate = mainDate(df.format(c.getTime()));
 
+            long different = endDate.getTime() - startDate.getTime();
+
+            System.out.println("startDate : " + startDate);
+            System.out.println("endDate : " + endDate);
+            System.out.println("different : " + different);
+
+            long secondsInMilli = 1000;
+            long minutesInMilli = secondsInMilli * 60;
+            long hoursInMilli = minutesInMilli * 60;
+            long daysInMilli = hoursInMilli * 24;
+
+            long elapsedDays = different / daysInMilli;
+            different = different % daysInMilli;
+            long elapsedHours = different / hoursInMilli;
+            different = different % hoursInMilli;
+
+            long elapsedMinutes = different / minutesInMilli;
+            different = different % minutesInMilli;
+
+            long elapsedSeconds = different / secondsInMilli;
+            if (elapsedDays>= 0)
+                return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
     protected void loadImageFromStorage(String name, ImageView view, String path) {
         try {
             File f = new File(path, name);
@@ -318,6 +351,7 @@ public class BaseCompactActivity extends AppCompatActivity {
         TextView text = (TextView) alertLayout.findViewById(R.id.dialog_title);
         TextView dialog_cancel = (TextView) alertLayout.findViewById(R.id.dialog_cancel);
         text.setText(msg);
+        AppCompatButton btn_regenerate = (AppCompatButton)alertLayout.findViewById(R.id.btn_regenerate);
         AppCompatButton btn_cancel = (AppCompatButton) alertLayout.findViewById(R.id.btn_cancel);
         AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
         if (type.equalsIgnoreCase("NETWORKLAYOUT")) {
@@ -325,11 +359,26 @@ public class BaseCompactActivity extends AppCompatActivity {
             btn_cancel.setTextSize(10);
             btn_ok.setText("Network Setting");
             btn_ok.setTextSize(10);
+            btn_regenerate.setText("Details");
+            btn_regenerate.setTextSize(10);
+            btn_regenerate.setVisibility(View.VISIBLE);
+            dialog_cancel.setVisibility(View.VISIBLE);
+            dialog.setView(alertLayout);
+        }
+        if (type.equalsIgnoreCase("KYCNEWLAYOUT")) {
+            btn_cancel.setTextSize(10);
+            btn_ok.setText("Update KYC!");
+            btn_ok.setTextSize(10);
             dialog_cancel.setVisibility(View.VISIBLE);
             dialog.setView(alertLayout);
         }
         try {
             if (type.equalsIgnoreCase("KYCLAYOUT") || type.equalsIgnoreCase("PENDINGREFUND") || type.equalsIgnoreCase("REFUNDTXN") || type.equalsIgnoreCase("SESSIONEXPIRRED") || type.equalsIgnoreCase("PENDINGLAYOUT")) {
+                customView(alertLayout, output);
+            }else if (type.equalsIgnoreCase("KYCNEWLAYOUT")) {
+                customView(alertLayout, output);
+            }else if (type.equalsIgnoreCase("KYCEWLAYOUT")) {
+                btn_cancel.setVisibility(View.GONE);
                 customView(alertLayout, output);
             } else if (type.equalsIgnoreCase("KYCLAYOUTS") || type.equalsIgnoreCase("KYCLAYOUTSS") || type.equalsIgnoreCase("LOGOUT") || type.equalsIgnoreCase("SESSIONEXPIRE")) {
                 btn_cancel.setVisibility(View.GONE);
@@ -387,6 +436,14 @@ public class BaseCompactActivity extends AppCompatActivity {
                 alertDialog.dismiss();
             }
         });
+        btn_regenerate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (type.equalsIgnoreCase("NETWORKLAYOUT"))
+                    anInterface.okClicked("DETAILS", ob);
+                alertDialog.dismiss();
+            }
+        });
         dialog_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -395,6 +452,7 @@ public class BaseCompactActivity extends AppCompatActivity {
         });
         alertDialog = dialog.show();
     }
+
 
     protected void return_Page() {
         Intent intent = new Intent(BaseCompactActivity.this, PinVerification.class);
@@ -409,7 +467,7 @@ public class BaseCompactActivity extends AppCompatActivity {
             return "";
         }
     }
-
+    protected EditText newtpin;
     protected void serviceFee(View alertLayout, JSONObject object, BeneficiaryDetailsPozo pozo, String msg, String input) throws Exception {
         TextView btn_name = (TextView) alertLayout.findViewById(R.id.btn_name_service);
         TextView btn_servicefee = (TextView) alertLayout.findViewById(R.id.btn_servicefee);
@@ -445,7 +503,7 @@ public class BaseCompactActivity extends AppCompatActivity {
         else
             btn_name.setText("NA");
         newtpin = (EditText)alertLayout.findViewById(R.id.newtpin);
-        if(BaseCompactActivity.ENABLE_TPIN!=null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y"))
+        if(BaseCompactActivity.ENABLE_TPIN !=null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y"))
             newtpin.setVisibility(View.VISIBLE);
         dialog.setView(alertLayout);
     }
@@ -514,7 +572,7 @@ public class BaseCompactActivity extends AppCompatActivity {
         if (name != null)
             btn_name.setText(name);
         newtpin = (EditText)alertLayout.findViewById(R.id.newtpin);
-        if(BaseCompactActivity.ENABLE_TPIN!=null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y"))
+        if(BaseCompactActivity.ENABLE_TPIN !=null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y"))
             newtpin.setVisibility(View.VISIBLE);
         dialog.setView(alertLayout);
     }
@@ -1010,9 +1068,6 @@ public class BaseCompactActivity extends AppCompatActivity {
         main_layout.buildDrawingCache(true);
         TextView text = (TextView) alertLayout.findViewById(R.id.agent_name);
         TextView custom_name = (TextView) alertLayout.findViewById(R.id.custom_name);
-        RelativeLayout amount_layout = (RelativeLayout)alertLayout.findViewById(R.id.amount_layout);
-        if(amount.equalsIgnoreCase("MATM_BALANCE_ENQ") || amount.equalsIgnoreCase("AEPS_BALANCE_ENQ"))
-            amount_layout.setVisibility(View.GONE);
         TextView amounts = (TextView) alertLayout.findViewById(R.id.amount);
         amounts.setText("Rs  " + amount);
         custom_name.setText(name);
@@ -1081,7 +1136,7 @@ public class BaseCompactActivity extends AppCompatActivity {
                     fo.flush();
                     fo.close();
                     f.setReadable(true, false);
-                    final Intent intent = new Intent(android.content.Intent.ACTION_SEND);
+                    final Intent intent = new Intent(Intent.ACTION_SEND);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
                     Uri apkURI = FileProvider.getUriForFile(
@@ -1168,7 +1223,7 @@ public class BaseCompactActivity extends AppCompatActivity {
         if (left.size() != 0) {
             for (int k = 0; k < left.size(); k++) {
                 View inflate = inflater.inflate(R.layout.receipt_list, null);
-                AutofitTextView recycler_text = (AutofitTextView) inflate.findViewById(R.id.recycler_text);
+                TextView recycler_text = (TextView) inflate.findViewById(R.id.recycler_text);
                 if (k == 1)
                     recycler_text.setTypeface(recycler_text.getTypeface(), Typeface.BOLD);
                 recycler_text.setText(left.get(k));
@@ -1178,7 +1233,7 @@ public class BaseCompactActivity extends AppCompatActivity {
         if (right.size() != 0) {
             for (int j = 0; j < right.size(); j++) {
                 View inflate = inflater.inflate(R.layout.receipt_list, null);
-                AutofitTextView recycler_text = (AutofitTextView) inflate.findViewById(R.id.recycler_text);
+                TextView recycler_text = (TextView) inflate.findViewById(R.id.recycler_text);
                 if (j == 1)
                     recycler_text.setTypeface(recycler_text.getTypeface(), Typeface.BOLD);
                 recycler_text.setText(right.get(j));
@@ -1235,7 +1290,7 @@ public class BaseCompactActivity extends AppCompatActivity {
                     fo.flush();
                     fo.close();
                     f.setReadable(true, false);
-                    final Intent intent = new Intent(android.content.Intent.ACTION_SEND);
+                    final Intent intent = new Intent(Intent.ACTION_SEND);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
                     Uri apkURI = FileProvider.getUriForFile(
@@ -1330,7 +1385,7 @@ public class BaseCompactActivity extends AppCompatActivity {
         if (left.size() != 0) {
             for (int k = 0; k < left.size(); k++) {
                 View inflate = inflater.inflate(R.layout.receipt_list, null);
-                AutofitTextView recycler_text = (AutofitTextView) inflate.findViewById(R.id.recycler_text);
+                TextView recycler_text = (TextView) inflate.findViewById(R.id.recycler_text);
                 if (k == 1)
                     recycler_text.setTypeface(recycler_text.getTypeface(), Typeface.BOLD);
                 recycler_text.setText(left.get(k));
@@ -1340,7 +1395,7 @@ public class BaseCompactActivity extends AppCompatActivity {
         if (right.size() != 0) {
             for (int j = 0; j < right.size(); j++) {
                 View inflate = inflater.inflate(R.layout.receipt_list, null);
-                AutofitTextView recycler_text = (AutofitTextView) inflate.findViewById(R.id.recycler_text);
+                TextView recycler_text = (TextView) inflate.findViewById(R.id.recycler_text);
                 if (j == 1)
                     recycler_text.setTypeface(recycler_text.getTypeface(), Typeface.BOLD);
                 recycler_text.setText(right.get(j));
@@ -1403,7 +1458,7 @@ public class BaseCompactActivity extends AppCompatActivity {
                     fo.flush();
                     fo.close();
                     f.setReadable(true, false);
-                    final Intent intent = new Intent(android.content.Intent.ACTION_SEND);
+                    final Intent intent = new Intent(Intent.ACTION_SEND);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
                     Uri apkURI = FileProvider.getUriForFile(
@@ -1466,8 +1521,8 @@ public class BaseCompactActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
+    protected void onStop() {
+        super.onStop();
         if (isRegister) {
             unregisterReceiver(mIntentReceiver);
             isRegister = false;
@@ -1591,7 +1646,7 @@ public class BaseCompactActivity extends AppCompatActivity {
     private void doCameraPermissionGrantedStuffs() {
         if (ActivityCompat.checkSelfPermission(BaseCompactActivity.this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
             if (TYPE.equalsIgnoreCase("internal")) {
-                if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
                     selectPhotoCustomer();
                 } else {
                     selectPhotoAgent();
@@ -1698,42 +1753,7 @@ public class BaseCompactActivity extends AppCompatActivity {
         }
         return Bitmap.createScaledBitmap(image, width, height, true);
     }
-    public boolean printDifference(Date startDate,Date endDate) {
-        //milliseconds
-        try {
-//            Calendar c = Calendar.getInstance();
-//            System.out.println("Current time => " + c.getTime());
-//
-//            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-//            Date endDate = mainDate(df.format(c.getTime()));
 
-            long different = endDate.getTime() - startDate.getTime();
-
-            System.out.println("startDate : " + startDate);
-            System.out.println("endDate : " + endDate);
-            System.out.println("different : " + different);
-
-            long secondsInMilli = 1000;
-            long minutesInMilli = secondsInMilli * 60;
-            long hoursInMilli = minutesInMilli * 60;
-            long daysInMilli = hoursInMilli * 24;
-
-            long elapsedDays = different / daysInMilli;
-            different = different % daysInMilli;
-            long elapsedHours = different / hoursInMilli;
-            different = different % hoursInMilli;
-
-            long elapsedMinutes = different / minutesInMilli;
-            different = different % minutesInMilli;
-
-            long elapsedSeconds = different / secondsInMilli;
-            if (elapsedDays>= 0)
-                return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
     public boolean printDifference(Date startDate) {
         //milliseconds
         try {
@@ -1834,7 +1854,7 @@ public class BaseCompactActivity extends AppCompatActivity {
 //                    intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
 //                    startActivityForResult(intent, id1);
                 } else if (items[item].equals("Choose from Gallery")) {
-                    Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                     intent.setType("image/*");
                     startActivityForResult(Intent.createChooser(intent, "Select File"), id2);
                 } else if (items[item].equals("Cancel")) {

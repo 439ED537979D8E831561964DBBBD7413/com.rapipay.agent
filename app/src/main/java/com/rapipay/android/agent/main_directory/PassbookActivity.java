@@ -9,15 +9,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Locale;
-
-import me.grantland.widget.AutofitTextView;
 import com.rapipay.android.agent.Model.PassbookPozo;
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.adapter.PassbookAdapter;
@@ -27,6 +18,16 @@ import com.rapipay.android.agent.utils.BaseCompactActivity;
 import com.rapipay.android.agent.utils.GenerateChecksum;
 import com.rapipay.android.agent.utils.ImageUtils;
 import com.rapipay.android.agent.utils.WebConfig;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Locale;
+
+import me.grantland.widget.AutofitTextView;
 
 public class PassbookActivity extends BaseCompactActivity implements View.OnClickListener, RequestHandler {
 
@@ -41,6 +42,7 @@ public class PassbookActivity extends BaseCompactActivity implements View.OnClic
     }
 
     private void initialize() {
+        TYPE = getIntent().getStringExtra("TYPE");
         Calendar calendar = Calendar.getInstance();
         selectedDate = calendar.get(Calendar.DAY_OF_MONTH);
         selectedMonth = calendar.get(Calendar.MONTH)+1;
@@ -49,8 +51,6 @@ public class PassbookActivity extends BaseCompactActivity implements View.OnClic
         heading.setText("Agent Ledger History");
         date2_text = (AutofitTextView) findViewById(R.id.date2);
         date1_text = (AutofitTextView) findViewById(R.id.date1);
-        date2_text.setText(selectedYear + "-" + selectedMonth + "-" + selectedDate);
-        date1_text.setText(selectedYear + "-" + selectedMonth + "-" + selectedDate);
         trans_details = (RecyclerView) findViewById(R.id.trans_details);
         findViewById(R.id.todate).setOnClickListener(toDateClicked);
         findViewById(R.id.date1).setOnClickListener(toDateClicked);
@@ -62,6 +62,15 @@ public class PassbookActivity extends BaseCompactActivity implements View.OnClic
         fromimage = (ImageView)findViewById(R.id.fromimage);
         fromimage.setOnClickListener(fromDateClicked);
         fromimage.setColorFilter(getResources().getColor(R.color.colorPrimaryDark));
+        if (TYPE.equalsIgnoreCase("NODE")) {
+            date2_text.setText(selectedYear + "-" + selectedMonth + "-" + "01");
+            date1_text.setText(selectedYear + "-" + selectedMonth + "-" + selectedDate);
+            if (printDifference(mainDate(date2_text.getText().toString()), mainDate(date1_text.getText().toString())))
+                new AsyncPostMethod(WebConfig.CommonReport, channel_request(0, 5).toString(), headerData, PassbookActivity.this, getString(R.string.responseTimeOut)).execute();
+        }else {
+            date2_text.setText(selectedYear + "-" + selectedMonth + "-" + selectedDate);
+            date1_text.setText(selectedYear + "-" + selectedMonth + "-" + selectedDate);
+        }
     }
     @Override
     public void onClick(View v) {

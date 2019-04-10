@@ -11,6 +11,7 @@ import com.rapipay.android.agent.Model.PendingKYCPozo;
 import com.rapipay.android.agent.R;
 
 import java.util.ArrayList;
+
 public class PendingKYCAdapter extends ArrayAdapter<PendingKYCPozo> {
 
     private ArrayList<PendingKYCPozo> mValues;
@@ -20,7 +21,7 @@ public class PendingKYCAdapter extends ArrayAdapter<PendingKYCPozo> {
         public TextView btn_p_bank,btn_name,p_transid,btn_p_amounts,remark,status,createdon;
     }
 
-    public PendingKYCAdapter(ArrayList<PendingKYCPozo> items,Context context) {
+    public PendingKYCAdapter(ArrayList<PendingKYCPozo> items, Context context) {
         super(context, R.layout.pending_layut_adapter, items);
         mValues = items;
         this.context = context;

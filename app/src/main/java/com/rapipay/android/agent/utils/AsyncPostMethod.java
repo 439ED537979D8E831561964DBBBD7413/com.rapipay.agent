@@ -11,12 +11,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 
-import org.json.JSONObject;
-
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.interfaces.RequestHandler;
 import com.rapipay.android.agent.main_directory.MainActivity;
 import com.rapipay.android.agent.main_directory.PinVerification;
+
+import org.json.JSONObject;
 
 public class AsyncPostMethod extends AsyncTask<String, String, String> {
     String url, xmlData, strHeaderData;
@@ -50,13 +50,24 @@ public class AsyncPostMethod extends AsyncTask<String, String, String> {
         dialog = new CustomProgessDialog(handler);
     }
 
-    public AsyncPostMethod(String url, String xmlData, String strHeaderData, RequestHandler handler, Context context,String responseData) {
+    public AsyncPostMethod(String url, String xmlData, String strHeaderData, RequestHandler handler, Context context, String responseData) {
         this.url = url;
         this.xmlData = xmlData;
         this.strHeaderData = strHeaderData;
         this.handler = handler;
         this.context = context;
         this.responseData = responseData;
+        customDialog("Please Wait...");
+        dialog = new CustomProgessDialog(context);
+    }
+    public AsyncPostMethod(String url, String xmlData, String strHeaderData, RequestHandler handler, Context context, String responseData, String hitFrom) {
+        this.url = url;
+        this.xmlData = xmlData;
+        this.strHeaderData = strHeaderData;
+        this.handler = handler;
+        this.context = context;
+        this.responseData = responseData;
+        this.hitFrom = hitFrom;
         customDialog("Please Wait...");
         dialog = new CustomProgessDialog(context);
     }
@@ -88,8 +99,8 @@ public class AsyncPostMethod extends AsyncTask<String, String, String> {
     @Override
     protected void onPostExecute(String s) {
         super.onPostExecute(s);
+        alertDialog1.dismiss();
         try {
-            alertDialog1.dismiss();
             if (hitFrom!=null && hitFrom.equalsIgnoreCase("AEPS-MATM")) {
                 handler.chechStat(hitFrom);
             } else if (s != null) {
@@ -98,7 +109,7 @@ public class AsyncPostMethod extends AsyncTask<String, String, String> {
                 } else if (!s.equalsIgnoreCase("false")) {
                     JSONObject object = new JSONObject(s);
                     if (object.has("responseCode")) {
-                        if (object.getString("responseCode").equalsIgnoreCase("1032") || object.getString("responseCode").equalsIgnoreCase("86004") || object.getString("responseCode").equalsIgnoreCase("60236") || object.getString("responseCode").equalsIgnoreCase("200") || object.getString("responseCode").equalsIgnoreCase("300") || object.getString("responseCode").equalsIgnoreCase("101") || object.getString("responseCode").equalsIgnoreCase("75077") || object.getString("responseCode").equalsIgnoreCase("75115") || object.getString("responseCode").equalsIgnoreCase("75062") || object.getString("responseCode").equalsIgnoreCase("75061") || object.getString("responseCode").equalsIgnoreCase("75063") || object.getString("responseCode").equalsIgnoreCase("60116") || object.getString("responseCode").equalsIgnoreCase("86001") || object.getString("responseCode").equalsIgnoreCase("86002")) {
+                        if (object.getString("responseCode").equalsIgnoreCase("201")||object.getString("responseCode").equalsIgnoreCase("1032") || object.getString("responseCode").equalsIgnoreCase("86004") || object.getString("responseCode").equalsIgnoreCase("60236") || object.getString("responseCode").equalsIgnoreCase("200") || object.getString("responseCode").equalsIgnoreCase("300") || object.getString("responseCode").equalsIgnoreCase("101") || object.getString("responseCode").equalsIgnoreCase("75077") || object.getString("responseCode").equalsIgnoreCase("75115") || object.getString("responseCode").equalsIgnoreCase("75062") || object.getString("responseCode").equalsIgnoreCase("75061") || object.getString("responseCode").equalsIgnoreCase("75063") || object.getString("responseCode").equalsIgnoreCase("60116") || object.getString("responseCode").equalsIgnoreCase("86001") || object.getString("responseCode").equalsIgnoreCase("86002")) {
                             handler.chechStatus(object);
                             if (object.has("apiCommonResposne")) {
                                 JSONObject object1 = object.getJSONObject("apiCommonResposne");
@@ -126,7 +137,7 @@ public class AsyncPostMethod extends AsyncTask<String, String, String> {
                                 responseMSg(object);
                         }
                     } else if (object.has("responsecode")) {
-                        if (object.getString("responsecode").equalsIgnoreCase("200") || object.getString("responsecode").equalsIgnoreCase("101") || object.getString("responsecode").equalsIgnoreCase("300") || object.getString("responsecode").equalsIgnoreCase("75077") || object.getString("responsecode").equalsIgnoreCase("75115") || object.getString("responsecode").equalsIgnoreCase("75062") || object.getString("responsecode").equalsIgnoreCase("75061") || object.getString("responsecode").equalsIgnoreCase("60116") || object.getString("responsecode").equalsIgnoreCase("75063") || object.getString("responsecode").equalsIgnoreCase("86001") || object.getString("responsecode").equalsIgnoreCase("86002")) {
+                        if (object.getString("responsecode").equalsIgnoreCase("201")||object.getString("responsecode").equalsIgnoreCase("200") || object.getString("responsecode").equalsIgnoreCase("101") || object.getString("responsecode").equalsIgnoreCase("300") || object.getString("responsecode").equalsIgnoreCase("75077") || object.getString("responsecode").equalsIgnoreCase("75115") || object.getString("responsecode").equalsIgnoreCase("75062") || object.getString("responsecode").equalsIgnoreCase("75061") || object.getString("responsecode").equalsIgnoreCase("60116") || object.getString("responsecode").equalsIgnoreCase("75063") || object.getString("responsecode").equalsIgnoreCase("86001") || object.getString("responsecode").equalsIgnoreCase("86002")) {
                             handler.chechStatus(object);
                             if (object.has("apiCommonResposne")) {
                                 JSONObject object1 = object.getJSONObject("apiCommonResposne");
@@ -196,6 +207,7 @@ public class AsyncPostMethod extends AsyncTask<String, String, String> {
             e.printStackTrace();
         }
     }
+
     protected void customDialog(String msg) {
         try {
             AlertDialog.Builder dialog = new AlertDialog.Builder(context);
@@ -216,6 +228,8 @@ public class AsyncPostMethod extends AsyncTask<String, String, String> {
             e.printStackTrace();
         }
     }
+
+
     private void responseMSg(JSONObject object) {
         try {
             if (object.has("responseMessage"))

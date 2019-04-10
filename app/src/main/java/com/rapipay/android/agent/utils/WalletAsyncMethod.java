@@ -12,7 +12,6 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.rapipay.android.agent.R;
-import com.rapipay.android.agent.interfaces.RequestHandler;
 import com.rapipay.android.agent.interfaces.WalletRequestHandler;
 import com.rapipay.android.agent.main_directory.MainActivity;
 import com.rapipay.android.agent.main_directory.PinVerification;

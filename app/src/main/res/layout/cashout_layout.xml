@@ -39,14 +39,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:padding="5dp"
-                android:weightSum="800">
+                android:padding="5dp">
 
                 <android.support.design.widget.TextInputLayout
                     android:id="@+id/mobile_top"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="650">
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
 
                     <EditText
                         android:id="@+id/input_mobile"
@@ -58,15 +56,15 @@
                         android:textSize="16dp" />
                 </android.support.design.widget.TextInputLayout>
 
-                <ImageView
-                    android:id="@+id/btn_contact"
-                    android:layout_width="0dp"
-                    android:layout_height="50dp"
-                    android:layout_weight="150"
-                    android:clickable="true"
-                    android:onClick="onClick"
-                    android:src="@drawable/contactsicon"
-                    android:textColor="@color/white" />
+                <!--<ImageView-->
+                    <!--android:id="@+id/btn_contact"-->
+                    <!--android:layout_width="0dp"-->
+                    <!--android:layout_height="50dp"-->
+                    <!--android:layout_weight="150"-->
+                    <!--android:clickable="true"-->
+                    <!--android:onClick="onClick"-->
+                    <!--android:src="@drawable/contactsicon"-->
+                    <!--android:textColor="@color/white" />-->
             </LinearLayout>
 
             <android.support.design.widget.TextInputLayout

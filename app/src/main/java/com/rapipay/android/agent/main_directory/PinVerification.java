@@ -22,10 +22,22 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.rapipay.android.agent.BuildConfig;
+import com.rapipay.android.agent.Database.RapipayDB;
+import com.rapipay.android.agent.Model.HeaderePozo;
 import com.rapipay.android.agent.Model.VersionPozo;
+import com.rapipay.android.agent.R;
+import com.rapipay.android.agent.adapter.FooterAdapter;
+import com.rapipay.android.agent.adapter.SlidingImage_Adapter;
+import com.rapipay.android.agent.interfaces.CustomInterface;
+import com.rapipay.android.agent.interfaces.RequestHandler;
 import com.rapipay.android.agent.interfaces.VersionListener;
+import com.rapipay.android.agent.utils.AsyncPostMethod;
+import com.rapipay.android.agent.utils.BaseCompactActivity;
+import com.rapipay.android.agent.utils.GenerateChecksum;
 import com.rapipay.android.agent.utils.ImageUtils;
 import com.rapipay.android.agent.utils.LocalStorage;
+import com.rapipay.android.agent.utils.RouteClass;
+import com.rapipay.android.agent.utils.WebConfig;
 import com.viewpagerindicator.CirclePageIndicator;
 
 import org.json.JSONArray;
@@ -36,19 +48,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import com.rapipay.android.agent.Database.RapipayDB;
-import com.rapipay.android.agent.Model.HeaderePozo;
-import com.rapipay.android.agent.R;
-import com.rapipay.android.agent.adapter.FooterAdapter;
-import com.rapipay.android.agent.adapter.SlidingImage_Adapter;
-import com.rapipay.android.agent.interfaces.CustomInterface;
-import com.rapipay.android.agent.interfaces.RequestHandler;
-import com.rapipay.android.agent.utils.AsyncPostMethod;
-import com.rapipay.android.agent.utils.BaseCompactActivity;
-import com.rapipay.android.agent.utils.GenerateChecksum;
-import com.rapipay.android.agent.utils.RouteClass;
-import com.rapipay.android.agent.utils.WebConfig;
 
 public class PinVerification extends BaseCompactActivity implements RequestHandler, View.OnClickListener, CustomInterface, VersionListener {
     private ViewPager mPager;
@@ -204,7 +203,7 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
                     String whereClause = "apikey=?";
                     String whereArgs[] = {list.get(0).getApikey()};
                     dba.update(RapipayDB.TABLE_NAME, contentValues, whereClause, whereArgs);
-                    localStorage.setActivityState(LocalStorage.ROUTESTATE, "UPDATE");
+//                    localStorage.setActivityState(LocalStorage.ROUTESTATE, "UPDATE");
                     localStorage.setActivityState(LocalStorage.LOGOUT, "LOGOUT");
                     Intent intent = new Intent(this, MainActivity.class);
                     startActivity(intent);
@@ -261,6 +260,9 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
         switch (v.getId()) {
             case R.id.forget_pin:
                 customDialog_Common("KYCLAYOUT", null, null, "Forgot Pin", null, "Do you want to reset your pin!.", PinVerification.this);
+                break;
+            case R.id.switchuser:
+                customDialog_Common("KYCLAYOUT", null, null, "Forgot Pin", null, "Do you want to switch user!.", PinVerification.this);
                 break;
         }
     }

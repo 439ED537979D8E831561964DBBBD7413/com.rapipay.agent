@@ -1,19 +1,12 @@
 package com.rapipay.android.agent.fragments;
 
 import android.Manifest;
-import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -23,8 +16,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatButton;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -32,43 +23,32 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.DatePicker;
-import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.rapipay.android.agent.Database.RapipayDB;
-
-import org.json.JSONObject;
-
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
-
-import me.grantland.widget.AutofitTextView;
-
 import com.rapipay.android.agent.Model.PaymentModePozo;
 import com.rapipay.android.agent.Model.RapiPayPozo;
 import com.rapipay.android.agent.R;
-import com.rapipay.android.agent.adapter.CustomSpinnerAdapter;
 import com.rapipay.android.agent.adapter.PaymentAdapter;
 import com.rapipay.android.agent.interfaces.CustomInterface;
 import com.rapipay.android.agent.interfaces.RequestHandler;
-import com.rapipay.android.agent.main_directory.CameraKitActivity;
 import com.rapipay.android.agent.utils.AsyncPostMethod;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
 import com.rapipay.android.agent.utils.BaseFragment;
 import com.rapipay.android.agent.utils.GenerateChecksum;
 import com.rapipay.android.agent.utils.ImageUtils;
 import com.rapipay.android.agent.utils.WebConfig;
+
+import org.json.JSONObject;
+
+import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.Calendar;
+
+import me.grantland.widget.AutofitTextView;
 
 public class CreditRequestFragment extends BaseFragment implements RequestHandler, View.OnClickListener, CustomInterface {
     final private static int PERMISSIONS_REQUEST_READ_PHONE_STATE = 0;
@@ -305,16 +285,17 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
                     bank_select.setError("Please enter valid data");
                 else if (paymode.isEmpty())
                     Toast.makeText(getActivity(), "Please select payment mode.", Toast.LENGTH_SHORT).show();
-                else if (BaseCompactActivity.IS_CRIMAGE_REQUIRED == null && image.getText().toString().isEmpty()) {
-                    image.setError("Please Select Image");
-                    image.requestFocus();
-                } else if (BaseCompactActivity.IS_CRIMAGE_REQUIRED != null && BaseCompactActivity.IS_CRIMAGE_REQUIRED.equalsIgnoreCase("Y") && image.getText().toString().isEmpty()) {
+//                else if (BaseCompactActivity.IS_CRIMAGE_REQUIRED == null && image.getText().toString().isEmpty()) {
+//                    image.setError("Please Select Image");
+//                    image.requestFocus();
+//                }
+                else if (BaseCompactActivity.IS_CRIMAGE_REQUIRED != null && BaseCompactActivity.IS_CRIMAGE_REQUIRED.equalsIgnoreCase("Y") && image.getText().toString().isEmpty()) {
                     image.setError("Please Select Image");
                     image.requestFocus();
                 } else if (date1_text.getText().toString().isEmpty()) {
                     date1_text.setError("Please select date");
                     date1_text.requestFocus();
-                } else if (!paymode.isEmpty() && BaseCompactActivity.IS_CRIMAGE_REQUIRED == null && !imageBase64.isEmpty())
+                } else if (!paymode.isEmpty() && BaseCompactActivity.IS_CRIMAGE_REQUIRED == null)
                     new AsyncPostMethod(WebConfig.CRNF, credit_request().toString(), headerData, CreditRequestFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
                 else if (!paymode.isEmpty() && BaseCompactActivity.IS_CRIMAGE_REQUIRED != null && BaseCompactActivity.IS_CRIMAGE_REQUIRED.equalsIgnoreCase("Y") && !imageBase64.isEmpty())
                     new AsyncPostMethod(WebConfig.CRNF, credit_request().toString(), headerData, CreditRequestFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();

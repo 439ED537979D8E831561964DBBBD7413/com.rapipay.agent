@@ -12,22 +12,25 @@
             android:id="@+id/nav_cpsw"
             android:title="Change Password" />
         <item
+            android:id="@+id/nav_tpin"
+            android:title="Change TPIN" />
+        <item
             android:id="@+id/nav_Cpin"
-            android:title="Change Pin" />
+            android:title="Change Login Pin" />
         <item
             android:id="@+id/nav_Cmobile"
             android:title="Change Mobile" />
         <item
             android:id="@+id/settle_Cmobile"
-            android:title="Settlement Bank" />
+            android:title="Bank Settlement Account" />
         <item
             android:id="@+id/payload_Cmobile"
-            android:title="Payload Bank" />
+            android:title="Whitelist Bank Account(Auto Credit)" />
         <item
             android:id="@+id/lien_Cmobile"
             android:title="Lien History" />
-        <item
-            android:id="@+id/nav_faq"
-            android:title="FAQ" />
+        <!--<item-->
+            <!--android:id="@+id/nav_faq"-->
+            <!--android:title="FAQ" />-->
     </group>
 </menu>

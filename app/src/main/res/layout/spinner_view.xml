@@ -11,6 +11,6 @@
         android:padding="4dp"
         android:text="Spinner"
         android:gravity="center"
-        android:textColor="@color/colorPrimaryDark"/>
+        android:textColor="@color/black"/>
 
 </RelativeLayout>

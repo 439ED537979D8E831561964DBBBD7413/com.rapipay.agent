@@ -11,11 +11,6 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-
 import com.rapipay.android.agent.Database.RapipayDB;
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.interfaces.CustomInterface;
@@ -25,6 +20,11 @@ import com.rapipay.android.agent.utils.BaseCompactActivity;
 import com.rapipay.android.agent.utils.GenerateChecksum;
 import com.rapipay.android.agent.utils.ImageUtils;
 import com.rapipay.android.agent.utils.WebConfig;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 public class ReChargeActivity extends BaseCompactActivity implements View.OnClickListener, RequestHandler, CustomInterface {
 
@@ -162,6 +162,10 @@ public class ReChargeActivity extends BaseCompactActivity implements View.OnClic
             jsonObject.put("mobileNumber", input_number.getText().toString());
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
             jsonObject.put("customerAccountNo", input_amount.getText().toString());
+            if (newtpin.getText().toString().isEmpty())
+                jsonObject.put("tPin", "");
+            else
+                jsonObject.put("tPin", ImageUtils.encodeSHA256(newtpin.getText().toString()));
             jsonObject.put("countryCode", "");
             jsonObject.put("stdCode", "");
             jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));

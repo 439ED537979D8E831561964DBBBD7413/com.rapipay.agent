@@ -5,12 +5,14 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.rapipay.android.agent.Model.BankDetailPozo;
 import com.rapipay.android.agent.R;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class BankDetailAdapter extends RecyclerView.Adapter<BankDetailAdapter.ViewHolder> {
 
@@ -19,8 +21,8 @@ public class BankDetailAdapter extends RecyclerView.Adapter<BankDetailAdapter.Vi
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
-        public final TextView btn_name, btn_account, btn_bank, isverified;
-
+        public final TextView btn_name, btn_account, btn_bank, isverified,ifsc;
+        public LinearLayout ifsc_lay;
         public ViewHolder(View view) {
             super(view);
             mView = view;
@@ -28,6 +30,8 @@ public class BankDetailAdapter extends RecyclerView.Adapter<BankDetailAdapter.Vi
             btn_account = (TextView) view.findViewById(R.id.btn_account);
             btn_bank = (TextView) view.findViewById(R.id.btn_bank);
             isverified = (TextView) view.findViewById(R.id.isverified);
+            ifsc = (TextView) view.findViewById(R.id.ifsc);
+            ifsc_lay = (LinearLayout)view.findViewById(R.id.ifsc_lay);
         }
     }
 
@@ -49,6 +53,10 @@ public class BankDetailAdapter extends RecyclerView.Adapter<BankDetailAdapter.Vi
         holder.btn_name.setText(mValues.get(position).getBANK());
         holder.btn_account.setText(mValues.get(position).getNAME());
         holder.isverified.setText(mValues.get(position).getDEPOSIT());
+        holder.ifsc.setText(mValues.get(position).getIFSC());
+        if(mValues.get(position).getIFSC().isEmpty())
+            holder.ifsc_lay.setVisibility(View.GONE);
+
     }
 
     @Override

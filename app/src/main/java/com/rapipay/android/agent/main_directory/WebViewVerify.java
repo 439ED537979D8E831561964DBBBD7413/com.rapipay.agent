@@ -142,7 +142,7 @@ public class WebViewVerify extends BaseCompactActivity implements CustomInterfac
                     try {
                         JSONObject object = new JSONObject(response);
                         if (object.has("responseCode"))
-                            if (object.getString("responseCode").equalsIgnoreCase("60187")) {
+                            if (object.getString("responseCode").equalsIgnoreCase("60187")||object.getString("responseCode").equalsIgnoreCase("200")) {
                                 customDialog_Common("KYCLAYOUTS", null, null, getResources().getString(R.string.Alert), null, object.getString("responseMessage"), WebViewVerify.this);
                                 //                            customDialog(object.getString("responseMessage"));
                             } else if (object.getString("responseCode").equalsIgnoreCase("60147") || object.getString("responseCode").equalsIgnoreCase("60173")) {

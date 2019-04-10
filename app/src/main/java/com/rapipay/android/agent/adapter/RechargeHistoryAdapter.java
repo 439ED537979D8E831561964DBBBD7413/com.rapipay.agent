@@ -6,13 +6,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.rapipay.android.agent.Model.RechargePozo;
+import com.rapipay.android.agent.R;
+
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Locale;
 
 import me.grantland.widget.AutofitTextView;
-import com.rapipay.android.agent.Model.RechargePozo;
-import com.rapipay.android.agent.R;
 
 public class RechargeHistoryAdapter extends RecyclerView.Adapter<RechargeHistoryAdapter.ViewHolder> {
 

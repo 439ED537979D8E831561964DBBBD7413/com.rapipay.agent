@@ -16,14 +16,6 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.Calendar;
-
-import me.grantland.widget.AutofitTextView;
-
 import com.rapipay.android.agent.Model.NetworkHistoryPozo;
 import com.rapipay.android.agent.Model.RapiPayPozo;
 import com.rapipay.android.agent.R;
@@ -36,6 +28,14 @@ import com.rapipay.android.agent.utils.BaseFragment;
 import com.rapipay.android.agent.utils.GenerateChecksum;
 import com.rapipay.android.agent.utils.ImageUtils;
 import com.rapipay.android.agent.utils.WebConfig;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+
+import me.grantland.widget.AutofitTextView;
 
 public class NetworkHistoryFragment extends BaseFragment implements RequestHandler, View.OnClickListener,CustomInterface {
     View rv;
@@ -67,10 +67,16 @@ public class NetworkHistoryFragment extends BaseFragment implements RequestHandl
     }
 
     private void initialize(View view) {
+        Calendar calendar = Calendar.getInstance();
+        selectedDate = calendar.get(Calendar.DAY_OF_MONTH);
+        selectedMonth = calendar.get(Calendar.MONTH)+1;
+        selectedYear = calendar.get(Calendar.YEAR);
         date2_text = (AutofitTextView) view.findViewById(R.id.date2);
         date2_text.setOnClickListener(this);
         date1_text = (AutofitTextView) view.findViewById(R.id.date1);
         date1_text.setOnClickListener(this);
+        date2_text.setText(selectedYear + "-" + selectedMonth + "-" + selectedDate);
+        date1_text.setText(selectedYear + "-" + selectedMonth + "-" + selectedDate);
         view.findViewById(R.id.btn_fund).setOnClickListener(this);
         trans_details = (ListView) view.findViewById(R.id.trans_details);
         select_state = (Spinner) view.findViewById(R.id.select_state);
@@ -137,7 +143,7 @@ public class NetworkHistoryFragment extends BaseFragment implements RequestHandl
                 } else if (date1_text.getText().toString().isEmpty()) {
                     date1_text.setError("Please enter valid data");
                     date1_text.requestFocus();
-                } else
+                } else if (printDifference(mainDate(date2_text.getText().toString()), mainDate(date1_text.getText().toString())))
                     new AsyncPostMethod(WebConfig.CommonReport, channel_request(first, last).toString(), headerData, NetworkHistoryFragment.this, getActivity(),getString(R.string.responseTimeOut)).execute();
                 break;
         }

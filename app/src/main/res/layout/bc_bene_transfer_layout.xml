@@ -2,10 +2,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fitsSystemWindows="true">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -25,18 +21,7 @@
                 android:layout_margin="5dp"
                 android:spinnerMode="dropdown"
                 android:text="Select Bank" />
-            <android.support.design.widget.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
 
-                <EditText
-                    android:id="@+id/bc_bene_name"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Beneficiary Name"
-                    android:inputType="text"
-                    android:textSize="16dp" />
-            </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
@@ -65,7 +50,26 @@
                     android:inputType="number"
                     android:textSize="16dp" />
             </android.support.design.widget.TextInputLayout>
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
+                <EditText
+                    android:id="@+id/bc_bene_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Beneficiary Name"
+                    android:inputType="text"
+                    android:textSize="16dp" />
+            </android.support.design.widget.TextInputLayout>
+            <EditText
+                android:id="@+id/newpin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Enter TPIN"
+                android:inputType="number"
+                android:maxLength="4"
+                android:textSize="16dp"
+                android:visibility="gone" />
         </LinearLayout>
-    </ScrollView>
 </LinearLayout>

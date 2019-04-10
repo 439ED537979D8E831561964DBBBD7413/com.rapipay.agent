@@ -5,12 +5,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.TextView;
+
+import com.rapipay.android.agent.R;
 
 import java.util.ArrayList;
 import java.util.Locale;
-
-import me.grantland.widget.AutofitTextView;
-import com.rapipay.android.agent.R;
 
 public class CustomSpinnerAdapter extends ArrayAdapter<String> {
 
@@ -19,7 +19,7 @@ public class CustomSpinnerAdapter extends ArrayAdapter<String> {
 
     Context mContext;
     private  class ViewHolder {
-        public AutofitTextView recycler_text;
+        public TextView recycler_text;
     }
 
     public CustomSpinnerAdapter(ArrayList<String> data, Context context) {
@@ -38,7 +38,7 @@ public class CustomSpinnerAdapter extends ArrayAdapter<String> {
             viewHolder = new ViewHolder();
             LayoutInflater inflater = LayoutInflater.from(getContext());
             view = inflater.inflate(R.layout.receipt_list, parent, false);
-            viewHolder.recycler_text = (AutofitTextView) view.findViewById(R.id.recycler_text);
+            viewHolder.recycler_text = (TextView) view.findViewById(R.id.recycler_text);
             view.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) view.getTag();

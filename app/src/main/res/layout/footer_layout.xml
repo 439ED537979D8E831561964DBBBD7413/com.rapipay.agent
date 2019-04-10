@@ -23,7 +23,7 @@
         android:singleLine="true"
         android:maxLines="1"
         autofit:minTextSize="8sp"
-        android:textColor="@color/colorPrimaryDark"
+        android:textColor="@color/black"
         android:layout_below="@+id/recycler_image"
         android:text="Recycler"/>
 

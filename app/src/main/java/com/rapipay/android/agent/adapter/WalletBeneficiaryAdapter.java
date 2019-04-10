@@ -8,10 +8,10 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-
 import com.rapipay.android.agent.Model.BeneficiaryDetailsPozo;
 import com.rapipay.android.agent.R;
+
+import java.util.ArrayList;
 
 public class WalletBeneficiaryAdapter extends RecyclerView.Adapter<WalletBeneficiaryAdapter.ViewHolder> {
 

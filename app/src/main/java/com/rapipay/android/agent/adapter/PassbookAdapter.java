@@ -6,11 +6,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.rapipay.android.agent.Model.PassbookPozo;
+import com.rapipay.android.agent.R;
+
 import java.util.ArrayList;
 
 import me.grantland.widget.AutofitTextView;
-import com.rapipay.android.agent.Model.PassbookPozo;
-import com.rapipay.android.agent.R;
 
 public class PassbookAdapter  extends RecyclerView.Adapter<PassbookAdapter.ViewHolder> {
 

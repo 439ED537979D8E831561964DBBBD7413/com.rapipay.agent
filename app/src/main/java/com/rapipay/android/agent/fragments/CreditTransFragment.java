@@ -3,7 +3,6 @@ package com.rapipay.android.agent.fragments;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -13,14 +12,6 @@ import android.view.ViewGroup;
 import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.Calendar;
-
-import me.grantland.widget.AutofitTextView;
 
 import com.rapipay.android.agent.Model.CreditHistoryPozo;
 import com.rapipay.android.agent.Model.RapiPayPozo;
@@ -36,6 +27,14 @@ import com.rapipay.android.agent.utils.GenerateChecksum;
 import com.rapipay.android.agent.utils.ImageUtils;
 import com.rapipay.android.agent.utils.RecyclerTouchListener;
 import com.rapipay.android.agent.utils.WebConfig;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+
+import me.grantland.widget.AutofitTextView;
 
 public class CreditTransFragment extends BaseFragment implements RequestHandler, View.OnClickListener, CustomInterface {
 
@@ -64,12 +63,18 @@ public class CreditTransFragment extends BaseFragment implements RequestHandler,
     }
 
     private void initialize(View view) {
+        Calendar calendar = Calendar.getInstance();
+        selectedDate = calendar.get(Calendar.DAY_OF_MONTH);
+        selectedMonth = calendar.get(Calendar.MONTH) + 1;
+        selectedYear = calendar.get(Calendar.YEAR);
         heading = (TextView) view.findViewById(R.id.heading);
         heading.setVisibility(View.GONE);
         date2_text = (AutofitTextView) view.findViewById(R.id.date2);
         date1_text = (AutofitTextView) view.findViewById(R.id.date1);
         date1_text.setOnClickListener(this);
         date2_text.setOnClickListener(this);
+        date2_text.setText(selectedYear + "-" + selectedMonth + "-" + selectedDate);
+        date1_text.setText(selectedYear + "-" + selectedMonth + "-" + selectedDate);
         btn_fund = (ImageView) view.findViewById(R.id.btn_fund);
         btn_fund.setOnClickListener(this);
         trans_details = (RecyclerView) view.findViewById(R.id.trans_details);
@@ -156,8 +161,8 @@ public class CreditTransFragment extends BaseFragment implements RequestHandler,
                 } else if (date1_text.getText().toString().isEmpty()) {
                     date1_text.setError("Please enter valid data");
                     date1_text.requestFocus();
-                } else
-                    new AsyncPostMethod(WebConfig.CommonReport, channel_request().toString(), headerData, CreditTransFragment.this, getActivity(),getString(R.string.responseTimeOut)).execute();
+                } else if (printDifference(mainDate(date2_text.getText().toString()), mainDate(date1_text.getText().toString())))
+                    new AsyncPostMethod(WebConfig.CommonReport, channel_request().toString(), headerData, CreditTransFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
                 break;
         }
     }

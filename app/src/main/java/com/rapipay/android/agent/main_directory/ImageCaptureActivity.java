@@ -19,7 +19,6 @@ import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
 
 import java.io.File;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;

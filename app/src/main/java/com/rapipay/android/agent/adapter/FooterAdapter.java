@@ -9,14 +9,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.rapipay.android.agent.Model.HeaderePozo;
+import com.rapipay.android.agent.R;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 import me.grantland.widget.AutofitTextView;
-import com.rapipay.android.agent.Model.HeaderePozo;
-import com.rapipay.android.agent.R;
 
 public class FooterAdapter extends RecyclerView.Adapter<FooterAdapter.ViewHolder> {
 

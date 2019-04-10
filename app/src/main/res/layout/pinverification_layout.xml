@@ -68,7 +68,7 @@
                     android:layout_marginTop="10dp"
                     android:gravity="center"
                     android:text="Enter Login Pin"
-                    android:textColor="@color/colorPrimaryDark"
+                    android:textColor="@color/black"
                     android:textSize="16sp" />
 
                 <EditText
@@ -81,7 +81,7 @@
                     android:gravity="center"
                     android:inputType="numberPassword"
                     android:maxLength="6"
-                    android:textColor="@color/colorPrimaryDark"
+                    android:textColor="@color/black"
                     android:textScaleX="1.4"
                     android:textSize="18dp" />
 
@@ -96,7 +96,22 @@
                     android:onClick="onClick"
                     android:padding="5dp"
                     android:text="Forgot Pin"
-                    android:textColor="@color/colorPrimaryDark"
+                    android:textColor="@color/black"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+                <TextView
+                    android:id="@+id/switchuser"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_above="@+id/confirmpinView"
+                    android:layout_gravity="center"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginTop="10dp"
+                    android:gravity="right"
+                    android:onClick="onClick"
+                    android:padding="5dp"
+                    android:text="Switch User"
+                    android:textColor="@color/black"
                     android:textSize="16sp"
                     android:textStyle="bold" />
             </LinearLayout>

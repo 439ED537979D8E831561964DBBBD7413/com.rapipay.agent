@@ -3,9 +3,10 @@ package com.rapipay.android.agent.utils;
 import android.content.Context;
 import android.util.Base64;
 
+import com.rapipay.android.agent.R;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -22,8 +23,6 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
-
-import com.rapipay.android.agent.R;
 
 public class HttpConnector {
     private static HttpConnector instance = null;

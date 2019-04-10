@@ -10,12 +10,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-import java.util.ArrayList;
-import java.util.Calendar;
-
-import me.grantland.widget.AutofitTextView;
 import com.rapipay.android.agent.Model.ChannelHistoryPozo;
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.adapter.ChannelListAdapter;
@@ -26,6 +20,14 @@ import com.rapipay.android.agent.utils.BaseCompactActivity;
 import com.rapipay.android.agent.utils.GenerateChecksum;
 import com.rapipay.android.agent.utils.ImageUtils;
 import com.rapipay.android.agent.utils.WebConfig;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+
+import me.grantland.widget.AutofitTextView;
 
 public class ChannelHistoryActivity extends BaseCompactActivity implements View.OnClickListener, RequestHandler, CustomInterface {
 
@@ -41,12 +43,15 @@ public class ChannelHistoryActivity extends BaseCompactActivity implements View.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.channel_history_layout);
         initialize();
+        TYPE = getIntent().getStringExtra("TYPE");
+        if (printDifference(mainDate(date2_text.getText().toString()), mainDate(date1_text.getText().toString())))
+            new AsyncPostMethod(WebConfig.CommonReport, channel_request(first, last).toString(), headerData, ChannelHistoryActivity.this, getString(R.string.responseTimeOut), "TRANSACTIONHISTORY").execute();
     }
 
     private void initialize() {
         Calendar calendar = Calendar.getInstance();
         selectedDate = calendar.get(Calendar.DAY_OF_MONTH);
-        selectedMonth = calendar.get(Calendar.MONTH)+1;
+        selectedMonth = calendar.get(Calendar.MONTH) + 1;
         selectedYear = calendar.get(Calendar.YEAR);
         heading = (TextView) findViewById(R.id.toolbar_title);
         heading.setText("Transaction History");
@@ -61,7 +66,7 @@ public class ChannelHistoryActivity extends BaseCompactActivity implements View.
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 ChannelHistoryPozo pozo = transactionPozoArrayList.get(position);
-                new AsyncPostMethod(WebConfig.WALLETRECEIPTURL, receipt_request(pozo).toString(), headerData, ChannelHistoryActivity.this,getString(R.string.responseTimeOut),"RECEIPTREQUEST").execute();
+                new AsyncPostMethod(WebConfig.WALLETRECEIPTURL, receipt_request(pozo).toString(), headerData, ChannelHistoryActivity.this, getString(R.string.responseTimeOut), "RECEIPTREQUEST").execute();
             }
         });
         findViewById(R.id.todate).setOnClickListener(toDateClicked);
@@ -79,13 +84,14 @@ public class ChannelHistoryActivity extends BaseCompactActivity implements View.
             public void onScrollStateChanged(AbsListView view, int scrollState) {
 
             }
+
             @Override
             public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
                 int lastInScreen = firstVisibleItem + visibleItemCount;
                 if (totalItemCount != 0 && totalItemCount == last && lastInScreen == totalItemCount && !isLoading) {
                     first = last + 1;
                     last += 25;
-                    new AsyncPostMethod(WebConfig.CommonReport, channel_request(first, last).toString(), headerData, ChannelHistoryActivity.this,getString(R.string.responseTimeOut),"TRANSACTIONHISTORY").execute();
+                    new AsyncPostMethod(WebConfig.CommonReport, channel_request(first, last).toString(), headerData, ChannelHistoryActivity.this, getString(R.string.responseTimeOut), "TRANSACTIONHISTORY").execute();
                     isLoading = true;
                 }
             }
@@ -126,10 +132,10 @@ public class ChannelHistoryActivity extends BaseCompactActivity implements View.
                 } else if (date1_text.getText().toString().isEmpty()) {
                     date1_text.setError("Please enter mandatory field");
                     Toast.makeText(this, "Please enter mandatory field", Toast.LENGTH_SHORT).show();
-                } else if (printDifference(mainDate(date2_text.getText().toString()),mainDate(date1_text.getText().toString())))
-                    new AsyncPostMethod(WebConfig.CommonReport, channel_request(first, last).toString(), headerData, ChannelHistoryActivity.this,getString(R.string.responseTimeOut),"TRANSACTIONHISTORY").execute();
+                } else if (printDifference(mainDate(date2_text.getText().toString()), mainDate(date1_text.getText().toString())))
+                    new AsyncPostMethod(WebConfig.CommonReport, channel_request(first, last).toString(), headerData, ChannelHistoryActivity.this, getString(R.string.responseTimeOut), "TRANSACTIONHISTORY").execute();
                 else
-                    Toast.makeText(ChannelHistoryActivity.this,"Please select correct date",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ChannelHistoryActivity.this, "Please select correct date", Toast.LENGTH_SHORT).show();
                 break;
         }
     }
@@ -145,6 +151,8 @@ public class ChannelHistoryActivity extends BaseCompactActivity implements View.
             jsonObject.put("fromTxnDate", date2_text.getText().toString());
             jsonObject.put("toTxnDate", date1_text.getText().toString());
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
+            if (TYPE.equalsIgnoreCase("NODE"))
+                jsonObject.put("operationFlag", "ALL");
             jsonObject.put("fromIndex", String.valueOf(fromIndex));
             jsonObject.put("toIndex", String.valueOf(toIndex));
             jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
@@ -168,7 +176,7 @@ public class ChannelHistoryActivity extends BaseCompactActivity implements View.
                             customReceiptNewTransaction("Transaction Receipt", object, ChannelHistoryActivity.this);
                         } catch (Exception e) {
                             e.printStackTrace();
-                            customDialog_Common("KYCLAYOUTS",null,null,"Transaction Receipt","","Cannot generate receipt now please try later!", ChannelHistoryActivity.this);
+                            customDialog_Common("KYCLAYOUTS", null, null, "Transaction Receipt", "", "Cannot generate receipt now please try later!", ChannelHistoryActivity.this);
                         }
                 }
             }

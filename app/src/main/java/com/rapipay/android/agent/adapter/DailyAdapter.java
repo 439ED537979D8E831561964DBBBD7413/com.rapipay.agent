@@ -6,11 +6,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 
+import com.rapipay.android.agent.Model.CommissionPozo;
+import com.rapipay.android.agent.R;
+
 import java.util.ArrayList;
 
 import me.grantland.widget.AutofitTextView;
-import com.rapipay.android.agent.Model.CommissionPozo;
-import com.rapipay.android.agent.R;
 
 public class DailyAdapter extends ArrayAdapter<CommissionPozo> {
 

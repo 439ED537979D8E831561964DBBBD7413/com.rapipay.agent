@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:autofit="http://schemas.android.com/tools"
@@ -24,22 +24,20 @@
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="400"
+                android:layout_weight="350"
                 android:inputType="text"
-                android:text="@string/p_accountno"
-                android:textSize="12sp" />
+                android:text="Account No."
+                android:textSize="14sp" />
 
-            <me.grantland.widget.AutofitTextView
+            <TextView
                 android:id="@+id/btn_name"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="400"
+                android:layout_weight="450"
                 android:text="@string/p_accountno"
-                android:textColor="@color/colorPrimaryDark"
-                android:textSize="12sp"
-                android:singleLine="true"
-                android:maxLines="1"
-                autofit:minTextSize="8sp" />
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                android:inputType="textMultiLine"/>
         </LinearLayout>
 
         <LinearLayout
@@ -52,22 +50,20 @@
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="400"
+                android:layout_weight="350"
                 android:inputType="text"
-                android:text="@string/p_amounts"
-                android:textSize="12sp" />
+                android:text="Total Amount"
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/btn_p_amounts"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="400"
+                android:layout_weight="450"
                 android:text="@string/p_amounts"
-                android:textColor="@color/colorPrimaryDark"
-                android:textSize="12sp"
-                android:singleLine="true"
-                android:maxLines="1"
-                autofit:minTextSize="8sp" />
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                android:inputType="textMultiLine"/>
         </LinearLayout>
 
         <LinearLayout
@@ -80,22 +76,20 @@
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="400"
+                android:layout_weight="350"
                 android:inputType="text"
-                android:text="@string/p_transid"
-                android:textSize="12sp" />
+                android:text="Iransaction ID"
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/btn_p_transid"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="400"
+                android:layout_weight="450"
                 android:text="@string/p_transid"
-                android:textColor="@color/colorPrimaryDark"
-                android:textSize="12sp"
-                android:singleLine="true"
-                android:maxLines="1"
-                autofit:minTextSize="8sp"/>
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                android:inputType="textMultiLine"/>
         </LinearLayout>
 
         <LinearLayout
@@ -108,19 +102,19 @@
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="400"
+                android:layout_weight="350"
                 android:inputType="text"
-                android:text="@string/p_bank"
-                android:textSize="12sp" />
+                android:text="Bank Name"
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/btn_p_bank"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="400"
+                android:layout_weight="450"
                 android:text="@string/p_bank"
-                android:textColor="@color/colorPrimaryDark"
-                android:textSize="12sp"
+                android:textColor="@color/black"
+                android:textSize="14sp"
                 android:inputType="textMultiLine"/>
         </LinearLayout>
         <LinearLayout
@@ -133,22 +127,20 @@
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="400"
+                android:layout_weight="350"
                 android:inputType="text"
-                android:text="@string/p_rrn"
-                android:textSize="12sp" />
+                android:text="Bank RRN"
+                android:textSize="14sp" />
 
-            <me.grantland.widget.AutofitTextView
+            <TextView
                 android:id="@+id/btn_rrn"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="400"
+                android:layout_weight="450"
                 android:text="@string/p_bank"
-                android:textColor="@color/colorPrimaryDark"
-                android:textSize="12sp"
-                android:singleLine="true"
-                android:maxLines="1"
-                autofit:minTextSize="8sp"/>
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                android:inputType="textMultiLine"/>
         </LinearLayout>
     </LinearLayout>
 

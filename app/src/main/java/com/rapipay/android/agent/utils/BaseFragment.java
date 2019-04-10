@@ -272,7 +272,7 @@ public class BaseFragment extends Fragment {
     }
     protected void selectImage() {
         final CharSequence[] items = {"Capture Image", "Choose from Gallery", "Cancel"};
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setIcon(R.drawable.camera);
         builder.setTitle("Add Photo!");
         builder.setItems(items, new DialogInterface.OnClickListener() {
@@ -336,5 +336,50 @@ public class BaseFragment extends Fragment {
         }
         return null;
     }
+    public boolean printDifference(Date startDate,Date endDate) {
+        //milliseconds
+        try {
+//            Calendar c = Calendar.getInstance();
+//            System.out.println("Current time => " + c.getTime());
+//
+//            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+//            Date endDate = mainDate(df.format(c.getTime()));
 
+            long different = endDate.getTime() - startDate.getTime();
+
+            System.out.println("startDate : " + startDate);
+            System.out.println("endDate : " + endDate);
+            System.out.println("different : " + different);
+
+            long secondsInMilli = 1000;
+            long minutesInMilli = secondsInMilli * 60;
+            long hoursInMilli = minutesInMilli * 60;
+            long daysInMilli = hoursInMilli * 24;
+
+            long elapsedDays = different / daysInMilli;
+            different = different % daysInMilli;
+            long elapsedHours = different / hoursInMilli;
+            different = different % hoursInMilli;
+
+            long elapsedMinutes = different / minutesInMilli;
+            different = different % minutesInMilli;
+
+            long elapsedSeconds = different / secondsInMilli;
+            if (elapsedDays>= 0)
+                return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public Date mainDate(String date) {
+        try {
+            Date date1 = new SimpleDateFormat("yyyy-MM-dd").parse(date);
+            return date1;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }

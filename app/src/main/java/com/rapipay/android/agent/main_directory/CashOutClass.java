@@ -21,7 +21,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Spinner;
@@ -52,13 +51,12 @@ import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.adapter.AcquirerBanksListAdapter;
 import com.rapipay.android.agent.adapter.EMITenureAdapter;
 import com.rapipay.android.agent.interfaces.CustomInterface;
-import com.rapipay.android.agent.interfaces.RequestHandler;
 import com.rapipay.android.agent.interfaces.WalletRequestHandler;
-import com.rapipay.android.agent.utils.WalletAsyncMethod;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
 import com.rapipay.android.agent.utils.CustomProgessDialog;
 import com.rapipay.android.agent.utils.GenerateChecksum;
 import com.rapipay.android.agent.utils.ImageUtils;
+import com.rapipay.android.agent.utils.WalletAsyncMethod;
 import com.rapipay.android.agent.utils.WebConfig;
 
 import org.json.JSONArray;
@@ -96,19 +94,20 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
     HostResponse type = null;
     String sign;
     private PaymentInitialization initialization;
-    private String check = "";
+    private String check = "",mobileNo,amount;
     ArrayList<AcquirerEmiDetailsVO> acquirerBanksList;
     private Spinner select_bank;
     private LinearLayout inflate_tenureee;
     private CustomProgessDialog progessDialog;
     private ListView lv_imflate;
     private AcquirerEmiDetailsVO vo = null;
-    private ImageView btn_contact;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.cashout_layout);
+        mobileNo = getIntent().getStringExtra("mobileNo");
+        amount = getIntent().getStringExtra("amount");
         typeput = getIntent().getStringExtra("typeput");
         serviceType = getIntent().getStringExtra("serviceType");
         requestChannel = getIntent().getStringExtra("requestChannel");
@@ -197,11 +196,11 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                     }
                 }
                 if (msg.what == FAIL) {
-                            try {
-                                clear();
-                                progessDialog.hide_progress();
-                                transactionFlag = false;
-                                customDialog_Common("KYCLAYOUTS", null, null, "Alert", "", (String) msg.obj, CashOutClass.this);
+                    try {
+                        clear();
+                        progessDialog.hide_progress();
+                        transactionFlag = false;
+                        customDialog_Common("KYCLAYOUTS", null, null, "Alert", "", (String) msg.obj, CashOutClass.this);
 //                        Toast.makeText(CashOutClass.this, (String) msg.obj, Toast.LENGTH_SHORT).show();
                         if (accessBluetoothDetails() != null) {
                             JSONObject object = new JSONObject();
@@ -338,13 +337,18 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
     private void initialize() {
         validator = new AccountValidator(getApplicationContext());
         heading = (TextView) findViewById(R.id.toolbar_title);
-        btn_contact = (ImageView) findViewById(R.id.btn_contact);
         if (balance != null)
             heading.setText(typeput + " (Balance : Rs." + balance + ")");
         else
             heading.setText(typeput);
         input_mobile = (EditText) findViewById(R.id.input_mobile);
         input_amount = (EditText) findViewById(R.id.input_amount);
+        if (!mobileNo.isEmpty()&& !amount.isEmpty()) {
+            input_mobile.setText(mobileNo);
+            input_mobile.setEnabled(false);
+            input_amount.setText(amount);
+            input_amount.setEnabled(false);
+        }
         btn_fund_mpos = (AppCompatButton) findViewById(R.id.btn_fund_mpos);
         receipt_details = (AppCompatButton) findViewById(R.id.reciept_details);
         receipt_details.setOnClickListener(this);
@@ -386,9 +390,6 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.btn_contact:
-                loadIMEI();
-                break;
             case R.id.btn_fund_mpos:
                 hideKeyboard(CashOutClass.this);
                 type=null;
@@ -689,10 +690,10 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
 
     protected void checkPermissions() {
         int permissionLocation = ContextCompat.checkSelfPermission(CashOutClass.this,
-                android.Manifest.permission.ACCESS_FINE_LOCATION);
+                Manifest.permission.ACCESS_FINE_LOCATION);
         List<String> listPermissionsNeeded = new ArrayList<>();
         if (permissionLocation != PackageManager.PERMISSION_GRANTED) {
-            listPermissionsNeeded.add(android.Manifest.permission.ACCESS_FINE_LOCATION);
+            listPermissionsNeeded.add(Manifest.permission.ACCESS_FINE_LOCATION);
             if (!listPermissionsNeeded.isEmpty()) {
                 ActivityCompat.requestPermissions(this,
                         listPermissionsNeeded.toArray(new String[listPermissionsNeeded.size()]), REQUEST_ID_MULTIPLE_PERMISSIONS);

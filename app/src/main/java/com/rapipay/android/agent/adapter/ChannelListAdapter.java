@@ -6,13 +6,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 
+import com.rapipay.android.agent.Model.ChannelHistoryPozo;
+import com.rapipay.android.agent.R;
+
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Locale;
 
 import me.grantland.widget.AutofitTextView;
-import com.rapipay.android.agent.Model.ChannelHistoryPozo;
-import com.rapipay.android.agent.R;
 
 public class ChannelListAdapter extends ArrayAdapter<ChannelHistoryPozo> {
 

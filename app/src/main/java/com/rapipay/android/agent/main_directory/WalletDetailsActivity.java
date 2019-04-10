@@ -21,30 +21,26 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-
 import com.rapipay.android.agent.Database.RapipayDB;
 import com.rapipay.android.agent.Model.BeneficiaryDetailsPozo;
-import com.rapipay.android.agent.Model.LastTransactionPozo;
 import com.rapipay.android.agent.Model.WalletTransPozo;
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.adapter.WalletBeneficiaryAdapter;
 import com.rapipay.android.agent.adapter.WalletTransactionAdapter;
 import com.rapipay.android.agent.interfaces.ClickListener;
 import com.rapipay.android.agent.interfaces.CustomInterface;
-import com.rapipay.android.agent.interfaces.RequestHandler;
 import com.rapipay.android.agent.interfaces.WalletRequestHandler;
-import com.rapipay.android.agent.utils.AsyncPostMethod;
-import com.rapipay.android.agent.utils.WalletAsyncMethod;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
 import com.rapipay.android.agent.utils.GenerateChecksum;
 import com.rapipay.android.agent.utils.ImageUtils;
-import com.rapipay.android.agent.utils.LocalStorage;
 import com.rapipay.android.agent.utils.RecyclerTouchListener;
+import com.rapipay.android.agent.utils.WalletAsyncMethod;
 import com.rapipay.android.agent.utils.WebConfig;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 public class WalletDetailsActivity extends BaseCompactActivity implements View.OnClickListener, WalletRequestHandler, CustomInterface {
 
@@ -55,7 +51,7 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
     LinearLayout sender_layout, otp_layout, fundlayout, beneficiary_layout, last_tran_layout;
     String otpRefId, ifsc_code;
     TextView bank_select;
-    ImageView btn_sender, btn_search;
+    ImageView btn_sender;
     RecyclerView beneficiary_details, trans_details;
     ArrayList<BeneficiaryDetailsPozo> beneficiaryDetailsPozoslist;
     ArrayList<WalletTransPozo> walletTransPozoArrayList;
@@ -76,8 +72,9 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
         initialize();
         TYPE = getIntent().getStringExtra("type");
         mobileNo = getIntent().getStringExtra("mobileNo");
-        if (TYPE.equalsIgnoreCase("internal")) {
+        if (TYPE.equalsIgnoreCase("internal") || !mobileNo.isEmpty()) {
             input_mobile.setText(mobileNo);
+            input_mobile.setEnabled(false);
         }
     }
 
@@ -97,8 +94,6 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
         input_name = (TextView) findViewById(R.id.input_name);
         input_mobile = (EditText) findViewById(R.id.input_mobile);
         input_otp = (EditText) findViewById(R.id.input_otp);
-        btn_search = (ImageView) findViewById(R.id.btn_search);
-        btn_search.setOnClickListener(this);
         btn_sender = (ImageView) findViewById(R.id.btn_sender);
         btn_sender.setOnClickListener(this);
         btn_sender.setColorFilter(getResources().getColor(R.color.colorPrimaryDark));
@@ -115,6 +110,9 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
         trans_details = (RecyclerView) findViewById(R.id.trans_details);
         findViewById(R.id.btn_verify).setOnClickListener(this);
         bank_select = (TextView) findViewById(R.id.bank_select);
+        newtpin = (EditText)findViewById(R.id.newtpin);
+        if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y"))
+            newtpin.setVisibility(View.VISIBLE);
         bank_select.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -184,6 +182,10 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
             jsonObject.put("senderMobileNo", input_mobile.getText().toString());
             jsonObject.put("txnAmount", amount);
             jsonObject.put("transferType", type);
+            if (newtpin.getText().toString().isEmpty())
+                jsonObject.put("tPin", "");
+            else
+                jsonObject.put("tPin", ImageUtils.encodeSHA256(newtpin.getText().toString()));
             if (value.equalsIgnoreCase("NEFT"))
                 jsonObject.put("ifscCode", input_ifsc.getText().toString());
             else
@@ -268,10 +270,6 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
                 setBack_click(this);
                 finish();
                 break;
-            case R.id.btn_search:
-                hideKeyboard(WalletDetailsActivity.this);
-                loadIMEI();
-                break;
             case R.id.btn_verify:
                 if (isVerifyAccount.equalsIgnoreCase("Y")) {
                     hideKeyboard(WalletDetailsActivity.this);
@@ -284,6 +282,9 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
                     } else if (!ImageUtils.commonRegex(input_ben_name.getText().toString(), 150, " ")) {
                         input_ben_name.setError("Please enter mandatory field");
                         input_ben_name.requestFocus();
+                    } else if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && (newtpin.getText().toString().isEmpty() || newtpin.getText().toString().length() != 4)) {
+                        newtpin.setError("Please enter TPIN");
+                        newtpin.requestFocus();
                     } else
                         new WalletAsyncMethod(WebConfig.BCRemittanceApp, verify_Account().toString(), headerData, WalletDetailsActivity.this, getString(R.string.responseTimeOutTrans), "VERIFYACCOUNT").execute();
                 } else {
@@ -316,7 +317,6 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
         otp_layout.setVisibility(View.GONE);
         sender_layout.setVisibility(View.GONE);
         fundlayout.setVisibility(View.GONE);
-        btn_search.setVisibility(View.VISIBLE);
         btn_sender.setVisibility(View.GONE);
         reset.setVisibility(View.GONE);
         beneficiary_layout.setVisibility(View.GONE);
@@ -355,6 +355,10 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
             jsonObject.put("mobileNumber", input_mobile.getText().toString());
             jsonObject.put("txnAmmount", "1");
             jsonObject.put("reqFor", "BC1");
+            if (newtpin.getText().toString().isEmpty())
+                jsonObject.put("tPin", "");
+            else
+                jsonObject.put("tPin", ImageUtils.encodeSHA256(newtpin.getText().toString()));
             jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
 
         } catch (Exception e) {
@@ -366,7 +370,6 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
     @Override
     public void chechStatus(JSONObject object, String hitFrom) {
         try {
-            reset.setVisibility(View.VISIBLE);
             if (object.has("apiCommonResposne")) {
                 JSONObject object1 = object.getJSONObject("apiCommonResposne");
                 String balance = object1.getString("runningBalance");
@@ -651,6 +654,7 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
 
     String value = "";
     TextView input_ifsc;
+
     private void customFund_Transfer(final BeneficiaryDetailsPozo pozo, String title, final String hitFrom) {
         AlertDialog.Builder dialog = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
@@ -710,13 +714,13 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
                 } else if (!ImageUtils.commonAmount(ben_amount.getText().toString())) {
                     ben_amount.setError("Please enter valid amount.");
                     ben_amount.requestFocus();
-                }else if(Integer.parseInt(ben_amount.getText().toString())>=25001){
+                } else if (Integer.parseInt(ben_amount.getText().toString()) >= 25001) {
                     ben_amount.setError("Maximum transfer amount would be 25000.");
                     ben_amount.requestFocus();
-                }else if(Integer.parseInt(ben_amount.getText().toString())>=limit+1){
-                    ben_amount.setError("Maximum transfer amount would be "+limit+".");
+                } else if (Integer.parseInt(ben_amount.getText().toString()) >= limit + 1) {
+                    ben_amount.setError("Maximum transfer amount would be " + limit + ".");
                     ben_amount.requestFocus();
-                }else if (value.equalsIgnoreCase("NEFT") && input_ifsc.getText().toString().isEmpty()) {
+                } else if (value.equalsIgnoreCase("NEFT") && input_ifsc.getText().toString().isEmpty()) {
                     input_ifsc.setError("Please enter ifsc code.");
                     input_ifsc.requestFocus();
                 } else {
@@ -755,7 +759,7 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
         return jsonObject;
     }
 
-    protected void customDialog_Common(final String type, final JSONObject object, final Object ob, String msg, String input, String output, final String hitFrom) {
+    protected void customDialog_Common(final String type, final JSONObject object, final Object ob, final String msg, String input, String output, final String hitFrom) {
         try {
             dialog = new AlertDialog.Builder(this);
             LayoutInflater inflater = getLayoutInflater();
@@ -825,6 +829,7 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
             dialog_cancel.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    setBack_click(WalletDetailsActivity.this);
                     alertDialog.dismiss();
                 }
             });
@@ -871,13 +876,13 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
                             customFund_Transfer((BeneficiaryDetailsPozo) ob, "RapiPay", "FUNDTRANSFER");
                             alertDialog.dismiss();
                         } else if (type.equalsIgnoreCase("Fund Transfer Confirmation")) {
-                            if(BaseCompactActivity.ENABLE_TPIN !=null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && newtpin.getText().toString().length()==4) {
+                            if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && newtpin.getText().toString().length() == 4) {
                                 new WalletAsyncMethod(WebConfig.WALLETTRANSFER_URL, fund_transfer(beneficiaryDetailsPozoslist.get(benePosition), value, ben_amount.getText().toString()).toString(), headerData, WalletDetailsActivity.this, getString(R.string.responseTimeOutTrans), hitFrom).execute();
                                 alertDialog.dismiss();
-                            }else if(BaseCompactActivity.ENABLE_TPIN !=null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && (newtpin.getText().toString().isEmpty() || newtpin.getText().toString().length()!=4)){
+                            } else if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && (newtpin.getText().toString().isEmpty() || newtpin.getText().toString().length() != 4)) {
                                 newtpin.setError("Please enter TPIN");
                                 newtpin.requestFocus();
-                            }else if(BaseCompactActivity.ENABLE_TPIN !=null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("N")){
+                            } else if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("N")) {
                                 new WalletAsyncMethod(WebConfig.WALLETTRANSFER_URL, fund_transfer(beneficiaryDetailsPozoslist.get(benePosition), value, ben_amount.getText().toString()).toString(), headerData, WalletDetailsActivity.this, getString(R.string.responseTimeOutTrans), hitFrom).execute();
                                 alertDialog.dismiss();
                             }
@@ -912,6 +917,9 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
                 public void onClick(View v) {
                     if (type.equalsIgnoreCase("BENLAYOUT")) {
                         new WalletAsyncMethod(WebConfig.WALLETTRANSFER_URL, delete_Benef((BeneficiaryDetailsPozo) ob).toString(), headerData, WalletDetailsActivity.this, getString(R.string.responseTimeOutTrans), "DELETEBENEFICIARY").execute();
+                    } else if (msg.equalsIgnoreCase("KYC Registration")) {
+                        setBack_click(WalletDetailsActivity.this);
+                        finish();
                     }
 //                    isRegenrate = false;
                     alertDialog.dismiss();

@@ -4,10 +4,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatButton;
-import android.util.JsonReader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +17,22 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.rapipay.android.agent.Model.NetworkManagePozo;
+import com.rapipay.android.agent.Model.NetworkTransferPozo;
+import com.rapipay.android.agent.Model.RapiPayPozo;
+import com.rapipay.android.agent.R;
+import com.rapipay.android.agent.adapter.NetworkAdapter;
+import com.rapipay.android.agent.interfaces.CustomInterface;
+import com.rapipay.android.agent.interfaces.RequestHandler;
+import com.rapipay.android.agent.main_directory.LoginScreenActivity;
+import com.rapipay.android.agent.utils.AsyncPostMethod;
+import com.rapipay.android.agent.utils.BaseCompactActivity;
+import com.rapipay.android.agent.utils.BaseFragment;
+import com.rapipay.android.agent.utils.GenerateChecksum;
+import com.rapipay.android.agent.utils.ImageUtils;
+import com.rapipay.android.agent.utils.LocalStorage;
+import com.rapipay.android.agent.utils.WebConfig;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -29,23 +43,6 @@ import java.util.Date;
 import java.util.Locale;
 
 import me.grantland.widget.AutofitTextView;
-
-import com.rapipay.android.agent.Model.NetworkManagePozo;
-import com.rapipay.android.agent.Model.NetworkTransferPozo;
-import com.rapipay.android.agent.Model.RapiPayPozo;
-import com.rapipay.android.agent.R;
-import com.rapipay.android.agent.adapter.NetworkAdapter;
-import com.rapipay.android.agent.interfaces.CustomInterface;
-import com.rapipay.android.agent.interfaces.RequestHandler;
-import com.rapipay.android.agent.main_directory.LoginScreenActivity;
-import com.rapipay.android.agent.main_directory.MainActivity;
-import com.rapipay.android.agent.utils.AsyncPostMethod;
-import com.rapipay.android.agent.utils.BaseCompactActivity;
-import com.rapipay.android.agent.utils.BaseFragment;
-import com.rapipay.android.agent.utils.GenerateChecksum;
-import com.rapipay.android.agent.utils.ImageUtils;
-import com.rapipay.android.agent.utils.LocalStorage;
-import com.rapipay.android.agent.utils.WebConfig;
 
 public class NetworkTransFragment extends BaseFragment implements RequestHandler,CustomInterface {
 

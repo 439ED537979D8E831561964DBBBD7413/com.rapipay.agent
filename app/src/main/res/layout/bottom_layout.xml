@@ -27,7 +27,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="300"
                 android:inputType="textMultiLine"
-                android:textColor="@color/colorPrimaryDark"
+                android:textColor="@color/black"
                 android:text="@string/p_mobile"
                 android:textSize="12sp" />
 
@@ -37,7 +37,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="500"
                 android:text="@string/p_accountno"
-                android:textColor="@color/colorPrimaryDark"
+                android:textColor="@color/black"
                 android:textSize="12sp"
                 android:textStyle="bold"
                 android:inputType="textMultiLine"

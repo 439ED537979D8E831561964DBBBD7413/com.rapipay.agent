@@ -33,7 +33,7 @@
                 android:layout_gravity="center"
                 android:layout_marginTop="30dp"
                 android:text="Handset Registration"
-                android:textColor="@color/colorPrimaryDark"
+                android:textColor="@color/black"
                 android:textSize="24dp"
                 android:textStyle="italic" />
 
@@ -44,7 +44,7 @@
                 android:layout_gravity="center"
                 android:layout_marginTop="30dp"
                 android:text=""
-                android:textColor="@color/colorPrimaryDark"
+                android:textColor="@color/black"
                 android:textSize="24dp" />
 
             <LinearLayout
@@ -60,7 +60,7 @@
                     android:layout_gravity="center"
                     android:layout_weight="200"
                     android:text="Enter OTP"
-                    android:textColor="@color/colorPrimaryDark"
+                    android:textColor="@color/black"
                     android:textSize="16dp" />
 
                 <com.rapipay.android.agent.view.PinEntryEditText
@@ -75,7 +75,7 @@
                     android:inputType="number"
                     android:maxLength="6"
                     android:padding="5dp"
-                    android:textColor="@color/colorPrimaryDark"
+                    android:textColor="@color/black"
                     android:textIsSelectable="false"
                     android:textSize="20sp" />
             </LinearLayout>
@@ -93,7 +93,7 @@
                     android:layout_gravity="center"
                     android:layout_weight="200"
                     android:text="Set Login Pin"
-                    android:textColor="@color/colorPrimaryDark"
+                    android:textColor="@color/black"
                     android:textSize="16dp" />
 
                 <com.rapipay.android.agent.view.PinEntryEditText
@@ -108,7 +108,7 @@
                     android:inputType="number"
                     android:maxLength="6"
                     android:padding="5dp"
-                    android:textColor="@color/colorPrimaryDark"
+                    android:textColor="@color/black"
                     android:textIsSelectable="false"
                     android:textSize="20sp" />
             </LinearLayout>
@@ -126,7 +126,7 @@
                     android:layout_gravity="center"
                     android:layout_weight="200"
                     android:text="Confirm Login Pin"
-                    android:textColor="@color/colorPrimaryDark"
+                    android:textColor="@color/black"
                     android:textSize="16dp" />
 
                 <com.rapipay.android.agent.view.PinEntryEditText
@@ -141,7 +141,7 @@
                     android:inputType="number"
                     android:maxLength="6"
                     android:padding="5dp"
-                    android:textColor="@color/colorPrimaryDark"
+                    android:textColor="@color/black"
                     android:textIsSelectable="false"
                     android:textSize="20sp" />
             </LinearLayout>

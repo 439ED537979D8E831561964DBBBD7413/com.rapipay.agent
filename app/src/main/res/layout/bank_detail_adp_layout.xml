@@ -19,7 +19,7 @@
             android:layout_weight="400"
             android:inputType="textMultiLine"
             android:text="@string/p_names"
-            android:textColor="@color/colorPrimaryDark"
+            android:textColor="@color/black"
             android:textSize="14sp" />
 
         <LinearLayout
@@ -52,7 +52,7 @@
                     android:layout_weight="400"
                     android:inputType="textMultiLine"
                     android:text="@string/p_accountno"
-                    android:textColor="@color/colorPrimaryDark"
+                    android:textColor="@color/black"
                     android:textSize="14sp" />
             </LinearLayout>
 
@@ -78,10 +78,34 @@
                     android:layout_weight="400"
                     android:inputType="textMultiLine"
                     android:text="@string/p_bank"
-                    android:textColor="@color/colorPrimaryDark"
+                    android:textColor="@color/black"
                     android:textSize="14sp" />
             </LinearLayout>
+            <LinearLayout
+                android:id="@+id/ifsc_lay"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="3sp"
+                android:orientation="horizontal"
+                android:weightSum="800">
 
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="400"
+                    android:inputType="text"
+                    android:text="IFSC"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/ifsc"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="400"
+                    android:inputType="textMultiLine"
+                    android:textColor="@color/black"
+                    android:textSize="14sp" />
+            </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -103,7 +127,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="400"
                     android:inputType="textMultiLine"
-                    android:textColor="@color/colorPrimaryDark"
+                    android:textColor="@color/black"
                     android:textSize="14sp" />
             </LinearLayout>
         </LinearLayout>

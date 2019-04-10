@@ -2,10 +2,10 @@ package com.rapipay.android.agent.utils;
 
 import android.database.sqlite.SQLiteDatabase;
 
+import com.rapipay.android.agent.Database.RapipayDB;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
-
-import com.rapipay.android.agent.Database.RapipayDB;
 
 public class MasterClass {
 

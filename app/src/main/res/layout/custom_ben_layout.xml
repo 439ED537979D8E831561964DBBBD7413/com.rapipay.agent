@@ -16,7 +16,7 @@
             android:layout_weight="570"
             android:onClick="onClick"
             android:text="@string/p_accountno"
-            android:textColor="@color/colorPrimaryDark"
+            android:textColor="@color/black"
             android:textSize="12sp" />
         <TextView
             android:id="@+id/btn_name"
@@ -25,7 +25,7 @@
             android:layout_weight="570"
             android:onClick="onClick"
             android:text="@string/p_names"
-            android:textColor="@color/colorPrimaryDark"
+            android:textColor="@color/black"
             android:textSize="12sp" />
         <TextView
             android:id="@+id/btn_bank"
@@ -34,7 +34,7 @@
             android:layout_weight="570"
             android:onClick="onClick"
             android:text="@string/p_bank"
-            android:textColor="@color/colorPrimaryDark"
+            android:textColor="@color/black"
             android:textSize="12sp" />
     </LinearLayout>
 

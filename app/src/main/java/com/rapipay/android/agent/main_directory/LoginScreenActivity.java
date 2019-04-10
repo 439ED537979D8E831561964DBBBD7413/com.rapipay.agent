@@ -14,19 +14,10 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatButton;
 import android.telephony.TelephonyManager;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Toast;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.iid.FirebaseInstanceId;
-import com.google.firebase.iid.InstanceIdResult;
 import com.rapipay.android.agent.BuildConfig;
 import com.rapipay.android.agent.Model.VersionPozo;
 import com.rapipay.android.agent.R;
@@ -40,6 +31,9 @@ import com.rapipay.android.agent.utils.ImageUtils;
 import com.rapipay.android.agent.utils.LocalStorage;
 import com.rapipay.android.agent.utils.RouteClass;
 import com.rapipay.android.agent.utils.WebConfig;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -81,6 +75,7 @@ public class LoginScreenActivity extends BaseCompactActivity implements View.OnC
             jsonObject.put("txnRefId", ImageUtils.miliSeconds());
             jsonObject.put("agentId", input_user.getText().toString());
             jsonObject.put("nodeAgentId", input_user.getText().toString());
+//            jsonObject.put("password", ImageUtils.encodeSHA_256(input_password.getText().toString()));
             jsonObject.put("password", input_password.getText().toString());
             jsonObject.put("imeiNo", imei);
             jsonObject.put("domainName", BuildConfig.DOMAINNAME);

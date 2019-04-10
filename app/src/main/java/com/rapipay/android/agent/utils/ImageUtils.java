@@ -5,6 +5,11 @@ import android.net.wifi.WifiManager;
 import android.text.format.Formatter;
 import android.util.Base64;
 
+import com.rapipay.android.agent.Model.ImagePozo;
+import com.rapipay.android.agent.R;
+
+import org.apache.commons.lang.StringUtils;
+
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -13,19 +18,21 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Random;
 
-import com.rapipay.android.agent.Model.ImagePozo;
-import com.rapipay.android.agent.R;
-
 import static android.content.Context.WIFI_SERVICE;
+
 public class ImageUtils {
 
     public static ArrayList<ImagePozo> getFirstImageUrl() {
         ArrayList<ImagePozo> list = new ArrayList<>();
         list.clear();
-        list.add(new ImagePozo(1, "Add Network Partner", R.drawable.subuser));
-        list.add(new ImagePozo(3, "Credit Request", R.drawable.creditrq));
-        list.add(new ImagePozo(2, "Credit to Network", R.drawable.networkft));
-        list.add(new ImagePozo(4, "Agent Ledger", R.drawable.passbook));
+//        list.add(new ImagePozo(1, "Add Network Partner", R.drawable.subuser));
+        list.add(new ImagePozo("CR", "Credit Request", R.drawable.creditrq));
+        list.add(new ImagePozo("CN", "Credit to Network", R.drawable.networkft));
+        list.add(new ImagePozo("AL", "Agent Ledger", R.drawable.passbook));
+        list.add(new ImagePozo("MP", "MPOS Registration", R.drawable.mposreg));
+        list.add(new ImagePozo("AE", "AEPS Registration", R.drawable.aeps));
+        list.add(new ImagePozo("BB", "BBPS Registration", R.drawable.bbps));
+        list.add(new ImagePozo("MA", "MATM Registration", R.drawable.matm));
         return list;
     }
 
@@ -39,27 +46,30 @@ public class ImageUtils {
         list.add(new ImagePozo(5, "INDO NEPAL", R.drawable.indonepal));
         return list;
     }
+
     public static ArrayList<ImagePozo> getSixthImageUrl() {
         ArrayList<ImagePozo> list = new ArrayList<>();
         list.clear();
-        list.add(new ImagePozo(2,"Cash@Pos",R.drawable.mposcash));
+        list.add(new ImagePozo(2, "Cash@Pos", R.drawable.mposcash));
         list.add(new ImagePozo(3, "Sale", R.drawable.mposale));
         list.add(new ImagePozo(4, "EMI", R.drawable.mposemi));
         return list;
     }
+
     public static ArrayList<ImagePozo> getSeventhImageUrl() {
         ArrayList<ImagePozo> list = new ArrayList<>();
         list.clear();
-        list.add(new ImagePozo(2,"MATM Cash Withdrawal ",R.drawable.mposcash));
-        list.add(new ImagePozo(3, "MATM Balance Enquiry", R.drawable.mposale));
+        list.add(new ImagePozo(2, "MATM Cash Withdrawal ", R.drawable.matm));
+        list.add(new ImagePozo(3, "MATM Balance Enquiry", R.drawable.matm));
 //        list.add(new ImagePozo(4, "Transaction Status", R.drawable.mposemi));
         return list;
     }
+
     public static ArrayList<ImagePozo> getEigthImageUrl() {
         ArrayList<ImagePozo> list = new ArrayList<>();
         list.clear();
-        list.add(new ImagePozo(2,"AEPS Cash Withdrawal ",R.drawable.mposcash));
-        list.add(new ImagePozo(3, "AEPS Balance Enquiry", R.drawable.mposale));
+        list.add(new ImagePozo(2, "AEPS Cash Withdrawal ", R.drawable.aeps));
+        list.add(new ImagePozo(3, "AEPS Balance Enquiry", R.drawable.aeps));
 //        list.add(new ImagePozo(4, "Transaction Status", R.drawable.mposemi));
         return list;
     }
@@ -76,7 +86,7 @@ public class ImageUtils {
     public static ArrayList<ImagePozo> getThirdImageUrl() {
         ArrayList<ImagePozo> list = new ArrayList<>();
         list.clear();
-        list.add(new ImagePozo("MP","MPOS Registration",R.drawable.mposreg));
+        list.add(new ImagePozo("MP", "MPOS Registration", R.drawable.mposreg));
         list.add(new ImagePozo("AE", "AEPS Registration", R.drawable.aeps));
         list.add(new ImagePozo("BB", "BBPS Registration", R.drawable.bbps));
         list.add(new ImagePozo("MA", "MATM Registration", R.drawable.matm));
@@ -90,13 +100,15 @@ public class ImageUtils {
         else
             return false;
     }
-    public static boolean commonAddress(String value,int length) {
+
+    public static boolean commonAddress(String value, int length) {
         String regex = "^[a-zA-Z0-9\\\\s ()&#_',./-]{1," + length + "}$";
         if (value.matches(regex))
             return true;
         else
             return false;
     }
+
     public static boolean commonAmount(String value) {
         String regex = "^[0-9]{0,10}[.]?[0-9]{1,2}+$";
         if (value.matches(regex))
@@ -106,7 +118,7 @@ public class ImageUtils {
     }
 
     public static boolean commonAccount(String value, int start, int end) {
-        String regex = "^\\d{"+start+","+end+"}$";
+        String regex = "^\\d{" + start + "," + end + "}$";
         if (value.matches(regex))
             return true;
         else
@@ -114,30 +126,34 @@ public class ImageUtils {
     }
 
     public static boolean commonNumber(String value, int start) {
-        String regex = "^\\d{"+start+"}$";
+        String regex = "^\\d{" + start + "}$";
         if (value.matches(regex))
             return true;
         else
             return false;
     }
-    public static String miliSeconds(){
+
+    public static String miliSeconds() {
         Random rand = new Random();
         int n = rand.nextInt(8) + 1;
-        SimpleDateFormat df=new SimpleDateFormat("ssmmHHMMddSSS");
-        Date date=new Date();
-        return "1"+n+df.format(date);
+        SimpleDateFormat df = new SimpleDateFormat("ssmmHHMMddSSS");
+        Date date = new Date();
+        return "1" + n + df.format(date);
     }
-    public static String ipAddress(Context context){
+
+    public static String ipAddress(Context context) {
         WifiManager wm = (WifiManager) context.getApplicationContext().getSystemService(WIFI_SERVICE);
         return Formatter.formatIpAddress(wm.getConnectionInfo().getIpAddress());
     }
+
     public static String encodeSHA256(String password) throws NoSuchAlgorithmException, IOException {
         StringBuilder hexStrBuilder = new StringBuilder();
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         digest.reset();
         byte[] btPass = digest.digest(password.getBytes("UTF-8"));
         for (int i = 0; i < btPass.length; i++) {
-            hexStrBuilder.append(Integer.toHexString(0xFF & btPass[i]));
+            String value=StringUtils.leftPad(Integer.toHexString(0xFF & btPass[i]),2,"0");
+            hexStrBuilder.append(value);
         }
 //        String encodedPassword = null;
 //
@@ -152,6 +168,7 @@ public class ImageUtils {
 //        encodedPassword = Base64.encodeToString(btPass, Base64.DEFAULT);
         return hexStrBuilder.toString();
     }
+
     static int[][] d = {
             {0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
             {1, 2, 3, 4, 0, 6, 7, 8, 9, 5},
@@ -203,5 +220,18 @@ public class ImageUtils {
             reversed[i] = myArray[(myArray.length - (i + 1))];
         }
         return reversed;
+    }
+
+    public static String encodeSHA_256(String password) throws NoSuchAlgorithmException, IOException {
+        String encodedPassword = null;
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        digest.reset();
+        byte[] btPass = digest.digest(password.getBytes("UTF-8"));
+        for (int i = 0; i < 5; i++) {
+            digest.reset();
+            btPass = digest.digest(btPass);
+        }
+        encodedPassword = Base64.encodeToString(btPass, Base64.DEFAULT);
+        return encodedPassword;
     }
 }

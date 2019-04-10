@@ -1,7 +1,6 @@
 package com.rapipay.android.agent.main_directory;
 
 import android.Manifest;
-import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -108,7 +107,7 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
     AppCompatButton add_bank_details;
     NepalCityAdapter nepalCityAdapter = null;
     private Uri imageUri;
-    String amount = "", selectGender = "", docType = "", imgType = "";
+    String amount = "", selectGender = "", docType = "", imgType = "",mobileNo;
     MovableFloatingActionButton fab;
     boolean isFabClick = false;
     String[] items = new String[]{"Select Document Type", "Aadhaar Card", "Voter ID", "Driving License", "Passport", "Nepalese Citizenship", "Rasan Card", "Pan Card", "Indian Citizenship"};
@@ -120,6 +119,11 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
         super.onCreate(savedInstanceState);
         setContentView(R.layout.pmt_resistance_layout);
         initialize();
+        mobileNo = getIntent().getStringExtra("MOBILENO");
+        if (!mobileNo.isEmpty()) {
+            input_mobile.setText(mobileNo);
+            input_mobile.setEnabled(false);
+        }
     }
 
     private void initialize() {
@@ -1308,7 +1312,7 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
 
     private void selectImage() {
         final CharSequence[] items = {"Capture Image", "Choose from Gallery", "Select PDF", "Cancel"};
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(PMTRemittanceActivity.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(PMTRemittanceActivity.this);
         builder.setIcon(R.drawable.camera);
         builder.setTitle("Add Photo!");
         builder.setItems(items, new DialogInterface.OnClickListener() {
@@ -1328,7 +1332,7 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
 //                    intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
 //                    startActivityForResult(intent, CAMERA_REQUEST);
                 } else if (items[item].equals("Choose from Gallery")) {
-                    Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                     intent.setType("image/*");
                     startActivityForResult(Intent.createChooser(intent, "Select File"), SELECT_FILE);
                 } else if (items[item].equals("Select PDF")) {

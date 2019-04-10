@@ -24,11 +24,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-
 import com.rapipay.android.agent.BuildConfig;
 import com.rapipay.android.agent.Database.RapipayDB;
 import com.rapipay.android.agent.Model.BankDetailsPozo;
@@ -44,6 +39,7 @@ import com.rapipay.android.agent.fragments.DashBoardFragments;
 import com.rapipay.android.agent.fragments.LienHistory;
 import com.rapipay.android.agent.fragments.ProfileFragment;
 import com.rapipay.android.agent.fragments.SettlementBankFragment;
+import com.rapipay.android.agent.fragments.TpinTab;
 import com.rapipay.android.agent.interfaces.CustomInterface;
 import com.rapipay.android.agent.interfaces.RequestHandler;
 import com.rapipay.android.agent.utils.AsyncPostMethod;
@@ -53,6 +49,11 @@ import com.rapipay.android.agent.utils.ImageUtils;
 import com.rapipay.android.agent.utils.LocalStorage;
 import com.rapipay.android.agent.utils.MasterClass;
 import com.rapipay.android.agent.utils.WebConfig;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 public class MainActivity extends BaseCompactActivity
         implements NavigationView.OnNavigationItemSelectedListener, RequestHandler, CustomInterface, View.OnClickListener {
@@ -126,10 +127,9 @@ public class MainActivity extends BaseCompactActivity
     }
 
     private void loadUrl() {
-        if (localStorage.getActivityState(LocalStorage.ROUTESTATE).equalsIgnoreCase("UPDATE")) {
-            url();
-        } else
-            itemSelection(0);
+        url();
+//        } else
+//            itemSelection(0);
     }
 
     @Override
@@ -144,6 +144,9 @@ public class MainActivity extends BaseCompactActivity
                 Intent intent = new Intent(MainActivity.this, BankDetails.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
+                break;
+            case R.id.back_click:
+                itemSelection(0);
                 break;
         }
     }
@@ -199,8 +202,6 @@ public class MainActivity extends BaseCompactActivity
         TextView contactus = navigationView.findViewById(R.id.contactus);
         if (BuildConfig.APPTYPE == 1 || BuildConfig.APPTYPE == 3)
             contactus.setVisibility(View.VISIBLE);
-        else if (BuildConfig.APPTYPE == 2)
-            contactus.setVisibility(View.GONE);
         try {
             verionName.setText("Version - " + getPackageManager().getPackageInfo(getPackageName(), 0).versionName);
         } catch (PackageManager.NameNotFoundException e) {
@@ -283,35 +284,47 @@ public class MainActivity extends BaseCompactActivity
         int id = item.getItemId();
         Fragment fragment = null;
         if (id == R.id.nav_home) {
+            bankde.setVisibility(View.VISIBLE);
             reset.setVisibility(View.VISIBLE);
             fragment = new DashBoardFragments();
         } else if (id == R.id.nav_Cpin) {
             reset.setVisibility(View.GONE);
+            bankde.setVisibility(View.GONE);
             fragment = new ChangePinFragment();
         } else if (id == R.id.nav_cpsw) {
             reset.setVisibility(View.GONE);
+            bankde.setVisibility(View.GONE);
             fragment = new ChangePassword();
         } else if (id == R.id.profile) {
             reset.setVisibility(View.GONE);
+            bankde.setVisibility(View.GONE);
             fragment = new ProfileFragment();
         } else if (id == R.id.nav_Cmobile) {
             reset.setVisibility(View.GONE);
+            bankde.setVisibility(View.GONE);
             fragment = new ChangeMobileFragment();
         } else if (id == R.id.settle_Cmobile) {
             reset.setVisibility(View.GONE);
+            bankde.setVisibility(View.GONE);
             Bundle bundle = new Bundle();
             bundle.putString("message", "S");
             fragment = new SettlementBankFragment();
             fragment.setArguments(bundle);
         } else if (id == R.id.payload_Cmobile) {
             reset.setVisibility(View.GONE);
+            bankde.setVisibility(View.GONE);
             Bundle bundle = new Bundle();
             bundle.putString("message", "P");
             fragment = new SettlementBankFragment();
             fragment.setArguments(bundle);
         } else if (id == R.id.lien_Cmobile) {
             reset.setVisibility(View.GONE);
+            bankde.setVisibility(View.GONE);
             fragment = new LienHistory();
+        } else if (id == R.id.nav_tpin) {
+            reset.setVisibility(View.GONE);
+            bankde.setVisibility(View.GONE);
+            fragment = new TpinTab();
         } else if (fragment == null)
             Toast.makeText(MainActivity.this, "Under Process", Toast.LENGTH_SHORT).show();
         if (fragment != null)
@@ -394,8 +407,8 @@ public class MainActivity extends BaseCompactActivity
                 } else if (object.getString("headerValue").equalsIgnoreCase("ENABLE_TPIN")) {
                     ENABLE_TPIN = object.getString("headerData");
 //                    customDialog_Common("KYCLAYOUTS", null, null, "Banl Update", "", object.getString("headerData").replace(",","\n"), MainActivity.this);
-//                }else if (object.getString("headerValue").equalsIgnoreCase("IS_KYC_COMPLETED") && object.getString("headerData").equalsIgnoreCase("N")) {
-//                    customDialog_Common("KYCNEWLAYOUT", null, null, "Warning", null, "Your KYC is not updated, Kindly Proceed to update complete KYC.", MainActivity.this);
+                } else if (object.getString("headerValue").equalsIgnoreCase("IS_KYC_COMPLETED") && object.getString("headerData").equalsIgnoreCase("N")) {
+                    customDialog_Common("KYCNEWLAYOUT", null, null, "Warning", null, "Your KYC is not updated, Kindly Proceed to update complete KYC.", MainActivity.this);
 //                    customDialog_Common("KYCLAYOUTS", null, null, "Banl Update", "", object.getString("headerData").replace(",","\n"), MainActivity.this);
                 } else if (object.getString("headerValue").equalsIgnoreCase("IS_CRIMAGE_REQUIRED")) {
                     IS_CRIMAGE_REQUIRED = object.getString("headerData");
@@ -507,13 +520,13 @@ public class MainActivity extends BaseCompactActivity
         } else if (type.equalsIgnoreCase("SESSIONEXPIRE"))
             jumpPage();
         else if (type.equalsIgnoreCase("KYCLAYOUTS")) {
-        }else if (type.equalsIgnoreCase("KYCNEWLAYOUT")) {
+        } else if (type.equalsIgnoreCase("KYCNEWLAYOUT")) {
             String formData = getUserKyc();
             Intent intent = new Intent(MainActivity.this, WebViewVerify.class);
             intent.putExtra("persons", "pending");
             intent.putExtra("mobileNo", list.get(0).getMobilno());
             intent.putExtra("formData", formData);
-            startActivityForResult(intent,2);
+            startActivityForResult(intent, 2);
         } else
             finish();
     }
@@ -522,6 +535,7 @@ public class MainActivity extends BaseCompactActivity
     public void cancelClicked(String type, Object ob) {
         alertDialog.dismiss();
     }
+
     public String getUserKyc() {
         JSONObject jsonObject = new JSONObject();
         String form = null;
@@ -531,7 +545,7 @@ public class MainActivity extends BaseCompactActivity
             jsonObject.put("typeMobileWeb", "mobile");
             jsonObject.put("responseUrl", "");
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
-            jsonObject.put("txnRef",ImageUtils.miliSeconds());
+            jsonObject.put("txnRef", ImageUtils.miliSeconds());
             jsonObject.put("mobileNo", list.get(0).getMobilno());
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
             jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));

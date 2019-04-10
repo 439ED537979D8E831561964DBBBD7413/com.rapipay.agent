@@ -184,8 +184,8 @@ public class PendingRefundActivity extends BaseCompactActivity implements Reques
                         customDialog_Common("KYCLAYOUTS", object, null, getResources().getString(R.string.Alert), null, object.getString("responseMsg"), PendingRefundActivity.this);
                     }
                 } else if (object.getString("responseCode").equalsIgnoreCase("200") || object.getString("responseCode").equalsIgnoreCase("300")) {
-                    if (object.getString("serviceType").equalsIgnoreCase("BC_Refund") && object.has("otpRefId"))
-                        customDialog_Ben(object.getString("responseMessage"), object.getString("otpRefId"), object.getString("transactionId"), object.getString("serviceType"));
+                    if (object.getString("serviceType").equalsIgnoreCase("BC_Refund") && object.has("otpRefId") && object.getString("otpRefId").equalsIgnoreCase("null"))
+                        customDialog_Common("KYCEWLAYOUT", null, null, "Alert", "", object.getString("responseMessage"), PendingRefundActivity.this);
                     else if (object.getString("serviceType").equalsIgnoreCase("BC_Refund"))
                         customDialog_Common("PENDINGREFUND", object, null, "BC Refund", input_mobile.getText().toString(), object.getString("responseMessage"), PendingRefundActivity.this);
                     else if (object.getString("serviceType").equalsIgnoreCase("WALLET_REFUND") && object.has("otpRefId"))
@@ -195,6 +195,9 @@ public class PendingRefundActivity extends BaseCompactActivity implements Reques
                         customDialog_Common("REFUNDTXN", object, null, "REFUND TXN", null, object.getString("responseMessage"), PendingRefundActivity.this);
                     } else
                         change_View(object);
+                } else if (object.getString("responseCode").equalsIgnoreCase("201")) {
+                    if (object.getString("serviceType").equalsIgnoreCase("BC_Refund") && object.has("otpRefId"))
+                        customDialog_Ben(object.getString("responseMessage"), object.getString("otpRefId"), object.getString("transactionId"), object.getString("serviceType"));
                 }
             } else if (object.has("responsecode")) {
                 if (object.getString("responsecode").equalsIgnoreCase("75077")) {
@@ -286,7 +289,7 @@ public class PendingRefundActivity extends BaseCompactActivity implements Reques
     public JSONObject getrefundDmt(LastTransactionPozo pozo) {
         JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put("serviceType", "WALLET_REFUND ");
+            jsonObject.put("serviceType", "WALLET_REFUND");
             jsonObject.put("requestType", "DMT_CHANNEL");
             jsonObject.put("typeMobileWeb", "mobile");
             jsonObject.put("fundtransactionID", pozo.getRefundTxnId());
@@ -496,19 +499,21 @@ public class PendingRefundActivity extends BaseCompactActivity implements Reques
 
     @Override
     public void okClicked(String type, Object ob) {
-        if (!type.equalsIgnoreCase("PENDINGREFUND") && !type.equalsIgnoreCase("KYCLAYOUT") && !type.equalsIgnoreCase("REFUNDTXN") && !type.equalsIgnoreCase("KYCLAYOUTS") && !type.equalsIgnoreCase("KYCLAYOUTSS"))
+        if (!type.equalsIgnoreCase("PENDINGREFUND") && !type.equalsIgnoreCase("KYCLAYOUT") && !type.equalsIgnoreCase("REFUNDTXN") && !type.equalsIgnoreCase("KYCLAYOUTS") && !type.equalsIgnoreCase("KYCLAYOUTSS") && !type.equalsIgnoreCase("KYCEWLAYOUT"))
             new AsyncPostMethod(WebConfig.BCRemittanceApp, getSender_Validate(type).toString(), headerData, PendingRefundActivity.this, getString(R.string.responseTimeOut)).execute();
-        else if (type.equalsIgnoreCase("REFUNDTXN")) {
+        else if (type.equalsIgnoreCase("REFUNDTXN") || type.equalsIgnoreCase("KYCEWLAYOUT")) {
             refundPozoArrayList.remove(refundPosition);
             adapter.notifyDataSetChanged();
             hideKeyboard(PendingRefundActivity.this);
-        } else if (type.equalsIgnoreCase("KYCLAYOUTS"))
+        } else if (type.equalsIgnoreCase("KYCLAYOUTS")) {
             input_mobile.setText("");
-        input_mobile.setHint(getResources().getString(R.string.p_cususerid));
+            input_mobile.setHint(getResources().getString(R.string.p_cususerid));
+        }
     }
 
     @Override
     public void cancelClicked(String type, Object ob) {
 
     }
+
 }

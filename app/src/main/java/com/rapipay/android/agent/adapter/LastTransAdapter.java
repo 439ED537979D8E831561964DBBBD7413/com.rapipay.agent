@@ -7,13 +7,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.rapipay.android.agent.Model.LastTransactionPozo;
+import com.rapipay.android.agent.R;
+
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Locale;
-
-import me.grantland.widget.AutofitTextView;
-import com.rapipay.android.agent.Model.LastTransactionPozo;
-import com.rapipay.android.agent.R;
 
 public class LastTransAdapter extends RecyclerView.Adapter<LastTransAdapter.ViewHolder> {
 
@@ -23,17 +22,17 @@ public class LastTransAdapter extends RecyclerView.Adapter<LastTransAdapter.View
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
-        public AutofitTextView btn_name,btn_rrn;
+        public TextView btn_name,btn_rrn;
         private TextView btn_p_bank,btn_p_amounts,p_transid;
 
         public ViewHolder(View view) {
             super(view);
             mView = view;
-            btn_name = (AutofitTextView) view.findViewById(R.id.btn_name);
+            btn_name = (TextView) view.findViewById(R.id.btn_name);
             btn_p_amounts = (TextView) view.findViewById(R.id.btn_p_amounts);
             p_transid = (TextView) view.findViewById(R.id.btn_p_transid);
             btn_p_bank = (TextView)view.findViewById(R.id.btn_p_bank);
-            btn_rrn = (AutofitTextView)view.findViewById(R.id.btn_rrn);
+            btn_rrn = (TextView)view.findViewById(R.id.btn_rrn);
         }
     }
     public LastTransAdapter(Context context, RecyclerView recyclerView, ArrayList<LastTransactionPozo> items) {

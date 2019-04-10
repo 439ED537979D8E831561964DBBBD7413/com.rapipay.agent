@@ -7,10 +7,13 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import java.util.ArrayList;
-import me.grantland.widget.AutofitTextView;
+
 import com.rapipay.android.agent.Model.HeaderePozo;
 import com.rapipay.android.agent.R;
+
+import java.util.ArrayList;
+
+import me.grantland.widget.AutofitTextView;
 
 public class BottomAdapter extends ArrayAdapter<HeaderePozo> {
 
