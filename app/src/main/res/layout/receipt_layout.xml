@@ -18,16 +18,16 @@
         android:textSize="18dp" />
 
     <ListView
-        android:layout_below="@+id/dialog_title"
         android:id="@+id/listbottom"
         android:layout_width="match_parent"
         android:layout_height="350dp"
+        android:layout_below="@+id/dialog_title"
         android:padding="5dp" />
 
     <RelativeLayout
-        android:layout_below="@+id/listbottom"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/listbottom">
 
         <android.support.v7.widget.AppCompatButton
             android:id="@+id/btn_cancel"

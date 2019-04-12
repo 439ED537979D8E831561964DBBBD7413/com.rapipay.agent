@@ -1,5 +1,6 @@
 package com.rapipay.android.agent.utils;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -9,6 +10,8 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatButton;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.TextView;
 
 import com.rapipay.android.agent.R;
@@ -176,11 +179,11 @@ public class AsyncPostMethod extends AsyncTask<String, String, String> {
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
-    AlertDialog alertDialog,alertDialog1;
+    AlertDialog alertDialog1;
 
     protected void customDialog_Common(String msg) {
         try {
-            AlertDialog.Builder dialog = new AlertDialog.Builder(context);
+            final Dialog dialog = new Dialog(context);
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View alertLayout = inflater.inflate(R.layout.custom_layout_common, null);
             TextView text = (TextView) alertLayout.findViewById(R.id.dialog_title);
@@ -195,14 +198,16 @@ public class AsyncPostMethod extends AsyncTask<String, String, String> {
                 @Override
                 public void onClick(View v) {
                     try {
-                        alertDialog.dismiss();
+                        dialog.dismiss();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
             });
-            dialog.setView(alertLayout);
-            alertDialog = dialog.show();
+            dialog.setContentView(alertLayout);
+            dialog.show();
+            Window window = dialog.getWindow();
+            window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -79,8 +79,8 @@ public class EnableDiablePinFragment extends BaseFragment implements View.OnClic
                 jsonObject.put("txnIP", ImageUtils.ipAddress(getActivity()));
                 jsonObject.put("resetStatus", "Y");
                 if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y"))
-                jsonObject.put("txnPinEnable", "N");
-                if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("N"))
+                    jsonObject.put("txnPinEnable", "N");
+                else if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("N"))
                     jsonObject.put("txnPinEnable", "Y");
                 else
                     jsonObject.put("txnPinEnable", "Y");

@@ -1,63 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
-    <TextView
-        android:id="@+id/dialog_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="left"
-        android:background="@color/colorPrimaryDark"
-        android:gravity="left"
-        android:padding="15dp"
-        android:text="@string/app_name"
-        android:textColor="@color/white"
-        android:textSize="18dp" />
-    <android.support.design.widget.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_marginTop="10sp"
-        android:padding="5dp"
-        android:layout_height="wrap_content">
 
-        <EditText
-            android:id="@+id/input_amount_ben"
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/dialog_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/p_otp"
-            android:inputType="number"
-            android:textSize="16dp" />
-    </android.support.design.widget.TextInputLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:gravity="end"
-        android:orientation="horizontal"
-        android:weightSum="800">
-
-        <android.support.v7.widget.AppCompatButton
-            android:id="@+id/btn_cancel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:background="@drawable/border_button"
-            android:onClick="onClick"
-            android:padding="5dp"
-            android:text="@string/cancel"
+            android:layout_gravity="left"
+            android:background="@color/colorPrimaryDark"
+            android:gravity="left"
+            android:padding="15dp"
+            android:text="@string/app_name"
             android:textColor="@color/white"
-            android:textSize="16dp" />
+            android:textSize="18dp" />
 
-        <android.support.v7.widget.AppCompatButton
-            android:id="@+id/btn_ok"
-            android:layout_width="wrap_content"
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:background="@drawable/border_button"
-            android:onClick="onClick"
-            android:padding="5dp"
-            android:text="@string/ok"
-            android:textColor="@color/white"
-            android:textSize="16dp" />
+            android:layout_marginTop="10sp"
+            android:padding="5dp">
+
+            <EditText
+                android:id="@+id/input_amount_ben"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/p_otp"
+                android:inputType="number"
+                android:textSize="16dp" />
+        </android.support.design.widget.TextInputLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:gravity="end"
+            android:orientation="horizontal"
+            android:weightSum="800">
+
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/btn_cancel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:background="@drawable/border_button"
+                android:onClick="onClick"
+                android:padding="5dp"
+                android:text="@string/cancel"
+                android:textColor="@color/white"
+                android:textSize="16dp" />
+
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/btn_ok"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:background="@drawable/border_button"
+                android:onClick="onClick"
+                android:padding="5dp"
+                android:text="@string/ok"
+                android:textColor="@color/white"
+                android:textSize="16dp" />
+        </LinearLayout>
     </LinearLayout>
-</LinearLayout>
+</RelativeLayout>

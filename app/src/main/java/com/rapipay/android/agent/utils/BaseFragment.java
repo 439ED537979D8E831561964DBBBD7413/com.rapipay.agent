@@ -1,6 +1,7 @@
 package com.rapipay.android.agent.utils;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
@@ -22,6 +23,7 @@ import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.EditText;
@@ -50,8 +52,8 @@ import java.util.Locale;
 
 public class BaseFragment extends Fragment {
     protected LocalStorage localStorage;
-    protected AlertDialog.Builder dialog;
-    protected AlertDialog alertDialog, newdialog;
+    protected Dialog dialog,dialognew;
+//    protected AlertDialog alertDialog, newdialog;
     CustomInterface anInterface;
     protected  boolean scan = false;
     protected  String TYPE,customerType;
@@ -102,9 +104,10 @@ public class BaseFragment extends Fragment {
 
     protected void customDialog_Common(final String type, JSONObject object, final Object ob, String msg, final String input, String output, final CustomInterface anInterface) {
         this.anInterface = anInterface;
-        dialog = new AlertDialog.Builder(getActivity());
+        dialog = new Dialog(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View alertLayout = inflater.inflate(R.layout.custom_layout_common, null);
+        alertLayout.setKeepScreenOn(true);
         TextView text = (TextView) alertLayout.findViewById(R.id.dialog_title);
         TextView dialog_cancel = (TextView) alertLayout.findViewById(R.id.dialog_cancel);
         text.setText(msg);
@@ -116,7 +119,7 @@ public class BaseFragment extends Fragment {
             btn_ok.setText("Network Setting");
             btn_ok.setTextSize(10);
             dialog_cancel.setVisibility(View.VISIBLE);
-            dialog.setView(alertLayout);
+            dialog.setContentView(alertLayout);
         }
         try {
             if (type.equalsIgnoreCase("KYCLAYOUT") || type.equalsIgnoreCase("PENDINGREFUND") || type.equalsIgnoreCase("REFUNDTXN") || type.equalsIgnoreCase("SESSIONEXPIRRED") || type.equalsIgnoreCase("PENDINGLAYOUT")) {
@@ -145,23 +148,25 @@ public class BaseFragment extends Fragment {
                     anInterface.okClicked(type, ob);
                 } else
                     anInterface.okClicked(type, ob);
-                alertDialog.dismiss();
+                dialog.dismiss();
             }
         });
         btn_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 anInterface.cancelClicked(type, ob);
-                alertDialog.dismiss();
+                dialog.dismiss();
             }
         });
         dialog_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                alertDialog.dismiss();
+                dialog.dismiss();
             }
         });
-        alertDialog = dialog.show();
+        dialog.show();
+        Window window = dialog.getWindow();
+        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
     }
     protected void moneyTransgerFees(View alertLayout, JSONObject object, Object ob, String ifsc_code, String name, String msg, String input) throws Exception {
         TextView btn_name = (TextView) alertLayout.findViewById(R.id.btn_name_service);
@@ -197,20 +202,20 @@ public class BaseFragment extends Fragment {
             btn_sendname.setText(input);
         if (name != null)
             btn_name.setText(name);
-        dialog.setView(alertLayout);
+        dialog.setContentView(alertLayout);
     }
     protected void customView(View alertLayout, String output) throws Exception {
         TextView otpView = (TextView) alertLayout.findViewById(R.id.dialog_msg);
         otpView.setText(output);
         otpView.setVisibility(View.VISIBLE);
-        dialog.setView(alertLayout);
+        dialog.setContentView(alertLayout);
     }
 
     protected ArrayList<String> spinner_list;
     protected CustomSpinnerAdapter adapter = null;
     protected void customSpinner(final TextView viewText, final String type, final ArrayList<String> list_spinner,final TextView ifsc_Code) {
         spinner_list = list_spinner;
-        dialog = new AlertDialog.Builder(getActivity());
+        dialog = new Dialog(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View alertLayout = inflater.inflate(R.layout.custom_spinner_layout, null);
         TextView text = (TextView) alertLayout.findViewById(R.id.spinner_title);
@@ -249,18 +254,20 @@ public class BaseFragment extends Fragment {
                     ifsc_Code.setText(BaseCompactActivity.db.geBankIFSC(condition).get(0));
                     ifsc_Code.setEnabled(false);
                 }
-                alertDialog.dismiss();
+                dialog.dismiss();
             }
         });
         dialog.setCancelable(false);
-        dialog.setView(alertLayout);
+        dialog.setContentView(alertLayout);
         btn_ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                alertDialog.dismiss();
+                dialog.dismiss();
             }
         });
-        alertDialog = dialog.show();
+        dialog.show();
+        Window window = dialog.getWindow();
+        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
     }
     protected void hideKeyboard(Activity activity) {
         InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);

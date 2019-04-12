@@ -21,6 +21,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.DatePicker;
 import android.widget.ImageView;
@@ -152,10 +153,10 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
 
     }
 
-    AlertDialog alertDialog;
+//    Dialog alertDialog;
 
     private void customDialog_Ben(String msg, String title) {
-        AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
+        final Dialog dialog = new Dialog(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View alertLayout = inflater.inflate(R.layout.custom_layout_common, null);
         AppCompatButton btn_cancel = (AppCompatButton) alertLayout.findViewById(R.id.btn_cancel);
@@ -166,22 +167,24 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
         otpView.setVisibility(View.VISIBLE);
         TextView texttitle = (TextView) alertLayout.findViewById(R.id.dialog_title);
         texttitle.setText(title);
-        dialog.setView(alertLayout);
+        dialog.setContentView(alertLayout);
         dialog.setCancelable(false);
         btn_ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 clear();
-                alertDialog.dismiss();
+                dialog.dismiss();
             }
         });
         btn_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                alertDialog.dismiss();
+                dialog.dismiss();
             }
         });
-        alertDialog = dialog.show();
+        dialog.show();
+        Window window = dialog.getWindow();
+        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
     }
 
     private void clear() {

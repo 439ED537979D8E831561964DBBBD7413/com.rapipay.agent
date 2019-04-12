@@ -1,5 +1,6 @@
 package com.rapipay.android.agent.fragments;
 
+import android.app.Dialog;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.support.v7.widget.AppCompatButton;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.TextView;
 
 import com.rapipay.android.agent.Database.RapipayDB;
@@ -19,6 +21,7 @@ import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.interfaces.RequestHandler;
 import com.rapipay.android.agent.utils.AsyncPostMethod;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
+import com.rapipay.android.agent.utils.BaseFragment;
 import com.rapipay.android.agent.utils.GenerateChecksum;
 import com.rapipay.android.agent.utils.ImageUtils;
 import com.rapipay.android.agent.utils.LocalStorage;
@@ -29,7 +32,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class ChangePassword extends Fragment implements RequestHandler, View.OnClickListener {
+public class ChangePassword extends BaseFragment implements RequestHandler, View.OnClickListener {
 
     View rv;
     protected ArrayList<RapiPayPozo> list;
@@ -122,12 +125,12 @@ public class ChangePassword extends Fragment implements RequestHandler, View.OnC
         }
     }
 
-    AlertDialog alertDialog;
 
     private void customDialog_Ben(String msg, String title) {
-        AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
+        dialog = new Dialog(getActivity());
         LayoutInflater inflater = getLayoutInflater();
         View alertLayout = inflater.inflate(R.layout.custom_layout_common, null);
+        alertLayout.setKeepScreenOn(true);
         AppCompatButton btn_cancel = (AppCompatButton) alertLayout.findViewById(R.id.btn_cancel);
         btn_cancel.setVisibility(View.GONE);
         AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
@@ -136,23 +139,25 @@ public class ChangePassword extends Fragment implements RequestHandler, View.OnC
         otpView.setVisibility(View.VISIBLE);
         TextView texttitle = (TextView) alertLayout.findViewById(R.id.dialog_title);
         texttitle.setText(title);
-        dialog.setView(alertLayout);
+        dialog.setContentView(alertLayout);
         dialog.setCancelable(false);
         btn_ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 deleteTables("forgot");
                 new RouteClass(getActivity(), null, "", localStorage, "0");
-                alertDialog.dismiss();
+                dialog.dismiss();
             }
         });
         btn_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                alertDialog.dismiss();
+                dialog.dismiss();
             }
         });
-        alertDialog = dialog.show();
+        dialog.show();
+        Window window = dialog.getWindow();
+        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
     }
     protected void deleteTables(String type) {
         SQLiteDatabase dba = BaseCompactActivity.db.getWritableDatabase();

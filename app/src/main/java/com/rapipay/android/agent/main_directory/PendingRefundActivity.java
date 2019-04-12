@@ -1,5 +1,6 @@
 package com.rapipay.android.agent.main_directory;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -12,6 +13,8 @@ import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -398,7 +401,7 @@ public class PendingRefundActivity extends BaseCompactActivity implements Reques
     int maxLength = 0;
 
     private void customDialog_Ben(String msg, final String otpRefId, final String transactionId, final String serviceType) {
-        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+        dialog = new Dialog(this);
         LayoutInflater inflater = getLayoutInflater();
         View alertLayout = inflater.inflate(R.layout.refund_layout, null);
         TextView texttitle = (TextView) alertLayout.findViewById(R.id.dialog_title);
@@ -414,13 +417,13 @@ public class PendingRefundActivity extends BaseCompactActivity implements Reques
         InputFilter[] FilterArray = new InputFilter[1];
         FilterArray[0] = new InputFilter.LengthFilter(maxLength);
         text.setFilters(FilterArray);
-        dialog.setView(alertLayout);
+        dialog.setContentView(alertLayout);
         dialog.setCancelable(false);
         AppCompatButton btn_cancel = (AppCompatButton) alertLayout.findViewById(R.id.btn_cancel);
         btn_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                alertDialog.dismiss();
+                dialog.dismiss();
             }
         });
         AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
@@ -429,10 +432,10 @@ public class PendingRefundActivity extends BaseCompactActivity implements Reques
             public void onClick(View v) {
                 if (!text.getText().toString().isEmpty() && text.length() == 6 && !transactionId.equalsIgnoreCase("") && serviceType.equalsIgnoreCase("BC_Refund")) {
                     new AsyncPostMethod(WebConfig.BCRemittanceApp, add_OtpDetails(otpRefId, transactionId, text.getText().toString()).toString(), headerData, PendingRefundActivity.this, getString(R.string.responseTimeOut)).execute();
-                    alertDialog.dismiss();
+                    dialog.dismiss();
                 } else if (!text.getText().toString().isEmpty() && text.length() == 6 && transactionId.equalsIgnoreCase("") && serviceType.equalsIgnoreCase("WALLET_REFUND")) {
                     new AsyncPostMethod(WebConfig.WALLETTRANSFER_URL, processOtp(text.getText().toString(), otpRefId).toString(), headerData, PendingRefundActivity.this, getString(R.string.responseTimeOut)).execute();
-                    alertDialog.dismiss();
+                    dialog.dismiss();
                 } else {
                     text.setError("Please Enter Otp");
                     text.requestFocus();
@@ -441,7 +444,9 @@ public class PendingRefundActivity extends BaseCompactActivity implements Reques
 
             }
         });
-        alertDialog = dialog.show();
+        dialog.show();
+        Window window = dialog.getWindow();
+        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
     }
 
     public JSONObject processOtp(String otp, String otpRefId) {

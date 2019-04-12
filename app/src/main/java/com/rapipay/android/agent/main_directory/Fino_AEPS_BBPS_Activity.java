@@ -181,6 +181,7 @@ public class Fino_AEPS_BBPS_Activity extends Activity implements View.OnClickLis
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setCancelable(cancelable);
         dialog.show();
+
     }
 
     private void hideKeyboard(Context ctx) {

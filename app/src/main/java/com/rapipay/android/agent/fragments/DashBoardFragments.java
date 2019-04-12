@@ -1,6 +1,7 @@
 package com.rapipay.android.agent.fragments;
 
 import android.Manifest;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -18,6 +19,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -51,6 +53,7 @@ import com.rapipay.android.agent.main_directory.ReChargeActivity;
 import com.rapipay.android.agent.main_directory.RechargeHistory;
 import com.rapipay.android.agent.main_directory.RegisterKYCTab;
 import com.rapipay.android.agent.main_directory.WalletDetailsActivity;
+import com.rapipay.android.agent.utils.BaseFragment;
 import com.rapipay.android.agent.utils.ImageUtils;
 import com.rapipay.android.agent.utils.RecyclerTouchListener;
 
@@ -59,7 +62,7 @@ import java.util.ArrayList;
 import static android.app.Activity.RESULT_OK;
 import static com.finopaytech.finosdk.helpers.Utils.hideKeyboard;
 
-public class DashBoardFragments extends Fragment {
+public class DashBoardFragments extends BaseFragment {
     RecyclerView recycler_view, recycler_view2, recycler_view3, recycler_view4, recycler_view5, recycler_view6, recycler_view7, recycler_view8;
     View rv;
     TextView bankdetails;
@@ -471,12 +474,13 @@ public class DashBoardFragments extends Fragment {
         }
     }
 
-    AlertDialog alertDialog;
+//    AlertDialog alertDialog;
     EditText input_number;
     private void customDialog_Ben(String title, final String type) {
-        AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
+        dialog = new Dialog(getActivity());
         final LayoutInflater inflater = getActivity().getLayoutInflater();
         View alertLayout = inflater.inflate(R.layout.dash_pop_layout, null);
+        alertLayout.setKeepScreenOn(true);
         AppCompatButton btn_cancel = (AppCompatButton) alertLayout.findViewById(R.id.btn_cancel);
         AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
         input_number = (EditText) alertLayout.findViewById(R.id.input_number);
@@ -487,7 +491,7 @@ public class DashBoardFragments extends Fragment {
         if (type.equalsIgnoreCase("MposCashoutTransfer") || type.equalsIgnoreCase("MposSaleTransfer") || type.equalsIgnoreCase("MposEmiTransfer"))
             input_amount.setVisibility(View.VISIBLE);
         dialog.setCancelable(false);
-        dialog.setView(alertLayout);
+        dialog.setContentView(alertLayout);
         btn_search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -507,7 +511,7 @@ public class DashBoardFragments extends Fragment {
                         intent.putExtra("MOBILENO", input_number.getText().toString());
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(intent);
-                        alertDialog.dismiss();
+                        dialog.dismiss();
                     }
                 } else if (type.equalsIgnoreCase("WALLETTransfer")) {
                     if (input_number.length() != 10) {
@@ -520,7 +524,7 @@ public class DashBoardFragments extends Fragment {
                         intent.putExtra("type", "");
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(intent);
-                        alertDialog.dismiss();
+                        dialog.dismiss();
                     }
                 }else if (type.equalsIgnoreCase("RefundTransfer")) {
                     if (input_number.length() != 10) {
@@ -532,7 +536,7 @@ public class DashBoardFragments extends Fragment {
                         intent.putExtra("mobileNo", input_number.getText().toString());
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(intent);
-                        alertDialog.dismiss();
+                        dialog.dismiss();
                     }
                 } else if (type.equalsIgnoreCase("PMTTransfer")) {
                     if (input_number.length() != 10) {
@@ -544,7 +548,7 @@ public class DashBoardFragments extends Fragment {
                         intent.putExtra("MOBILENO", input_number.getText().toString());
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(intent);
-                        alertDialog.dismiss();
+                        dialog.dismiss();
                     }
                 } else if (type.equalsIgnoreCase("MposCashoutTransfer")) {
                     if (input_number.length() != 10) {
@@ -565,7 +569,7 @@ public class DashBoardFragments extends Fragment {
                         intent.putExtra("reqFor", "MPOS");
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(intent);
-                        alertDialog.dismiss();
+                        dialog.dismiss();
                     }
                 } else if (type.equalsIgnoreCase("MposSaleTransfer")) {
                     if (input_number.length() != 10) {
@@ -586,7 +590,7 @@ public class DashBoardFragments extends Fragment {
                         intent.putExtra("reqFor", "MPOS");
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(intent);
-                        alertDialog.dismiss();
+                        dialog.dismiss();
                     }
                 } else if (type.equalsIgnoreCase("MposEmiTransfer")) {
                     if (input_number.length() != 10) {
@@ -607,20 +611,20 @@ public class DashBoardFragments extends Fragment {
                         intent.putExtra("reqFor", "MPOS");
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(intent);
-                        alertDialog.dismiss();
+                        dialog.dismiss();
                     }
                 }
             }
         });
-        btn_cancel.setOnClickListener(new View.OnClickListener()
-
-        {
+        btn_cancel.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                alertDialog.dismiss();
+                dialog.dismiss();
             }
         });
-        alertDialog = dialog.show();
+        dialog.show();
+        Window window = dialog.getWindow();
+        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
     }
     public void loadIMEI() {
         if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_CONTACTS)

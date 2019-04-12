@@ -12,6 +12,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.rapipay.android.agent.Model.LoadSummaryPozo;
 import com.rapipay.android.agent.Model.NewTransactionPozo;
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.adapter.TransactionHistAdapter;
@@ -36,7 +37,7 @@ public class NewChannelHistoryActivity extends BaseCompactActivity implements Vi
     private boolean isLoading;
     ListView trans_details;
     ImageView btn_fund;
-    ArrayList<NewTransactionPozo> transactionPozoArrayList;
+    ArrayList<LoadSummaryPozo> transactionPozoArrayList;
     private int first = 1, last = 25;
     TransactionHistAdapter adapter;
     EditText search_data;
@@ -49,7 +50,7 @@ public class NewChannelHistoryActivity extends BaseCompactActivity implements Vi
         TYPE = getIntent().getStringExtra("TYPE");
         if (TYPE.equalsIgnoreCase("NODE"))
             if (printDifference(mainDate(date2_text.getText().toString()), mainDate(date1_text.getText().toString())))
-                new AsyncPostMethod(WebConfig.CommonReport, channel_request(first, last).toString(), headerData, NewChannelHistoryActivity.this, getString(R.string.responseTimeOut), "TRANSACTIONHISTORY").execute();
+                new AsyncPostMethod(WebConfig.CommonReport, channel_request().toString(), headerData, NewChannelHistoryActivity.this, getString(R.string.responseTimeOut), "TRANSACTIONHISTORY").execute();
     }
 
     private void initialize() {
@@ -58,7 +59,7 @@ public class NewChannelHistoryActivity extends BaseCompactActivity implements Vi
         selectedMonth = calendar.get(Calendar.MONTH) + 1;
         selectedYear = calendar.get(Calendar.YEAR);
         heading = (TextView) findViewById(R.id.toolbar_title);
-        heading.setText("Transaction History");
+        heading.setText("Load Summary");
         btn_fund = (ImageView) findViewById(R.id.btn_fund);
         btn_fund.setOnClickListener(this);
         date2_text = (AutofitTextView) findViewById(R.id.date2);
@@ -66,7 +67,7 @@ public class NewChannelHistoryActivity extends BaseCompactActivity implements Vi
         date2_text.setText(selectedYear + "-" + selectedMonth + "-" + selectedDate);
         date1_text.setText(selectedYear + "-" + selectedMonth + "-" + selectedDate);
         trans_details = (ListView) findViewById(R.id.trans_details);
-        search_data = (EditText)findViewById(R.id.search_data);
+        search_data = (EditText) findViewById(R.id.search_data);
         search_data.setVisibility(View.VISIBLE);
         search_data.addTextChangedListener(new TextWatcher() {
             @Override
@@ -81,7 +82,7 @@ public class NewChannelHistoryActivity extends BaseCompactActivity implements Vi
 
             @Override
             public void afterTextChanged(Editable s) {
-                if(s.toString().length()!=0)
+                if (s.toString().length() != 0)
                     adapter.filter(s.toString());
 
             }
@@ -115,7 +116,7 @@ public class NewChannelHistoryActivity extends BaseCompactActivity implements Vi
                 if (totalItemCount != 0 && totalItemCount == last && lastInScreen == totalItemCount && !isLoading) {
                     first = last + 1;
                     last += 25;
-                    new AsyncPostMethod(WebConfig.CommonReport, channel_request(first, last).toString(), headerData, NewChannelHistoryActivity.this, getString(R.string.responseTimeOut), "TRANSACTIONHISTORY").execute();
+                    new AsyncPostMethod(WebConfig.CommonReport, channel_request().toString(), headerData, NewChannelHistoryActivity.this, getString(R.string.responseTimeOut), "TRANSACTIONHISTORY").execute();
                     isLoading = true;
                 }
             }
@@ -157,28 +158,25 @@ public class NewChannelHistoryActivity extends BaseCompactActivity implements Vi
                     date1_text.setError("Please enter mandatory field");
                     Toast.makeText(this, "Please enter mandatory field", Toast.LENGTH_SHORT).show();
                 } else if (printDifference(mainDate(date2_text.getText().toString()), mainDate(date1_text.getText().toString())))
-                    new AsyncPostMethod(WebConfig.CommonReport, channel_request(first, last).toString(), headerData, NewChannelHistoryActivity.this, getString(R.string.responseTimeOut), "TRANSACTIONHISTORY").execute();
+                    new AsyncPostMethod(WebConfig.CommonReport, channel_request().toString(), headerData, NewChannelHistoryActivity.this, getString(R.string.responseTimeOut), "TRANSACTIONHISTORY").execute();
                 else
                     Toast.makeText(NewChannelHistoryActivity.this, "Please select correct date", Toast.LENGTH_SHORT).show();
                 break;
         }
     }
 
-    public JSONObject channel_request(int fromIndex, int toIndex) {
+    public JSONObject channel_request() {
         JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put("serviceType", "GET_CHANNEL_TXN_HISTORY");
+            jsonObject.put("serviceType", "GET_LOAD_SUMMARY");
             jsonObject.put("requestType", "REPORT_CHANNEL");
             jsonObject.put("typeMobileWeb", "mobile");
             jsonObject.put("transactionID", ImageUtils.miliSeconds());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
-            jsonObject.put("fromTxnDate", date2_text.getText().toString());
-            jsonObject.put("toTxnDate", date1_text.getText().toString());
+            jsonObject.put("agentMobile", list.get(0).getMobilno());
+            jsonObject.put("fromDate", date2_text.getText().toString());
+            jsonObject.put("toDate", date1_text.getText().toString());
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
-            if (TYPE.equalsIgnoreCase("NODE"))
-                jsonObject.put("operationFlag", "ALL");
-            jsonObject.put("fromIndex", String.valueOf(fromIndex));
-            jsonObject.put("toIndex", String.valueOf(toIndex));
             jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
 
         } catch (Exception e) {
@@ -191,8 +189,10 @@ public class NewChannelHistoryActivity extends BaseCompactActivity implements Vi
     public void chechStatus(JSONObject object) {
         try {
             if (object.getString("responseCode").equalsIgnoreCase("200")) {
-                if (object.has("allTxnHistory")) {
-                    insertLastTransDetails(object.getJSONArray("allTxnHistory"));
+                if (object.getString("serviceType").equalsIgnoreCase("GET_LOAD_SUMMARY")) {
+                    if (object.has("getLoadSummaryList")) {
+                        insertLastTransDetails(object.getJSONArray("getLoadSummaryList"));
+                    }
                 } else if (object.getString("serviceType").equalsIgnoreCase("Get_Txn_Recipt")) {
                     if (object.has("getTxnReceiptDataList"))
                         try {
@@ -210,11 +210,11 @@ public class NewChannelHistoryActivity extends BaseCompactActivity implements Vi
     }
 
     private void insertLastTransDetails(JSONArray array) {
-        transactionPozoArrayList  = new ArrayList<NewTransactionPozo>();
+        transactionPozoArrayList = new ArrayList<LoadSummaryPozo>();
         try {
             for (int i = 0; i < array.length(); i++) {
                 JSONObject object = array.getJSONObject(i);
-                transactionPozoArrayList.add(new NewTransactionPozo(object.getString("senderMoibleNumber"), object.getString("txnAmount"), object.getString("txnStatus"), object.getString("txnID"), object.getString("txnDate"), object.getString("serviceType"), object.getString("senderName"), object.getString("payeeAccount"), object.getString("payeeBankName"), object.getString("bankRRN")));
+                transactionPozoArrayList.add(new LoadSummaryPozo(object.getString("srNo"), object.getString("serviceType"), object.getString("debitAmount"), object.getString("creditAmount")));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -223,7 +223,7 @@ public class NewChannelHistoryActivity extends BaseCompactActivity implements Vi
             initializeTransAdapter(transactionPozoArrayList);
     }
 
-    private void initializeTransAdapter(ArrayList<NewTransactionPozo> list) {
+    private void initializeTransAdapter(ArrayList<LoadSummaryPozo> list) {
         if (first == 1) {
             adapter = new TransactionHistAdapter(list, NewChannelHistoryActivity.this);
             trans_details.setAdapter(adapter);

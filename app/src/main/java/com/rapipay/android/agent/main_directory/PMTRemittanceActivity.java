@@ -1,6 +1,7 @@
 package com.rapipay.android.agent.main_directory;
 
 import android.Manifest;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -33,6 +34,8 @@ import android.util.Base64OutputStream;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -537,7 +540,6 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
     @Override
     public void chechStatus(JSONObject object) {
         try {
-            reset.setVisibility(View.VISIBLE);
             if (object.has("apiCommonResposne")) {
                 JSONObject object1 = object.getJSONObject("apiCommonResposne");
                 if (object1 != null) {
@@ -595,7 +597,7 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
                 }
             } else if (object.getString("serviceType").equalsIgnoreCase("VERIFY_SENDER_OTP")) {
                 if (object.getString("responseCode").equalsIgnoreCase("200")) {
-                    alertDialog.dismiss();
+                    dialog.dismiss();
                     new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, getSender_Validate().toString(), headerData, PMTRemittanceActivity.this, getString(R.string.responseTimeOutTrans)).execute();
                     sender_layout.setVisibility(View.GONE);
                     delete_all.setVisibility(View.VISIBLE);
@@ -803,8 +805,11 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
                 new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, getOtpPMT(otpView.getText().toString()).toString(), headerData, PMTRemittanceActivity.this, getString(R.string.responseTimeOutTrans)).execute();
                 otp_flag = false;
             }
-        } else if (type.equalsIgnoreCase("KYCLAYOUTS") || type.equalsIgnoreCase("INDO-NEPAL BILL PAYMENT")) {
+        } else if (type.equalsIgnoreCase("KYCLAYOUTS")) {
             new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, getSender_Validate().toString(), headerData, PMTRemittanceActivity.this, getString(R.string.responseTimeOutTrans)).execute();
+        }else if(type.equalsIgnoreCase("INDO-NEPAL BILL PAYMENT")) {
+            setBack_click(PMTRemittanceActivity.this);
+            finish();
         }
     }
 
@@ -820,7 +825,7 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
     protected void customDialog_Doc(final String type, final PMTTransactionHistory ob, String msg) {
         imageBase64 = null;
         imgType = "";
-        dialog = new AlertDialog.Builder(this);
+        dialognew = new Dialog(this);
         LayoutInflater inflater = getLayoutInflater();
         final View alertLayout = inflater.inflate(R.layout.custom_layout_common, null);
         alertLayout.setKeepScreenOn(true);
@@ -840,12 +845,12 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
                     }
                 });
                 btn_ok.setText("Upload Document");
-                dialog.setView(alertLayout);
+                dialognew.setContentView(alertLayout);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        dialog.setCancelable(false);
+        dialognew.setCancelable(false);
         btn_ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -854,7 +859,7 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
                     image.requestFocus();
                 } else {
                     new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, docUpload(ob.getUserTxnId()).toString(), headerData, PMTRemittanceActivity.this, getString(R.string.responseTimeOutTrans)).execute();
-                    newdialog.dismiss();
+                    dialognew.dismiss();
                 }
             }
         });
@@ -862,20 +867,22 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
             @Override
             public void onClick(View v) {
 
-                newdialog.dismiss();
+                dialognew.dismiss();
             }
         });
         dialog_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                alertDialog.dismiss();
+                dialognew.dismiss();
             }
         });
-        newdialog = dialog.show();
+        dialognew.show();
+        Window window = dialog.getWindow();
+        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
     }
 
     protected void customDialog_Common(final String type, final PMTBenefPozo ob, String msg) {
-        dialog = new AlertDialog.Builder(this);
+        dialog = new Dialog(this);
         LayoutInflater inflater = getLayoutInflater();
         final View alertLayout = inflater.inflate(R.layout.custom_layout_common, null);
         alertLayout.setKeepScreenOn(true);
@@ -987,7 +994,7 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
 
                     }
                 });
-                dialog.setView(alertLayout);
+                dialog.setContentView(alertLayout);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -1006,10 +1013,10 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
                     input_amountss.requestFocus();
                 } else if (!paymode.equalsIgnoreCase("PMTAD")) {
                     new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, getServiceFee(input_amountss.getText().toString(), paymode).toString(), headerData, PMTRemittanceActivity.this, getString(R.string.responseTimeOutTrans)).execute();
-                    alertDialog.dismiss();
+                    dialog.dismiss();
                 } else if (paymode.equalsIgnoreCase("PMTAD") && !(ob.getAccount_Number().equalsIgnoreCase("null") || ob.getAccount_Number().equalsIgnoreCase("")) && !(ob.getBank_Details().equalsIgnoreCase("null") || ob.getBank_Details().equalsIgnoreCase(""))) {
                     new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, getServiceFee(input_amountss.getText().toString(), paymode).toString(), headerData, PMTRemittanceActivity.this, getString(R.string.responseTimeOutTrans)).execute();
-                    alertDialog.dismiss();
+                    dialog.dismiss();
                 } else {
                     if (nepalBank.equalsIgnoreCase(""))
                         Toast.makeText(PMTRemittanceActivity.this, "Please select bank", Toast.LENGTH_SHORT).show();
@@ -1030,7 +1037,7 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
                         new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, addBene(ob.getReceiver_Mobile(), split[0], split[1], split[2], ob.getRelation_With_Sender(), "U", branchID, accountno.getText().toString(), confirmAccountNo.getText().toString(), ob.getPmt_Bene_Id(), accountType).toString(), headerData, PMTRemittanceActivity.this, getString(R.string.responseTimeOutTrans)).execute();
                         bene_update = true;
                         amount = input_amountss.getText().toString();
-                        alertDialog.dismiss();
+                        dialog.dismiss();
                     } else
                         Toast.makeText(PMTRemittanceActivity.this, "Account number not match", Toast.LENGTH_SHORT).show();
                 }
@@ -1040,20 +1047,22 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
             @Override
             public void onClick(View v) {
 
-                alertDialog.dismiss();
+                dialog.dismiss();
             }
         });
         dialog_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                alertDialog.dismiss();
+                dialog.dismiss();
             }
         });
-        alertDialog = dialog.show();
+        dialog.show();
+        Window window = dialog.getWindow();
+        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
     }
 
     protected void addBeneDetails(final String type, String msg) {
-        dialog = new AlertDialog.Builder(this);
+        dialog = new Dialog(this);
         LayoutInflater inflater = getLayoutInflater();
         final View alertLayout = inflater.inflate(R.layout.custom_layout_common, null);
         alertLayout.setKeepScreenOn(true);
@@ -1155,7 +1164,7 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
 
                     }
                 });
-                dialog.setView(alertLayout);
+                dialog.setContentView(alertLayout);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -1196,12 +1205,12 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
                         Toast.makeText(PMTRemittanceActivity.this, "Please Select Account Type", Toast.LENGTH_SHORT).show();
                     else if (accountno.getText().toString().equalsIgnoreCase(confirmAccountNo.getText().toString())) {
                         new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, addBene(bene_number.getText().toString(), bene_name.getText().toString(), bene_city.getText().toString(), bene_address.getText().toString(), bene_relation.getText().toString(), "I", branchID, accountno.getText().toString(), confirmAccountNo.getText().toString(), "", accountType).toString(), headerData, PMTRemittanceActivity.this, getString(R.string.responseTimeOutTrans)).execute();
-                        alertDialog.dismiss();
+                        dialog.dismiss();
                     } else
                         Toast.makeText(PMTRemittanceActivity.this, "Account number not match", Toast.LENGTH_SHORT).show();
                 } else {
                     new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, addBene(bene_number.getText().toString(), bene_name.getText().toString(), bene_city.getText().toString(), bene_address.getText().toString(), bene_relation.getText().toString(), "I", branchID, "", "", "", "").toString(), headerData, PMTRemittanceActivity.this, getString(R.string.responseTimeOutTrans)).execute();
-                    alertDialog.dismiss();
+                    dialog.dismiss();
                 }
             }
         });
@@ -1209,10 +1218,12 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
             @Override
             public void onClick(View v) {
 
-                alertDialog.dismiss();
+                dialog.dismiss();
             }
         });
-        alertDialog = dialog.show();
+        dialog.show();
+        Window window = dialog.getWindow();
+        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
     }
 
     private void enterSenderDetails(JSONObject object) {

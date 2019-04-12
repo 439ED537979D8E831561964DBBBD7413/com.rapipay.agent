@@ -72,6 +72,7 @@ public class MainActivity extends BaseCompactActivity
     public static ArrayList<HeaderePozo> pozoArrayList;
     public static boolean relailerDetails = false;
     public static ArrayList<DeviceDetailsPozo> deviceDetailsPozoArrayList;
+    boolean isUrl = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -128,8 +129,6 @@ public class MainActivity extends BaseCompactActivity
 
     private void loadUrl() {
         url();
-//        } else
-//            itemSelection(0);
     }
 
     @Override
@@ -285,25 +284,34 @@ public class MainActivity extends BaseCompactActivity
         Fragment fragment = null;
         if (id == R.id.nav_home) {
             bankde.setVisibility(View.VISIBLE);
-            reset.setVisibility(View.VISIBLE);
+            reset.setVisibility(View.GONE);
+            if (isUrl) {
+                isUrl = false;
+                loadUrl();
+            }
             fragment = new DashBoardFragments();
         } else if (id == R.id.nav_Cpin) {
+            isUrl = true;
             reset.setVisibility(View.GONE);
             bankde.setVisibility(View.GONE);
             fragment = new ChangePinFragment();
         } else if (id == R.id.nav_cpsw) {
+            isUrl = true;
             reset.setVisibility(View.GONE);
             bankde.setVisibility(View.GONE);
             fragment = new ChangePassword();
         } else if (id == R.id.profile) {
+            isUrl = true;
             reset.setVisibility(View.GONE);
             bankde.setVisibility(View.GONE);
             fragment = new ProfileFragment();
         } else if (id == R.id.nav_Cmobile) {
+            isUrl = true;
             reset.setVisibility(View.GONE);
             bankde.setVisibility(View.GONE);
             fragment = new ChangeMobileFragment();
         } else if (id == R.id.settle_Cmobile) {
+            isUrl = true;
             reset.setVisibility(View.GONE);
             bankde.setVisibility(View.GONE);
             Bundle bundle = new Bundle();
@@ -311,6 +319,7 @@ public class MainActivity extends BaseCompactActivity
             fragment = new SettlementBankFragment();
             fragment.setArguments(bundle);
         } else if (id == R.id.payload_Cmobile) {
+            isUrl = true;
             reset.setVisibility(View.GONE);
             bankde.setVisibility(View.GONE);
             Bundle bundle = new Bundle();
@@ -318,10 +327,12 @@ public class MainActivity extends BaseCompactActivity
             fragment = new SettlementBankFragment();
             fragment.setArguments(bundle);
         } else if (id == R.id.lien_Cmobile) {
+            isUrl = true;
             reset.setVisibility(View.GONE);
             bankde.setVisibility(View.GONE);
             fragment = new LienHistory();
         } else if (id == R.id.nav_tpin) {
+            isUrl = true;
             reset.setVisibility(View.GONE);
             bankde.setVisibility(View.GONE);
             fragment = new TpinTab();
@@ -533,7 +544,7 @@ public class MainActivity extends BaseCompactActivity
 
     @Override
     public void cancelClicked(String type, Object ob) {
-        alertDialog.dismiss();
+        dialog.dismiss();
     }
 
     public String getUserKyc() {

@@ -1,6 +1,7 @@
 package com.rapipay.android.agent.fragments;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -9,9 +10,11 @@ import android.support.v7.widget.AppCompatButton;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -44,7 +47,7 @@ import java.util.Locale;
 
 import me.grantland.widget.AutofitTextView;
 
-public class NetworkTransFragment extends BaseFragment implements RequestHandler,CustomInterface {
+public class NetworkTransFragment extends BaseFragment implements RequestHandler, CustomInterface {
 
     private int first = 1, last = 25;
     private boolean isLoading;
@@ -72,14 +75,14 @@ public class NetworkTransFragment extends BaseFragment implements RequestHandler
         if (BaseCompactActivity.db != null && BaseCompactActivity.db.getDetails_Rapi()) {
             list = BaseCompactActivity.db.getDetails();
             loadApi();
-        }else
+        } else
             dbNull(NetworkTransFragment.this);
         return rv;
     }
 
     private void loadApi() {
         logList.add(new NetworkManagePozo(list.get(0).getMobilno(), list.get(0).getMobilno()));
-        new AsyncPostMethod(WebConfig.CommonReport, getNetwork_Validate("GET_MY_NODE_DETAILS", list.get(0).getMobilno(), first, last).toString(), headerData, NetworkTransFragment.this, getActivity(),getString(R.string.responseTimeOut)).execute();
+        new AsyncPostMethod(WebConfig.CommonReport, getNetwork_Validate("GET_MY_NODE_DETAILS", list.get(0).getMobilno(), first, last).toString(), headerData, NetworkTransFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
     }
 
     @Override
@@ -118,7 +121,7 @@ public class NetworkTransFragment extends BaseFragment implements RequestHandler
                 if (totalItemCount != 0 && totalItemCount == last && lastInScreen == totalItemCount && !isLoading) {
                     first = last + 1;
                     last += 25;
-                    new AsyncPostMethod(WebConfig.CommonReport, getNetwork_Validate("GET_MY_NODE_DETAILS", list.get(0).getMobilno(), first, last).toString(), headerData, NetworkTransFragment.this, getActivity(),getString(R.string.responseTimeOut)).execute();
+                    new AsyncPostMethod(WebConfig.CommonReport, getNetwork_Validate("GET_MY_NODE_DETAILS", list.get(0).getMobilno(), first, last).toString(), headerData, NetworkTransFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
                     isLoading = true;
                 }
             }
@@ -157,9 +160,9 @@ public class NetworkTransFragment extends BaseFragment implements RequestHandler
                 if (object.getString("headerValue").equalsIgnoreCase("My Balance")) {
                     String data = object.getString("headerData");
                     if (formatss(data) == null || formatss(data).equalsIgnoreCase("0")) {
-                        Toast.makeText(getActivity(),"Not Authorized to create New User!.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "Not Authorized to create New User!.", Toast.LENGTH_SHORT).show();
                     } else
-                        customDialogConfirm(pozoClick, "Are you sure you want to Transfer?", "CONFIRMATION", textsss.getText().toString(), "Credit Confirmation");
+                        customDialogConfirm(pozoClick, "Are you sure you want to Transfer?", "CONFIRMATION", textsss.getText().toString(), "", "Credit Confirmation");
                 }
             }
         } catch (Exception e) {
@@ -222,13 +225,17 @@ public class NetworkTransFragment extends BaseFragment implements RequestHandler
     }
 
 
-    AlertDialog alertDialog, alertDialogs;
+    //    AlertDialog alertDialog, alertDialogs;
     TextView textsss;
+    EditText newtpinss;
+
     private void customDialog_Ben(final NetworkTransferPozo pozo, String msg, final String type, String amount, String title) {
         AutofitTextView btn_p_bank, btn_name, p_transid;
-        AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
+
+        dialog = new Dialog(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View alertLayout = inflater.inflate(R.layout.custom_layout_common, null);
+        alertLayout.setKeepScreenOn(true);
         AppCompatButton btn_cancel = (AppCompatButton) alertLayout.findViewById(R.id.btn_cancel);
         AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
         if (type.equalsIgnoreCase("AMOUNTTRANSFER")) {
@@ -236,6 +243,9 @@ public class NetworkTransFragment extends BaseFragment implements RequestHandler
             btn_name = (AutofitTextView) alertLayout.findViewById(R.id.btn_name_popup);
             p_transid = (AutofitTextView) alertLayout.findViewById(R.id.btn_p_transid);
             btn_p_bank = (AutofitTextView) alertLayout.findViewById(R.id.btn_p_bank);
+            newtpinss = (EditText) alertLayout.findViewById(R.id.newtpinss);
+            if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && (newtpinss.getText().toString().isEmpty() || newtpinss.getText().toString().length() != 4))
+                newtpinss.setVisibility(View.VISIBLE);
             btn_name.setText("Company Name : " + pozo.getCompanyName());
             p_transid.setText(pozo.getAgentName() + " - " + pozo.getMobileNo());
             btn_p_bank.setText("Current Balance : " + formatss(pozo.getAgentBalance()));
@@ -246,7 +256,7 @@ public class NetworkTransFragment extends BaseFragment implements RequestHandler
             otpView.setVisibility(View.VISIBLE);
         }
         textsss = (TextView) alertLayout.findViewById(R.id.input_amount_popup);
-        dialog.setView(alertLayout);
+        dialog.setContentView(alertLayout);
         TextView texttitle = (TextView) alertLayout.findViewById(R.id.dialog_title);
         texttitle.setText(title);
         dialog.setCancelable(false);
@@ -258,29 +268,36 @@ public class NetworkTransFragment extends BaseFragment implements RequestHandler
                     if (!ImageUtils.commonAmount(textsss.getText().toString())) {
                         textsss.setError("Please enter valid data");
                         textsss.requestFocus();
-                    } else {
-                                    customDialogConfirm(pozo, "Are you sure you want to Transfer?", "CONFIRMATION", textsss.getText().toString(), "Credit Confirmation");
-                        alertDialog.dismiss();
+                    } else if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && (newtpinss.getText().toString().isEmpty() || newtpinss.getText().toString().length() != 4)){
+                        newtpinss.setError("Please enter valid data");
+                        newtpinss.requestFocus();
+                    }else {
+                        dialog.dismiss();
+                        customDialogConfirm(pozo, "Are you sure you want to Transfer?", "CONFIRMATION", textsss.getText().toString(), newtpinss.getText().toString(), "Credit Confirmation");
                     }
                 } else if (type.equalsIgnoreCase("NETWORK_CREDIT")) {
                     loadApi();
-                    alertDialog.dismiss();
+                    dialog.dismiss();
                 }
             }
         });
         btn_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                alertDialog.dismiss();
+                dialog.dismiss();
             }
         });
-        alertDialog = dialog.show();
+        dialog.show();
+        Window window = dialog.getWindow();
+        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
     }
 
-    private void customDialogConfirm(final NetworkTransferPozo pozo, String msg, final String type, final String amount, String title) {
-        AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
+    private void customDialogConfirm(final NetworkTransferPozo pozo, String msg,
+                                     final String type, final String amount, final String tpin, String title) {
+        dialognew = new Dialog(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View alertLayout = inflater.inflate(R.layout.custom_layout_common, null);
+        alertLayout.setKeepScreenOn(true);
         AppCompatButton btn_cancel = (AppCompatButton) alertLayout.findViewById(R.id.btn_cancel);
         AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
         if (type.equalsIgnoreCase("CONFIRMATION")) {
@@ -288,30 +305,31 @@ public class NetworkTransFragment extends BaseFragment implements RequestHandler
             otpView.setText(msg);
             otpView.setVisibility(View.VISIBLE);
         }
-        dialog.setView(alertLayout);
+        dialognew.setContentView(alertLayout);
         TextView texttitle = (TextView) alertLayout.findViewById(R.id.dialog_title);
         texttitle.setText(title);
-        dialog.setCancelable(false);
+        dialognew.setCancelable(false);
         btn_ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (type.equalsIgnoreCase("CONFIRMATION")) {
-                    alertDialogs.dismiss();
-                    new AsyncPostMethod(WebConfig.CRNF, getNetwork_Transfer(pozo.getMobileNo(), amount).toString(), headerData, NetworkTransFragment.this, getActivity(),getString(R.string.responseTimeOut)).execute();
+                    dialognew.dismiss();
+                    new AsyncPostMethod(WebConfig.CRNF, getNetwork_Transfer(pozo.getMobileNo(), amount, tpin).toString(), headerData, NetworkTransFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
                 }
-                alertDialogs.dismiss();
             }
         });
         btn_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                alertDialogs.dismiss();
+                dialog.dismiss();
             }
         });
-        alertDialogs = dialog.show();
+        dialognew.show();
+        Window window = dialognew.getWindow();
+        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
     }
 
-    public JSONObject getNetwork_Transfer(String receiverId, String txnAmount) {
+    public JSONObject getNetwork_Transfer(String receiverId, String txnAmount, String newtpin) {
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("serviceType", "C2C_NETWORK_CREDIT");
@@ -323,6 +341,10 @@ public class NetworkTransFragment extends BaseFragment implements RequestHandler
             jsonObject.put("agentSenderID", list.get(0).getMobilno());
             jsonObject.put("agentReciverID", receiverId);
             jsonObject.put("txnAmount", txnAmount);
+            if (newtpin.isEmpty())
+                jsonObject.put("tPin", "");
+            else
+                jsonObject.put("tPin", ImageUtils.encodeSHA256(newtpin));
             jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
 
         } catch (Exception e) {
@@ -330,8 +352,9 @@ public class NetworkTransFragment extends BaseFragment implements RequestHandler
         }
         return jsonObject;
     }
+
     private void url() {
-        new AsyncPostMethod(WebConfig.COMMONAPI, getDashBoard("GET_NODE_HEADER_DATA").toString(), headerData, getActivity(),getString(R.string.responseTimeOut)).execute();
+        new AsyncPostMethod(WebConfig.COMMONAPI, getDashBoard("GET_NODE_HEADER_DATA").toString(), headerData, getActivity(), getString(R.string.responseTimeOut)).execute();
     }
 
     public JSONObject getDashBoard(String servicetype) {
@@ -375,12 +398,13 @@ public class NetworkTransFragment extends BaseFragment implements RequestHandler
         return null;
     }
 
-    protected void jumpPage(){
+    protected void jumpPage() {
         Intent intent = new Intent(getActivity(), LoginScreenActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         deleteTables("ALL");
     }
+
     protected void dbNull(CustomInterface customInterface) {
         customDialog_Common("SESSIONEXPIRE", null, null, "Session Expired", null, "Your current session will get expired.", customInterface);
     }
