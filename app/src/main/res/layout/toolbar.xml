@@ -20,7 +20,7 @@
         android:src="@drawable/home" />
 
     <RelativeLayout
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
         <TextView
@@ -72,4 +72,18 @@
         android:scaleType="fitStart"
         android:src="@drawable/delete"
         android:visibility="gone" />
+    <TextView
+        android:id="@+id/consent"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:layout_gravity="right|center"
+        android:layout_marginRight="5dp"
+        android:onClick="onClick"
+        android:clickable="true"
+        android:textStyle="bold"
+        android:text="Consent"
+        android:textColor="@color/black"
+        android:visibility="gone"/>
+
 </android.support.v7.widget.Toolbar>

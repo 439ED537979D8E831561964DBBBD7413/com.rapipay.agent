@@ -637,6 +637,12 @@
                     android:layout_width="match_parent"
                     android:layout_height="380dp"
                     android:visibility="gone" />
+                <include
+                    android:id="@+id/consent_term"
+                    layout="@layout/consent_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="380dp"
+                    android:visibility="gone" />
 
                 <include
                     android:id="@+id/add_bene_details"
