@@ -68,6 +68,7 @@ public class MainActivity extends BaseCompactActivity
     private static final int dpPhoto1 = 2001;
     private static final int dpPhoto2 = 2002;
     public static String bankdetails = null;
+    public static String Parent_Mobile = null;
     public static String regBankDetails = null;
     public static ArrayList<HeaderePozo> pozoArrayList;
     public static boolean relailerDetails = false;
@@ -284,7 +285,7 @@ public class MainActivity extends BaseCompactActivity
         Fragment fragment = null;
         if (id == R.id.nav_home) {
             bankde.setVisibility(View.VISIBLE);
-            reset.setVisibility(View.GONE);
+            reset.setVisibility(View.VISIBLE);
             if (isUrl) {
                 isUrl = false;
                 loadUrl();
@@ -404,6 +405,8 @@ public class MainActivity extends BaseCompactActivity
                 JSONObject object = array.getJSONObject(i);
                 if (object.getString("headerData").equalsIgnoreCase("Retailer") && object.getString("headerValue").equalsIgnoreCase("CATEGORY"))
                     relailerDetails = true;
+                if (object.getString("headerValue").equalsIgnoreCase("Parent Mobile"))
+                    Parent_Mobile = object.getString("headerData");
                 if (object.getString("displayFlag").equalsIgnoreCase("D"))
                     pozoArrayList.add(new HeaderePozo(object.getString("headerValue"), object.getString("headerData"), object.getString("headerId"), object.getString("displayFlag")));
                 else if (object.getString("headerValue").equalsIgnoreCase("Notice")) {

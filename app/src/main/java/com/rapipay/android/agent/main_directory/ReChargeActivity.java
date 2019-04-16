@@ -222,6 +222,7 @@ public class ReChargeActivity extends BaseCompactActivity implements View.OnClic
         select_operator.setText("Select Operator");
         prepaid.setChecked(false);
         postpaid.setChecked(false);
+        newtpin.setText("");
         if (operator_clicked.equalsIgnoreCase("PRE") || operator_clicked.equalsIgnoreCase("POST"))
             operator_clicked = "MOBILE";
     }

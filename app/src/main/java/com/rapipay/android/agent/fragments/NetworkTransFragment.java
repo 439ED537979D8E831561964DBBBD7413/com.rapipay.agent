@@ -5,7 +5,6 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatButton;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -89,6 +88,8 @@ public class NetworkTransFragment extends BaseFragment implements RequestHandler
     public void okClicked(String type, Object ob) {
         if (type.equalsIgnoreCase("SESSIONEXPIRE"))
             jumpPage();
+        else if(type.equalsIgnoreCase("KYCLAYOUT"))
+            loadApi();
     }
 
     @Override
@@ -105,8 +106,9 @@ public class NetworkTransFragment extends BaseFragment implements RequestHandler
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 pozoClick = transactionPozoArrayList.get(position);
-                if (clickedId.equalsIgnoreCase("0"))
-                    customDialog_Ben(transactionPozoArrayList.get(position), "Network Transfer", "AMOUNTTRANSFER", "", "Credit To Network");
+                customDialog_Ben(transactionPozoArrayList.get(position), "Network Transfer", "BENLAYOUT", pozoClick.getConsentStatus(), "Credit To Network");
+//                if (clickedId.equalsIgnoreCase("0"))
+//                    customDialog_Ben(transactionPozoArrayList.get(position), "Network Transfer", "AMOUNTTRANSFER", "", "Credit To Network");
             }
         });
         trans_details.setOnScrollListener(new AbsListView.OnScrollListener() {
@@ -140,6 +142,8 @@ public class NetworkTransFragment extends BaseFragment implements RequestHandler
                     }
                 } else if (object.getString("serviceType").equalsIgnoreCase("C2C_NETWORK_CREDIT")) {
                     customDialog_Ben(null, object.getString("responseMessage"), "NETWORK_CREDIT", null, "Credit Confirmation");
+                }else if (object.getString("serviceType").equalsIgnoreCase("C2C_NETWORK_PULL_FUND")) {
+                    customDialog_Common("KYCLAYOUT", object, null, "Successfull", null, object.getString("responseMessage"),NetworkTransFragment.this);
                 } else if (object.getString("serviceType").equalsIgnoreCase("GET_NODE_HEADER_DATA")) {
                     if (object.has("headerList")) {
                         if (Integer.parseInt(object.getString("listCount")) > 0) {
@@ -176,7 +180,7 @@ public class NetworkTransFragment extends BaseFragment implements RequestHandler
             for (int i = 0; i < array.length(); i++) {
                 JSONObject object = array.getJSONObject(i);
                 if (!logList.get(logList.size() - 1).getCuurentNo().equalsIgnoreCase(object.getString("mobileNo")))
-                    transactionPozoArrayList.add(new NetworkTransferPozo(object.getString("companyName"), object.getString("mobileNo"), object.getString("agentName"), object.getString("agentBalance"), object.getString("agentCategory")));
+                    transactionPozoArrayList.add(new NetworkTransferPozo(object.getString("companyName"), object.getString("mobileNo"), object.getString("agentName"), object.getString("agentBalance"), object.getString("agentCategory"), object.getString("consentStatus")));
                 else {
                     header.setVisibility(View.GONE);
                     header.setText(object.getString("agentName") + " - " + object.getString("mobileNo") + "\n" + object.getString("agentCategory"));
@@ -224,6 +228,30 @@ public class NetworkTransFragment extends BaseFragment implements RequestHandler
         return jsonObject;
     }
 
+    public JSONObject getReverseTransfer(String mobileno) {
+        format = new SimpleDateFormat("ddMMyyyyHHmmss");
+        date = new Date();
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("serviceType", "C2C_NETWORK_PULL_FUND");
+            jsonObject.put("requestType", "CRNF_Channel");
+            jsonObject.put("typeMobileWeb", "mobile");
+            jsonObject.put("transactionID", "GMND" + format.format(date));
+            jsonObject.put("nodeAgentId", list.get(0).getMobilno());
+            jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
+            jsonObject.put("agentPayer", mobileno);
+            jsonObject.put("agentPayee", list.get(0).getMobilno());
+            jsonObject.put("requestFrom", "B2B");
+            jsonObject.put("remark","");
+            jsonObject.put("txnAmmount",textsss.getText().toString());
+            jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return jsonObject;
+    }
+
 
     //    AlertDialog alertDialog, alertDialogs;
     TextView textsss;
@@ -238,7 +266,19 @@ public class NetworkTransFragment extends BaseFragment implements RequestHandler
         alertLayout.setKeepScreenOn(true);
         AppCompatButton btn_cancel = (AppCompatButton) alertLayout.findViewById(R.id.btn_cancel);
         AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
-        if (type.equalsIgnoreCase("AMOUNTTRANSFER")) {
+        AppCompatButton btn_regenerate = (AppCompatButton)alertLayout.findViewById(R.id.btn_regenerate);
+        if (type.equalsIgnoreCase("BENLAYOUT")) {
+            if (amount.equalsIgnoreCase("N"))
+                btn_cancel.setVisibility(View.GONE);
+            btn_cancel.setText("Reverse transfer");
+            btn_regenerate.setText("Cancel");
+            btn_regenerate.setTextSize(10);
+            btn_regenerate.setVisibility(View.VISIBLE);
+            btn_cancel.setTextSize(10);
+            btn_ok.setText("Fund Transfer");
+            btn_ok.setTextSize(10);
+            dialog.setContentView(alertLayout);
+        } else if (type.equalsIgnoreCase("AMOUNTTRANSFER")) {
             alertLayout.findViewById(R.id.custom_popup).setVisibility(View.VISIBLE);
             btn_name = (AutofitTextView) alertLayout.findViewById(R.id.btn_name_popup);
             p_transid = (AutofitTextView) alertLayout.findViewById(R.id.btn_p_transid);
@@ -246,6 +286,14 @@ public class NetworkTransFragment extends BaseFragment implements RequestHandler
             newtpinss = (EditText) alertLayout.findViewById(R.id.newtpinss);
             if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && (newtpinss.getText().toString().isEmpty() || newtpinss.getText().toString().length() != 4))
                 newtpinss.setVisibility(View.VISIBLE);
+            btn_name.setText("Company Name : " + pozo.getCompanyName());
+            p_transid.setText(pozo.getAgentName() + " - " + pozo.getMobileNo());
+            btn_p_bank.setText("Current Balance : " + formatss(pozo.getAgentBalance()));
+        }else if (type.equalsIgnoreCase("REVERSETRANSFER")) {
+            alertLayout.findViewById(R.id.custom_popup).setVisibility(View.VISIBLE);
+            btn_name = (AutofitTextView) alertLayout.findViewById(R.id.btn_name_popup);
+            p_transid = (AutofitTextView) alertLayout.findViewById(R.id.btn_p_transid);
+            btn_p_bank = (AutofitTextView) alertLayout.findViewById(R.id.btn_p_bank);
             btn_name.setText("Company Name : " + pozo.getCompanyName());
             p_transid.setText(pozo.getAgentName() + " - " + pozo.getMobileNo());
             btn_p_bank.setText("Current Balance : " + formatss(pozo.getAgentBalance()));
@@ -268,26 +316,48 @@ public class NetworkTransFragment extends BaseFragment implements RequestHandler
                     if (!ImageUtils.commonAmount(textsss.getText().toString())) {
                         textsss.setError("Please enter valid data");
                         textsss.requestFocus();
-                    } else if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && (newtpinss.getText().toString().isEmpty() || newtpinss.getText().toString().length() != 4)){
+                    } else if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && (newtpinss.getText().toString().isEmpty() || newtpinss.getText().toString().length() != 4)) {
                         newtpinss.setError("Please enter valid data");
                         newtpinss.requestFocus();
-                    }else {
+                    } else {
                         dialog.dismiss();
                         customDialogConfirm(pozo, "Are you sure you want to Transfer?", "CONFIRMATION", textsss.getText().toString(), newtpinss.getText().toString(), "Credit Confirmation");
+                    }
+                }if (type.equalsIgnoreCase("REVERSETRANSFER")) {
+                    hideKeyboard(getActivity());
+                    if (!ImageUtils.commonAmount(textsss.getText().toString())) {
+                        textsss.setError("Please enter valid data");
+                        textsss.requestFocus();
+                    } else {
+                        dialog.dismiss();
+                        new AsyncPostMethod(WebConfig.CRNF, getReverseTransfer(pozo.getMobileNo()).toString(), headerData, NetworkTransFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
                     }
                 } else if (type.equalsIgnoreCase("NETWORK_CREDIT")) {
                     loadApi();
                     dialog.dismiss();
+                } else if (type.equalsIgnoreCase("BENLAYOUT")) {
+                    dialog.dismiss();
+                    customDialog_Ben(pozo, "Network Transfer", "AMOUNTTRANSFER", "", "Credit To Network");
                 }
             }
         });
         btn_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dialog.dismiss();
+                if (type.equalsIgnoreCase("BENLAYOUT")) {
+                    dialog.dismiss();
+                    customDialog_Ben(pozo, "Network Transfer", "REVERSETRANSFER", "", "Credit To Network");
+                } else
+                    dialog.dismiss();
             }
         });
         dialog.show();
+        btn_regenerate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
         Window window = dialog.getWindow();
         window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
     }
@@ -321,7 +391,7 @@ public class NetworkTransFragment extends BaseFragment implements RequestHandler
         btn_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dialog.dismiss();
+                dialognew.dismiss();
             }
         });
         dialognew.show();

@@ -46,6 +46,8 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -344,7 +346,7 @@ public class BaseCompactActivity extends AppCompatActivity {
 //    protected AlertDialog alertDialog, newdialog;
     CustomInterface anInterface;
 
-    protected void customDialog_Common(final String type, JSONObject object, final Object ob, String msg, final String input, String output, final CustomInterface anInterface) {
+    protected void customDialog_Common(final String type, final JSONObject object, final Object ob, String msg, final String input, String output, final CustomInterface anInterface) {
         this.anInterface = anInterface;
         dialog = new Dialog(this);
         LayoutInflater inflater = getLayoutInflater();
@@ -353,9 +355,10 @@ public class BaseCompactActivity extends AppCompatActivity {
         TextView text = (TextView) alertLayout.findViewById(R.id.dialog_title);
         TextView dialog_cancel = (TextView) alertLayout.findViewById(R.id.dialog_cancel);
         text.setText(msg);
-        AppCompatButton btn_regenerate = (AppCompatButton)alertLayout.findViewById(R.id.btn_regenerate);
+        AppCompatButton btn_regenerate = (AppCompatButton) alertLayout.findViewById(R.id.btn_regenerate);
         AppCompatButton btn_cancel = (AppCompatButton) alertLayout.findViewById(R.id.btn_cancel);
         AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
+        final CheckBox checkBox = (CheckBox) alertLayout.findViewById(R.id.consent_checked);
         if (type.equalsIgnoreCase("NETWORKLAYOUT")) {
             btn_cancel.setText("Network User");
             btn_cancel.setTextSize(10);
@@ -377,9 +380,12 @@ public class BaseCompactActivity extends AppCompatActivity {
         try {
             if (type.equalsIgnoreCase("KYCLAYOUT") || type.equalsIgnoreCase("PENDINGREFUND") || type.equalsIgnoreCase("REFUNDTXN") || type.equalsIgnoreCase("SESSIONEXPIRRED") || type.equalsIgnoreCase("PENDINGLAYOUT")) {
                 customView(alertLayout, output);
-            }else if (type.equalsIgnoreCase("KYCNEWLAYOUT")) {
+            } else if (type.equalsIgnoreCase("OTPLAYOUTS")) {
+                alertLayout.findViewById(R.id.otp_layout).setVisibility(View.VISIBLE);
+                otpView(alertLayout, object);
+            } else if (type.equalsIgnoreCase("KYCNEWLAYOUT")) {
                 customView(alertLayout, output);
-            }else if (type.equalsIgnoreCase("KYCEWLAYOUT")) {
+            } else if (type.equalsIgnoreCase("KYCEWLAYOUT")) {
                 btn_cancel.setVisibility(View.GONE);
                 customView(alertLayout, output);
             } else if (type.equalsIgnoreCase("KYCLAYOUTS") || type.equalsIgnoreCase("KYCLAYOUTSS") || type.equalsIgnoreCase("LOGOUT") || type.equalsIgnoreCase("SESSIONEXPIRE")) {
@@ -392,6 +398,19 @@ public class BaseCompactActivity extends AppCompatActivity {
                 btn_ok.setTextSize(10);
                 alertLayout.findViewById(R.id.accept_term).setVisibility(View.VISIBLE);
                 customView_term(alertLayout, output);
+            } else if (type.equalsIgnoreCase("CONSENTLAYOUT")) {
+                btn_cancel.setVisibility(View.VISIBLE);
+                btn_ok.setText("Submit");
+                alertLayout.findViewById(R.id.consent_term).setVisibility(View.VISIBLE);
+                TextView tv_linkosn = (TextView) alertLayout.findViewById(R.id.tv_linkosn);
+                tv_linkosn.setText(output);
+                tv_linkosn.setVisibility(View.VISIBLE);
+                if (input.equalsIgnoreCase("Y")) {
+                    checkBox.setChecked(true);
+                    checkBox.setEnabled(false);
+                    btn_ok.setVisibility(View.GONE);
+                }
+                dialog.setContentView(alertLayout);
             } else if (type.equalsIgnoreCase("Fund Transfer Confirmation")) {
                 alertLayout.findViewById(R.id.custom_service).setVisibility(View.VISIBLE);
                 moneyTransgerFees(alertLayout, object, ob, null, output, msg, input);
@@ -403,6 +422,12 @@ public class BaseCompactActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         dialog.setCancelable(false);
+        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+            }
+        });
         btn_ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -414,11 +439,28 @@ public class BaseCompactActivity extends AppCompatActivity {
                     dialog.dismiss();
                 } else if (type.equalsIgnoreCase("OTPLAYOUT")) {
                     anInterface.okClicked(type, ob);
-                } else if (type.equalsIgnoreCase("Fund Transfer Confirmation")){
-                    if(BaseCompactActivity.ENABLE_TPIN !=null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && (newtpin.getText().toString().isEmpty() || newtpin.getText().toString().length()!=4)){
+                } else if (type.equalsIgnoreCase("OTPLAYOUTS")) {
+                    if (otpView.getText().toString().isEmpty()) {
+                        otpView.setError("Please enter OTP");
+                        otpView.requestFocus();
+                    } else if (otpView.getText().toString().length() != 6) {
+                        otpView.setError("Please enter OTP");
+                        otpView.requestFocus();
+                    } else {
+                        anInterface.okClicked(type, object);
+                        dialog.dismiss();
+                    }
+                } else if (type.equalsIgnoreCase("CONSENTLAYOUT")) {
+                    if (checkBox.isChecked()) {
+                        anInterface.okClicked(type, object);
+                        dialog.dismiss();
+                    } else
+                        Toast.makeText(BaseCompactActivity.this, "Please check then proceed", Toast.LENGTH_SHORT).show();
+                } else if (type.equalsIgnoreCase("Fund Transfer Confirmation")) {
+                    if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && (newtpin.getText().toString().isEmpty() || newtpin.getText().toString().length() != 4)) {
                         newtpin.setError("Please enter TPIN");
                         newtpin.requestFocus();
-                    }else {
+                    } else {
                         anInterface.okClicked(type, ob);
                         dialog.dismiss();
                     }
@@ -471,7 +513,9 @@ public class BaseCompactActivity extends AppCompatActivity {
             return "";
         }
     }
+
     protected EditText newtpin;
+
     protected void serviceFee(View alertLayout, JSONObject object, BeneficiaryDetailsPozo pozo, String msg, String input) throws Exception {
         TextView btn_name = (TextView) alertLayout.findViewById(R.id.btn_name_service);
         TextView btn_servicefee = (TextView) alertLayout.findViewById(R.id.btn_servicefee);
@@ -506,8 +550,8 @@ public class BaseCompactActivity extends AppCompatActivity {
             btn_name.setText(pozo.getName());
         else
             btn_name.setText("NA");
-        newtpin = (EditText)alertLayout.findViewById(R.id.newtpin);
-        if(BaseCompactActivity.ENABLE_TPIN !=null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y"))
+        newtpin = (EditText) alertLayout.findViewById(R.id.newtpin);
+        if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y"))
             newtpin.setVisibility(View.VISIBLE);
         dialog.setContentView(alertLayout);
     }
@@ -575,8 +619,8 @@ public class BaseCompactActivity extends AppCompatActivity {
             btn_sendname.setText(input);
         if (name != null)
             btn_name.setText(name);
-        newtpin = (EditText)alertLayout.findViewById(R.id.newtpin);
-        if(BaseCompactActivity.ENABLE_TPIN !=null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y"))
+        newtpin = (EditText) alertLayout.findViewById(R.id.newtpin);
+        if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y"))
             newtpin.setVisibility(View.VISIBLE);
         dialog.setContentView(alertLayout);
     }
@@ -651,6 +695,16 @@ public class BaseCompactActivity extends AppCompatActivity {
         TextView otpView = (TextView) alertLayout.findViewById(R.id.tv_linkon);
         otpView.setText(Html.fromHtml(output));
         otpView.setVisibility(View.VISIBLE);
+        dialog.setContentView(alertLayout);
+    }
+
+    protected void customView_Consent(View alertLayout, String output, String input) throws Exception {
+        TextView otpView = (TextView) alertLayout.findViewById(R.id.tv_linkon);
+        CheckBox checkBox = (CheckBox) alertLayout.findViewById(R.id.consent_checked);
+        otpView.setText(Html.fromHtml(output));
+        otpView.setVisibility(View.VISIBLE);
+        if (input.equalsIgnoreCase("Y"))
+            checkBox.setChecked(true);
         dialog.setContentView(alertLayout);
     }
 
@@ -1515,13 +1569,13 @@ public class BaseCompactActivity extends AppCompatActivity {
             String action = intent.getAction();
             isRegister = true;
             if (action.equalsIgnoreCase("android.intent.action.SCREEN_OFF")) {
-                if (BaseCompactActivity.ENABLE_TPIN!=null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y")) {
+                if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y")) {
                     objTimer.cancel();
                     count = 30 * 60 * 7500;
                     objTimer.start();
 //                    customDialogLog("LOGOUT", "Session Expired", "Your Session got expired");
 //                    Toast.makeText(BaseCompactActivity.this, "Your Session got expired", Toast.LENGTH_SHORT).show();
-                }else if (localStorage.getActivityState(LocalStorage.LOGOUT).equalsIgnoreCase("LOGOUT")) {
+                } else if (localStorage.getActivityState(LocalStorage.LOGOUT).equalsIgnoreCase("LOGOUT")) {
                     customDialogLog("LOGOUT", "Session Expired", "Your Session got expired");
                     Toast.makeText(BaseCompactActivity.this, "Your Session got expired", Toast.LENGTH_SHORT).show();
                 }
