@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
     <android.support.design.widget.CoordinatorLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -58,7 +57,6 @@
                 <android.support.design.widget.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
                     android:layout_marginTop="8dp"
                     app:passwordToggleEnabled="true"
                     app:passwordToggleTint="@color/colorAccent">
@@ -71,7 +69,17 @@
                         android:inputType="textPassword"
                         android:textSize="16dp" />
                 </android.support.design.widget.TextInputLayout>
-
+                <TextView
+                    android:id="@+id/btn_fosuser"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right"
+                    android:gravity="center|right"
+                    android:clickable="true"
+                    android:onClick="onClick"
+                    android:text="FOS User"
+                    android:textSize="15dp"
+                    android:textColor="@color/black" />
                 <android.support.v7.widget.AppCompatButton
                     android:id="@+id/btn_login"
                     android:layout_width="fill_parent"

@@ -13,7 +13,35 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="5dp">
+        <LinearLayout
+            android:id="@+id/number_payee"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_margin="3sp"
+            android:weightSum="800"
+            android:visibility="gone">
 
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="300"
+                android:inputType="text"
+                android:text="Payee No."
+                android:textSize="12sp" />
+
+            <me.grantland.widget.AutofitTextView
+                android:id="@+id/btn_nnumber"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="500"
+                android:text="@string/p_accountno"
+                android:textColor="@color/black"
+                android:textSize="12sp"
+                android:singleLine="true"
+                android:maxLines="1"
+                autofit:minTextSize="8sp" />
+        </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

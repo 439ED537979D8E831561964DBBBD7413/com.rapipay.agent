@@ -10,14 +10,13 @@
 
     <ImageView
         android:id="@+id/back_click"
-        android:layout_width="100dp"
-        android:layout_height="50dp"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
         android:layout_gravity="center|left"
         android:layout_marginLeft="10dp"
-        android:layout_marginTop="12dp"
         android:clickable="true"
         android:onClick="onClick"
-        android:scaleType="fitStart" />
+        android:scaleType="center" />
     <TextView
         android:layout_width="100dp"
         android:layout_height="50dp"
@@ -58,13 +57,13 @@
             android:layout_marginRight="15dp"
             android:layout_toLeftOf="@+id/reset"
             android:gravity="center"
-            android:text="Credit Banks"
             android:clickable="true"
             android:onClick="onClick"
             android:textColor="@color/colorPrimaryDark"
             android:textSize="16dp"
             android:textStyle="bold"
             android:visibility="gone"/>
+
 
     </RelativeLayout>
 </android.support.v7.widget.Toolbar>

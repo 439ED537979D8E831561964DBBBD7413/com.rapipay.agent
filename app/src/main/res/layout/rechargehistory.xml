@@ -16,7 +16,7 @@
         <include layout="@layout/toolbar" />
     </android.support.design.widget.AppBarLayout>
 
-    <LinearLayout
+    <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/white"
@@ -67,14 +67,14 @@
                     android:textSize="14dp" />
             </LinearLayout>
 
-            <ListView
+            <android.support.v7.widget.RecyclerView
                 android:id="@+id/trans_details"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="5dp"
                 android:gravity="center_horizontal" />
 
         </LinearLayout>
-    </LinearLayout>
+    </android.support.v4.widget.NestedScrollView>
 </android.support.design.widget.CoordinatorLayout>
