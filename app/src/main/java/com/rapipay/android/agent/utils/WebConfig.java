@@ -25,7 +25,9 @@ public class WebConfig {
     public static String CRNF = WEBMain +"CRNFApp/CRNFService";
     public static String CommonReport = WEBMain+"TxnReportingApp/CommonReport";
     public static String COMMONAPI = WEBMain+"CommonApiApp/CommonApi";
+    public static String COMMONAPIS = WEBMain+"CommonApiApp/SubAgentCommonService";
     public static String LOGIN_URL=WEBMain+"SecLogOnApp/SecLogOnService";
+    public static String SUBAGENT=WEBMain+"SecLogOnApp/SubAgentService";
     public static String PMTSERVICE_DETAILS=WEBMain+"IndoNepalFTAPP/PMTService";
     public static String BCRemittanceApp = WEBMain + "BCRemittanceApp/BCService";
     public static String AEPSReg = WEBMain + "KYC_RAPIPAY_APP/registrationForward";

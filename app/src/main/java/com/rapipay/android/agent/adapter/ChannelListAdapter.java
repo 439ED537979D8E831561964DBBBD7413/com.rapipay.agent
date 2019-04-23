@@ -22,7 +22,7 @@ public class ChannelListAdapter extends ArrayAdapter<ChannelHistoryPozo> {
 
     private  class ViewHolder {
         public View mView;
-        public AutofitTextView btn_p_bank,btn_name,p_transid,btn_p_amounts,btn_status,transferType;
+        public AutofitTextView btn_p_bank,btn_name,p_transid,btn_p_amounts,btn_status,transferType,transferdate;
     }
 
     public ChannelListAdapter(ArrayList<ChannelHistoryPozo> data, Context context) {
@@ -52,6 +52,7 @@ public class ChannelListAdapter extends ArrayAdapter<ChannelHistoryPozo> {
             viewHolder.btn_p_bank = (AutofitTextView)view.findViewById(R.id.btn_p_bank);
             viewHolder.btn_status = (AutofitTextView)view.findViewById(R.id.btn_status);
             viewHolder.transferType = (AutofitTextView)view.findViewById(R.id.transferType);
+            viewHolder.transferdate = (AutofitTextView)view.findViewById(R.id.transferdate);
             result=view;
 
             view.setTag(viewHolder);
@@ -66,6 +67,7 @@ public class ChannelListAdapter extends ArrayAdapter<ChannelHistoryPozo> {
         viewHolder.btn_p_bank.setText("RRN : "+mValues.get(position).getServiceProviderTXNID());
         viewHolder.btn_status.setText("Status : "+mValues.get(position).getTxnId());
         viewHolder.transferType.setText("Transaction Type :"+mValues.get(position).getServiceType());
+        viewHolder.transferdate.setText("Txn Date : "+mValues.get(position).getTxnRequestDate());
         return view;
     }
     private String format(String amount) {

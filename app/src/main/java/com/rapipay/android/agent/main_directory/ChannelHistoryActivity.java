@@ -189,7 +189,7 @@ public class ChannelHistoryActivity extends BaseCompactActivity implements View.
         try {
             for (int i = 0; i < array.length(); i++) {
                 JSONObject object = array.getJSONObject(i);
-                transactionPozoArrayList.add(new ChannelHistoryPozo(object.getString("senderName") + " ( " + object.getString("mobileNo") + " )", object.getString("accountNo") + " ( " + object.getString("bankName") + " )", object.getString("requestAmt"), object.getString("txnStatus"), object.getString("txnDateTime"), object.getString("serviceProviderTXNID"), object.getString("transferType"), object.getString("userTxnId"), object.getString("serviceType")));
+                transactionPozoArrayList.add(new ChannelHistoryPozo(object.getString("senderName") + " ( " + object.getString("mobileNo") + " )", object.getString("accountNo") + " ( " + object.getString("bankName") + " )", object.getString("requestAmt"), object.getString("txnStatus"), object.getString("txnDateTime"), object.getString("serviceProviderTXNID"), object.getString("transferType"), object.getString("userTxnId"), object.getString("serviceType"),object.getString("txnDateTime")));
             }
         } catch (Exception e) {
             e.printStackTrace();

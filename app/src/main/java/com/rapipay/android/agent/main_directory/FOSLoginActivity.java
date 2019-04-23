@@ -24,12 +24,12 @@ import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.interfaces.CustomInterface;
 import com.rapipay.android.agent.interfaces.RequestHandler;
 import com.rapipay.android.agent.interfaces.VersionListener;
+import com.rapipay.android.agent.kotlin_classs.FOSMainActivity;
 import com.rapipay.android.agent.utils.AsyncPostMethod;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
 import com.rapipay.android.agent.utils.GenerateChecksum;
 import com.rapipay.android.agent.utils.ImageUtils;
 import com.rapipay.android.agent.utils.LocalStorage;
-import com.rapipay.android.agent.utils.RouteClass;
 import com.rapipay.android.agent.utils.WebConfig;
 
 import org.json.JSONArray;
@@ -37,10 +37,10 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class LoginScreenActivity extends BaseCompactActivity implements View.OnClickListener, RequestHandler, CustomInterface, VersionListener {
+public class FOSLoginActivity extends BaseCompactActivity implements View.OnClickListener, RequestHandler, CustomInterface, VersionListener {
 
     final private static int PERMISSIONS_REQUEST_READ_PHONE_STATE = 0;
-    EditText input_user;
+    EditText input_user, input_subuser;
     TextInputEditText input_password;
     AppCompatButton btn_login;
     ImageView image_app;
@@ -48,7 +48,7 @@ public class LoginScreenActivity extends BaseCompactActivity implements View.OnC
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.activity_fos);
         initialize();
         loadIMEI();
     }
@@ -62,6 +62,7 @@ public class LoginScreenActivity extends BaseCompactActivity implements View.OnC
         findViewById(R.id.back_click).setVisibility(View.GONE);
         input_password = (TextInputEditText) findViewById(R.id.input_password);
         input_user = (EditText) findViewById(R.id.input_user);
+        input_subuser = (EditText) findViewById(R.id.input_subuser);
         btn_login = (AppCompatButton) findViewById(R.id.btn_login);
         btn_login.setOnClickListener(this);
     }
@@ -70,16 +71,16 @@ public class LoginScreenActivity extends BaseCompactActivity implements View.OnC
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("serviceType", "ValidCredentialService");
-            jsonObject.put("requestType", "handset_CHannel");/*FOS_Channel*/
+            jsonObject.put("requestType", "FOS");/*FOS_Channel*/
             jsonObject.put("typeMobileWeb", "mobile");
             jsonObject.put("txnRefId", ImageUtils.miliSeconds());
-            jsonObject.put("agentId", input_user.getText().toString());
+            jsonObject.put("agentId", input_subuser.getText().toString());
             jsonObject.put("nodeAgentId", input_user.getText().toString());
 //            jsonObject.put("password", ImageUtils.encodeSHA_256(input_password.getText().toString()));
             jsonObject.put("password", input_password.getText().toString());
             jsonObject.put("imeiNo", imei);
             jsonObject.put("domainName", BuildConfig.DOMAINNAME);
-            jsonObject.put("clientRequestIP", ImageUtils.ipAddress(LoginScreenActivity.this));
+            jsonObject.put("clientRequestIP", ImageUtils.ipAddress(FOSLoginActivity.this));
             jsonObject.put("checkSum", GenerateChecksum.checkSum(imei, jsonObject.toString()));
 
         } catch (Exception e) {
@@ -104,7 +105,7 @@ public class LoginScreenActivity extends BaseCompactActivity implements View.OnC
             alertPerm(getString(R.string.permission_read_phone_state_rationale), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    ActivityCompat.requestPermissions(LoginScreenActivity.this,
+                    ActivityCompat.requestPermissions(FOSLoginActivity.this,
                             new String[]{Manifest.permission.READ_PHONE_STATE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.CAMERA, Manifest.permission.READ_CONTACTS},
                             PERMISSIONS_REQUEST_READ_PHONE_STATE);
                     doPermissionGrantedStuffs();
@@ -156,17 +157,14 @@ public class LoginScreenActivity extends BaseCompactActivity implements View.OnC
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_login:
-                if (input_user.getText().toString().length() != 10)
+                if (input_subuser.getText().toString().length() != 10)
+                    input_subuser.setError("Please enter mandatory field");
+                else if (input_user.getText().toString().length() != 10)
                     input_user.setError("Please enter mandatory field");
                 else if (input_password.getText().toString().isEmpty())
                     input_password.setError("Please enter mandatory field");
                 else
                     loadVersion(imei);
-                break;
-            case R.id.btn_fosuser:
-                Intent intent = new Intent(LoginScreenActivity.this, FOSLoginActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                startActivity(intent);
                 break;
         }
     }
@@ -177,16 +175,27 @@ public class LoginScreenActivity extends BaseCompactActivity implements View.OnC
             if (object.getString("serviceType").equalsIgnoreCase("APP_LIVE_STATUS")) {
                 if (object.has("headerList")) {
                     JSONArray array = object.getJSONArray("headerList");
-                    versionDetails(array, LoginScreenActivity.this);
+                    versionDetails(array, FOSLoginActivity.this);
                 }
             } else if (object.getString("responseCode").equalsIgnoreCase("200")) {
-                new RouteClass(this, object, input_user.getText().toString(), localStorage, "PINENTERED");
+                Intent intent = new Intent(FOSLoginActivity.this, FOSMainActivity.class);
+                intent.putExtra("nodeAgentID", input_user.getText().toString());
+                intent.putExtra("AgentID", input_subuser.getText().toString());
+                intent.putExtra("sessionRefNo", object.getString("sessionRefNo"));
+                intent.putExtra("sessionKey", object.getString("sessionKey"));
+//                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                input_subuser.setText("");
+                input_user.setText("");
+                input_password.setText("");
+//                clear()
+//                finish();
             } else if (object.getString("responseCode").equalsIgnoreCase("75115")) {
-                customDialog_Common("KYCLAYOUTS", null, null, "RapiPay Login Failed", null, object.getString("responseMessage"), LoginScreenActivity.this);
+                customDialog_Common("KYCLAYOUTS", null, null, "RapiPay Login Failed", null, object.getString("responseMessage"), FOSLoginActivity.this);
             } else if (object.getString("responseCode").equalsIgnoreCase("75115")) {
-                customDialog_Common("KYCLAYOUTS", null, null, "RapiPay Login Failed", null, object.getString("responseMessage"), LoginScreenActivity.this);
+                customDialog_Common("KYCLAYOUTS", null, null, "RapiPay Login Failed", null, object.getString("responseMessage"), FOSLoginActivity.this);
             } else if (object.getString("responseCode").equalsIgnoreCase("75077")) {
-                customDialog_Common("KYCLAYOUTS", null, null, "RapiPay Login Failed", null, object.getString("responseMessage"), LoginScreenActivity.this);
+                customDialog_Common("KYCLAYOUTS", null, null, "RapiPay Login Failed", null, object.getString("responseMessage"), FOSLoginActivity.this);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -195,7 +204,7 @@ public class LoginScreenActivity extends BaseCompactActivity implements View.OnC
 
     @Override
     public void chechStat(String object) {
-        customDialog_Common("KYCLAYOUTS", null, null, getResources().getString(R.string.Alert), null, object, LoginScreenActivity.this);
+        customDialog_Common("KYCLAYOUTS", null, null, getResources().getString(R.string.Alert), null, object, FOSLoginActivity.this);
     }
 
     @Override
@@ -203,6 +212,7 @@ public class LoginScreenActivity extends BaseCompactActivity implements View.OnC
         if (type.equalsIgnoreCase("KYCLAYOUTS")) {
             input_user.setText("");
             input_password.setText("");
+            input_subuser.setText("");
         } else if (type.equalsIgnoreCase("KYCLAYOUTSS")) {
             Intent webIntent = new Intent(Intent.ACTION_VIEW,
                     Uri.parse("https://play.google.com/store/apps/details?id=" + getPackageName()));
@@ -226,9 +236,9 @@ public class LoginScreenActivity extends BaseCompactActivity implements View.OnC
 //                        PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
 //                        String version = pInfo.versionName;
 //                        if (!version.equalsIgnoreCase(list.get(i + 1).getValue())) {
-//                            customDialog_Common("KYCLAYOUTSS", null, null, "Update Available", null, "You are running on lower version please update for new versions!.", LoginScreenActivity.this);
+//                            customDialog_Common("KYCLAYOUTSS", null, null, "Update Available", null, "You are running on lower version please update for new versions!.", FOSLoginActivity.this);
 //                        } else {
-//                            new AsyncPostMethod(WebConfig.LOGIN_URL, getJson_Validate().toString(), "", LoginScreenActivity.this, getString(R.string.responseTimeOut)).execute();
+//                            new AsyncPostMethod(WebConfig.LOGIN_URL, getJson_Validate().toString(), "", FOSLoginActivity.this, getString(R.string.responseTimeOut)).execute();
 //                        }
 //                    } catch (PackageManager.NameNotFoundException e) {
 //                        e.printStackTrace();
@@ -239,9 +249,9 @@ public class LoginScreenActivity extends BaseCompactActivity implements View.OnC
 //                        PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
 //                        String version = pInfo.versionName;
 //                        if (("F").equalsIgnoreCase(list.get(i + 1).getValue())) {
-//                            customDialog_Common("KYCLAYOUTSS", null, null, "Update Available", null, "You are running on lower version please update for new versions!.", LoginScreenActivity.this);
+//                            customDialog_Common("KYCLAYOUTSS", null, null, "Update Available", null, "You are running on lower version please update for new versions!.", FOSLoginActivity.this);
 //                        } else {
-//                            new AsyncPostMethod(WebConfig.LOGIN_URL, getJson_Validate().toString(), "", LoginScreenActivity.this, getString(R.string.responseTimeOut)).execute();
+//                            new AsyncPostMethod(WebConfig.LOGIN_URL, getJson_Validate().toString(), "", FOSLoginActivity.this, getString(R.string.responseTimeOut)).execute();
 //                        }
 //                    } catch (PackageManager.NameNotFoundException e) {
 //                        e.printStackTrace();
@@ -253,13 +263,13 @@ public class LoginScreenActivity extends BaseCompactActivity implements View.OnC
                 PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
                 String version = pInfo.versionName;
                 if (Double.valueOf(version) >= Double.valueOf(stringArrayList.get(0)) && (stringArrayList.get(1).equalsIgnoreCase("F") || stringArrayList.get(1).equalsIgnoreCase("N"))) {
-                    new AsyncPostMethod(WebConfig.LOGIN_URL, getJson_Validate().toString(), "", LoginScreenActivity.this, getString(R.string.responseTimeOut)).execute();
+                    new AsyncPostMethod(WebConfig.LOGIN_URL, getJson_Validate().toString(), "", FOSLoginActivity.this, getString(R.string.responseTimeOut)).execute();
                 } else if (Double.valueOf(version) < Double.valueOf(stringArrayList.get(0)) && stringArrayList.get(1).equalsIgnoreCase("F")) {
-                    customDialog_Common("KYCLAYOUTSS", null, null, "Update Available", null, "You are running on lower version please update for new versions!.", LoginScreenActivity.this);
+                    customDialog_Common("KYCLAYOUTSS", null, null, "Update Available", null, "You are running on lower version please update for new versions!.", FOSLoginActivity.this);
                 } else if (Double.valueOf(stringArrayList.get(0)) != Double.valueOf(version) && stringArrayList.get(1).equalsIgnoreCase("N")) {
-                    new AsyncPostMethod(WebConfig.LOGIN_URL, getJson_Validate().toString(), "", LoginScreenActivity.this, getString(R.string.responseTimeOut)).execute();
+                    new AsyncPostMethod(WebConfig.LOGIN_URL, getJson_Validate().toString(), "", FOSLoginActivity.this, getString(R.string.responseTimeOut)).execute();
                 } else {
-                    customDialog_Common("KYCLAYOUTSS", null, null, "Update Available", null, "You are running on lower version please update for new versions!.", LoginScreenActivity.this);
+                    customDialog_Common("KYCLAYOUTSS", null, null, "Update Available", null, "You are running on lower version please update for new versions!.", FOSLoginActivity.this);
                 }
             } catch (PackageManager.NameNotFoundException e) {
                 e.printStackTrace();
@@ -267,4 +277,5 @@ public class LoginScreenActivity extends BaseCompactActivity implements View.OnC
         }
     }
 }
+
 

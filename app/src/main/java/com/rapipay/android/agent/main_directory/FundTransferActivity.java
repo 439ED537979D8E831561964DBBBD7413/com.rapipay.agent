@@ -4,7 +4,6 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -33,7 +32,6 @@ import com.rapipay.android.agent.utils.AsyncPostMethod;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
 import com.rapipay.android.agent.utils.GenerateChecksum;
 import com.rapipay.android.agent.utils.ImageUtils;
-import com.rapipay.android.agent.utils.LocalStorage;
 import com.rapipay.android.agent.utils.RecyclerTouchListener;
 import com.rapipay.android.agent.utils.WebConfig;
 
@@ -69,7 +67,6 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
         mobileNo = getIntent().getStringExtra("MOBILENO");
         if (!mobileNo.isEmpty()) {
             input_mobile.setText(mobileNo);
-            input_mobile.setEnabled(false);
         }
     }
 
@@ -410,6 +407,7 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
                     clear();
                     input_name.setText(object.getString("senderName"));
                     findViewById(R.id.warning).setVisibility(View.GONE);
+                    reset.setVisibility(View.VISIBLE);
                     input_name.setEnabled(false);
                     if (object.has("remainingLimit") && !object.getString("remainingLimit").equalsIgnoreCase("null"))
                         limit = Integer.valueOf(object.getInt("remainingLimit"));
@@ -592,7 +590,7 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
                     String condition = "where " + RapipayDB.COLOMN__BANK_NAME + "='" + bank_select_bene.getText().toString() + "'";
                     ifsc_code = db.geBankIFSC(condition).get(0);
 //                    if (newtin.getText().toString().isEmpty())
-                        new AsyncPostMethod(WebConfig.BCRemittanceApp, verify_Account(ifsc_code, bene_number.getText().toString()).toString(), headerData, FundTransferActivity.this, getString(R.string.responseTimeOutTrans)).execute();
+                    new AsyncPostMethod(WebConfig.BCRemittanceApp, verify_Account(ifsc_code, bene_number.getText().toString()).toString(), headerData, FundTransferActivity.this, getString(R.string.responseTimeOutTrans)).execute();
 //                    else
 //                        new AsyncPostMethod(WebConfig.BCRemittanceApp, verify_Account(ifsc_code, bene_number.getText().toString(), newtin.getText().toString()).toString(), headerData, FundTransferActivity.this, getString(R.string.responseTimeOutTrans)).execute();
                 }
@@ -706,7 +704,7 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
         try {
             for (int i = 0; i < array.length(); i++) {
                 JSONObject object = array.getJSONObject(i);
-                transactionPozoArrayList.add(new LastTransactionPozo(object.getString("accountNo"), object.getString("txnAmount"), object.getString("refundTxnId"), object.getString("bankName"), object.getString("serviceProviderTXNID"), object.getString("transferType")));
+                transactionPozoArrayList.add(new LastTransactionPozo(object.getString("accountNo"), object.getString("txnAmount"), object.getString("refundTxnId"), object.getString("bankName"), object.getString("serviceProviderTXNID"), object.getString("transferType"),object.getString("txnRequestDate")));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -888,8 +886,7 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
             new AsyncPostMethod(WebConfig.BCRemittanceApp, getSender_Validate().toString(), headerData, FundTransferActivity.this, getString(R.string.responseTimeOutTrans)).execute();
         else if (type.equalsIgnoreCase("Fund Transfer Details")) {
 //            localStorage.setActivityState(LocalStorage.ROUTESTATE, "UPDATE");
-            setBack_click(FundTransferActivity.this);
-            finish();
+            new AsyncPostMethod(WebConfig.BCRemittanceApp, getSender_Validate().toString(), headerData, FundTransferActivity.this, getString(R.string.responseTimeOutTrans)).execute();
         }
     }
 

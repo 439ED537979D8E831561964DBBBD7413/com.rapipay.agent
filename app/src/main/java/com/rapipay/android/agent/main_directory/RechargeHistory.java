@@ -46,7 +46,7 @@ public class RechargeHistory extends BaseCompactActivity implements View.OnClick
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.passbook_layout);
+        setContentView(R.layout.rechargehistory);
         initialize();
     }
 

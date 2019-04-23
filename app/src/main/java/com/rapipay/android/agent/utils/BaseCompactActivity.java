@@ -71,6 +71,7 @@ import com.rapipay.android.agent.adapter.CustomSpinnerAdapter;
 import com.rapipay.android.agent.interfaces.CustomInterface;
 import com.rapipay.android.agent.interfaces.VersionListener;
 import com.rapipay.android.agent.main_directory.CameraKitActivity;
+import com.rapipay.android.agent.main_directory.FOSLoginActivity;
 import com.rapipay.android.agent.main_directory.LoginScreenActivity;
 import com.rapipay.android.agent.main_directory.MainActivity;
 import com.rapipay.android.agent.main_directory.PinVerification;
@@ -145,7 +146,8 @@ public class BaseCompactActivity extends AppCompatActivity {
         if (db != null && db.getDetails_Rapi())
             list = db.getDetails();
     }
-    public boolean printDifference(Date startDate,Date endDate) {
+
+    public boolean printDifference(Date startDate, Date endDate) {
         //milliseconds
         try {
 //            Calendar c = Calendar.getInstance();
@@ -174,13 +176,14 @@ public class BaseCompactActivity extends AppCompatActivity {
             different = different % minutesInMilli;
 
             long elapsedSeconds = different / secondsInMilli;
-            if (elapsedDays>= 0)
+            if (elapsedDays >= 0)
                 return true;
         } catch (Exception e) {
             e.printStackTrace();
         }
         return false;
     }
+
     protected void loadImageFromStorage(String name, ImageView view, String path) {
         try {
             File f = new File(path, name);
@@ -274,7 +277,8 @@ public class BaseCompactActivity extends AppCompatActivity {
         }
         return jsonObject;
     }
-//    public void turnOnScreen(){
+
+    //    public void turnOnScreen(){
 //        // turn on screen
 //        Log.v("ProximityActivity", "ON!");
 //        mWakeLock = mPowerManager.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "tag");
@@ -338,12 +342,19 @@ public class BaseCompactActivity extends AppCompatActivity {
         deleteTables("ALL");
     }
 
+    protected void jumpPageFOS() {
+        Intent intent = new Intent(BaseCompactActivity.this, FOSLoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        deleteTables("ALL");
+    }
+
     protected void dbNull(CustomInterface customInterface) {
         customDialog_Common("SESSIONEXPIRE", null, null, "Session Expired", null, "Your current session will get expired.", customInterface);
     }
 
-    protected Dialog dialog,dialognew;
-//    protected AlertDialog alertDialog, newdialog;
+    protected Dialog dialog, dialognew;
+    //    protected AlertDialog alertDialog, newdialog;
     CustomInterface anInterface;
 
     protected void customDialog_Common(final String type, final JSONObject object, final Object ob, String msg, final String input, String output, final CustomInterface anInterface) {
@@ -378,7 +389,7 @@ public class BaseCompactActivity extends AppCompatActivity {
             dialog.setContentView(alertLayout);
         }
         try {
-            if (type.equalsIgnoreCase("KYCLAYOUT") || type.equalsIgnoreCase("PENDINGREFUND") || type.equalsIgnoreCase("REFUNDTXN") || type.equalsIgnoreCase("SESSIONEXPIRRED") || type.equalsIgnoreCase("PENDINGLAYOUT")) {
+            if (type.equalsIgnoreCase("KYCLAYOUTFOS")||type.equalsIgnoreCase("KYCLAYOUT") || type.equalsIgnoreCase("PENDINGREFUND") || type.equalsIgnoreCase("REFUNDTXN") || type.equalsIgnoreCase("SESSIONEXPIRRED") || type.equalsIgnoreCase("PENDINGLAYOUT")) {
                 customView(alertLayout, output);
             } else if (type.equalsIgnoreCase("OTPLAYOUTS")) {
                 alertLayout.findViewById(R.id.otp_layout).setVisibility(View.VISIBLE);
@@ -417,6 +428,9 @@ public class BaseCompactActivity extends AppCompatActivity {
             } else if (type.equalsIgnoreCase("OTPLAYOUT")) {
                 alertLayout.findViewById(R.id.otp_layout_pmt).setVisibility(View.VISIBLE);
                 otpViewPMT(alertLayout, object);
+            } else if (type.equalsIgnoreCase("CREATEAGENT")) {
+                alertLayout.findViewById(R.id.createagen_lay).setVisibility(View.VISIBLE);
+                createAgent(alertLayout, object);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -462,6 +476,29 @@ public class BaseCompactActivity extends AppCompatActivity {
                         newtpin.requestFocus();
                     } else {
                         anInterface.okClicked(type, ob);
+                        dialog.dismiss();
+                    }
+                } else if (type.equalsIgnoreCase("CREATEAGENT")) {
+                    if (first_name.getText().toString().isEmpty()) {
+                        first_name.setError("Please enter first name");
+                        first_name.requestFocus();
+                    } else if (last_name.getText().toString().isEmpty()) {
+                        last_name.setError("Please enter last name");
+                        last_name.requestFocus();
+                    }else if (mobile_num.getText().toString().length() != 10) {
+                        mobile_num.setError("Please enter mobile number");
+                        mobile_num.requestFocus();
+                    }else if (cree_address.getText().toString().isEmpty()) {
+                        cree_address.setError("Please enter address");
+                        cree_address.requestFocus();
+                    }else if (bank_select.getText().toString().isEmpty()) {
+                        bank_select.setError("Please enter bank");
+                        bank_select.requestFocus();
+                    }else if (pincode.getText().toString().length() != 6) {
+                        pincode.setError("Please enter pincode");
+                        pincode.requestFocus();
+                    } else {
+                        anInterface.okClicked(type, object);
                         dialog.dismiss();
                     }
                 } else {
@@ -681,6 +718,25 @@ public class BaseCompactActivity extends AppCompatActivity {
 
     protected void otpViewPMT(View alertLayout, JSONObject object) throws Exception {
         otpView = (TextView) alertLayout.findViewById(R.id.input_otppmt);
+        dialog.setContentView(alertLayout);
+    }
+
+    protected TextView first_name, last_name, mobile_num, cree_address, bank_select, pincode;
+
+    protected void createAgent(View alertLayout, JSONObject object) throws Exception {
+        first_name = (TextView) alertLayout.findViewById(R.id.first_name);
+        last_name = (TextView) alertLayout.findViewById(R.id.last_name);
+        mobile_num = (TextView) alertLayout.findViewById(R.id.mobile_num);
+        cree_address = (TextView) alertLayout.findViewById(R.id.cree_address);
+        bank_select = (TextView) alertLayout.findViewById(R.id.bank_select);
+        pincode = (TextView) alertLayout.findViewById(R.id.pincode);
+        bank_select.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ArrayList<String> list_state = db.getState_Details();
+                customSpinner(bank_select, "Select State*", list_state);
+            }
+        });
         dialog.setContentView(alertLayout);
     }
 
@@ -1059,7 +1115,7 @@ public class BaseCompactActivity extends AppCompatActivity {
 
     protected void customSpinner(final TextView viewText, final String type, final ArrayList<String> list_spinner) {
         spinner_list = list_spinner;
-        dialog = new Dialog(this);
+        dialognew = new Dialog(this);
         LayoutInflater inflater = getLayoutInflater();
         View alertLayout = inflater.inflate(R.layout.custom_spinner_layout, null);
         alertLayout.setKeepScreenOn(true);
@@ -1094,19 +1150,19 @@ public class BaseCompactActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 viewText.setText(list_spinner.get(position));
                 viewText.setError(null);
-                dialog.dismiss();
+                dialognew.dismiss();
             }
         });
-        dialog.setCancelable(false);
-        dialog.setContentView(alertLayout);
+        dialognew.setCancelable(false);
+        dialognew.setContentView(alertLayout);
         btn_ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dialog.dismiss();
+                dialognew.dismiss();
             }
         });
-        dialog.show();
-        Window window = dialog.getWindow();
+        dialognew.show();
+        Window window = dialognew.getWindow();
         window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
     }
 

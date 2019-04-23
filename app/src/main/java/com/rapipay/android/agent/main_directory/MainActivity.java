@@ -42,6 +42,7 @@ import com.rapipay.android.agent.fragments.SettlementBankFragment;
 import com.rapipay.android.agent.fragments.TpinTab;
 import com.rapipay.android.agent.interfaces.CustomInterface;
 import com.rapipay.android.agent.interfaces.RequestHandler;
+import com.rapipay.android.agent.kotlin_classs.SubAgentFrag;
 import com.rapipay.android.agent.utils.AsyncPostMethod;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
 import com.rapipay.android.agent.utils.GenerateChecksum;
@@ -87,7 +88,7 @@ public class MainActivity extends BaseCompactActivity
                 byteConvert(back_click, imagePozoArrayList.get(0).getImagePath());
             } else {
                 if (BuildConfig.APPTYPE == 1 || BuildConfig.APPTYPE == 3)
-                    back_click.setImageDrawable(getResources().getDrawable(R.drawable.rapipay_agent));
+                    back_click.setImageDrawable(getResources().getDrawable(R.drawable.new_test));
                 if (BuildConfig.APPTYPE == 2)
                     back_click.setImageDrawable(getResources().getDrawable(R.drawable.rapipay_parter));
             }
@@ -173,6 +174,7 @@ public class MainActivity extends BaseCompactActivity
         reset.setOnClickListener(this);
         bankde = (TextView) findViewById(R.id.bankde);
         bankde.setVisibility(View.VISIBLE);
+        bankde.setText("Credit Banks");
         back_click = (ImageView) findViewById(R.id.back_click);
         tv = (TextView) this.findViewById(R.id.mywidget);
         tv.setSelected(true);
@@ -327,6 +329,11 @@ public class MainActivity extends BaseCompactActivity
             bundle.putString("message", "P");
             fragment = new SettlementBankFragment();
             fragment.setArguments(bundle);
+        } else if (id == R.id.nav_agent) {
+            isUrl = true;
+            reset.setVisibility(View.GONE);
+            bankde.setVisibility(View.GONE);
+            fragment = new SubAgentFrag();
         } else if (id == R.id.lien_Cmobile) {
             isUrl = true;
             reset.setVisibility(View.GONE);

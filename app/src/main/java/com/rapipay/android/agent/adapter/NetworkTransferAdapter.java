@@ -19,6 +19,7 @@ public class NetworkTransferAdapter extends ArrayAdapter<NetworkTransferPozo>{
 
     private ArrayList<NetworkTransferPozo> mValues;
     private Context context;
+    private ArrayList<NetworkTransferPozo> arraylist;
 
     public class ViewHolder {
         public AutofitTextView btn_p_bank, btn_name, p_transid, btn_p_amounts, agent_category;
@@ -28,6 +29,8 @@ public class NetworkTransferAdapter extends ArrayAdapter<NetworkTransferPozo>{
         super(context, R.layout.network_list_adapter, items);
         this.mValues = items;
         this.context = context;
+        this.arraylist = new ArrayList<NetworkTransferPozo>();
+        this.arraylist.addAll(mValues);
     }
     @Override
     public View getView(int position, View view, ViewGroup parent) {
@@ -73,6 +76,22 @@ public class NetworkTransferAdapter extends ArrayAdapter<NetworkTransferPozo>{
             e.printStackTrace();
         }
         return null;
+    }
+
+    public void filter(String charText) {
+        charText = charText.toLowerCase(Locale.getDefault());
+        mValues.clear();
+        if (charText.length() == 0) {
+            mValues.addAll(arraylist);
+        } else {
+            for (NetworkTransferPozo wp : arraylist) {
+                if (wp.getMobileNo().toLowerCase(Locale.getDefault())
+                        .contains(charText)) {
+                    mValues.add(wp);
+                }
+            }
+        }
+        notifyDataSetChanged();
     }
 }
 

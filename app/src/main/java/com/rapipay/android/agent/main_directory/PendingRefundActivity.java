@@ -331,7 +331,7 @@ public class PendingRefundActivity extends BaseCompactActivity implements Reques
         try {
             for (int i = 0; i < array.length(); i++) {
                 JSONObject object = array.getJSONObject(i);
-                transactionPozoArrayList.add(new LastTransactionPozo(object.getString("accountNo"), object.getString("txnAmount"), object.getString("refundTxnId"), object.getString("bankName")));
+                transactionPozoArrayList.add(new LastTransactionPozo(object.getString("accountNo"), object.getString("txnAmount"), object.getString("refundTxnId"), object.getString("bankName"),""));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -358,9 +358,9 @@ public class PendingRefundActivity extends BaseCompactActivity implements Reques
             for (int i = 0; i < array.length(); i++) {
                 JSONObject object = array.getJSONObject(i);
                 if (object.getString("refundType").equalsIgnoreCase("BC"))
-                    refundPozoArrayList.add(new LastTransactionPozo(object.getString("accountNo"), object.getString("txnAmount"), object.getString("refundTxnId"), object.getString("bankName"), object.getString("refundType")));
+                    refundPozoArrayList.add(new LastTransactionPozo(object.getString("accountNo"), object.getString("txnAmount"), object.getString("refundTxnId"), object.getString("bankName"), object.getString("refundType"),object.getString("txnRequestDate")));
                 else
-                    refundPozoArrayList.add(new LastTransactionPozo(object.getString("accountNo"), object.getString("txnAmount"), object.getString("refundTxnId"), object.getString("bankName"), object.getString("refundType"), object.getString("customerId")));
+                    refundPozoArrayList.add(new LastTransactionPozo(object.getString("accountNo"), object.getString("txnAmount"), object.getString("refundTxnId"), object.getString("bankName"), object.getString("refundType"), object.getString("customerId"),object.getString("txnRequestDate")));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -381,7 +381,7 @@ public class PendingRefundActivity extends BaseCompactActivity implements Reques
         try {
             for (int i = 0; i < array.length(); i++) {
                 JSONObject object = array.getJSONObject(i);
-                pendingPozoArrayList.add(new LastTransactionPozo(object.getString("accountNo"), object.getString("txnAmount"), object.getString("refundTxnId"), object.getString("bankName")));
+                pendingPozoArrayList.add(new LastTransactionPozo(object.getString("accountNo"), object.getString("txnAmount"), object.getString("refundTxnId"), object.getString("bankName"),object.getString("txnRequestDate")));
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -1,10 +1,11 @@
 package com.rapipay.android.agent.adapter;
 
 import android.content.Context;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 
 import com.rapipay.android.agent.Model.PassbookPozo;
 import com.rapipay.android.agent.R;
@@ -13,52 +14,57 @@ import java.util.ArrayList;
 
 import me.grantland.widget.AutofitTextView;
 
-public class PassbookAdapter  extends RecyclerView.Adapter<PassbookAdapter.ViewHolder> {
+public class PassbookAdapter extends ArrayAdapter<PassbookPozo> {
 
     private ArrayList<PassbookPozo> mValues;
-    private RecyclerView mRecyclerView;
     private Context context;
-
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        public final View mView;
-        public AutofitTextView btn_p_bank,btn_name,p_transid,btn_p_amounts;
-//        ,status;
-
-        public ViewHolder(View view) {
-            super(view);
-            mView = view;
-            btn_name = (AutofitTextView) view.findViewById(R.id.btn_name);
-            btn_p_amounts = (AutofitTextView) view.findViewById(R.id.btn_p_amounts);
-            p_transid = (AutofitTextView) view.findViewById(R.id.btn_p_transid);
-            btn_p_bank = (AutofitTextView)view.findViewById(R.id.btn_p_bank);
-//            status = (AutofitTextView)view.findViewById(R.id.status);
-        }
+    private  class ViewHolder {
+        public View mView;
+        public AutofitTextView btn_p_bank,btn_name,p_transid,btn_p_amounts,btn_nnumber;
+        public LinearLayout number_payee;
     }
-
-    public PassbookAdapter(Context context, RecyclerView recyclerView, ArrayList<PassbookPozo> items) {
-        mValues = items;
-        mRecyclerView = recyclerView;
-        this.context = context;
-    }
-
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.passbook_adapter_layout, parent, false);
-        return new ViewHolder(view);
-    }
-
-    @Override
-    public void onBindViewHolder(final ViewHolder holder, final int position) {
-        holder.btn_p_amounts.setText(mValues.get(position).getTxnDate());
-        holder.btn_name.setText(mValues.get(position).getServiceName());
-        holder.p_transid.setText(mValues.get(position).getTxncrdrAmount());
-        holder.btn_p_bank.setText(mValues.get(position).getOpeningclosingBalance());
-//        holder.status.setText(mValues.get(position).getTransactionStatus());
-    }
-
-    @Override
-    public int getItemCount() {
+    public int getCount() {
         return mValues.size();
+    }
+
+    @Override
+    public View getView(int position, View view, ViewGroup parent) {
+        ViewHolder viewHolder;
+        final View result;
+        if (view == null) {
+            viewHolder = new ViewHolder();
+            LayoutInflater inflater = LayoutInflater.from(getContext());
+            view = inflater.inflate(R.layout.passbook_adapter_layout, parent, false);
+            viewHolder.number_payee = (LinearLayout)view.findViewById(R.id.number_payee);
+            viewHolder.btn_name = (AutofitTextView) view.findViewById(R.id.btn_name);
+            viewHolder.btn_nnumber = (AutofitTextView)view.findViewById(R.id.btn_nnumber);
+            viewHolder.btn_p_amounts = (AutofitTextView) view.findViewById(R.id.btn_p_amounts);
+            viewHolder.p_transid = (AutofitTextView) view.findViewById(R.id.btn_p_transid);
+            viewHolder.btn_p_bank = (AutofitTextView)view.findViewById(R.id.btn_p_bank);
+            result=view;
+
+            view.setTag(viewHolder);
+        } else {
+            viewHolder = (ViewHolder) view.getTag();
+            result=view;
+        }
+        if(!mValues.get(position).getPayeeNumber().isEmpty()) {
+            viewHolder.number_payee.setVisibility(View.VISIBLE);
+            viewHolder.btn_nnumber.setText(mValues.get(position).getPayeeNumber());
+        }else {
+            viewHolder.number_payee.setVisibility(View.GONE);
+        }
+        viewHolder.btn_p_amounts.setText(mValues.get(position).getTxnDate());
+        viewHolder.btn_name.setText(mValues.get(position).getServiceName());
+        viewHolder.p_transid.setText(mValues.get(position).getTxncrdrAmount());
+        viewHolder.btn_p_bank.setText(mValues.get(position).getOpeningclosingBalance());
+        return view;
+    }
+    public PassbookAdapter(Context context, ArrayList<PassbookPozo> items) {
+        super(context, R.layout.passbook_adapter_layout, items);
+        mValues = items;
+        this.context = context;
     }
 }
 

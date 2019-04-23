@@ -6,13 +6,23 @@ public class PassbookPozo {
     String txnDate;
     String openingclosingBalance;
     String transactionStatus;
+    String payeeNumber;
 
-    public PassbookPozo(String serviceName, String txncrdrAmount, String txnDate, String openingclosingBalance, String transactionStatus) {
+    public PassbookPozo(String payeeNumber, String serviceName, String txncrdrAmount, String txnDate, String openingclosingBalance, String transactionStatus) {
         this.serviceName = serviceName;
         this.txncrdrAmount = txncrdrAmount;
         this.txnDate = txnDate;
         this.openingclosingBalance = openingclosingBalance;
         this.transactionStatus = transactionStatus;
+        this.payeeNumber = payeeNumber;
+    }
+
+    public String getPayeeNumber() {
+        return payeeNumber;
+    }
+
+    public void setPayeeNumber(String payeeNumber) {
+        this.payeeNumber = payeeNumber;
     }
 
     public String getServiceName() {

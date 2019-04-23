@@ -29,7 +29,7 @@ public class AsyncPostMethod extends AsyncTask<String, String, String> {
     Context context;
     String responseData;
     String hitFrom;
-
+    Dialog dialogs;
     public AsyncPostMethod(String url, String xmlData, String strHeaderData, Context handler,String responseData,String hitFrom) {
         this.url = url;
         this.xmlData = xmlData;
@@ -102,7 +102,7 @@ public class AsyncPostMethod extends AsyncTask<String, String, String> {
     @Override
     protected void onPostExecute(String s) {
         super.onPostExecute(s);
-        alertDialog1.dismiss();
+        dialogs.dismiss();
         try {
             if (hitFrom!=null && hitFrom.equalsIgnoreCase("AEPS-MATM")) {
                 handler.chechStat(hitFrom);
@@ -179,8 +179,6 @@ public class AsyncPostMethod extends AsyncTask<String, String, String> {
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
-    AlertDialog alertDialog1;
-
     protected void customDialog_Common(String msg) {
         try {
             final Dialog dialog = new Dialog(context);
@@ -215,7 +213,7 @@ public class AsyncPostMethod extends AsyncTask<String, String, String> {
 
     protected void customDialog(String msg) {
         try {
-            AlertDialog.Builder dialog = new AlertDialog.Builder(context);
+            dialogs = new Dialog(context);
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View alertLayout = inflater.inflate(R.layout.custom_layout_common, null);
             alertLayout.setKeepScreenOn(true);
@@ -227,8 +225,8 @@ public class AsyncPostMethod extends AsyncTask<String, String, String> {
             alertLayout.findViewById(R.id.btn_cancel).setVisibility(View.GONE);
             AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
             btn_ok.setVisibility(View.GONE);
-            dialog.setView(alertLayout);
-            alertDialog1 = dialog.show();
+            dialogs.setContentView(alertLayout);
+            dialogs.show();
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -5,7 +5,9 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,9 +33,12 @@ import me.grantland.widget.AutofitTextView;
 
 public class PassbookActivity extends BaseCompactActivity implements View.OnClickListener, RequestHandler {
 
-    RecyclerView trans_details;
+    ListView trans_details;
+    private boolean isLoading;
     TextView heading;
     ArrayList<PassbookPozo> transactionPozoArrayList;
+    private int first = 1, last = 25;
+    PassbookAdapter adapter;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,7 +56,7 @@ public class PassbookActivity extends BaseCompactActivity implements View.OnClic
         heading.setText("Agent Ledger History");
         date2_text = (AutofitTextView) findViewById(R.id.date2);
         date1_text = (AutofitTextView) findViewById(R.id.date1);
-        trans_details = (RecyclerView) findViewById(R.id.trans_details);
+        trans_details = (ListView) findViewById(R.id.trans_details);
         findViewById(R.id.todate).setOnClickListener(toDateClicked);
         findViewById(R.id.date1).setOnClickListener(toDateClicked);
         findViewById(R.id.fromdate).setOnClickListener(fromDateClicked);
@@ -66,11 +71,28 @@ public class PassbookActivity extends BaseCompactActivity implements View.OnClic
             date2_text.setText(selectedYear + "-" + selectedMonth + "-" + "01");
             date1_text.setText(selectedYear + "-" + selectedMonth + "-" + selectedDate);
             if (printDifference(mainDate(date2_text.getText().toString()), mainDate(date1_text.getText().toString())))
-                new AsyncPostMethod(WebConfig.CommonReport, channel_request(0, 5).toString(), headerData, PassbookActivity.this, getString(R.string.responseTimeOut)).execute();
+                new AsyncPostMethod(WebConfig.CommonReport, channel_request(first, last).toString(), headerData, PassbookActivity.this, getString(R.string.responseTimeOut)).execute();
         }else {
             date2_text.setText(selectedYear + "-" + selectedMonth + "-" + selectedDate);
             date1_text.setText(selectedYear + "-" + selectedMonth + "-" + selectedDate);
         }
+        trans_details.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                int lastInScreen = firstVisibleItem + visibleItemCount;
+                if (totalItemCount != 0 && totalItemCount == last && lastInScreen == totalItemCount && !isLoading) {
+                    first = last + 1;
+                    last += 25;
+                    new AsyncPostMethod(WebConfig.CommonReport, channel_request(first, last).toString(), headerData, PassbookActivity.this, getString(R.string.responseTimeOut), "TRANSACTIONHISTORY").execute();
+                    isLoading = true;
+                }
+            }
+        });
     }
     @Override
     public void onClick(View v) {
@@ -87,7 +109,7 @@ public class PassbookActivity extends BaseCompactActivity implements View.OnClic
                     date1_text.setError("Please enter mandatory field");
                     date1_text.requestFocus();
                 } else if (printDifference(mainDate(date2_text.getText().toString()),mainDate(date1_text.getText().toString())))
-                    new AsyncPostMethod(WebConfig.CommonReport, channel_request(0,5).toString(), headerData, PassbookActivity.this,getString(R.string.responseTimeOut)).execute();
+                    new AsyncPostMethod(WebConfig.CommonReport, channel_request(first, last).toString(), headerData, PassbookActivity.this,getString(R.string.responseTimeOut)).execute();
                 else
                     Toast.makeText(PassbookActivity.this,"Please select correct date",Toast.LENGTH_SHORT).show();
                 break;
@@ -136,7 +158,7 @@ public class PassbookActivity extends BaseCompactActivity implements View.OnClic
         try {
             for (int i = 0; i < array.length(); i++) {
                 JSONObject object = array.getJSONObject(i);
-                transactionPozoArrayList.add(new PassbookPozo(object.getString("serviceName"), formatss(object.getString("txnAmount")) + " / " + formatss(object.getString("crDrAmount")) + " " + object.getString("crDrType"), object.getString("txnDate"), formatss(object.getString("openingBalance")) + " / " + formatss(object.getString("closingBalance")), object.getString("transactionStatus")));
+                transactionPozoArrayList.add(new PassbookPozo(object.getString("txnDate"),object.getString("serviceName"), formatss(object.getString("txnAmount")) + " / " + formatss(object.getString("crDrAmount")) + " " + object.getString("crDrType"), object.getString("txnDate"), formatss(object.getString("openingBalance")) + " / " + formatss(object.getString("closingBalance")), object.getString("transactionStatus")));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -146,9 +168,17 @@ public class PassbookActivity extends BaseCompactActivity implements View.OnClic
     }
 
     private void initializeTransAdapter(ArrayList<PassbookPozo> list) {
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-        trans_details.setLayoutManager(layoutManager);
-        trans_details.setAdapter(new PassbookAdapter(this, trans_details, list));
+        if (first == 1) {
+            adapter = new PassbookAdapter(PassbookActivity.this, list);
+            trans_details.setAdapter(adapter);
+        } else {
+            adapter.addAll(list);
+            adapter.notifyDataSetChanged();
+        }
+        isLoading = false;
+//        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+//        trans_details.setLayoutManager(layoutManager);
+//        trans_details.setAdapter(new PassbookAdapter(PassbookActivity.this, list));
     }
 
     @Override

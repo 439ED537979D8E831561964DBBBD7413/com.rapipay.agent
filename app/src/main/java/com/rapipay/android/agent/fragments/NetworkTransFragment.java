@@ -50,8 +50,6 @@ public class NetworkTransFragment extends BaseFragment implements RequestHandler
 
     private int first = 1, last = 25;
     private boolean isLoading;
-    protected SimpleDateFormat format;
-    protected Date date;
     ListView trans_details;
     LinearLayout last_tran_layout;
     TextView header;
@@ -207,14 +205,12 @@ public class NetworkTransFragment extends BaseFragment implements RequestHandler
     }
 
     public JSONObject getNetwork_Validate(String servicetype, String mobileNo, int fromIndex, int toIndex) {
-        format = new SimpleDateFormat("ddMMyyyyHHmmss");
-        date = new Date();
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("serviceType", servicetype);
             jsonObject.put("requestType", "BC_Channel");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("transactionID", "GMND" + format.format(date));
+            jsonObject.put("transactionID", ImageUtils.miliSeconds());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
             jsonObject.put("agentMobile", mobileNo);
@@ -229,14 +225,12 @@ public class NetworkTransFragment extends BaseFragment implements RequestHandler
     }
 
     public JSONObject getReverseTransfer(String mobileno) {
-        format = new SimpleDateFormat("ddMMyyyyHHmmss");
-        date = new Date();
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("serviceType", "C2C_NETWORK_PULL_FUND");
             jsonObject.put("requestType", "CRNF_Channel");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("transactionID", "GMND" + format.format(date));
+            jsonObject.put("transactionID", ImageUtils.miliSeconds());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
             jsonObject.put("agentPayer", mobileno);

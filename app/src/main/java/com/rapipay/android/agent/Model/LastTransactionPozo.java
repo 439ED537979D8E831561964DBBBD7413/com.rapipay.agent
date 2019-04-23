@@ -7,31 +7,71 @@ public class LastTransactionPozo {
     String bankName;
     String serviceProviderTXNID;
     String transferType;
+    String txnRequestDate;
 
-
-    public LastTransactionPozo(String accountNo, String txnAmount, String refundTxnId, String bankName, String serviceProviderTXNID) {
-        this.accountNo = accountNo;
-        this.txnAmount = txnAmount;
-        this.refundTxnId = refundTxnId;
-        this.bankName = bankName;
-        this.serviceProviderTXNID = serviceProviderTXNID;
-    }
-
-    public LastTransactionPozo(String accountNo, String txnAmount, String refundTxnId, String bankName, String serviceProviderTXNID,
-                               String transferType) {
+    public LastTransactionPozo(String accountNo, String txnAmount, String refundTxnId, String bankName, String serviceProviderTXNID, String transferType, String txnRequestDate) {
         this.accountNo = accountNo;
         this.txnAmount = txnAmount;
         this.refundTxnId = refundTxnId;
         this.bankName = bankName;
         this.serviceProviderTXNID = serviceProviderTXNID;
         this.transferType = transferType;
+        this.txnRequestDate = txnRequestDate;
     }
 
+    public LastTransactionPozo(String accountNo, String txnAmount, String refundTxnId, String bankName, String serviceProviderTXNID, String txnRequestDate) {
+        this.accountNo = accountNo;
+        this.txnAmount = txnAmount;
+        this.refundTxnId = refundTxnId;
+        this.bankName = bankName;
+        this.serviceProviderTXNID = serviceProviderTXNID;
+        this.txnRequestDate = txnRequestDate;
+    }
+
+//    public LastTransactionPozo(String accountNo, String txnAmount, String refundTxnId, String bankName, String serviceProviderTXNID,
+//                               String transferType, String txnRequestDate) {
+//        this.accountNo = accountNo;
+//        this.txnAmount = txnAmount;
+//        this.refundTxnId = refundTxnId;
+//        this.bankName = bankName;
+//        this.serviceProviderTXNID = serviceProviderTXNID;
+//        this.transferType = transferType;
+//        this.txnRequestDate = txnRequestDate;
+//    }
+
+    public LastTransactionPozo(String accountNo, String txnAmount, String refundTxnId, String bankName, String txnRequestDate) {
+        this.accountNo = accountNo;
+        this.txnAmount = txnAmount;
+        this.refundTxnId = refundTxnId;
+        this.bankName = bankName;
+        this.txnRequestDate = txnRequestDate;
+    }
     public LastTransactionPozo(String accountNo, String txnAmount, String refundTxnId, String bankName) {
         this.accountNo = accountNo;
         this.txnAmount = txnAmount;
         this.refundTxnId = refundTxnId;
         this.bankName = bankName;
+    }
+
+    public void setServiceProviderTXNID(String serviceProviderTXNID) {
+        this.serviceProviderTXNID = serviceProviderTXNID;
+    }
+
+    public void setTransferType(String transferType) {
+        this.transferType = transferType;
+    }
+
+    public String getTxnRequestDate() {
+        return txnRequestDate;
+    }
+
+    public void setTxnRequestDate(String txnRequestDate) {
+        this.txnRequestDate = txnRequestDate;
+    }
+
+    public LastTransactionPozo(String txnRequestDate) {
+
+        this.txnRequestDate = txnRequestDate;
     }
 
     public String getServiceProviderTXNID() {

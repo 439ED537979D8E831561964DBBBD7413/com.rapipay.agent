@@ -26,19 +26,24 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.rapipay.android.agent.Database.RapipayDB;
 import com.rapipay.android.agent.Model.PMTBenefPozo;
+import com.rapipay.android.agent.Model.PermissionPozo;
 import com.rapipay.android.agent.Model.RapiPayPozo;
+import com.rapipay.android.agent.Model.SubAgentList;
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.adapter.CustomSpinnerAdapter;
+import com.rapipay.android.agent.adapter.PermissionCheckAdapter;
 import com.rapipay.android.agent.interfaces.CustomInterface;
 import com.rapipay.android.agent.main_directory.CameraKitActivity;
 import com.rapipay.android.agent.main_directory.LoginScreenActivity;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
@@ -52,15 +57,16 @@ import java.util.Locale;
 
 public class BaseFragment extends Fragment {
     protected LocalStorage localStorage;
-    protected Dialog dialog,dialognew;
-//    protected AlertDialog alertDialog, newdialog;
+    protected Dialog dialog, dialognew;
+    //    protected AlertDialog alertDialog, newdialog;
     CustomInterface anInterface;
-    protected  boolean scan = false;
-    protected  String TYPE,customerType;
+    protected boolean scan = false;
+    protected String TYPE, customerType;
     protected ArrayList<RapiPayPozo> list;
     protected String imageBase64 = "";
     protected static final int CAMERA_REQUEST = 1888;
     protected int SELECT_FILE = 1;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
@@ -109,10 +115,11 @@ public class BaseFragment extends Fragment {
         View alertLayout = inflater.inflate(R.layout.custom_layout_common, null);
         alertLayout.setKeepScreenOn(true);
         TextView text = (TextView) alertLayout.findViewById(R.id.dialog_title);
-        TextView dialog_cancel = (TextView) alertLayout.findViewById(R.id.dialog_cancel);
+        final TextView dialog_cancel = (TextView) alertLayout.findViewById(R.id.dialog_cancel);
         text.setText(msg);
         AppCompatButton btn_cancel = (AppCompatButton) alertLayout.findViewById(R.id.btn_cancel);
         AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
+        AppCompatButton btn_regenerate = (AppCompatButton) alertLayout.findViewById(R.id.btn_regenerate);
         if (type.equalsIgnoreCase("NETWORKLAYOUT")) {
             btn_cancel.setText("Network User");
             btn_cancel.setTextSize(10);
@@ -121,15 +128,55 @@ public class BaseFragment extends Fragment {
             dialog_cancel.setVisibility(View.VISIBLE);
             dialog.setContentView(alertLayout);
         }
+        if (type.equalsIgnoreCase("ACTIVATELAYOUT")) {
+            btn_ok.setText(input);
+            btn_ok.setTextSize(10);
+            dialog_cancel.setVisibility(View.VISIBLE);
+            dialog.setContentView(alertLayout);
+        }
+        if (type.equalsIgnoreCase("SUBAGENTSERVICE")) {
+            SubAgentList pozo = (SubAgentList) ob;
+            if (pozo.getStatus().equalsIgnoreCase("N")) {
+                btn_cancel.setText("Activate");
+                btn_ok.setVisibility(View.GONE);
+            }else if (pozo.getStatus().equalsIgnoreCase("Y"))
+                btn_cancel.setText("Deactiviate");
+            btn_cancel.setTextSize(10);
+            btn_ok.setText("Update Service");
+            btn_ok.setTextSize(10);
+            dialog_cancel.setVisibility(View.VISIBLE);
+            btn_regenerate.setText("Cancel");
+            btn_regenerate.setVisibility(View.VISIBLE);
+            dialog.setContentView(alertLayout);
+        }
         try {
             if (type.equalsIgnoreCase("KYCLAYOUT") || type.equalsIgnoreCase("PENDINGREFUND") || type.equalsIgnoreCase("REFUNDTXN") || type.equalsIgnoreCase("SESSIONEXPIRRED") || type.equalsIgnoreCase("PENDINGLAYOUT")) {
-                customView(alertLayout, output);
+                customView(alertLayout, output, dialog);
             } else if (type.equalsIgnoreCase("KYCLAYOUTS") || type.equalsIgnoreCase("KYCLAYOUTSS") || type.equalsIgnoreCase("LOGOUT") || type.equalsIgnoreCase("SESSIONEXPIRE")) {
                 btn_cancel.setVisibility(View.GONE);
-                customView(alertLayout, output);
+                customView(alertLayout, output, dialog);
             } else if (type.equalsIgnoreCase("Fund Transfer Confirmation")) {
                 alertLayout.findViewById(R.id.custom_service).setVisibility(View.VISIBLE);
                 moneyTransgerFees(alertLayout, object, ob, null, output, msg, input);
+            }
+            if (type.equalsIgnoreCase("ACTIVATELAYOUT")) {
+                customView(alertLayout, output, dialog);
+            } else if (type.equalsIgnoreCase("CREATEAGENT")) {
+                alertLayout.findViewById(R.id.createagen_lay).setVisibility(View.VISIBLE);
+                first_name = (TextView) alertLayout.findViewById(R.id.first_name);
+                last_name = (TextView) alertLayout.findViewById(R.id.last_name);
+                mobile_num = (TextView) alertLayout.findViewById(R.id.mobile_num);
+                cree_address = (TextView) alertLayout.findViewById(R.id.cree_address);
+                bank_select = (TextView) alertLayout.findViewById(R.id.bank_select);
+                pincode = (TextView) alertLayout.findViewById(R.id.pincode);
+                bank_select.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        ArrayList<String> list_state = BaseCompactActivity.db.getState_Details();
+                        customSpinner(bank_select, "Select State*", list_state, null);
+                    }
+                });
+                dialog.setContentView(alertLayout);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -146,6 +193,27 @@ public class BaseFragment extends Fragment {
                     anInterface.okClicked(type, ob);
                 } else if (type.equalsIgnoreCase("KYCLAYOUTS")) {
                     anInterface.okClicked(type, ob);
+                } else if (type.equalsIgnoreCase("CREATEAGENT")) {
+                    if (first_name.getText().toString().isEmpty()) {
+                        first_name.setError("Please enter first name");
+                        first_name.requestFocus();
+                    } else if (last_name.getText().toString().isEmpty()) {
+                        last_name.setError("Please enter last name");
+                        last_name.requestFocus();
+                    } else if (mobile_num.getText().toString().length() != 10) {
+                        mobile_num.setError("Please enter mobile number");
+                        mobile_num.requestFocus();
+                    } else if (cree_address.getText().toString().isEmpty()) {
+                        cree_address.setError("Please enter address");
+                        cree_address.requestFocus();
+                    } else if (bank_select.getText().toString().isEmpty()) {
+                        bank_select.setError("Please enter bank");
+                        bank_select.requestFocus();
+                    } else if (pincode.getText().toString().length() != 6) {
+                        pincode.setError("Please enter pincode");
+                        pincode.requestFocus();
+                    } else
+                        anInterface.okClicked(type, ob);
                 } else
                     anInterface.okClicked(type, ob);
                 dialog.dismiss();
@@ -155,6 +223,12 @@ public class BaseFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 anInterface.cancelClicked(type, ob);
+                dialog.dismiss();
+            }
+        });
+        btn_regenerate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 dialog.dismiss();
             }
         });
@@ -168,6 +242,200 @@ public class BaseFragment extends Fragment {
         Window window = dialog.getWindow();
         window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
     }
+
+    protected void customDialog_CommonNew(final String type, JSONObject object, final Object ob, String msg, final String input, String output, final CustomInterface anInterface) {
+        this.anInterface = anInterface;
+        dialognew = new Dialog(getActivity());
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+        View alertLayout = inflater.inflate(R.layout.custom_layout_common, null);
+        alertLayout.setKeepScreenOn(true);
+        TextView text = (TextView) alertLayout.findViewById(R.id.dialog_title);
+        final TextView dialog_cancel = (TextView) alertLayout.findViewById(R.id.dialog_cancel);
+        text.setText(msg);
+        AppCompatButton btn_cancel = (AppCompatButton) alertLayout.findViewById(R.id.btn_cancel);
+        AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
+        AppCompatButton btn_regenerate = (AppCompatButton) alertLayout.findViewById(R.id.btn_regenerate);
+        ListView list_view_with_checkbox = (ListView) alertLayout.findViewById(R.id.list_view_with_checkbox);
+        if (type.equalsIgnoreCase("ACTIVATELAYOUT")) {
+            btn_ok.setText(input);
+            btn_ok.setTextSize(10);
+            dialog_cancel.setVisibility(View.VISIBLE);
+            dialognew.setContentView(alertLayout);
+        }
+        if (type.equalsIgnoreCase("UPDATESERVICE")) {
+            btn_cancel.setText("Close");
+            btn_cancel.setTextSize(10);
+            btn_ok.setText("Update Service Status");
+            btn_ok.setTextSize(10);
+            dialog_cancel.setVisibility(View.VISIBLE);
+            dialognew.setContentView(alertLayout);
+        }
+        try {
+            if (type.equalsIgnoreCase("ACTIVATELAYOUT")) {
+                customView(alertLayout, output, dialognew);
+            } else if (type.equalsIgnoreCase("UPDATESERVICE")) {
+                createAgent(alertLayout, list_view_with_checkbox, object);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        dialog.setCancelable(false);
+        btn_ok.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                anInterface.okClicked(type, ob);
+                dialognew.dismiss();
+            }
+        });
+        btn_cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                anInterface.cancelClicked(type, ob);
+                dialognew.dismiss();
+            }
+        });
+        btn_regenerate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialognew.dismiss();
+            }
+        });
+        dialog_cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialognew.dismiss();
+            }
+        });
+        dialognew.show();
+        Window window = dialognew.getWindow();
+        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+    }
+    protected ArrayList<String> arrayList;
+    protected EditText increaselimit;
+    protected void customDialog_List(final String type, JSONObject object, final Object ob, String msg, final String input, String output, final CustomInterface anInterface) {
+        this.anInterface = anInterface;
+        dialognew = new Dialog(getActivity());
+        final ArrayList<PermissionPozo> medium = new ArrayList<PermissionPozo>();
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+        View alertLayout = inflater.inflate(R.layout.customlistview_layout, null);
+        alertLayout.setKeepScreenOn(true);
+        TextView text = (TextView) alertLayout.findViewById(R.id.dialog_title);
+        increaselimit = (EditText) alertLayout.findViewById(R.id.increaselimit);
+        text.setText(msg);
+        AppCompatButton btn_cancel = (AppCompatButton) alertLayout.findViewById(R.id.btn_cancel);
+        AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
+        ListView list_view_with_checkbox = (ListView) alertLayout.findViewById(R.id.list_view_with_checkbox);
+        list_view_with_checkbox.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int itemIndex, long l) {
+                // Get user selected item.
+                Object itemObject = adapterView.getAdapter().getItem(itemIndex);
+
+                // Translate the selected item to DTO object.
+                PermissionPozo itemDto = (PermissionPozo) itemObject;
+
+                // Get the checkbox.
+                CheckBox itemCheckbox = (CheckBox) view.findViewById(R.id.list_view_item_checkbox);
+
+                // Reverse the checkbox and clicked item check state.
+                if (itemCheckbox.isChecked()) {
+                    medium.get(itemIndex).setChecked(false);
+                    itemCheckbox.setChecked(false);
+                    itemDto.setChecked(false);
+                } else {
+                    medium.get(itemIndex).setChecked(true);
+                    itemCheckbox.setChecked(true);
+                    itemDto.setChecked(true);
+
+                }
+
+                //Toast.makeText(getApplicationContext(), "select item text : " + itemDto.getItemText(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        try {
+            JSONArray array = object.getJSONArray("serviceList");
+            for (int i = 0; i < array.length(); i++) {
+                JSONObject jsonObject = array.getJSONObject(i);
+                if (jsonObject.getString("status").equalsIgnoreCase("Y"))
+                    medium.add(new PermissionPozo(jsonObject.getString("serviceId"), jsonObject.getString("serviceName"), jsonObject.getString("status"), true));
+                else
+                    medium.add(new PermissionPozo(jsonObject.getString("serviceId"), jsonObject.getString("serviceName"), jsonObject.getString("status"), false));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (type.equalsIgnoreCase("UPDATESERVICE")) {
+            btn_cancel.setText("Close");
+            btn_cancel.setTextSize(10);
+            btn_ok.setText("Update Service Status");
+            btn_ok.setTextSize(10);
+            dialognew.setContentView(alertLayout);
+        }
+        try {
+            if (type.equalsIgnoreCase("UPDATESERVICE")) {
+                createAgent(alertLayout, list_view_with_checkbox, object);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        dialog.setCancelable(false);
+        btn_ok.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                arrayList = new ArrayList<>();
+                if (medium != null && medium.size() != 0) {
+                    int size = medium.size();
+                    for (int i = 0; i < size; i++) {
+                        PermissionPozo dto = medium.get(i);
+                        if (dto.isChecked()) {
+                            arrayList.add(dto.getServiceId());
+                        }
+                    }
+                }
+                if (arrayList.size() != 0)
+                    anInterface.okClicked(type, ob);
+                dialognew.dismiss();
+            }
+        });
+        btn_cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                anInterface.cancelClicked(type, ob);
+                dialognew.dismiss();
+            }
+        });
+        dialognew.show();
+        Window window = dialognew.getWindow();
+        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+    }
+
+    protected TextView first_name, last_name, mobile_num, cree_address, bank_select, pincode;
+
+    protected void createAgent(View alertLayout, ListView listView, JSONObject object) throws Exception {
+        ArrayList<PermissionPozo> medium = new ArrayList<PermissionPozo>();
+        try {
+            JSONArray array = object.getJSONArray("serviceList");
+            for (int i = 0; i < array.length(); i++) {
+                JSONObject jsonObject = array.getJSONObject(i);
+                if (jsonObject.getString("status").equalsIgnoreCase("Y"))
+                    medium.add(new PermissionPozo(jsonObject.getString("serviceId"), jsonObject.getString("serviceName"), jsonObject.getString("status"), true));
+                else
+                    medium.add(new PermissionPozo(jsonObject.getString("serviceId"), jsonObject.getString("serviceName"), jsonObject.getString("status"), false));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (medium.size() != 0) {
+            listView.setVisibility(View.VISIBLE);
+            PermissionCheckAdapter listViewDataAdapter = new PermissionCheckAdapter(getActivity(), medium);
+            listViewDataAdapter.notifyDataSetChanged();
+            // Set data adapter to list view.
+            listView.setAdapter(listViewDataAdapter);
+        }
+
+    }
+
     protected void moneyTransgerFees(View alertLayout, JSONObject object, Object ob, String ifsc_code, String name, String msg, String input) throws Exception {
         TextView btn_name = (TextView) alertLayout.findViewById(R.id.btn_name_service);
         TextView btn_servicefee = (TextView) alertLayout.findViewById(R.id.btn_servicefee);
@@ -204,7 +472,8 @@ public class BaseFragment extends Fragment {
             btn_name.setText(name);
         dialog.setContentView(alertLayout);
     }
-    protected void customView(View alertLayout, String output) throws Exception {
+
+    protected void customView(View alertLayout, String output, Dialog dialog) throws Exception {
         TextView otpView = (TextView) alertLayout.findViewById(R.id.dialog_msg);
         otpView.setText(output);
         otpView.setVisibility(View.VISIBLE);
@@ -213,9 +482,10 @@ public class BaseFragment extends Fragment {
 
     protected ArrayList<String> spinner_list;
     protected CustomSpinnerAdapter adapter = null;
-    protected void customSpinner(final TextView viewText, final String type, final ArrayList<String> list_spinner,final TextView ifsc_Code) {
+
+    protected void customSpinner(final TextView viewText, final String type, final ArrayList<String> list_spinner, final TextView ifsc_Code) {
         spinner_list = list_spinner;
-        dialog = new Dialog(getActivity());
+        dialognew = new Dialog(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View alertLayout = inflater.inflate(R.layout.custom_spinner_layout, null);
         TextView text = (TextView) alertLayout.findViewById(R.id.spinner_title);
@@ -249,26 +519,27 @@ public class BaseFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 viewText.setText(list_spinner.get(position));
                 viewText.setError(null);
-                if(ifsc_Code!=null){
+                if (ifsc_Code != null) {
                     String condition = "where " + RapipayDB.COLOMN__BANK_NAME + "='" + viewText.getText().toString() + "'";
                     ifsc_Code.setText(BaseCompactActivity.db.geBankIFSC(condition).get(0));
                     ifsc_Code.setEnabled(false);
                 }
-                dialog.dismiss();
+                dialognew.dismiss();
             }
         });
-        dialog.setCancelable(false);
-        dialog.setContentView(alertLayout);
+        dialognew.setCancelable(false);
+        dialognew.setContentView(alertLayout);
         btn_ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dialog.dismiss();
+                dialognew.dismiss();
             }
         });
-        dialog.show();
-        Window window = dialog.getWindow();
+        dialognew.show();
+        Window window = dialognew.getWindow();
         window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
     }
+
     protected void hideKeyboard(Activity activity) {
         InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
         View view = activity.getCurrentFocus();
@@ -277,6 +548,7 @@ public class BaseFragment extends Fragment {
         }
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
+
     protected void selectImage() {
         final CharSequence[] items = {"Capture Image", "Choose from Gallery", "Cancel"};
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -320,6 +592,7 @@ public class BaseFragment extends Fragment {
 
         return result;
     }
+
     protected void setPic(Bitmap mCurrentPhotoPath) {
         imageBase64 = getBytesFromBitmap(addWaterMark(mCurrentPhotoPath));
     }
@@ -343,7 +616,8 @@ public class BaseFragment extends Fragment {
         }
         return null;
     }
-    public boolean printDifference(Date startDate,Date endDate) {
+
+    public boolean printDifference(Date startDate, Date endDate) {
         //milliseconds
         try {
 //            Calendar c = Calendar.getInstance();
@@ -372,7 +646,7 @@ public class BaseFragment extends Fragment {
             different = different % minutesInMilli;
 
             long elapsedSeconds = different / secondsInMilli;
-            if (elapsedDays>= 0)
+            if (elapsedDays >= 0)
                 return true;
         } catch (Exception e) {
             e.printStackTrace();
