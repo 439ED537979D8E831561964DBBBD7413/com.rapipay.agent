@@ -297,12 +297,12 @@ public class SettlementBankFragment extends BaseFragment implements WalletReques
                 } else {
                     if (pageType.equalsIgnoreCase("S")) {
                         if (!accountAdded)
-                            new WalletAsyncMethod(WebConfig.FUNDTRANSFER_URL, service_fee("1", "Money_Transfer_Bene").toString(), headerData, SettlementBankFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "SERVICEFEE").execute();
+                            new WalletAsyncMethod(WebConfig.BCRemittanceApp, service_fee("1", "Money_Transfer_Bene").toString(), headerData, SettlementBankFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "SERVICEFEE").execute();
                         else {
                             customDialog_Common("SESSIONEXPIRRED", null, null, "Error", "", "Request For add Settlement Bank Account is Already Pending.", SettlementBankFragment.this);
                         }
                     } else if (pageType.equalsIgnoreCase("P")) {
-                        new WalletAsyncMethod(WebConfig.FUNDTRANSFER_URL, service_fee("1", "Money_Transfer_Bene").toString(), headerData, SettlementBankFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "SERVICEFEE").execute();
+                        new WalletAsyncMethod(WebConfig.BCRemittanceApp, service_fee("1", "Money_Transfer_Bene").toString(), headerData, SettlementBankFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "SERVICEFEE").execute();
                     }
                 }
                 break;

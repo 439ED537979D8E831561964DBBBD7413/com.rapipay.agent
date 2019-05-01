@@ -47,7 +47,7 @@
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden" />
         <activity
-            android:name=".main_directory.FundTransferActivity"
+            android:name=".kotlin_classs.BCTab"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden" />
         <activity
@@ -68,6 +68,10 @@
             android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".main_directory.WalletDetailsActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name=".main_directory.FOSLoginActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden" />
         <activity
@@ -145,6 +149,10 @@
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden" />
         <activity
+            android:name=".kotlin_classs.FOSMainActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
             android:name=".main_directory.DailyCommissionActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden" />
@@ -168,10 +176,10 @@
             android:name=".main_directory.MPOSRegistration"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden" />
-        <activity
-            android:name=".main_directory.Fino_AEPS_BBPS_Activity"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="stateHidden" />
+        <!--<activity-->
+            <!--android:name=".main_directory.Fino_AEPS_BBPS_Activity"-->
+            <!--android:screenOrientation="portrait"-->
+            <!--android:windowSoftInputMode="stateHidden" />-->
         <activity
             android:name=".main_directory.MyCommission"
             android:screenOrientation="portrait"

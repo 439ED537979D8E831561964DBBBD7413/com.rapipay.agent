@@ -31,7 +31,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:weightSum="1"
-                android:layout_marginTop="10dp">z
+                android:layout_marginTop="10dp">
                 <CheckBox
                     android:id="@+id/cb_micro_atm"
                     android:layout_width="0dp"

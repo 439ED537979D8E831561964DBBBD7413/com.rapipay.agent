@@ -17,9 +17,11 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,8 +32,10 @@ import com.rapipay.android.agent.Model.BankDetailsPozo;
 import com.rapipay.android.agent.Model.DeviceDetailsPozo;
 import com.rapipay.android.agent.Model.HeaderePozo;
 import com.rapipay.android.agent.Model.ImagePozo;
+import com.rapipay.android.agent.Model.MenuModel;
 import com.rapipay.android.agent.Model.RapiPayPozo;
 import com.rapipay.android.agent.R;
+import com.rapipay.android.agent.adapter.ExpandableListAdapter;
 import com.rapipay.android.agent.fragments.ChangeMobileFragment;
 import com.rapipay.android.agent.fragments.ChangePassword;
 import com.rapipay.android.agent.fragments.ChangePinFragment;
@@ -42,7 +46,9 @@ import com.rapipay.android.agent.fragments.SettlementBankFragment;
 import com.rapipay.android.agent.fragments.TpinTab;
 import com.rapipay.android.agent.interfaces.CustomInterface;
 import com.rapipay.android.agent.interfaces.RequestHandler;
+import com.rapipay.android.agent.kotlin_classs.SettlementTab;
 import com.rapipay.android.agent.kotlin_classs.SubAgentFrag;
+import com.rapipay.android.agent.kotlin_classs.TransactionReports;
 import com.rapipay.android.agent.utils.AsyncPostMethod;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
 import com.rapipay.android.agent.utils.GenerateChecksum;
@@ -55,6 +61,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class MainActivity extends BaseCompactActivity
         implements NavigationView.OnNavigationItemSelectedListener, RequestHandler, CustomInterface, View.OnClickListener {
@@ -64,7 +72,7 @@ public class MainActivity extends BaseCompactActivity
     private static String filePath;
     DrawerLayout drawer;
     String data, term = null;
-    TextView tv, bankde;
+    TextView tv, bankde,bal;
     ImageView back_click;
     private static final int dpPhoto1 = 2001;
     private static final int dpPhoto2 = 2002;
@@ -75,6 +83,12 @@ public class MainActivity extends BaseCompactActivity
     public static boolean relailerDetails = false;
     public static ArrayList<DeviceDetailsPozo> deviceDetailsPozoArrayList;
     boolean isUrl = false;
+
+
+    ExpandableListAdapter expandableListAdapter;
+    ExpandableListView expandableListView;
+    List<MenuModel> headerList = new ArrayList<>();
+    HashMap<MenuModel, List<MenuModel>> childList = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,6 +107,7 @@ public class MainActivity extends BaseCompactActivity
                     back_click.setImageDrawable(getResources().getDrawable(R.drawable.rapipay_parter));
             }
             loadUrl();
+            loadBalance();
             loadMasterData();
         } else {
             dbNull(MainActivity.this);
@@ -133,11 +148,15 @@ public class MainActivity extends BaseCompactActivity
         url();
     }
 
+    private void loadBalance(){
+        new AsyncPostMethod(WebConfig.CRNF, getBalance().toString(), headerData, MainActivity.this, getString(R.string.responseTimeOut), "NODEHEADERDATA").execute();
+    }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.reset:
-                url();
+                loadBalance();
                 tv.setText("");
                 tv.setVisibility(View.GONE);
                 break;
@@ -147,7 +166,7 @@ public class MainActivity extends BaseCompactActivity
                 startActivity(intent);
                 break;
             case R.id.back_click:
-                itemSelection(0);
+                openfragment(0);
                 break;
         }
     }
@@ -169,11 +188,33 @@ public class MainActivity extends BaseCompactActivity
         return jsonObject;
     }
 
+    public JSONObject getBalance() {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("serviceType", "GET_AGENT_BALANCE");
+            jsonObject.put("requestType", "CRNF_CHANNEL");
+            jsonObject.put("typeMobileWeb", "mobile");
+            jsonObject.put("transactionID", ImageUtils.miliSeconds());
+            jsonObject.put("nodeAgentId", list.get(0).getMobilno());
+            jsonObject.put("agentID", list.get(0).getMobilno());
+            jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
+            jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return jsonObject;
+    }
+
     private void initialization() {
+        expandableListView = findViewById(R.id.expandableListView);
+        prepareMenuData();
+        populateExpandableList();
+        bal = (TextView)findViewById(R.id.bal);
         reset = (ImageView) findViewById(R.id.reset);
         reset.setOnClickListener(this);
         bankde = (TextView) findViewById(R.id.bankde);
-        bankde.setVisibility(View.VISIBLE);
+        bankde.setVisibility(View.GONE);
         bankde.setText("Credit Banks");
         back_click = (ImageView) findViewById(R.id.back_click);
         tv = (TextView) this.findViewById(R.id.mywidget);
@@ -218,6 +259,132 @@ public class MainActivity extends BaseCompactActivity
             @Override
             public void onClick(View v) {
                 selectImage(dpPhoto1, dpPhoto2, "DPPHOTO");
+            }
+        });
+    }
+    private void prepareMenuData() {
+
+        MenuModel menuModel = new MenuModel("Home", true, false, "https://www.journaldev.com/9333/android-webview-example-tutorial"); //Menu of Android Tutorial. No sub menus
+        headerList.add(menuModel);
+
+        if (!menuModel.hasChildren) {
+            childList.put(menuModel, null);
+        }
+        menuModel = new MenuModel("Profile", true, false, "https://www.journaldev.com/9333/android-webview-example-tutorial"); //Menu of Android Tutorial. No sub menus
+        headerList.add(menuModel);
+
+        if (!menuModel.hasChildren) {
+            childList.put(menuModel, null);
+        }
+
+        menuModel = new MenuModel("Sub Agents", true, false, "https://www.journaldev.com/9333/android-webview-example-tutorial"); //Menu of Android Tutorial. No sub menus
+        headerList.add(menuModel);
+
+        if (!menuModel.hasChildren) {
+            childList.put(menuModel, null);
+        }
+        menuModel = new MenuModel("Credit Banks", true, false, "https://www.journaldev.com/9333/android-webview-example-tutorial"); //Menu of Android Tutorial. No sub menus
+        headerList.add(menuModel);
+
+        if (!menuModel.hasChildren) {
+            childList.put(menuModel, null);
+        }
+
+        menuModel = new MenuModel("Settings", true, true, ""); //Menu of Java Tutorials
+        headerList.add(menuModel);
+        List<MenuModel> childModelsList = new ArrayList<>();
+        MenuModel childModel = new MenuModel("Change Password", false, false, "https://www.journaldev.com/7153/core-java-tutorial");
+        childModelsList.add(childModel);
+
+        childModel = new MenuModel("Change TPIN", false, false, "https://www.journaldev.com/19187/java-fileinputstream");
+        childModelsList.add(childModel);
+
+        childModel = new MenuModel("Change Login Pin", false, false, "https://www.journaldev.com/19115/java-filereader");
+        childModelsList.add(childModel);
+        childModel = new MenuModel("Change Mobile", false, false, "https://www.journaldev.com/19115/java-filereader");
+        childModelsList.add(childModel);
+
+
+        if (menuModel.hasChildren) {
+            Log.d("API123","here");
+            childList.put(menuModel, childModelsList);
+        }
+
+        childModelsList = new ArrayList<>();
+        menuModel = new MenuModel("Accounts Details", true, true, ""); //Menu of Python Tutorials
+        headerList.add(menuModel);
+        childModel = new MenuModel("Bank Settlement Account", false, false, "https://www.journaldev.com/19243/python-ast-abstract-syntax-tree");
+        childModelsList.add(childModel);
+
+        childModel = new MenuModel("Whitelist Bank Account(Auto Credit)", false, false, "https://www.journaldev.com/19226/python-fractions");
+        childModelsList.add(childModel);
+        childModel = new MenuModel("Bank Settlement", false, false, "https://www.journaldev.com/19226/python-fractions");
+        childModelsList.add(childModel);
+        childModel = new MenuModel("Lien History", false, false, "https://www.journaldev.com/19226/python-fractions");
+        childModelsList.add(childModel);
+
+        if (menuModel.hasChildren) {
+            childList.put(menuModel, childModelsList);
+        }
+
+        childModelsList = new ArrayList<>();
+        menuModel = new MenuModel("Transaction Reports", true, true, ""); //Menu of Python Tutorials
+        headerList.add(menuModel);
+        childModel = new MenuModel("BC Fund Transfer History", false, false, "https://www.journaldev.com/19243/python-ast-abstract-syntax-tree");
+        childModelsList.add(childModel);
+
+        childModel = new MenuModel("Wallet Fund Transfer History", false, false, "https://www.journaldev.com/19226/python-fractions");
+        childModelsList.add(childModel);
+        childModel = new MenuModel("Indo-Nepal Fund Transfer History", false, false, "https://www.journaldev.com/19226/python-fractions");
+        childModelsList.add(childModel);
+        childModel = new MenuModel("MPOS Transaction History", false, false, "https://www.journaldev.com/19226/python-fractions");
+        childModelsList.add(childModel);
+        childModel = new MenuModel("AEPS/ MATM Transaction History", false, false, "https://www.journaldev.com/19226/python-fractions");
+        childModelsList.add(childModel);
+
+        if (menuModel.hasChildren) {
+            childList.put(menuModel, childModelsList);
+        }
+    }
+    private void populateExpandableList() {
+
+        expandableListAdapter = new ExpandableListAdapter(this, headerList, childList);
+        expandableListView.setAdapter(expandableListAdapter);
+
+        expandableListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+            @Override
+            public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
+
+                if (headerList.get(groupPosition).isGroup) {
+                    if (!headerList.get(groupPosition).hasChildren) {
+                        openfragment(groupPosition);
+//                        WebView webView = findViewById(R.id.webView);
+//                        webView.loadUrl(headerList.get(groupPosition).url);
+                        closeDrawer();
+                    }
+                }
+
+                return false;
+            }
+        });
+
+        expandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+            @Override
+            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+
+                if (childList.get(headerList.get(groupPosition)) != null) {
+                    MenuModel model = childList.get(headerList.get(groupPosition)).get(childPosition);
+                    if (model.url.length() > 0) {
+                        int index = parent.getFlatListPosition(ExpandableListView.getPackedPositionForChild(groupPosition, childPosition));
+                        parent.setItemChecked(index, true);
+                        openChildfragment(groupPosition,childPosition);
+//                        WebView webView = findViewById(R.id.webView);
+//                        webView.loadUrl(model.url);
+                        closeDrawer();
+                    }
+                }
+
+                return false;
             }
         });
     }
@@ -286,11 +453,12 @@ public class MainActivity extends BaseCompactActivity
         int id = item.getItemId();
         Fragment fragment = null;
         if (id == R.id.nav_home) {
-            bankde.setVisibility(View.VISIBLE);
+            bankde.setVisibility(View.GONE);
             reset.setVisibility(View.VISIBLE);
             if (isUrl) {
                 isUrl = false;
                 loadUrl();
+                loadBalance();
             }
             fragment = new DashBoardFragments();
         } else if (id == R.id.nav_Cpin) {
@@ -344,7 +512,16 @@ public class MainActivity extends BaseCompactActivity
             reset.setVisibility(View.GONE);
             bankde.setVisibility(View.GONE);
             fragment = new TpinTab();
+        }else if (id == R.id.nav_faq) {
+            isUrl = true;
+            reset.setVisibility(View.GONE);
+            bankde.setVisibility(View.GONE);
+            Bundle bundle = new Bundle();
+            bundle.putString("reqFor", "STLMNT");
+            fragment = new SettlementTab();
+            fragment.setArguments(bundle);
         } else if (fragment == null)
+
             Toast.makeText(MainActivity.this, "Under Process", Toast.LENGTH_SHORT).show();
         if (fragment != null)
             fragmentReplace(fragment);
@@ -362,6 +539,135 @@ public class MainActivity extends BaseCompactActivity
 
     private void itemSelection(int id) {
         onNavigationItemSelected(navigationView.getMenu().getItem(0));
+    }
+    private void openChildfragment(int head,int child){
+        Fragment fragment = null;
+        if (head==4 && child == 2) {
+            isUrl = true;
+            reset.setVisibility(View.GONE);
+            bankde.setVisibility(View.GONE);
+            fragment = new ChangePinFragment();
+        } else if (head==4 && child == 0) {
+            isUrl = true;
+            reset.setVisibility(View.GONE);
+            bankde.setVisibility(View.GONE);
+            fragment = new ChangePassword();
+        } else if (head==4 && child ==3) {
+            isUrl = true;
+            reset.setVisibility(View.GONE);
+            bankde.setVisibility(View.GONE);
+            fragment = new ChangeMobileFragment();
+        } else if (head==5 && child == 0) {
+            isUrl = true;
+            reset.setVisibility(View.GONE);
+            bankde.setVisibility(View.GONE);
+            Bundle bundle = new Bundle();
+            bundle.putString("message", "S");
+            fragment = new SettlementBankFragment();
+            fragment.setArguments(bundle);
+        } else if (head==5 && child == 1) {
+            isUrl = true;
+            reset.setVisibility(View.GONE);
+            bankde.setVisibility(View.GONE);
+            Bundle bundle = new Bundle();
+            bundle.putString("message", "P");
+            fragment = new SettlementBankFragment();
+            fragment.setArguments(bundle);
+        } else if (head==5 && child == 3) {
+            isUrl = true;
+            reset.setVisibility(View.GONE);
+            bankde.setVisibility(View.GONE);
+            fragment = new LienHistory();
+        } else if (head==4 && child == 1) {
+            isUrl = true;
+            reset.setVisibility(View.GONE);
+            bankde.setVisibility(View.GONE);
+            fragment = new TpinTab();
+        }else if (head==5 && child == 2) {
+            isUrl = true;
+            reset.setVisibility(View.GONE);
+            bankde.setVisibility(View.GONE);
+            Bundle bundle = new Bundle();
+            bundle.putString("reqFor", "STLMNT");
+            fragment = new SettlementTab();
+            fragment.setArguments(bundle);
+        }else if (head==6 && child == 0) {
+            isUrl = true;
+            reset.setVisibility(View.GONE);
+            bankde.setVisibility(View.GONE);
+            Bundle bundle = new Bundle();
+            bundle.putString("reqFor", "BCS");
+            fragment = new TransactionReports();
+            fragment.setArguments(bundle);
+        }else if (head==6 && child == 1) {
+            isUrl = true;
+            reset.setVisibility(View.GONE);
+            bankde.setVisibility(View.GONE);
+            Bundle bundle = new Bundle();
+            bundle.putString("reqFor", "WLT");
+            fragment = new TransactionReports();
+            fragment.setArguments(bundle);
+        }else if (head==6 && child == 2) {
+            isUrl = true;
+            reset.setVisibility(View.GONE);
+            bankde.setVisibility(View.GONE);
+            Bundle bundle = new Bundle();
+            bundle.putString("reqFor", "PMT");
+            fragment = new TransactionReports();
+            fragment.setArguments(bundle);
+        }else if (head==6 && child == 3) {
+            isUrl = true;
+            reset.setVisibility(View.GONE);
+            bankde.setVisibility(View.GONE);
+            Bundle bundle = new Bundle();
+            bundle.putString("reqFor", "MPOS");
+            fragment = new TransactionReports();
+            fragment.setArguments(bundle);
+        }else if (head==6 && child == 4) {
+            isUrl = true;
+            reset.setVisibility(View.GONE);
+            bankde.setVisibility(View.GONE);
+            Bundle bundle = new Bundle();
+            bundle.putString("reqFor", "AEPSMATM");
+            fragment = new TransactionReports();
+            fragment.setArguments(bundle);
+        } else if (fragment == null)
+
+            Toast.makeText(MainActivity.this, "Under Process", Toast.LENGTH_SHORT).show();
+        if (fragment != null)
+            fragmentReplace(fragment);
+        drawer.closeDrawer(GravityCompat.START);
+    }
+    private void openfragment(int id){
+        Fragment fragment = null;
+        if (id == 0) {
+            bankde.setVisibility(View.GONE);
+            reset.setVisibility(View.VISIBLE);
+            if (isUrl) {
+                isUrl = false;
+                loadUrl();
+            }
+            fragment = new DashBoardFragments();
+        }  else if (id == 1) {
+            isUrl = true;
+            reset.setVisibility(View.GONE);
+            bankde.setVisibility(View.GONE);
+            fragment = new ProfileFragment();
+        }  else if (id == 2) {
+            isUrl = true;
+            reset.setVisibility(View.GONE);
+            bankde.setVisibility(View.GONE);
+            fragment = new SubAgentFrag();
+        } else if (id == 3) {
+            isUrl = true;
+            reset.setVisibility(View.GONE);
+            bankde.setVisibility(View.GONE);
+            fragment = new com.rapipay.android.agent.kotlin_classs.BankDetails();
+        }  else if (fragment == null)
+            Toast.makeText(MainActivity.this, "Under Process", Toast.LENGTH_SHORT).show();
+        if (fragment != null)
+            fragmentReplace(fragment);
+        drawer.closeDrawer(GravityCompat.START);
     }
 
     @Override
@@ -381,6 +687,9 @@ public class MainActivity extends BaseCompactActivity
                     }
                 } else if (object.getString("serviceType").equalsIgnoreCase("UPDATE_DOWNLAOD_DATA_STATUS")) {
                     loadUrl();
+                }else if (object.getString("serviceType").equalsIgnoreCase("GET_AGENT_BALANCE")) {
+                    bal.setText("Bal:-"+format(object.getString("agentBalance")));
+                    bal.setVisibility(View.VISIBLE);
                 } else if (object.getString("serviceType").equalsIgnoreCase("GET_MASTER_DEVICE_DETAILS")) {
                     if (object.has("deviceList")) {
                         deviceDetails(object.getJSONArray("deviceList"));
@@ -464,7 +773,7 @@ public class MainActivity extends BaseCompactActivity
             e.printStackTrace();
         }
 
-        itemSelection(0);
+        openfragment(0);
     }
 
     private void callMasterDetails() {
@@ -531,6 +840,12 @@ public class MainActivity extends BaseCompactActivity
             drawer.closeDrawer(GravityCompat.START);
         }
         customDialog_Common("KYCLAYOUT", null, null, "Rapipay", null, "Are you sure you want to exit ?", MainActivity.this);
+    }
+
+    private void closeDrawer(){
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        }
     }
 
     @Override

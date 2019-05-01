@@ -215,7 +215,7 @@
                             android:layout_height="wrap_content"
                             android:hint="@string/p_tramount"
                             android:inputType="number"
-                            android:maxLength="10"
+                            android:maxLength="5"
                             android:textSize="16dp" />
                     </android.support.design.widget.TextInputLayout>
 
@@ -612,7 +612,33 @@
                             android:textColor="@color/black"
                             android:textSize="12sp" />
                     </LinearLayout>
+                    <RadioGroup
+                        android:layout_margin="10dp"
+                        android:id="@+id/myRadioGroup"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:checkedButton="@+id/sound"
+                        android:weightSum="800"
+                        android:visibility="gone">
 
+                        <RadioButton
+                            android:id="@+id/prepaid"
+                            android:layout_weight="400"
+                            android:textSize="12dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="OTP" />
+
+                        <RadioButton
+                            android:layout_weight="400"
+                            android:id="@+id/postpaid"
+                            android:textSize="12dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="IPIN" />
+
+                    </RadioGroup>
                     <EditText
                         android:id="@+id/newtpin"
                         android:layout_width="match_parent"

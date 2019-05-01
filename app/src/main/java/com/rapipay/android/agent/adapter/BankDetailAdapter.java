@@ -12,7 +12,6 @@ import com.rapipay.android.agent.Model.BankDetailPozo;
 import com.rapipay.android.agent.R;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class BankDetailAdapter extends RecyclerView.Adapter<BankDetailAdapter.ViewHolder> {
 

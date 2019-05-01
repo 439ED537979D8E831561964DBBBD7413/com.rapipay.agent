@@ -38,6 +38,7 @@
                 android:gravity="left"
                 android:inputType="number"
                 android:padding="15dp"
+                android:maxLength="10"
                 android:hint="Increase Limit"
                 android:textColor="@color/black"
                 android:textSize="16dp" />

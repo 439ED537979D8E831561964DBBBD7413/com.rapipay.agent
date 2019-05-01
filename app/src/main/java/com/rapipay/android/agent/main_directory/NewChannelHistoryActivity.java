@@ -13,7 +13,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.rapipay.android.agent.Model.LoadSummaryPozo;
-import com.rapipay.android.agent.Model.NewTransactionPozo;
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.adapter.TransactionHistAdapter;
 import com.rapipay.android.agent.interfaces.CustomInterface;

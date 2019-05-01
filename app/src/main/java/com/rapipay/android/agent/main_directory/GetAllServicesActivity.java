@@ -15,11 +15,9 @@ import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.adapter.ListViewItemCheckboxBaseAdapter;
 import com.rapipay.android.agent.interfaces.CustomInterface;
 import com.rapipay.android.agent.interfaces.RequestHandler;
-import com.rapipay.android.agent.utils.AsyncPostMethod;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
 import com.rapipay.android.agent.utils.GenerateChecksum;
 import com.rapipay.android.agent.utils.ImageUtils;
-import com.rapipay.android.agent.utils.WebConfig;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

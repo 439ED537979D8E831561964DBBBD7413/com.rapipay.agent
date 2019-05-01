@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.LinearLayoutManager;
@@ -31,12 +30,12 @@ import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.adapter.HeaderAdapter;
 import com.rapipay.android.agent.adapter.SimpleStringRecyclerViewAdapter;
 import com.rapipay.android.agent.interfaces.ClickListener;
+import com.rapipay.android.agent.kotlin_classs.BCTab;
 import com.rapipay.android.agent.main_directory.AEPS_BBPS_RegistrationActivity;
 import com.rapipay.android.agent.main_directory.CashOutClass;
 import com.rapipay.android.agent.main_directory.ChannelHistoryActivity;
 import com.rapipay.android.agent.main_directory.CreditTabPage;
 import com.rapipay.android.agent.main_directory.CreditTransHistActivity;
-import com.rapipay.android.agent.main_directory.Fino_AEPS_BBPS_Activity;
 import com.rapipay.android.agent.main_directory.FundTransferActivity;
 import com.rapipay.android.agent.main_directory.MICRO_AEPS_Activity;
 import com.rapipay.android.agent.main_directory.MPOSRegistration;
@@ -60,7 +59,8 @@ import com.rapipay.android.agent.utils.RecyclerTouchListener;
 import java.util.ArrayList;
 
 import static android.app.Activity.RESULT_OK;
-import static com.finopaytech.finosdk.helpers.Utils.hideKeyboard;
+
+//import com.rapipay.android.agent.main_directory.Fino_AEPS_BBPS_Activity;
 
 public class DashBoardFragments extends BaseFragment {
     RecyclerView recycler_view, recycler_view2, recycler_view3, recycler_view4, recycler_view5, recycler_view6, recycler_view7, recycler_view8;
@@ -182,34 +182,34 @@ public class DashBoardFragments extends BaseFragment {
         recycler_view6.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), recycler_view6, new ClickListener() {
             @Override
             public void onClick(View view, int position) {
-//                Intent intent = null;
+                Intent intent = null;
                 if (position == 0) {
-                    customDialog_Ben("MPOS-SALE", "MposCashoutTransfer");
-//                    intent = new Intent(getActivity(), CashOutClass.class);
-//                    intent.putExtra("typeput", "CASHOUT");
-//                    intent.putExtra("serviceType", "MPOS_CASHOUT");
-//                    intent.putExtra("requestChannel", "MPOS_CHANNEL");
-//                    intent.putExtra("requestType", "MPOS-CASHOUT");
-//                    intent.putExtra("reqFor", "MPOS");
+//                    customDialog_Ben("MPOS-SALE", "MposCashoutTransfer");
+                    intent = new Intent(getActivity(), CashOutClass.class);
+                    intent.putExtra("typeput", "CASHOUT");
+                    intent.putExtra("serviceType", "MPOS_CASHOUT");
+                    intent.putExtra("requestChannel", "MPOS_CHANNEL");
+                    intent.putExtra("requestType", "MPOS-CASHOUT");
+                    intent.putExtra("reqFor", "MPOS");
                 } else if (position == 1) {
-                    customDialog_Ben("MPOS-SALE", "MposSaleTransfer");
-//                    intent = new Intent(getActivity(), CashOutClass.class);
-//                    intent.putExtra("typeput", "SALE");
-//                    intent.putExtra("serviceType", "MPOS_SALE");
-//                    intent.putExtra("requestChannel", "MPOS_CHANNEL");
-//                    intent.putExtra("requestType", "MPOS-SALE");
-//                    intent.putExtra("reqFor", "MPOS");
+//                    customDialog_Ben("MPOS-SALE", "MposSaleTransfer");
+                    intent = new Intent(getActivity(), CashOutClass.class);
+                    intent.putExtra("typeput", "SALE");
+                    intent.putExtra("serviceType", "MPOS_SALE");
+                    intent.putExtra("requestChannel", "MPOS_CHANNEL");
+                    intent.putExtra("requestType", "MPOS-SALE");
+                    intent.putExtra("reqFor", "MPOS");
                 } else if (position == 2) {
-                    customDialog_Ben("MPOS-SALE", "MposEmiTransfer");
-//                    intent = new Intent(getActivity(), CashOutClass.class);
-//                    intent.putExtra("typeput", "EMI");
-//                    intent.putExtra("serviceType", "MPOS_EMI");
-//                    intent.putExtra("requestChannel", "MPOS_CHANNEL");
-//                    intent.putExtra("requestType", "MPOS-EMI");
-//                    intent.putExtra("reqFor", "MPOS");
+//                    customDialog_Ben("MPOS-SALE", "MposEmiTransfer");
+                    intent = new Intent(getActivity(), CashOutClass.class);
+                    intent.putExtra("typeput", "EMI");
+                    intent.putExtra("serviceType", "MPOS_EMI");
+                    intent.putExtra("requestChannel", "MPOS_CHANNEL");
+                    intent.putExtra("requestType", "MPOS-EMI");
+                    intent.putExtra("reqFor", "MPOS");
                 }
-//                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//                startActivity(intent);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
             }
 
             @Override
@@ -276,12 +276,12 @@ public class DashBoardFragments extends BaseFragment {
                     intent.putExtra("requestType", "AEPS-BE");
                     intent.putExtra("reqFor", "AEPS");
                 } else if (position == 2) {
-                    intent = new Intent(getActivity(), Fino_AEPS_BBPS_Activity.class);
-                    intent.putExtra("typeput", "EMI");
-                    intent.putExtra("serviceType", "MPOS_EMI");
-                    intent.putExtra("requestChannel", "MPOS_CHANNEL");
-                    intent.putExtra("requestType", "MPOS_EMI");
-                    intent.putExtra("reqFor", "MPOS");
+//                    intent = new Intent(getActivity(), Fino_AEPS_BBPS_Activity.class);
+//                    intent.putExtra("typeput", "EMI");
+//                    intent.putExtra("serviceType", "MPOS_EMI");
+//                    intent.putExtra("requestChannel", "MPOS_CHANNEL");
+//                    intent.putExtra("requestType", "MPOS_EMI");
+//                    intent.putExtra("reqFor", "MPOS");
                 }
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
@@ -353,20 +353,33 @@ public class DashBoardFragments extends BaseFragment {
             @Override
             public void onClick(View view, int position) {
                 if (position == 1) {
-                    customDialog_Ben("BC FUND TRANSFER", "FundTransfer");
+//                    customDialog_Ben("BC FUND TRANSFER", "FundTransfer");
+                    Intent intent = new Intent(getActivity(), BCTab.class);
+                    intent.putExtra("reqFor", "BCS");
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
                 } else if (position == 2) {
                     Intent intent = new Intent(getActivity(), PendingRefundActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                 } else if (position == 0) {
-                    customDialog_Ben("RAPIPAY WALLET FUND TRANSFER", "WALLETTransfer");
+//                    customDialog_Ben("RAPIPAY WALLET FUND TRANSFER", "WALLETTransfer");
+                    Intent intent = new Intent(getActivity(), WalletDetailsActivity.class);
+//                    intent.putExtra("mobileNo", input_number.getText().toString());
+                    intent.putExtra("type", "");
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
                 } else if (position == 3) {
                     Intent intent = new Intent(getActivity(), ChannelHistoryActivity.class);
                     intent.putExtra("TYPE", "");
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                 } else if (position == 4) {
-                    customDialog_Ben("INDO-NEPAL Remittance", "PMTTransfer");
+//                    customDialog_Ben("INDO-NEPAL Remittance", "PMTTransfer");
+                    Intent intent = new Intent(getActivity(), PMTRemittanceActivity.class);
+//                    intent.putExtra("MOBILENO", input_number.getText().toString());
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
                 }
             }
 

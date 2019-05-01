@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 
 import com.rapipay.android.agent.Model.LoadSummaryPozo;
-import com.rapipay.android.agent.Model.NewTransactionPozo;
 import com.rapipay.android.agent.R;
 
 import java.text.NumberFormat;

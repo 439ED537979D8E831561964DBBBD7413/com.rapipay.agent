@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
+apply plugin: 'kotlin-android'
 apply plugin: 'com.google.firebase.firebase-perf'
 android {
     compileSdkVersion 27
@@ -7,12 +8,12 @@ android {
 //        applicationId "com.rapipay.android.agent"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 42
-        versionName "0.42"
+        versionCode 45
+        versionName "0.45"
         multiDexEnabled true
-        buildConfigField "int", "APPTYPE", "2"
-        buildConfigField "String", "USERTYPE", "\"Other\""
-        buildConfigField "String", "DOMAINNAME", "\"partner.rapipay.com\""
+        buildConfigField "int", "APPTYPE", "3"
+        buildConfigField "String", "USERTYPE", "\"RapiPay\""
+        buildConfigField "String", "DOMAINNAME", "\"agent.rapipay.com\""
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         ndk{
             abiFilters "armeabi-v7a", "x86"
@@ -94,5 +95,6 @@ dependencies {
     implementation 'com.android.support:multidex:1.0.0'
     implementation 'com.camerakit:camerakit:1.0.0-beta1'
     implementation 'com.google.firebase:firebase-messaging:17.3.4'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
 apply plugin: 'com.google.gms.google-services'

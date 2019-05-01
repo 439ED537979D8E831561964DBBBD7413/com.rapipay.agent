@@ -9,6 +9,9 @@
             android:id="@+id/profile"
             android:title="Profile" />
         <item
+            android:id="@+id/nav_agent"
+            android:title="Sub Agents" />
+        <item
             android:id="@+id/nav_cpsw"
             android:title="Change Password" />
         <item
@@ -29,8 +32,8 @@
         <item
             android:id="@+id/lien_Cmobile"
             android:title="Lien History" />
-        <!--<item-->
-            <!--android:id="@+id/nav_faq"-->
-            <!--android:title="FAQ" />-->
+        <item
+            android:id="@+id/nav_faq"
+            android:title="Bank Settlement" />
     </group>
 </menu>

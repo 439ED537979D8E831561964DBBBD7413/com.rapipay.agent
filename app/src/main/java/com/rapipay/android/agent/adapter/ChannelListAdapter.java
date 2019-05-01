@@ -29,7 +29,6 @@ public class ChannelListAdapter extends ArrayAdapter<ChannelHistoryPozo> {
         super(context, R.layout.channel_history_adapter, data);
         this.mValues = data;
         this.mContext=context;
-
     }
 
     @Override

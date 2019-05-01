@@ -1,17 +1,21 @@
 package com.rapipay.android.agent.kotlin_classs
 
 import android.app.Dialog
+import android.content.Context
 import android.os.Bundle
 import android.support.v7.widget.AppCompatButton
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import com.rapipay.android.agent.Model.NetworkTransferPozo
+import com.rapipay.android.agent.Model.SettlementPozoo
 import com.rapipay.android.agent.R
-import com.rapipay.android.agent.adapter.NetworkTransferAdapter
+import com.rapipay.android.agent.adapter.SettleAdapterBank
+import com.rapipay.android.agent.interfaces.ClickListener
 import com.rapipay.android.agent.interfaces.RequestHandler
 import com.rapipay.android.agent.utils.*
 import me.grantland.widget.AutofitTextView
@@ -20,81 +24,61 @@ import org.json.JSONObject
 import java.text.NumberFormat
 import java.util.*
 
-class FOSTransfer : BaseFragment(), RequestHandler {
-    var agentID: String? = null
-    var nodeAgentID: String? = null
-    var sessionRefNo: String? = null
-    var sessionKey: String? = null
-    var first = 1
-    var last = 25
-    private var isLoading: Boolean = false
-    var transactionPozoArrayList: ArrayList<NetworkTransferPozo>? = null
-    var trans_details: ListView? = null
+class SettlementBak : BaseFragment(), RequestHandler {
+    var transactionPozoArrayList: ArrayList<SettlementPozoo>? = null
+    var trans_details: RecyclerView? = null
     protected var headerData = WebConfig.BASIC_USERID + ":" + WebConfig.BASIC_PASSWORD
-    var adapters: NetworkTransferAdapter? = null
-    var pozoClick: NetworkTransferPozo?=null
-    var textsss: TextView?=null
-
+    var adapters: SettleAdapterBank? = null
+    var pozoClick: SettlementPozoo? = null
+    var textsss: TextView? = null
+    var jsonObjects: JSONObject? = null
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        var view = inflater.inflate(R.layout.fos_layout_transfer,container,false) as View
+        var view = inflater.inflate(R.layout.settle_lay, container, false) as View
+        if (BaseCompactActivity.db != null && BaseCompactActivity.db.details_Rapi)
+            list = BaseCompactActivity.db.details
         init(view)
         loadUrl()
         return view
     }
 
-    fun init(v:View) {
+    fun init(v: View) {
         var heading = v.findViewById<EditText>(R.id.headingsearch)
-        heading?.onChange {  "test"}
-        nodeAgentID = arguments!!.getString("nodeAgentID")
-        agentID = arguments!!.getString("AgentID")
-        sessionRefNo = arguments!!.getString("sessionRefNo")
-        sessionKey = arguments!!.getString("sessionKey")
-        trans_details = v.findViewById<ListView>(R.id.trans_details)
-        trans_details!!.setOnScrollListener(object : AbsListView.OnScrollListener {
-            override fun onScrollStateChanged(view: AbsListView, scrollState: Int) {
-
+        heading?.onChange()
+        trans_details = v.findViewById<RecyclerView>(R.id.trans_details)
+        trans_details!!.addOnItemTouchListener(RecyclerTouchListener(activity, trans_details, object : ClickListener {
+            override fun onClick(view: View?, position: Int) {
+                pozoClick = transactionPozoArrayList!!.get(position)
+                customDialog_Ben(transactionPozoArrayList!!.get(position), "Network Transfer", "BENLAYOUT", "Transfer Amount")
             }
 
-            override fun onScroll(view: AbsListView, firstVisibleItem: Int, visibleItemCount: Int, totalItemCount: Int) {
-                val lastInScreen = firstVisibleItem + visibleItemCount
-                if (totalItemCount != 0 && totalItemCount == last && lastInScreen == totalItemCount && !isLoading) {
-                    first = last + 1
-                    last += 25
-                    AsyncPostMethod(WebConfig.CommonReport, getTransgerRequest(first,last).toString(), headerData,this@FOSTransfer,  activity, getString(R.string.responseTimeOut)).execute()
-                    isLoading = true
-                }
+            override fun onLongClick(view: View?, position: Int) {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
             }
-        })
-        trans_details!!.setOnItemClickListener(AdapterView.OnItemClickListener { parent, view, position, id ->
-            pozoClick = transactionPozoArrayList!!.get(position)
-            customDialog_Ben(transactionPozoArrayList!!.get(position), "Network Transfer", "BENLAYOUT", pozoClick!!.getConsentStatus(), "Credit To Network")
-            //                if (clickedId.equalsIgnoreCase("0"))
-            //                    customDialog_Ben(transactionPozoArrayList.get(position), "Network Transfer", "AMOUNTTRANSFER", "", "Credit To Network");
-        })
+        }))
+//            pozoClick = transactionPozoArrayList!!.get(position)
+////            customDialog_Ben(transactionPozoArrayList!!.get(position), "Network Transfer", "BENLAYOUT", pozoClick!!.getConsentStatus(), "Credit To Network")
+
     }
 
     fun loadUrl() {
-        AsyncPostMethod(WebConfig.CommonReport, getTransgerRequest(first,last).toString(), headerData, this, activity, getString(R.string.responseTimeOut)).execute()
+        AsyncPostMethod(WebConfig.CRNF, getTransgerRequest().toString(), headerData, this, activity, getString(R.string.responseTimeOut)).execute()
     }
 
     override fun chechStat(`object`: String?) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
-    var s:String?=null
+
     override fun chechStatus(`object`: JSONObject?) {
         try {
             if (`object`!!.has("responseCode") && `object`.getString("responseCode").equals("200", true)) {
-                if (`object`.getString("serviceType").equals("GET_MY_NODE_DETAILS", true)) {
-                    if (`object`.has("objAgentNodeList")) {
-                        s = formatss(`object`!!.getString("subAgentLimit")!!)
-                        FOSMainActivity.setCount("Balance : "+ s)
-                        if (Integer.parseInt(`object`.getString("agentCount")) > 0) {
-                            insertLastTransDetails(`object`.getJSONArray("objAgentNodeList"))
-                        }
+                if (`object`.getString("serviceType").equals("CALCULATE_TRANFSER_AMOUNT", true)) {
+                    jsonObjects = `object`
+                    if (`object`.has("objTransferAmountList")) {
+                        insertLastTransDetails(`object`.getJSONArray("objTransferAmountList"))
                     }
 
-                }else if (`object`.getString("serviceType").equals("C2C_NETWORK_CREDIT",true)) {
-                    customDialog_Ben(null, `object`.getString("responseMessage"), "NETWORK_CREDIT", null, "Credit Confirmation")
+                } else if (`object`.getString("serviceType").equals("C2C_NETWORK_CREDIT", true)) {
+                    customDialog_Ben(null, `object`.getString("responseMessage"), "NETWORK_CREDIT",  "Credit Confirmation")
                 }
             }
         } catch (e: Exception) {
@@ -103,12 +87,11 @@ class FOSTransfer : BaseFragment(), RequestHandler {
     }
 
     private fun insertLastTransDetails(array: JSONArray) {
-        if (array.length() != 1)
-            transactionPozoArrayList = ArrayList<NetworkTransferPozo>()
+        transactionPozoArrayList = ArrayList<SettlementPozoo>()
         try {
             for (i in 0 until array.length()) {
                 val `object` = array.getJSONObject(i)
-                transactionPozoArrayList!!.add(NetworkTransferPozo(`object`.getString("companyName"), `object`.getString("mobileNo"), `object`.getString("agentName"), `object`.getString("agentBalance"), `object`.getString("agentCategory")))
+                transactionPozoArrayList!!.add(SettlementPozoo(`object`.getString("requestType"), `object`.getString("aepsCount"), `object`.getString("aepsValue"), `object`.getString("usage"), `object`.getString("transferAmount"), `object`.getString("serviceFee"), `object`.getString("iGST") + "/" + `object`.getString("cGST") + "/" + `object`.getString("sGST")))
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -117,46 +100,42 @@ class FOSTransfer : BaseFragment(), RequestHandler {
             initializeTransAdapter(transactionPozoArrayList!!)
     }
 
-    private fun initializeTransAdapter(list: ArrayList<NetworkTransferPozo>) {
-        if (first == 1) {
-            adapters = NetworkTransferAdapter(activity, list)
-            trans_details!!.setAdapter(adapters)
-        } else {
-            adapters!!.addAll(list)
-            adapters!!.notifyDataSetChanged()
-        }
-        isLoading = false
+    private fun initializeTransAdapter(lists: ArrayList<SettlementPozoo>) {
+        var layoutManager = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
+        trans_details!!.setLayoutManager(layoutManager)
+        adapters = SettleAdapterBank(activity as Context, lists, activity as Context)
+        trans_details!!.setAdapter(adapters)
     }
 
-    fun getTransgerRequest(first:Int,last:Int): JSONObject {
+    fun getTransgerRequest(): JSONObject {
         var jsonObject = JSONObject()
         try {
-            jsonObject.put("serviceType", "GET_MY_NODE_DETAILS")
-            jsonObject.put("requestType", "BC_CHANNEL")
+            jsonObject.put("serviceType", "CALCULATE_TRANFSER_AMOUNT")
+            jsonObject.put("requestType", "CRNF_CHANNEL")
             jsonObject.put("typeMobileWeb", "mobile")
             jsonObject.put("transactionID", ImageUtils.miliSeconds())
-            jsonObject.put("nodeAgentId", nodeAgentID)
-            jsonObject.put("sessionRefNo", sessionRefNo)
-            jsonObject.put("agentMobile", agentID)
-            jsonObject.put("fromIndex", first)
-            jsonObject.put("toIndex", last)
-            jsonObject.put("checkSum", GenerateChecksum.checkSum(sessionKey, jsonObject.toString()))
+            jsonObject.put("sessionRefNo", list.get(0).aftersessionRefNo)
+            jsonObject.put("nodeAgentId", list[0].mobilno)
+            jsonObject.put("agentID", list[0].mobilno)
+            jsonObject.put("checkSum", GenerateChecksum.checkSum(list[0].pinsession, jsonObject.toString()))
         } catch (e: Exception) {
             e.printStackTrace()
         }
         return jsonObject
     }
-    fun EditText.onChange(cb: (String) -> Unit) {
-        this.addTextChangedListener(object: TextWatcher {
+
+    fun EditText.onChange() {
+        this.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 adapters!!.filter(s.toString())
             }
+
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
     }
 
-    private fun customDialog_Ben(pozo: NetworkTransferPozo?, msg: String, type: String, amount: String?, title: String) {
+    private fun customDialog_Ben(pozo: SettlementPozoo?, msg: String, type: String, title: String) {
         val btn_p_bank: AutofitTextView
         val btn_name: AutofitTextView
         val p_transid: AutofitTextView
@@ -170,7 +149,7 @@ class FOSTransfer : BaseFragment(), RequestHandler {
         val btn_regenerate = alertLayout.findViewById<View>(R.id.btn_regenerate) as AppCompatButton
         if (type.equals("BENLAYOUT", ignoreCase = true)) {
 //            if (amount?.equals("null")||amount!!.equals("N", ignoreCase = true))
-                btn_cancel.visibility = View.GONE
+            btn_cancel.visibility = View.GONE
             btn_cancel.text = "Reverse transfer"
             btn_regenerate.text = "Cancel"
             btn_regenerate.textSize = 10f
@@ -184,10 +163,10 @@ class FOSTransfer : BaseFragment(), RequestHandler {
             btn_name = alertLayout.findViewById<View>(R.id.btn_name_popup) as AutofitTextView
             p_transid = alertLayout.findViewById<View>(R.id.btn_p_transid) as AutofitTextView
             btn_p_bank = alertLayout.findViewById<View>(R.id.btn_p_bank) as AutofitTextView
-            btn_name.text = "Company Name : " + pozo!!.companyName
-            p_transid.text = pozo.agentName + " - " + pozo.mobileNo
-            btn_p_bank.text = "Current Balance : " + formatss(pozo.agentBalance)!!
-        }  else if (type.equals("NETWORK_CREDIT", ignoreCase = true)) {
+            btn_name.text = "Request Type : " + pozo!!.requestType
+            p_transid.text = "Usage : " +  formatss(pozo.usage)!!
+            btn_p_bank.text = "Transfer Amount : " + formatss(pozo.transferAmount)!!
+        } else if (type.equals("NETWORK_CREDIT", ignoreCase = true)) {
             btn_cancel.visibility = View.GONE
             val otpView = alertLayout.findViewById<View>(R.id.dialog_msg) as TextView
             otpView.text = msg
@@ -204,26 +183,26 @@ class FOSTransfer : BaseFragment(), RequestHandler {
                 if (!ImageUtils.commonAmount(textsss!!.getText().toString())) {
                     textsss!!.setError("Please enter valid data")
                     textsss!!.requestFocus()
-                }else if(!(Integer.parseInt(textsss!!.getText().toString())  <= Integer.parseInt(formatss(s!!)))){
+                }else if(!(Integer.parseInt(textsss!!.getText().toString())  <= Integer.parseInt(formatss(pozo!!.transferAmount)))){
                     textsss!!.setError("Please enter valid amount")
                     textsss!!.requestFocus()
                 } else {
                     dialog.dismiss()
-                    customDialogConfirm(pozo, "Are you sure you want to Transfer?", "CONFIRMATION", textsss!!.getText().toString(), "", "Credit Confirmation")
+                    customDialogConfirm(pozo, "Are you sure you want to Transfer?", "CONFIRMATION", textsss!!.getText().toString(), "Credit Confirmation")
                 }
             }
-             if (type.equals("NETWORK_CREDIT", ignoreCase = true)) {
+            if (type.equals("NETWORK_CREDIT", ignoreCase = true)) {
                 loadUrl()
                 dialog.dismiss()
             } else if (type.equals("BENLAYOUT", ignoreCase = true)) {
                 dialog.dismiss()
-                customDialog_Ben(pozo, "Network Transfer", "AMOUNTTRANSFER", "", "Credit To Network")
+                customDialog_Ben(pozo, "Network Transfer", "AMOUNTTRANSFER", "Credit To Network")
             }
         }
         btn_cancel.setOnClickListener {
             if (type.equals("BENLAYOUT", ignoreCase = true)) {
                 dialog.dismiss()
-                customDialog_Ben(pozo, "Network Transfer", "REVERSETRANSFER", "", "Credit To Network")
+                customDialog_Ben(pozo, "Network Transfer", "REVERSETRANSFER", "Credit To Network")
             } else
                 dialog.dismiss()
         }
@@ -233,8 +212,8 @@ class FOSTransfer : BaseFragment(), RequestHandler {
         window!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
     }
 
-    private fun customDialogConfirm(pozo: NetworkTransferPozo?, msg: String,
-                                    type: String, amount: String, tpin: String, title: String) {
+    private fun customDialogConfirm(pozo: SettlementPozoo?, msg: String,
+                                    type: String, amount: String, title: String) {
         dialognew = Dialog(activity!!)
         val inflater = activity!!.layoutInflater
         val alertLayout = inflater.inflate(R.layout.custom_layout_common, null)
@@ -253,7 +232,7 @@ class FOSTransfer : BaseFragment(), RequestHandler {
         btn_ok.setOnClickListener {
             if (type.equals("CONFIRMATION", ignoreCase = true)) {
                 dialognew.dismiss()
-                AsyncPostMethod(WebConfig.CRNF, getNetwork_Transfer(pozo!!.mobileNo, amount, tpin).toString(), headerData, this@FOSTransfer, activity, getString(R.string.responseTimeOut)).execute()
+                AsyncPostMethod(WebConfig.CRNF, getNetwork_Transfer(pozo,amount).toString(), headerData, this@SettlementBak, activity, getString(R.string.responseTimeOut)).execute()
             }
         }
         btn_cancel.setOnClickListener { dialognew.dismiss() }
@@ -262,24 +241,23 @@ class FOSTransfer : BaseFragment(), RequestHandler {
         window!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
     }
 
-    fun getNetwork_Transfer(receiverId: String, txnAmount: String, newtpin: String): JSONObject {
+    fun getNetwork_Transfer(pozo: SettlementPozoo?,txnAmount: String): JSONObject {
         val jsonObject = JSONObject()
         try {
-            jsonObject.put("serviceType", "C2C_NETWORK_CREDIT")
+            jsonObject.put("serviceType", "INITIATE_STLMNT_TRANSFER_FUND")
             jsonObject.put("requestType", "BC_CHANNEL")
             jsonObject.put("typeMobileWeb", "mobile")
             jsonObject.put("transactionID", ImageUtils.miliSeconds())
-            jsonObject.put("nodeAgentId", nodeAgentID)
-            jsonObject.put("sessionRefNo", sessionRefNo)
-            jsonObject.put("agentSenderID", agentID)
-            jsonObject.put("agentReciverID", receiverId)
-            jsonObject.put("subNetFlag", "Y")
-            jsonObject.put("txnAmount", txnAmount)
-            if (newtpin.isEmpty())
-                jsonObject.put("tPin", "")
-            else
-                jsonObject.put("tPin", ImageUtils.encodeSHA256(newtpin))
-            jsonObject.put("checkSum", GenerateChecksum.checkSum(sessionKey, jsonObject.toString()))
+            jsonObject.put("sessionRefNo", list.get(0).aftersessionRefNo)
+            jsonObject.put("nodeAgentId", list[0].mobilno)
+            jsonObject.put("agentID", list[0].mobilno)
+            jsonObject.put("bankAccountName", jsonObjects!!.getString("bankAccountName"))
+            jsonObject.put("accountNo", jsonObjects!!.getString("bankAccountNumber"))
+            jsonObject.put("IFSC", jsonObjects!!.getString("bankIFSC"))
+            jsonObject.put("reqFor", "STFT")
+            jsonObject.put("txnAmmount", txnAmount)
+            jsonObject.put("txnType",pozo!!.requestType)
+            jsonObject.put("checkSum", GenerateChecksum.checkSum(list[0].pinsession, jsonObject.toString()))
 
         } catch (e: Exception) {
             e.printStackTrace()

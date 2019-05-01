@@ -7,59 +7,46 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import com.rapipay.android.agent.Model.PassbookPozo
+import com.rapipay.android.agent.Model.ChannelHistoryPozo
 import com.rapipay.android.agent.R
-import com.rapipay.android.agent.adapter.PassbookAdapter
+import com.rapipay.android.agent.adapter.ChannelListAdapter
 import com.rapipay.android.agent.interfaces.RequestHandler
 import com.rapipay.android.agent.utils.*
 import me.grantland.widget.AutofitTextView
 import org.json.JSONArray
 import org.json.JSONObject
-import java.text.NumberFormat
+import java.lang.Exception
 import java.util.*
 
-class FOSLedger : BaseFragment(), RequestHandler, View.OnClickListener {
-    internal var months: String? = null
-    internal var dayss: String? = null
-    var agentID: String? = null
-    var nodeAgentID: String? = null
-    var sessionRefNo: String? = null
-    var sessionKey: String? = null
-    var first = 1
-    var last = 25
-    private var isLoading: Boolean = false
-    var transactionPozoArrayList: ArrayList<PassbookPozo>? = null
-    var trans_details: ListView? = null
+class TransactionReports : BaseFragment(), RequestHandler, View.OnClickListener {
     protected var headerData = WebConfig.BASIC_USERID + ":" + WebConfig.BASIC_PASSWORD
-    var adapters: PassbookAdapter? = null
-    protected var selectedDate: Int = 0
-    protected var selectedMonth: Int = 0
-    protected var selectedYear: Int = 0
+    var transactionPozoArrayList: ArrayList<ChannelHistoryPozo>? = null
+    var reqFor: String? = null
+    var adapters: ChannelListAdapter? = null
+    var trans_details: ListView? = null
     protected var date2_text: AutofitTextView? = null
     protected var date1_text: AutofitTextView? = null
     protected var toimage: ImageView? = null
     protected var fromimage: ImageView? = null
-//    override fun onCreate(savedInstanceState: Bundle?) {
-//        super.onCreate(savedInstanceState)
-//        setContentView(R.layout.network_transfer_layout)
-//        var intent = intent as Intent
-//
-//        init()
-//        loadUrl()
-//    }
 
+    protected var selectedDate: Int = 0
+    protected var selectedMonth: Int = 0
+    protected var selectedYear: Int = 0
+    var first = 1
+    var last = 25
+    internal var months: String? = null
+    internal var dayss: String? = null
+    private var isLoading: Boolean = false
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        var view = inflater.inflate(R.layout.fos_layout_ledger, container, false) as View
+        var view = inflater.inflate(R.layout.txn_report_layout, container, false);
+        reqFor = arguments!!.getString("reqFor")
+        if (BaseCompactActivity.db != null && BaseCompactActivity.db.details_Rapi)
+            list = BaseCompactActivity.db.details
         init(view)
-//        loadUrl()
-        return view
+        return view;
     }
 
     fun init(v: View) {
-        nodeAgentID = arguments!!.getString("nodeAgentID")
-        agentID = arguments!!.getString("AgentID")
-        sessionRefNo = arguments!!.getString("sessionRefNo")
-        sessionKey = arguments!!.getString("sessionKey")
         trans_details = v.findViewById<ListView>(R.id.trans_details)
         val calendar = Calendar.getInstance()
         selectedDate = calendar.get(Calendar.DAY_OF_MONTH)
@@ -88,7 +75,7 @@ class FOSLedger : BaseFragment(), RequestHandler, View.OnClickListener {
                 if (totalItemCount != 0 && totalItemCount == last && lastInScreen == totalItemCount && !isLoading) {
                     first = last + 1
                     last += 25
-                    AsyncPostMethod(WebConfig.CommonReport, getTransgerRequest(first, last).toString(), headerData, this@FOSLedger, activity, getString(R.string.responseTimeOut)).execute()
+                    AsyncPostMethod(WebConfig.CommonReport, getSubAgent(first, last).toString(), headerData, this@TransactionReports, activity, getString(R.string.responseTimeOut)).execute()
                     isLoading = true
                 }
             }
@@ -182,79 +169,27 @@ class FOSLedger : BaseFragment(), RequestHandler, View.OnClickListener {
         dialog.show()
     }
 
+
     fun loadUrl() {
-        AsyncPostMethod(WebConfig.CommonReport, getTransgerRequest(first, last).toString(), headerData, this, activity, getString(R.string.responseTimeOut)).execute()
+        AsyncPostMethod(WebConfig.CommonReport, getSubAgent(first, last).toString(), headerData, this, activity, getString(R.string.responseTimeOut)).execute()
     }
 
-    override fun chechStat(`object`: String?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun chechStatus(`object`: JSONObject?) {
-        try {
-            if (`object`!!.has("responseCode") && `object`.getString("responseCode").equals("200", true)) {
-                if (`object`.getString("serviceType").equals("SUB_AGENT_TXN_HISTORY", true)) {
-                    if (`object`.has("subAgentTxnList"))
-                        insertLastTransDetails(`object`.getJSONArray("subAgentTxnList"))
-                }
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
-
-    private fun formatss(amount: String): String? {
-        try {
-            val formatter = NumberFormat.getInstance(Locale("en", "IN"))
-            return formatter.format(formatter.parse(amount))
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-
-        return null
-    }
-    private fun insertLastTransDetails(array: JSONArray) {
-        if (array.length() != 1)
-            transactionPozoArrayList = ArrayList<PassbookPozo>()
-        try {
-            for (i in 0 until array.length()) {
-                val `object` = array.getJSONObject(i)
-                transactionPozoArrayList!!.add(PassbookPozo(`object`.getString("payeeMobNo"),`object`.getString("txnServiceType"), formatss(`object`.getString("txnAmount")) + " / " + formatss(`object`.getString("crDrAmmount")) + " " + `object`.getString("crDrType"), `object`.getString("txnDate"), formatss(`object`.getString("openingBal")) + " / " + formatss(`object`.getString("closingBal")), `object`.getString("txnStatus")))
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-
-        if (transactionPozoArrayList!!.size != 0)
-            initializeTransAdapter(transactionPozoArrayList!!)
-    }
-
-    private fun initializeTransAdapter(list: ArrayList<PassbookPozo>) {
-        if (first == 1) {
-            adapters = PassbookAdapter(activity, list)
-            trans_details!!.setAdapter(adapters)
-        } else {
-            adapters!!.addAll(list)
-            adapters!!.notifyDataSetChanged()
-        }
-        isLoading = false
-    }
-
-    fun getTransgerRequest(first: Int, last: Int): JSONObject {
+    fun getSubAgent(first: Int, last: Int): JSONObject {
         var jsonObject = JSONObject()
         try {
-            jsonObject.put("serviceType", "SUB_AGENT_TXN_HISTORY")
-            jsonObject.put("requestType", "BC_CHANNEL")
-            jsonObject.put("typeMobileWeb", "mobile")
+            jsonObject.put("serviceType", "GET_TXN_HISTORY_BY_SERVICE")
             jsonObject.put("transactionID", ImageUtils.miliSeconds())
-            jsonObject.put("nodeAgentId", nodeAgentID)
-            jsonObject.put("sessionRefNo", sessionRefNo)
-            jsonObject.put("agentId", agentID)
+            jsonObject.put("nodeAgentId", list[0].mobilno)
+            jsonObject.put("fromTxnDate", date2_text!!.getText().toString())
+            jsonObject.put("toTxnDate", date1_text!!.getText().toString())
             jsonObject.put("fromIndex", first)
             jsonObject.put("toIndex", last)
-            jsonObject.put("fromDate", date2_text!!.getText().toString())
-            jsonObject.put("toDate", date1_text!!.getText().toString())
-            jsonObject.put("checkSum", GenerateChecksum.checkSum(sessionKey, jsonObject.toString()))
+            jsonObject.put("reqFor", reqFor)
+            jsonObject.put("typeMobileWeb", "mobile")
+            jsonObject.put("requestType", "BC_CHANNEL")
+            jsonObject.put("sessionRefNo", list.get(0).aftersessionRefNo)
+            jsonObject.put("checkSum", GenerateChecksum.checkSum(list[0].pinsession, jsonObject.toString()))
+
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -274,5 +209,49 @@ class FOSLedger : BaseFragment(), RequestHandler, View.OnClickListener {
             else
                 Toast.makeText(activity, "Please select correct date", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    override fun chechStat(`object`: String?) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun chechStatus(`object`: JSONObject?) {
+        try {
+            if (`object`!!.getString("responseCode").equals("200")) {
+                if (`object`.getString("serviceType").equals("GET_TXN_HISTORY_BY_SERVICE")) {
+                    if (`object`.has("getTxnHistory")) {
+                        insertLastTransDetails(`object`.getJSONArray("getTxnHistory"))
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun insertLastTransDetails(array: JSONArray) {
+        try {
+            transactionPozoArrayList = ArrayList<ChannelHistoryPozo>()
+            for (i in 0 until array.length()) {
+                val `object` = array.getJSONObject(i)
+                transactionPozoArrayList!!.add(ChannelHistoryPozo(`object`.getString("senderName") + " ( " + `object`.getString("mobileNo") + " )", `object`.getString("accountNo") + " ( " + `object`.getString("bankName") + " )", `object`.getString("requestAmt"), `object`.getString("txnStatus"), `object`.getString("txnDateTime"), `object`.getString("serviceProviderTXNID"), `object`.getString("transferType"), `object`.getString("userTxnId"), `object`.getString("serviceType"), `object`.getString("txnDateTime")))
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        if (transactionPozoArrayList!!.size != 0)
+            initializeTransAdapter(transactionPozoArrayList!!)
+    }
+
+    private fun initializeTransAdapter(list: ArrayList<ChannelHistoryPozo>) {
+        if (first == 1) {
+            adapters = ChannelListAdapter(list, activity)
+            trans_details!!.setAdapter(adapters)
+        } else {
+            adapters!!.addAll(list)
+            adapters!!.notifyDataSetChanged()
+        }
+        isLoading = false
     }
 }

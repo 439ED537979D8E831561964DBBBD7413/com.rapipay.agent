@@ -22,7 +22,17 @@ public class PermissionCheckAdapter extends BaseAdapter {
         this.ctx = ctx;
         this.listViewItemDtoList = listViewItemDtoList;
     }
+    @Override
+    public int getViewTypeCount() {
 
+        return getCount();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+
+        return position;
+    }
     @Override
     public int getCount() {
         int ret = 0;
@@ -70,8 +80,9 @@ public class PermissionCheckAdapter extends BaseAdapter {
         }
 
         PermissionPozo listViewItemDto = listViewItemDtoList.get(itemIndex);
-        if (listViewItemDto.getStatus().equalsIgnoreCase("Y"))
+//        if (listViewItemDto.getStatus().equalsIgnoreCase("Y"))
             viewHolder.getItemCheckbox().setChecked(true);
+        viewHolder.getItemCheckbox().setEnabled(false);
         viewHolder.getItemTextView().setText(listViewItemDto.getServiceName());
 
         return convertView;

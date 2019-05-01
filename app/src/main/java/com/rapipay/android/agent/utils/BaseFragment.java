@@ -1,9 +1,12 @@
 package com.rapipay.android.agent.utils;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -12,9 +15,16 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
+import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.ContactsContract;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatButton;
 import android.text.Editable;
@@ -28,10 +38,16 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.rapipay.android.agent.Database.RapipayDB;
+import com.rapipay.android.agent.Model.BeneficiaryDetailsPozo;
+import com.rapipay.android.agent.Model.HeaderePozo;
+import com.rapipay.android.agent.Model.ImagePozo;
 import com.rapipay.android.agent.Model.PMTBenefPozo;
 import com.rapipay.android.agent.Model.PermissionPozo;
 import com.rapipay.android.agent.Model.RapiPayPozo;
@@ -50,10 +66,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
+
+import me.grantland.widget.AutofitTextView;
 
 public class BaseFragment extends Fragment {
     protected LocalStorage localStorage;
@@ -66,11 +85,128 @@ public class BaseFragment extends Fragment {
     protected String imageBase64 = "";
     protected static final int CAMERA_REQUEST = 1888;
     protected int SELECT_FILE = 1;
+    protected EditText newtpin;
+    protected TextView ben_amount;
+    protected static final int CONTACT_PICKER_RESULT = 1;
+    final protected static int PERMISSIONS_REQUEST_CAMERA_STATE = 1;
+    final protected static int PERMISSIONS_REQUEST_READ_PHONE_STATE = 0;
+    ArrayList<String> left, right, medium, spinner_list;
+    ArrayList<HeaderePozo> bottom;
+    LinearLayout main_layout;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         return super.onCreateView(inflater, container, savedInstanceState);
+    }
+
+    protected void contactRead(Intent data, TextView input_number) {
+        if (data != null) {
+            Uri contactData = data.getData();
+            Cursor c = getActivity().getContentResolver().query(contactData, null, null, null, null);
+            if (c.moveToFirst()) {
+                String contactId = c.getString(c.getColumnIndex(ContactsContract.Contacts._ID));
+                String phoneNumber = c.getString(c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                if (phoneNumber.contains(" "))
+                    phoneNumber = phoneNumber.replaceAll(" ", "");
+                if (phoneNumber.startsWith("+")) {
+                    if (phoneNumber.length() == 13) {
+                        String str_getMOBILE = phoneNumber.substring(3);
+                        input_number.setText(str_getMOBILE);
+                    } else if (phoneNumber.length() == 11) {
+                        String str_getMOBILE = phoneNumber.substring(1);
+                        input_number.setText(str_getMOBILE);
+                    } else if (phoneNumber.length() == 10) {
+                        input_number.setText(phoneNumber);
+                    }
+                } else if (phoneNumber.startsWith("0")) {
+                    if (phoneNumber.length() == 11) {
+                        String str_getMOBILE = phoneNumber.substring(1);
+                        input_number.setText(str_getMOBILE);
+                    }
+                } else if (phoneNumber.length() == 10) {
+                    input_number.setText(phoneNumber);
+                } else {
+                    Toast.makeText(getActivity(), "Please select valid number.", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+    }
+
+
+    public void loadIMEI() {
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_CONTACTS)
+                != PackageManager.PERMISSION_GRANTED) {
+            requestReadPhoneStatePermission();
+        } else {
+            doPermissionGrantedStuffs();
+        }
+    }
+
+    private void requestReadPhoneStatePermission() {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),
+                Manifest.permission.READ_CONTACTS)) {
+            alertPerm(getString(R.string.permission_read_phone_state_rationale), new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    ActivityCompat.requestPermissions(getActivity(),
+                            new String[]{Manifest.permission.READ_CONTACTS},
+                            PERMISSIONS_REQUEST_READ_PHONE_STATE);
+                    doPermissionGrantedStuffs();
+                }
+            });
+
+        } else {
+            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_CONTACTS},
+                    PERMISSIONS_REQUEST_READ_PHONE_STATE);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+
+        if (requestCode == PERMISSIONS_REQUEST_READ_PHONE_STATE) {
+            if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                doPermissionGrantedStuffs();
+            } else {
+                alertPerm(getString(R.string.permissions_not_granted_read_phone_state), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        loadIMEI();
+                    }
+                });
+            }
+        } else if (requestCode == PERMISSIONS_REQUEST_CAMERA_STATE) {
+//            if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//                doCameraPermissionGrantedStuffs();
+//            } else {
+//                alertPerm(getString(R.string.permissions_not_granted_read_phone_state), new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        loadCamera();
+//                    }
+//                });
+//            }
+        }
+    }
+
+    private void alertPerm(String msg, DialogInterface.OnClickListener okListener) {
+        new AlertDialog.Builder(getActivity())
+                .setTitle("Permission Request")
+                .setMessage(msg)
+                .setCancelable(false)
+                .setPositiveButton(android.R.string.yes, okListener)
+                .setIcon(R.mipmap.ic_launcher_round)
+                .show();
+    }
+
+    private void doPermissionGrantedStuffs() {
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
+            Intent contactPickerIntent = new Intent(Intent.ACTION_PICK,
+                    ContactsContract.CommonDataKinds.Phone.CONTENT_URI);
+            startActivityForResult(contactPickerIntent, CONTACT_PICKER_RESULT);
+        }
     }
 
     protected void deleteTables(String type) {
@@ -139,7 +275,7 @@ public class BaseFragment extends Fragment {
             if (pozo.getStatus().equalsIgnoreCase("N")) {
                 btn_cancel.setText("Activate");
                 btn_ok.setVisibility(View.GONE);
-            }else if (pozo.getStatus().equalsIgnoreCase("Y"))
+            } else if (pozo.getStatus().equalsIgnoreCase("Y"))
                 btn_cancel.setText("Deactiviate");
             btn_cancel.setTextSize(10);
             btn_ok.setText("Update Service");
@@ -185,14 +321,18 @@ public class BaseFragment extends Fragment {
         btn_ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (type.equalsIgnoreCase("PENDINGREFUND"))
+                if (type.equalsIgnoreCase("PENDINGREFUND")) {
                     anInterface.okClicked(input, ob);
-                else if (type.equalsIgnoreCase("KYCLAYOUTS"))
-                    anInterface.okClicked(type, ob);
-                else if (type.equalsIgnoreCase("TERMCONDITION")) {
-                    anInterface.okClicked(type, ob);
+                    dialog.dismiss();
                 } else if (type.equalsIgnoreCase("KYCLAYOUTS")) {
                     anInterface.okClicked(type, ob);
+                    dialog.dismiss();
+                } else if (type.equalsIgnoreCase("TERMCONDITION")) {
+                    anInterface.okClicked(type, ob);
+                    dialog.dismiss();
+                } else if (type.equalsIgnoreCase("KYCLAYOUTS")) {
+                    anInterface.okClicked(type, ob);
+                    dialog.dismiss();
                 } else if (type.equalsIgnoreCase("CREATEAGENT")) {
                     if (first_name.getText().toString().isEmpty()) {
                         first_name.setError("Please enter first name");
@@ -212,11 +352,14 @@ public class BaseFragment extends Fragment {
                     } else if (pincode.getText().toString().length() != 6) {
                         pincode.setError("Please enter pincode");
                         pincode.requestFocus();
-                    } else
+                    } else {
                         anInterface.okClicked(type, ob);
-                } else
+                        dialog.dismiss();
+                    }
+                } else {
                     anInterface.okClicked(type, ob);
-                dialog.dismiss();
+                    dialog.dismiss();
+                }
             }
         });
         btn_cancel.setOnClickListener(new View.OnClickListener() {
@@ -310,8 +453,10 @@ public class BaseFragment extends Fragment {
         Window window = dialognew.getWindow();
         window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
     }
+
     protected ArrayList<String> arrayList;
     protected EditText increaselimit;
+
     protected void customDialog_List(final String type, JSONObject object, final Object ob, String msg, final String input, String output, final CustomInterface anInterface) {
         this.anInterface = anInterface;
         dialognew = new Dialog(getActivity());
@@ -325,33 +470,33 @@ public class BaseFragment extends Fragment {
         AppCompatButton btn_cancel = (AppCompatButton) alertLayout.findViewById(R.id.btn_cancel);
         AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
         ListView list_view_with_checkbox = (ListView) alertLayout.findViewById(R.id.list_view_with_checkbox);
-        list_view_with_checkbox.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int itemIndex, long l) {
-                // Get user selected item.
-                Object itemObject = adapterView.getAdapter().getItem(itemIndex);
-
-                // Translate the selected item to DTO object.
-                PermissionPozo itemDto = (PermissionPozo) itemObject;
-
-                // Get the checkbox.
-                CheckBox itemCheckbox = (CheckBox) view.findViewById(R.id.list_view_item_checkbox);
-
-                // Reverse the checkbox and clicked item check state.
-                if (itemCheckbox.isChecked()) {
-                    medium.get(itemIndex).setChecked(false);
-                    itemCheckbox.setChecked(false);
-                    itemDto.setChecked(false);
-                } else {
-                    medium.get(itemIndex).setChecked(true);
-                    itemCheckbox.setChecked(true);
-                    itemDto.setChecked(true);
-
-                }
-
-                //Toast.makeText(getApplicationContext(), "select item text : " + itemDto.getItemText(), Toast.LENGTH_SHORT).show();
-            }
-        });
+//        list_view_with_checkbox.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> adapterView, View view, int itemIndex, long l) {
+//                // Get user selected item.
+//                Object itemObject = adapterView.getAdapter().getItem(itemIndex);
+//
+//                // Translate the selected item to DTO object.
+//                PermissionPozo itemDto = (PermissionPozo) itemObject;
+//
+//                // Get the checkbox.
+//                CheckBox itemCheckbox = (CheckBox) view.findViewById(R.id.list_view_item_checkbox);
+//
+//                // Reverse the checkbox and clicked item check state.
+//                if (itemCheckbox.isChecked()) {
+//                    medium.get(itemIndex).setChecked(false);
+//                    itemCheckbox.setChecked(false);
+//                    itemDto.setChecked(false);
+//                } else {
+//                    medium.get(itemIndex).setChecked(true);
+//                    itemCheckbox.setChecked(true);
+//                    itemDto.setChecked(true);
+//
+//                }
+//
+//                //Toast.makeText(getApplicationContext(), "select item text : " + itemDto.getItemText(), Toast.LENGTH_SHORT).show();
+//            }
+//        });
 
         try {
             JSONArray array = object.getJSONArray("serviceList");
@@ -388,9 +533,7 @@ public class BaseFragment extends Fragment {
                     int size = medium.size();
                     for (int i = 0; i < size; i++) {
                         PermissionPozo dto = medium.get(i);
-                        if (dto.isChecked()) {
-                            arrayList.add(dto.getServiceId());
-                        }
+                        arrayList.add(dto.getServiceId());
                     }
                 }
                 if (arrayList.size() != 0)
@@ -480,7 +623,6 @@ public class BaseFragment extends Fragment {
         dialog.setContentView(alertLayout);
     }
 
-    protected ArrayList<String> spinner_list;
     protected CustomSpinnerAdapter adapter = null;
 
     protected void customSpinner(final TextView viewText, final String type, final ArrayList<String> list_spinner, final TextView ifsc_Code) {
@@ -662,5 +804,276 @@ public class BaseFragment extends Fragment {
             e.printStackTrace();
         }
         return null;
+    }
+
+    protected void serviceFee(View alertLayout, JSONObject object, BeneficiaryDetailsPozo pozo, String msg, String input) throws Exception {
+        TextView btn_name = (TextView) alertLayout.findViewById(R.id.btn_name_service);
+        TextView btn_servicefee = (TextView) alertLayout.findViewById(R.id.btn_servicefee);
+        btn_servicefee.setText(String.valueOf(Math.round(Double.parseDouble(object.getString("chargeServiceFee")) * 100.0) / 100.0));
+        TextView btn_igst = (TextView) alertLayout.findViewById(R.id.btn_igst);
+        btn_igst.setText(String.valueOf(Math.round(Double.parseDouble(object.getString("igst")) * 100.0) / 100.0));
+        TextView btn_cgst = (TextView) alertLayout.findViewById(R.id.btn_cgst);
+        btn_cgst.setText(String.valueOf(Math.round(Double.parseDouble(object.getString("cgst")) * 100.0) / 100.0));
+        TextView btn_sgst = (TextView) alertLayout.findViewById(R.id.btn_sgst);
+        btn_sgst.setText(String.valueOf(Math.round(Double.parseDouble(object.getString("sgst")) * 100.0) / 100.0));
+        TextView btn_sendname = (TextView) alertLayout.findViewById(R.id.btn_sendname);
+        TextView btn_account = (TextView) alertLayout.findViewById(R.id.btn_account_service);
+        TextView btn_bank = (TextView) alertLayout.findViewById(R.id.btn_bank_service);
+        TextView btn_amount_servide = (TextView) alertLayout.findViewById(R.id.btn_amount_servide);
+        TextView change = (TextView) alertLayout.findViewById(R.id.change);
+        change.setText(object.getString("sForComm"));
+        btn_amount_servide.setText(object.getString("txnAmount"));
+        if (!pozo.getAccountno().equalsIgnoreCase("null"))
+            btn_account.setText(pozo.getAccountno());
+        else
+            btn_account.setText("NA");
+        btn_sendname.setText(input);
+        if (msg.equalsIgnoreCase("Confirm Money Transfer?")) {
+            String condition = "where " + RapipayDB.COLOMN_IFSC + "='" + pozo.getIfsc() + "'";
+            if (BaseCompactActivity.db.geBank(condition).size() != 0)
+                btn_bank.setText(BaseCompactActivity.db.geBank(condition).get(0));
+            else
+                btn_bank.setVisibility(View.GONE);
+        } else
+            btn_bank.setText(pozo.getBank());
+        if (!pozo.getName().equalsIgnoreCase("null"))
+            btn_name.setText(pozo.getName());
+        else
+            btn_name.setText("NA");
+        newtpin = (EditText) alertLayout.findViewById(R.id.newtpin);
+        if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y"))
+            newtpin.setVisibility(View.VISIBLE);
+        dialog.setContentView(alertLayout);
+    }
+
+    protected void moneyTransgerFee(View alertLayout, JSONObject object, String accountNo, String ifsc_code, String name, String msg, String input) throws Exception {
+        TextView btn_name = (TextView) alertLayout.findViewById(R.id.btn_name_service);
+        TextView btn_servicefee = (TextView) alertLayout.findViewById(R.id.btn_servicefee);
+        btn_servicefee.setText(String.valueOf(Math.round(Double.parseDouble(object.getString("chargeServiceFee")) * 100.0) / 100.0));
+        TextView btn_igst = (TextView) alertLayout.findViewById(R.id.btn_igst);
+        btn_igst.setText(String.valueOf(Math.round(Double.parseDouble(object.getString("igst")) * 100.0) / 100.0));
+        TextView btn_cgst = (TextView) alertLayout.findViewById(R.id.btn_cgst);
+        btn_cgst.setText(String.valueOf(Math.round(Double.parseDouble(object.getString("cgst")) * 100.0) / 100.0));
+        TextView btn_sgst = (TextView) alertLayout.findViewById(R.id.btn_sgst);
+        btn_sgst.setText(String.valueOf(Math.round(Double.parseDouble(object.getString("sgst")) * 100.0) / 100.0));
+        TextView btn_sendname = (TextView) alertLayout.findViewById(R.id.btn_sendname);
+        TextView btn_account = (TextView) alertLayout.findViewById(R.id.btn_account_service);
+        TextView btn_bank = (TextView) alertLayout.findViewById(R.id.btn_bank_service);
+        TextView btn_amount_servide = (TextView) alertLayout.findViewById(R.id.btn_amount_servide);
+        TextView change = (TextView) alertLayout.findViewById(R.id.change);
+        change.setText(object.getString("sForComm"));
+        btn_amount_servide.setText(object.getString("txnAmount"));
+        if (accountNo != null)
+            btn_account.setText(accountNo);
+        btn_sendname.setText(input);
+        if (ifsc_code != null) {
+            String condition = "where " + RapipayDB.COLOMN_IFSC + "='" + ifsc_code + "'";
+            btn_bank.setText(BaseCompactActivity.db.geBank(condition).get(0));
+        }
+        if (name != null)
+            btn_name.setText(name);
+        dialog.setContentView(alertLayout);
+    }
+
+    protected void customDialog_Ben(View alertLayout, BeneficiaryDetailsPozo pozo) {
+        TextView btn_name = (TextView) alertLayout.findViewById(R.id.btn_name);
+        TextView btn_account = (TextView) alertLayout.findViewById(R.id.btn_account);
+        TextView btn_bank = (TextView) alertLayout.findViewById(R.id.btn_bank);
+        TextView notverified = (TextView) alertLayout.findViewById(R.id.notverified);
+        if (!pozo.getAccountno().equalsIgnoreCase("null"))
+            btn_account.setText(pozo.getAccountno());
+        else
+            btn_account.setText("NA");
+        if (!pozo.getBank().equalsIgnoreCase("null"))
+            btn_bank.setText(pozo.getBank());
+        else
+            btn_bank.setText("NA");
+        if (!pozo.getName().equalsIgnoreCase("null"))
+            btn_name.setText(pozo.getName());
+        else
+            btn_name.setText("NA");
+        if (pozo.getIfsc().equalsIgnoreCase("NOT-VEREFIED"))
+            notverified.setVisibility(View.VISIBLE);
+        else
+            notverified.setVisibility(View.GONE);
+        ben_amount = (TextView) alertLayout.findViewById(R.id.input_amount_ben);
+        dialog.setContentView(alertLayout);
+    }
+
+    protected void verifyTransferFee(View alertLayout, JSONObject object) throws Exception {
+        TextView btn_name = (TextView) alertLayout.findViewById(R.id.btn_name_verify);
+        TextView btn_servicefee = (TextView) alertLayout.findViewById(R.id.bt_verify);
+        btn_servicefee.setText(object.getString("subResponseMsg"));
+        TextView btn_sendname = (TextView) alertLayout.findViewById(R.id.btn_sendname_verify);
+        TextView btn_account = (TextView) alertLayout.findViewById(R.id.btn_account_verify);
+        TextView btn_bank = (TextView) alertLayout.findViewById(R.id.btn_bank_verify);
+        TextView btn_amount_servide = (TextView) alertLayout.findViewById(R.id.btn_amount_verify);
+        btn_amount_servide.setText(object.getString("bankRRNNumber"));
+        btn_account.setText(object.getString("txnAmount"));
+        btn_sendname.setText(object.getString("bankName"));
+        btn_bank.setText(object.getString("bankAccountName"));
+        btn_name.setText(object.getString("accountNo"));
+        dialog.setContentView(alertLayout);
+    }
+
+    protected void customReceiptNew(final String type, final JSONObject object, final CustomInterface anInterface) {
+        this.anInterface = anInterface;
+        left = new ArrayList<>();
+        right = new ArrayList<>();
+        medium = new ArrayList<>();
+        bottom = new ArrayList<>();
+        try {
+            JSONArray array = object.getJSONArray("getTxnReceiptDataList");
+            for (int i = 0; i < array.length(); i++) {
+                JSONObject jsonObject = array.getJSONObject(i);
+                if (jsonObject.getString("displayType").equalsIgnoreCase("L")) {
+                    if (jsonObject.getString("headerValue").equalsIgnoreCase("null"))
+                        left.add(jsonObject.getString("headerText") + " " + "NA");
+                    else
+                        left.add(jsonObject.getString("headerText") + " " + jsonObject.getString("headerValue"));
+                }
+                if (jsonObject.getString("displayType").equalsIgnoreCase("R")) {
+                    if (jsonObject.getString("headerValue").equalsIgnoreCase("null"))
+                        right.add(jsonObject.getString("headerText") + " " + "NA");
+                    else
+                        right.add(jsonObject.getString("headerText") + " " + jsonObject.getString("headerValue"));
+                }
+                if (jsonObject.getString("displayType").equalsIgnoreCase("M")) {
+                    if (jsonObject.getString("headerValue").equalsIgnoreCase("null"))
+                        medium.add(jsonObject.getString("headerText") + " " + "NA");
+                    else
+                        medium.add(jsonObject.getString("headerText") + " " + jsonObject.getString("headerValue"));
+                }
+                if (jsonObject.getString("displayType").equalsIgnoreCase("D")) {
+                    if (jsonObject.getString("headerValue").equalsIgnoreCase("null"))
+                        bottom.add(new HeaderePozo(jsonObject.getString("headerText"), "NA"));
+                    else
+                        bottom.add(new HeaderePozo(jsonObject.getString("headerText"), jsonObject.getString("headerValue")));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        dialog = new Dialog(getActivity());
+        LayoutInflater inflater = getLayoutInflater();
+        View alertLayout = inflater.inflate(R.layout.receipt_layout_new, null);
+        alertLayout.setKeepScreenOn(true);
+        ImageView receipt_logo = (ImageView) alertLayout.findViewById(R.id.receipt_logo);
+        String condition = "where " + RapipayDB.IMAGE_NAME + "='invoiceLogo.jpg'";
+        ArrayList<ImagePozo> imagePozoArrayList = BaseCompactActivity.db.getImageDetails(condition);
+        if (imagePozoArrayList.size() != 0) {
+            byteConvert(receipt_logo, imagePozoArrayList.get(0).getImagePath());
+        }
+        main_layout = (LinearLayout) alertLayout.findViewById(R.id.main_layout);
+        TextView mediums = (TextView) alertLayout.findViewById(R.id.medium);
+        main_layout.setDrawingCacheEnabled(true);
+        main_layout.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+        main_layout.layout(0, 0, main_layout.getMeasuredWidth(), main_layout.getMeasuredHeight());
+        main_layout.buildDrawingCache(true);
+
+        TextView text = (TextView) alertLayout.findViewById(R.id.dialog_title);
+
+        text.setText(type);
+        LinearLayout listLeft = (LinearLayout) main_layout.findViewById(R.id.listLeft);
+        LinearLayout listRight = (LinearLayout) main_layout.findViewById(R.id.listRight);
+        LinearLayout listbottom = (LinearLayout) main_layout.findViewById(R.id.listbottom);
+        AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
+        ImageView share = (ImageView) alertLayout.findViewById(R.id.share);
+        share.setColorFilter(getResources().getColor(R.color.colorPrimaryDark));
+        if (left.size() != 0) {
+            for (int k = 0; k < left.size(); k++) {
+                View inflate = inflater.inflate(R.layout.receipt_list, null);
+                TextView recycler_text = (TextView) inflate.findViewById(R.id.recycler_text);
+                if (k == 1)
+                    recycler_text.setTypeface(recycler_text.getTypeface(), Typeface.BOLD);
+                recycler_text.setText(left.get(k));
+                listLeft.addView(inflate);
+            }
+        }
+        if (right.size() != 0) {
+            for (int j = 0; j < right.size(); j++) {
+                View inflate = inflater.inflate(R.layout.receipt_list, null);
+                TextView recycler_text = (TextView) inflate.findViewById(R.id.recycler_text);
+                if (j == 1)
+                    recycler_text.setTypeface(recycler_text.getTypeface(), Typeface.BOLD);
+                recycler_text.setText(right.get(j));
+                listRight.addView(inflate);
+            }
+        }
+        if (medium.size() == 1)
+            mediums.setText(medium.get(0));
+        if (bottom.size() != 0) {
+            for (int i = 0; i < bottom.size(); i++) {
+                View inflate = inflater.inflate(R.layout.bottom_layout, null);
+                AutofitTextView btn_name = (AutofitTextView) inflate.findViewById(R.id.btn_name);
+                TextView btn_p_bank = (TextView) inflate.findViewById(R.id.btn_p_bank);
+                LinearLayout top = (LinearLayout) inflate.findViewById(R.id.top);
+                if (i % 2 == 0)
+                    top.setBackgroundColor(getResources().getColor(R.color.colorbackground));
+                else
+                    top.setBackgroundColor(getResources().getColor(R.color.white));
+                if (bottom.get(i).getHeaderValue().equalsIgnoreCase("Txn. ID/RRN/STATUS")) {
+                    top.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
+                    btn_name.setTextColor(getResources().getColor(R.color.white));
+                    btn_p_bank.setTextColor(getResources().getColor(R.color.white));
+                } else {
+                    btn_name.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
+                    btn_p_bank.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
+                }
+                btn_name.setText(bottom.get(i).getHeaderData());
+                btn_p_bank.setText(bottom.get(i).getHeaderValue());
+                listbottom.addView(inflate);
+            }
+        }
+        dialog.setCancelable(false);
+        dialog.setContentView(alertLayout);
+        btn_ok.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                anInterface.okClicked(type, object);
+                dialog.dismiss();
+            }
+        });
+        share.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Bitmap b = Bitmap.createBitmap(main_layout.getDrawingCache());
+                main_layout.setDrawingCacheEnabled(false);
+                ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                b.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+
+                File f = new File(Environment.getExternalStorageDirectory() + File.separator + "v2i.jpg");
+                try {
+                    f.createNewFile();
+                    FileOutputStream fo = new FileOutputStream(f);
+                    fo.write(bytes.toByteArray());
+                    fo.flush();
+                    fo.close();
+                    f.setReadable(true, false);
+                    final Intent intent = new Intent(Intent.ACTION_SEND);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                    Uri apkURI = FileProvider.getUriForFile(
+                            getActivity(),
+                            getActivity().getApplicationContext()
+                                    .getPackageName() + ".provider", f);
+                    intent.putExtra(Intent.EXTRA_STREAM, apkURI);
+                    intent.setType("image/png");
+                    startActivity(Intent.createChooser(intent, "Share image via"));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        dialog.show();
+        Window window = dialog.getWindow();
+        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+    }
+
+    protected void byteConvert(ImageView imageViews, byte[] decodedString) {
+        Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+        imageViews.setImageBitmap(decodedByte);
+        imageViews.setVisibility(View.VISIBLE);
     }
 }

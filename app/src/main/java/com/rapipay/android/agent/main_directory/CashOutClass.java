@@ -343,12 +343,12 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
             heading.setText(typeput);
         input_mobile = (EditText) findViewById(R.id.input_mobile);
         input_amount = (EditText) findViewById(R.id.input_amount);
-        if (!mobileNo.isEmpty()&& !amount.isEmpty()) {
-            input_mobile.setText(mobileNo);
-            input_mobile.setEnabled(false);
-            input_amount.setText(amount);
-            input_amount.setEnabled(false);
-        }
+//        if (!mobileNo.isEmpty()&& !amount.isEmpty()) {
+//            input_mobile.setText(mobileNo);
+//            input_mobile.setEnabled(false);
+//            input_amount.setText(amount);
+//            input_amount.setEnabled(false);
+//        }
         btn_fund_mpos = (AppCompatButton) findViewById(R.id.btn_fund_mpos);
         receipt_details = (AppCompatButton) findViewById(R.id.reciept_details);
         receipt_details.setOnClickListener(this);

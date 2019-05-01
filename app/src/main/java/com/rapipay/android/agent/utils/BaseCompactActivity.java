@@ -53,6 +53,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -552,8 +553,8 @@ public class BaseCompactActivity extends AppCompatActivity {
     }
 
     protected EditText newtpin;
-
-    protected void serviceFee(View alertLayout, JSONObject object, BeneficiaryDetailsPozo pozo, String msg, String input) throws Exception {
+    protected String radio_Clicked="";
+    protected void serviceFee(View alertLayout, JSONObject object, BeneficiaryDetailsPozo pozo, String msg, String input,String type) throws Exception {
         TextView btn_name = (TextView) alertLayout.findViewById(R.id.btn_name_service);
         TextView btn_servicefee = (TextView) alertLayout.findViewById(R.id.btn_servicefee);
         btn_servicefee.setText(String.valueOf(Math.round(Double.parseDouble(object.getString("chargeServiceFee")) * 100.0) / 100.0));
@@ -569,6 +570,17 @@ public class BaseCompactActivity extends AppCompatActivity {
         TextView btn_amount_servide = (TextView) alertLayout.findViewById(R.id.btn_amount_servide);
         TextView change = (TextView) alertLayout.findViewById(R.id.change);
         change.setText(object.getString("sForComm"));
+        RadioGroup radioGroup = (RadioGroup) alertLayout.findViewById(R.id.myRadioGroup);
+        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                if (checkedId == R.id.prepaid) {
+                    radio_Clicked = "OTP";
+                } else if (checkedId == R.id.postpaid) {
+                    radio_Clicked = "IPIN";
+                }
+            }
+        });
         btn_amount_servide.setText(object.getString("txnAmount"));
         if (!pozo.getAccountno().equalsIgnoreCase("null"))
             btn_account.setText(pozo.getAccountno());
@@ -590,6 +602,8 @@ public class BaseCompactActivity extends AppCompatActivity {
         newtpin = (EditText) alertLayout.findViewById(R.id.newtpin);
         if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y"))
             newtpin.setVisibility(View.VISIBLE);
+        if(type.equalsIgnoreCase("WALLET") && BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y"))
+            alertLayout.findViewById(R.id.myRadioGroup).setVisibility(View.VISIBLE);
         dialog.setContentView(alertLayout);
     }
 

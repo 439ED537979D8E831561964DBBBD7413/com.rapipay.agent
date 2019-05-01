@@ -122,11 +122,11 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
         super.onCreate(savedInstanceState);
         setContentView(R.layout.pmt_resistance_layout);
         initialize();
-        mobileNo = getIntent().getStringExtra("MOBILENO");
-        if (!mobileNo.isEmpty()) {
-            input_mobile.setText(mobileNo);
-            input_mobile.setEnabled(false);
-        }
+//        mobileNo = getIntent().getStringExtra("MOBILENO");
+//        if (!mobileNo.isEmpty()) {
+//            input_mobile.setText(mobileNo);
+//            input_mobile.setEnabled(false);
+//        }
     }
 
     private void initialize() {
@@ -555,6 +555,7 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
                     sender_layout.setVisibility(View.VISIBLE);
                 } else if (object.getString("responseCode").equalsIgnoreCase("200")) {
                     sender_layout.setVisibility(View.GONE);
+                    reset.setVisibility(View.VISIBLE);
                     if (object.has("senderDetails")) {
                         JSONArray array = object.getJSONArray("senderDetails");
                         JSONObject jsonObject = array.getJSONObject(0);
