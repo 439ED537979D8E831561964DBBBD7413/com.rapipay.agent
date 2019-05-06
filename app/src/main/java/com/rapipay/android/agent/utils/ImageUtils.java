@@ -101,6 +101,14 @@ public class ImageUtils {
             return false;
     }
 
+    public static boolean commonName(String value) {
+        String regex = "^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$";
+        if (value.matches(regex))
+            return true;
+        else
+            return false;
+    }
+
     public static boolean commonAddress(String value, int length) {
         String regex = "^[a-zA-Z0-9\\\\s ()&#_',./-]{1," + length + "}$";
         if (value.matches(regex))

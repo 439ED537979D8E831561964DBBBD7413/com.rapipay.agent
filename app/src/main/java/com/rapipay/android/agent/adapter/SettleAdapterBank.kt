@@ -51,7 +51,7 @@ class SettleAdapterBank(private val context: Context,private val mValues: ArrayL
         viewHolder.btn_name!!.text = mValues[position].requestType
         viewHolder.p_transid!!.setText(format(mValues[position].aepsValue))
         viewHolder.btn_p_bank!!.setText(format(mValues[position].usage))
-        viewHolder.agent_category!!.setText(format(mValues[position].transferAmount))
+        viewHolder.agent_category!!.setText(mValues[position].transferAmount.toString())
         viewHolder.serfee!!.setText(format(mValues[position].serviceFee))
         viewHolder.isgct!!.text = mValues[position].iGST
     }

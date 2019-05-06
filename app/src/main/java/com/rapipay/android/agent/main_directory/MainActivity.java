@@ -65,14 +65,14 @@ import java.util.HashMap;
 import java.util.List;
 
 public class MainActivity extends BaseCompactActivity
-        implements NavigationView.OnNavigationItemSelectedListener, RequestHandler, CustomInterface, View.OnClickListener {
+        implements RequestHandler, CustomInterface, View.OnClickListener {
 
     public static ImageView ivHeaderPhoto;
     NavigationView navigationView;
     private static String filePath;
     DrawerLayout drawer;
     String data, term = null;
-    TextView tv, bankde,bal;
+    TextView tv, bankde, bal;
     ImageView back_click;
     private static final int dpPhoto1 = 2001;
     private static final int dpPhoto2 = 2002;
@@ -83,6 +83,7 @@ public class MainActivity extends BaseCompactActivity
     public static boolean relailerDetails = false;
     public static ArrayList<DeviceDetailsPozo> deviceDetailsPozoArrayList;
     boolean isUrl = false;
+    boolean isclicked = false;
 
 
     ExpandableListAdapter expandableListAdapter;
@@ -148,7 +149,7 @@ public class MainActivity extends BaseCompactActivity
         url();
     }
 
-    private void loadBalance(){
+    private void loadBalance() {
         new AsyncPostMethod(WebConfig.CRNF, getBalance().toString(), headerData, MainActivity.this, getString(R.string.responseTimeOut), "NODEHEADERDATA").execute();
     }
 
@@ -210,7 +211,7 @@ public class MainActivity extends BaseCompactActivity
         expandableListView = findViewById(R.id.expandableListView);
         prepareMenuData();
         populateExpandableList();
-        bal = (TextView)findViewById(R.id.bal);
+        bal = (TextView) findViewById(R.id.bal);
         reset = (ImageView) findViewById(R.id.reset);
         reset.setOnClickListener(this);
         bankde = (TextView) findViewById(R.id.bankde);
@@ -239,7 +240,6 @@ public class MainActivity extends BaseCompactActivity
             }
         });
         navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
         View headerLayout = navigationView.inflateHeaderView(R.layout.nav_header_main);
         TextView verionName = navigationView.findViewById(R.id.btn_sing_in);
         TextView contactus = navigationView.findViewById(R.id.contactus);
@@ -262,6 +262,7 @@ public class MainActivity extends BaseCompactActivity
             }
         });
     }
+
     private void prepareMenuData() {
 
         MenuModel menuModel = new MenuModel("Home", true, false, "https://www.journaldev.com/9333/android-webview-example-tutorial"); //Menu of Android Tutorial. No sub menus
@@ -277,13 +278,19 @@ public class MainActivity extends BaseCompactActivity
             childList.put(menuModel, null);
         }
 
-        menuModel = new MenuModel("Sub Agents", true, false, "https://www.journaldev.com/9333/android-webview-example-tutorial"); //Menu of Android Tutorial. No sub menus
+        menuModel = new MenuModel("Manage FOS", true, false, "https://www.journaldev.com/9333/android-webview-example-tutorial"); //Menu of Android Tutorial. No sub menus
         headerList.add(menuModel);
 
         if (!menuModel.hasChildren) {
             childList.put(menuModel, null);
         }
         menuModel = new MenuModel("Credit Banks", true, false, "https://www.journaldev.com/9333/android-webview-example-tutorial"); //Menu of Android Tutorial. No sub menus
+        headerList.add(menuModel);
+
+        if (!menuModel.hasChildren) {
+            childList.put(menuModel, null);
+        }
+        menuModel = new MenuModel("Bank Settlement", true, false, "https://www.journaldev.com/9333/android-webview-example-tutorial"); //Menu of Android Tutorial. No sub menus
         headerList.add(menuModel);
 
         if (!menuModel.hasChildren) {
@@ -306,7 +313,7 @@ public class MainActivity extends BaseCompactActivity
 
 
         if (menuModel.hasChildren) {
-            Log.d("API123","here");
+            Log.d("API123", "here");
             childList.put(menuModel, childModelsList);
         }
 
@@ -317,8 +324,6 @@ public class MainActivity extends BaseCompactActivity
         childModelsList.add(childModel);
 
         childModel = new MenuModel("Whitelist Bank Account(Auto Credit)", false, false, "https://www.journaldev.com/19226/python-fractions");
-        childModelsList.add(childModel);
-        childModel = new MenuModel("Bank Settlement", false, false, "https://www.journaldev.com/19226/python-fractions");
         childModelsList.add(childModel);
         childModel = new MenuModel("Lien History", false, false, "https://www.journaldev.com/19226/python-fractions");
         childModelsList.add(childModel);
@@ -346,6 +351,7 @@ public class MainActivity extends BaseCompactActivity
             childList.put(menuModel, childModelsList);
         }
     }
+
     private void populateExpandableList() {
 
         expandableListAdapter = new ExpandableListAdapter(this, headerList, childList);
@@ -377,7 +383,7 @@ public class MainActivity extends BaseCompactActivity
                     if (model.url.length() > 0) {
                         int index = parent.getFlatListPosition(ExpandableListView.getPackedPositionForChild(groupPosition, childPosition));
                         parent.setItemChecked(index, true);
-                        openChildfragment(groupPosition,childPosition);
+                        openChildfragment(groupPosition, childPosition);
 //                        WebView webView = findViewById(R.id.webView);
 //                        webView.loadUrl(model.url);
                         closeDrawer();
@@ -447,89 +453,6 @@ public class MainActivity extends BaseCompactActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        Fragment fragment = null;
-        if (id == R.id.nav_home) {
-            bankde.setVisibility(View.GONE);
-            reset.setVisibility(View.VISIBLE);
-            if (isUrl) {
-                isUrl = false;
-                loadUrl();
-                loadBalance();
-            }
-            fragment = new DashBoardFragments();
-        } else if (id == R.id.nav_Cpin) {
-            isUrl = true;
-            reset.setVisibility(View.GONE);
-            bankde.setVisibility(View.GONE);
-            fragment = new ChangePinFragment();
-        } else if (id == R.id.nav_cpsw) {
-            isUrl = true;
-            reset.setVisibility(View.GONE);
-            bankde.setVisibility(View.GONE);
-            fragment = new ChangePassword();
-        } else if (id == R.id.profile) {
-            isUrl = true;
-            reset.setVisibility(View.GONE);
-            bankde.setVisibility(View.GONE);
-            fragment = new ProfileFragment();
-        } else if (id == R.id.nav_Cmobile) {
-            isUrl = true;
-            reset.setVisibility(View.GONE);
-            bankde.setVisibility(View.GONE);
-            fragment = new ChangeMobileFragment();
-        } else if (id == R.id.settle_Cmobile) {
-            isUrl = true;
-            reset.setVisibility(View.GONE);
-            bankde.setVisibility(View.GONE);
-            Bundle bundle = new Bundle();
-            bundle.putString("message", "S");
-            fragment = new SettlementBankFragment();
-            fragment.setArguments(bundle);
-        } else if (id == R.id.payload_Cmobile) {
-            isUrl = true;
-            reset.setVisibility(View.GONE);
-            bankde.setVisibility(View.GONE);
-            Bundle bundle = new Bundle();
-            bundle.putString("message", "P");
-            fragment = new SettlementBankFragment();
-            fragment.setArguments(bundle);
-        } else if (id == R.id.nav_agent) {
-            isUrl = true;
-            reset.setVisibility(View.GONE);
-            bankde.setVisibility(View.GONE);
-            fragment = new SubAgentFrag();
-        } else if (id == R.id.lien_Cmobile) {
-            isUrl = true;
-            reset.setVisibility(View.GONE);
-            bankde.setVisibility(View.GONE);
-            fragment = new LienHistory();
-        } else if (id == R.id.nav_tpin) {
-            isUrl = true;
-            reset.setVisibility(View.GONE);
-            bankde.setVisibility(View.GONE);
-            fragment = new TpinTab();
-        }else if (id == R.id.nav_faq) {
-            isUrl = true;
-            reset.setVisibility(View.GONE);
-            bankde.setVisibility(View.GONE);
-            Bundle bundle = new Bundle();
-            bundle.putString("reqFor", "STLMNT");
-            fragment = new SettlementTab();
-            fragment.setArguments(bundle);
-        } else if (fragment == null)
-
-            Toast.makeText(MainActivity.this, "Under Process", Toast.LENGTH_SHORT).show();
-        if (fragment != null)
-            fragmentReplace(fragment);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
-
-    }
-
     private void fragmentReplace(Fragment fragment) {
         final FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.frame_container, fragment);
@@ -537,110 +460,112 @@ public class MainActivity extends BaseCompactActivity
         fragmentTransaction.commit();
     }
 
-    private void itemSelection(int id) {
-        onNavigationItemSelected(navigationView.getMenu().getItem(0));
-    }
-    private void openChildfragment(int head,int child){
+    private void openChildfragment(int head, int child) {
         Fragment fragment = null;
-        if (head==4 && child == 2) {
+        if (head == 5 && child == 2) {
             isUrl = true;
             reset.setVisibility(View.GONE);
             bankde.setVisibility(View.GONE);
+            isclicked = false;
             fragment = new ChangePinFragment();
-        } else if (head==4 && child == 0) {
+        } else if (head == 5 && child == 0) {
             isUrl = true;
             reset.setVisibility(View.GONE);
             bankde.setVisibility(View.GONE);
+            isclicked = false;
             fragment = new ChangePassword();
-        } else if (head==4 && child ==3) {
+        } else if (head == 5 && child == 3) {
             isUrl = true;
             reset.setVisibility(View.GONE);
             bankde.setVisibility(View.GONE);
+            isclicked = false;
             fragment = new ChangeMobileFragment();
-        } else if (head==5 && child == 0) {
+        } else if (head == 6 && child == 0) {
             isUrl = true;
             reset.setVisibility(View.GONE);
             bankde.setVisibility(View.GONE);
             Bundle bundle = new Bundle();
             bundle.putString("message", "S");
+            isclicked = false;
             fragment = new SettlementBankFragment();
             fragment.setArguments(bundle);
-        } else if (head==5 && child == 1) {
+        } else if (head == 6 && child == 1) {
             isUrl = true;
             reset.setVisibility(View.GONE);
             bankde.setVisibility(View.GONE);
             Bundle bundle = new Bundle();
             bundle.putString("message", "P");
+            isclicked = false;
             fragment = new SettlementBankFragment();
             fragment.setArguments(bundle);
-        } else if (head==5 && child == 3) {
+        } else if (head == 6 && child == 2) {
             isUrl = true;
             reset.setVisibility(View.GONE);
             bankde.setVisibility(View.GONE);
+            isclicked = false;
             fragment = new LienHistory();
-        } else if (head==4 && child == 1) {
+        } else if (head == 5 && child == 1) {
             isUrl = true;
             reset.setVisibility(View.GONE);
             bankde.setVisibility(View.GONE);
+            isclicked = false;
             fragment = new TpinTab();
-        }else if (head==5 && child == 2) {
-            isUrl = true;
-            reset.setVisibility(View.GONE);
-            bankde.setVisibility(View.GONE);
-            Bundle bundle = new Bundle();
-            bundle.putString("reqFor", "STLMNT");
-            fragment = new SettlementTab();
-            fragment.setArguments(bundle);
-        }else if (head==6 && child == 0) {
+        } else if (head == 7 && child == 0) {
             isUrl = true;
             reset.setVisibility(View.GONE);
             bankde.setVisibility(View.GONE);
             Bundle bundle = new Bundle();
             bundle.putString("reqFor", "BCS");
+            isclicked = false;
             fragment = new TransactionReports();
             fragment.setArguments(bundle);
-        }else if (head==6 && child == 1) {
+        } else if (head == 7 && child == 1) {
             isUrl = true;
             reset.setVisibility(View.GONE);
             bankde.setVisibility(View.GONE);
             Bundle bundle = new Bundle();
             bundle.putString("reqFor", "WLT");
+            isclicked = false;
             fragment = new TransactionReports();
             fragment.setArguments(bundle);
-        }else if (head==6 && child == 2) {
+        } else if (head == 7 && child == 2) {
             isUrl = true;
             reset.setVisibility(View.GONE);
             bankde.setVisibility(View.GONE);
             Bundle bundle = new Bundle();
             bundle.putString("reqFor", "PMT");
+            isclicked = false;
             fragment = new TransactionReports();
             fragment.setArguments(bundle);
-        }else if (head==6 && child == 3) {
+        } else if (head == 7 && child == 3) {
             isUrl = true;
             reset.setVisibility(View.GONE);
             bankde.setVisibility(View.GONE);
             Bundle bundle = new Bundle();
             bundle.putString("reqFor", "MPOS");
+            isclicked = false;
             fragment = new TransactionReports();
             fragment.setArguments(bundle);
-        }else if (head==6 && child == 4) {
+        } else if (head == 7 && child == 4) {
             isUrl = true;
             reset.setVisibility(View.GONE);
             bankde.setVisibility(View.GONE);
             Bundle bundle = new Bundle();
             bundle.putString("reqFor", "AEPSMATM");
+            isclicked = false;
             fragment = new TransactionReports();
             fragment.setArguments(bundle);
         } else if (fragment == null)
-
             Toast.makeText(MainActivity.this, "Under Process", Toast.LENGTH_SHORT).show();
         if (fragment != null)
             fragmentReplace(fragment);
         drawer.closeDrawer(GravityCompat.START);
     }
-    private void openfragment(int id){
+
+    private void openfragment(int id) {
         Fragment fragment = null;
         if (id == 0) {
+            isclicked = true;
             bankde.setVisibility(View.GONE);
             reset.setVisibility(View.VISIBLE);
             if (isUrl) {
@@ -648,22 +573,34 @@ public class MainActivity extends BaseCompactActivity
                 loadUrl();
             }
             fragment = new DashBoardFragments();
-        }  else if (id == 1) {
+        } else if (id == 1) {
+            isclicked = false;
             isUrl = true;
             reset.setVisibility(View.GONE);
             bankde.setVisibility(View.GONE);
             fragment = new ProfileFragment();
-        }  else if (id == 2) {
+        } else if (id == 2) {
             isUrl = true;
+            isclicked = false;
             reset.setVisibility(View.GONE);
             bankde.setVisibility(View.GONE);
             fragment = new SubAgentFrag();
         } else if (id == 3) {
             isUrl = true;
+            isclicked = false;
             reset.setVisibility(View.GONE);
             bankde.setVisibility(View.GONE);
             fragment = new com.rapipay.android.agent.kotlin_classs.BankDetails();
-        }  else if (fragment == null)
+        } else if (id == 4) {
+            isUrl = true;
+            isclicked = false;
+            reset.setVisibility(View.GONE);
+            bankde.setVisibility(View.GONE);
+            Bundle bundle = new Bundle();
+            bundle.putString("reqFor", "STLMNT");
+            fragment = new SettlementTab();
+            fragment.setArguments(bundle);
+        } else if (fragment == null)
             Toast.makeText(MainActivity.this, "Under Process", Toast.LENGTH_SHORT).show();
         if (fragment != null)
             fragmentReplace(fragment);
@@ -687,8 +624,8 @@ public class MainActivity extends BaseCompactActivity
                     }
                 } else if (object.getString("serviceType").equalsIgnoreCase("UPDATE_DOWNLAOD_DATA_STATUS")) {
                     loadUrl();
-                }else if (object.getString("serviceType").equalsIgnoreCase("GET_AGENT_BALANCE")) {
-                    bal.setText("Bal:-"+format(object.getString("agentBalance")));
+                } else if (object.getString("serviceType").equalsIgnoreCase("GET_AGENT_BALANCE")) {
+                    bal.setText("Bal:-" + format(object.getString("agentBalance")));
                     bal.setVisibility(View.VISIBLE);
                 } else if (object.getString("serviceType").equalsIgnoreCase("GET_MASTER_DEVICE_DETAILS")) {
                     if (object.has("deviceList")) {
@@ -836,13 +773,23 @@ public class MainActivity extends BaseCompactActivity
 
     @Override
     public void onBackPressed() {
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
+        if (!isclicked ) {
+            isclicked = true;
+            bankde.setVisibility(View.GONE);
+            reset.setVisibility(View.VISIBLE);
+            if (isUrl) {
+                isUrl = false;
+                loadUrl();
+            }
+            Fragment fragment = new DashBoardFragments();
+            fragmentReplace(fragment);
+
+        } else if (isclicked) {
+            customDialog_Common("KYCLAYOUT", null, null, "Rapipay", null, "Are you sure you want to exit ?", MainActivity.this);
         }
-        customDialog_Common("KYCLAYOUT", null, null, "Rapipay", null, "Are you sure you want to exit ?", MainActivity.this);
     }
 
-    private void closeDrawer(){
+    private void closeDrawer() {
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         }

@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -74,11 +73,11 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
         setContentView(R.layout.wallet_details_layout);
         initialize();
         TYPE = getIntent().getStringExtra("type");
-        mobileNo = getIntent().getStringExtra("mobileNo");
-        if (TYPE.equalsIgnoreCase("internal") || !mobileNo.isEmpty()) {
-            input_mobile.setText(mobileNo);
-            input_mobile.setEnabled(false);
-        }
+//        mobileNo = getIntent().getStringExtra("mobileNo");
+//        if (TYPE.equalsIgnoreCase("internal") || !mobileNo.isEmpty()) {
+//            input_mobile.setText(mobileNo);
+//            input_mobile.setEnabled(false);
+//        }
     }
 
     private void initialize() {
@@ -185,6 +184,7 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
             jsonObject.put("senderMobileNo", input_mobile.getText().toString());
             jsonObject.put("txnAmount", amount);
             jsonObject.put("transferType", type);
+//            jsonObject.put("isOtpIpin", radio_Clicked);
             if (newtpin.getText().toString().isEmpty())
                 jsonObject.put("tPin", "");
             else
@@ -404,6 +404,7 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
                         btn_sender.setVisibility(View.GONE);
                         input_name.setText(object.getString("customerName"));
                         input_name.setEnabled(false);
+                        reset.setVisibility(View.VISIBLE);
                         isVerifyAccount = object.getString("isVerifyAccount");
                         limit = Integer.valueOf(object.getInt("dailyRemLimit"));
                         text_ben.setText("Add Beneficiary  Transfer Limit" + "\n" + "Monthly : Rs " + format(object.getString("monthlyRemLimit")));
@@ -440,7 +441,7 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
                     customDialog_Common("KYCLAYOUTLAY", object, null, "Payee Detail", null, object.getString("responseMessage"), hitFrom);
             } else if (object.getString("serviceType").equalsIgnoreCase("FUND_TRANSFER")) {
                 if (object.getString("responseCode").equalsIgnoreCase("200"))
-                    customDialog_Common("OTPLAYOUT", object, null, "Fund Transfer OTP", null, null, hitFrom);
+                    customDialog_Common("OTPLAYOUT", object, null, "Fund Transfer " + radio_Clicked, null, null, hitFrom);
 //                else {
 //                    localStorage.setActivityState(LocalStorage.ROUTESTATE, "UPDATE");
 //                    if (object.has("getTxnReceiptDataList")) {
@@ -474,7 +475,10 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
                 }
             } else if (object.getString("serviceType").equalsIgnoreCase("REGENRATE_OTP")) {
                 if (object.getString("responseCode").equalsIgnoreCase("200"))
-                    customDialog_Common("OTPLAYOUT", object, null, "OTP Sent Again", null, null, hitFrom);
+                    if (!radio_Clicked.isEmpty())
+                        customDialog_Common("OTPLAYOUT", object, null, radio_Clicked + " Sent Again", null, null, hitFrom);
+                    else
+                        customDialog_Common("OTPLAYOUT", object, null, "OTP Sent Again", null, null, hitFrom);
             } else if (object.getString("serviceType").equalsIgnoreCase("Get_Txn_Recipt")) {
                 if (object.has("getTxnReceiptDataList")) {
                     try {
@@ -798,6 +802,10 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
                         @Override
                         public void run() {
                             btn_regenerate.setVisibility(View.VISIBLE);
+                            if (!radio_Clicked.isEmpty())
+                                btn_regenerate.setText("REGENRATE " + radio_Clicked);
+                            else
+                                btn_regenerate.setText("REGENRATE OTP");
                         }
                     }, 15000);
                     alertLayout.findViewById(R.id.otp_layout).setVisibility(View.VISIBLE);
@@ -807,6 +815,10 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
                         @Override
                         public void run() {
                             btn_regenerate.setVisibility(View.VISIBLE);
+                            if (!radio_Clicked.isEmpty())
+                                btn_regenerate.setText("REGENRATE " + radio_Clicked);
+                            else
+                                btn_regenerate.setText("REGENRATE OTP");
                         }
                     }, 15000);
                     alertLayout.findViewById(R.id.otp_layout).setVisibility(View.VISIBLE);
@@ -825,7 +837,7 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
                     alertLayout.findViewById(R.id.fundtransfer).setVisibility(View.VISIBLE);
                 } else if (type.equalsIgnoreCase("Fund Transfer Confirmation")) {
                     alertLayout.findViewById(R.id.custom_service).setVisibility(View.VISIBLE);
-                    serviceFee(alertLayout, object, (BeneficiaryDetailsPozo) ob, msg, input);
+                    serviceFee(alertLayout, object, (BeneficiaryDetailsPozo) ob, msg, input, "WALLET");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -834,7 +846,7 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
             dialog_cancel.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    setBack_click(WalletDetailsActivity.this);
+//                    setBack_click(WalletDetailsActivity.this);
                     dialog.dismiss();
                 }
             });
@@ -861,7 +873,11 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
                                     new WalletAsyncMethod(WebConfig.WALLETTRANSFER_URL, processOtp(otpView.getText().toString(), object).toString(), headerData, WalletDetailsActivity.this, getString(R.string.responseTimeOutTrans), hitFrom).execute();
                                 dialog.dismiss();
                             } else {
-                                otpView.setError("Please Enter Otp");
+                                btn_regenerate.setVisibility(View.VISIBLE);
+                                if (!radio_Clicked.isEmpty())
+                                    otpView.setError("Please Enter " + radio_Clicked);
+                                else
+                                    otpView.setError("Please Enter OTP");
                                 otpView.requestFocus();
                             }
                         } else if (type.equalsIgnoreCase("KYCLAYOUT") || type.equalsIgnoreCase("KYCLAYOUTL")) {
@@ -882,6 +898,9 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
                             customFund_Transfer((BeneficiaryDetailsPozo) ob, "RapiPay", "FUNDTRANSFER");
                             dialog.dismiss();
                         } else if (type.equalsIgnoreCase("Fund Transfer Confirmation")) {
+//                            if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && radio_Clicked.isEmpty()) {
+//                                Toast.makeText(WalletDetailsActivity.this, "Please select type", Toast.LENGTH_SHORT).show();
+//                            } else
                             if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && newtpin.getText().toString().length() == 4) {
                                 new WalletAsyncMethod(WebConfig.WALLETTRANSFER_URL, fund_transfer(beneficiaryDetailsPozoslist.get(benePosition), value, ben_amount.getText().toString()).toString(), headerData, WalletDetailsActivity.this, getString(R.string.responseTimeOutTrans), hitFrom).execute();
                                 dialog.dismiss();

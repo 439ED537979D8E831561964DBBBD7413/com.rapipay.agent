@@ -390,7 +390,7 @@ public class BaseCompactActivity extends AppCompatActivity {
             dialog.setContentView(alertLayout);
         }
         try {
-            if (type.equalsIgnoreCase("KYCLAYOUTFOS")||type.equalsIgnoreCase("KYCLAYOUT") || type.equalsIgnoreCase("PENDINGREFUND") || type.equalsIgnoreCase("REFUNDTXN") || type.equalsIgnoreCase("SESSIONEXPIRRED") || type.equalsIgnoreCase("PENDINGLAYOUT")) {
+            if (type.equalsIgnoreCase("KYCLAYOUTFOS") || type.equalsIgnoreCase("KYCLAYOUT") || type.equalsIgnoreCase("PENDINGREFUND") || type.equalsIgnoreCase("REFUNDTXN") || type.equalsIgnoreCase("SESSIONEXPIRRED") || type.equalsIgnoreCase("PENDINGLAYOUT")) {
                 customView(alertLayout, output);
             } else if (type.equalsIgnoreCase("OTPLAYOUTS")) {
                 alertLayout.findViewById(R.id.otp_layout).setVisibility(View.VISIBLE);
@@ -486,16 +486,16 @@ public class BaseCompactActivity extends AppCompatActivity {
                     } else if (last_name.getText().toString().isEmpty()) {
                         last_name.setError("Please enter last name");
                         last_name.requestFocus();
-                    }else if (mobile_num.getText().toString().length() != 10) {
+                    } else if (mobile_num.getText().toString().length() != 10) {
                         mobile_num.setError("Please enter mobile number");
                         mobile_num.requestFocus();
-                    }else if (cree_address.getText().toString().isEmpty()) {
+                    } else if (cree_address.getText().toString().isEmpty()) {
                         cree_address.setError("Please enter address");
                         cree_address.requestFocus();
-                    }else if (bank_select.getText().toString().isEmpty()) {
+                    } else if (bank_select.getText().toString().isEmpty()) {
                         bank_select.setError("Please enter bank");
                         bank_select.requestFocus();
-                    }else if (pincode.getText().toString().length() != 6) {
+                    } else if (pincode.getText().toString().length() != 6) {
                         pincode.setError("Please enter pincode");
                         pincode.requestFocus();
                     } else {
@@ -553,8 +553,9 @@ public class BaseCompactActivity extends AppCompatActivity {
     }
 
     protected EditText newtpin;
-    protected String radio_Clicked="";
-    protected void serviceFee(View alertLayout, JSONObject object, BeneficiaryDetailsPozo pozo, String msg, String input,String type) throws Exception {
+    protected String radio_Clicked = "";
+
+    protected void serviceFee(View alertLayout, JSONObject object, BeneficiaryDetailsPozo pozo, String msg, String input, String type) throws Exception {
         TextView btn_name = (TextView) alertLayout.findViewById(R.id.btn_name_service);
         TextView btn_servicefee = (TextView) alertLayout.findViewById(R.id.btn_servicefee);
         btn_servicefee.setText(String.valueOf(Math.round(Double.parseDouble(object.getString("chargeServiceFee")) * 100.0) / 100.0));
@@ -602,8 +603,8 @@ public class BaseCompactActivity extends AppCompatActivity {
         newtpin = (EditText) alertLayout.findViewById(R.id.newtpin);
         if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y"))
             newtpin.setVisibility(View.VISIBLE);
-        if(type.equalsIgnoreCase("WALLET") && BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y"))
-            alertLayout.findViewById(R.id.myRadioGroup).setVisibility(View.VISIBLE);
+//        if (type.equalsIgnoreCase("WALLET") && BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y"))
+//            alertLayout.findViewById(R.id.myRadioGroup).setVisibility(View.VISIBLE);
         dialog.setContentView(alertLayout);
     }
 
@@ -723,6 +724,10 @@ public class BaseCompactActivity extends AppCompatActivity {
 
     protected void otpView(View alertLayout, JSONObject object) throws Exception {
         otpView = (TextView) alertLayout.findViewById(R.id.input_otp);
+        if (!radio_Clicked.isEmpty())
+            otpView.setHint("Enter " + radio_Clicked);
+        else
+            otpView.setHint("Enter OTP");
         otpView.setInputType(InputType.TYPE_CLASS_NUMBER);
         InputFilter[] filterArray = new InputFilter[1];
         filterArray[0] = new InputFilter.LengthFilter(12);

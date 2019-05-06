@@ -8,8 +8,17 @@ public class LastTransactionPozo {
     String serviceProviderTXNID;
     String transferType;
     String txnRequestDate;
+    String customerId;
 
-    public LastTransactionPozo(String accountNo, String txnAmount, String refundTxnId, String bankName, String serviceProviderTXNID, String transferType, String txnRequestDate) {
+    public String getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(String customerId) {
+        this.customerId = customerId;
+    }
+
+    public LastTransactionPozo(String accountNo, String txnAmount, String refundTxnId, String bankName, String serviceProviderTXNID, String transferType, String txnRequestDate, String customerId) {
         this.accountNo = accountNo;
         this.txnAmount = txnAmount;
         this.refundTxnId = refundTxnId;
@@ -17,15 +26,17 @@ public class LastTransactionPozo {
         this.serviceProviderTXNID = serviceProviderTXNID;
         this.transferType = transferType;
         this.txnRequestDate = txnRequestDate;
+        this.customerId =customerId;
     }
 
-    public LastTransactionPozo(String accountNo, String txnAmount, String refundTxnId, String bankName, String serviceProviderTXNID, String txnRequestDate) {
+    public LastTransactionPozo(String accountNo, String txnAmount, String refundTxnId, String bankName, String serviceProviderTXNID, String txnRequestDate, String customerId) {
         this.accountNo = accountNo;
         this.txnAmount = txnAmount;
         this.refundTxnId = refundTxnId;
         this.bankName = bankName;
         this.serviceProviderTXNID = serviceProviderTXNID;
         this.txnRequestDate = txnRequestDate;
+        this.customerId = customerId;
     }
 
 //    public LastTransactionPozo(String accountNo, String txnAmount, String refundTxnId, String bankName, String serviceProviderTXNID,

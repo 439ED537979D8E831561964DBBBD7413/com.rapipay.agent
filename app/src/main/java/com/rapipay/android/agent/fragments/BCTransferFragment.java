@@ -260,7 +260,7 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
                 jsonObject.put("transactionID", ImageUtils.miliSeconds());
                 jsonObject.put("txnAmmount", input_amount.getText().toString());
                 jsonObject.put("nodeAgentId", list.get(0).getMobilno());
-                jsonObject.put("senderName", input_name.getText().toString());
+                jsonObject.put("senderName", input_name.getText().toString().trim());
                 jsonObject.put("IFSC", ifsc_code);
                 jsonObject.put("accountNo", input_account.getText().toString());
                 jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
@@ -335,7 +335,7 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
                 jsonObject.put("nodeAgentId", list.get(0).getMobilno());
                 jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
                 jsonObject.put("mobileNumber", input_mobile.getText().toString());
-                jsonObject.put("senderName", input_name.getText().toString());
+                jsonObject.put("senderName", input_name.getText().toString().trim());
                 jsonObject.put("reqFor", "BC1");
                 jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
 
@@ -406,9 +406,9 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
                 } else if (object.getString("serviceType").equalsIgnoreCase("GET_SERVICE_FEE")) {
                     customDialog_Common("Fund Transfer Confirmation", object, pozo, "Sure you want to Transfer?", input_mobile.getText().toString());
                 } else if (object.getString("serviceType").equalsIgnoreCase("Verify_Account")) {
-                    customDialog_Common("Account Verify Details", object, pozo, "VerifyLayout", input_name.getText().toString());
+                    customDialog_Common("Account Verify Details", object, pozo, "VerifyLayout", input_name.getText().toString().trim());
                 } else if (object.getString("serviceType").equalsIgnoreCase("Money_Transfer_Bene")) {
-                    customDialog_Common("Fund Transfer Details", object, pozo, "VerifyLayout", input_name.getText().toString());
+                    customDialog_Common("Fund Transfer Details", object, pozo, "VerifyLayout", input_name.getText().toString().trim());
                 } else if (object.getString("serviceType").equalsIgnoreCase("Money_Transfer")) {
                     if (object.has("getTxnReceiptDataList")) {
                         try {
@@ -416,7 +416,7 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
                             customReceiptNew("Money Transfer", object, BCTransferFragment.this);
                         } catch (Exception e) {
                             e.printStackTrace();
-                            customDialog_Common("Cannot generate receipt now please try later!", object, pozo, "VerifyLayout", input_name.getText().toString());
+                            customDialog_Common("Cannot generate receipt now please try later!", object, pozo, "VerifyLayout", input_name.getText().toString().trim());
                         }
                     }
                 } else if (object.getString("serviceType").equalsIgnoreCase("SENDER_COMPLETE_DETAILS")) {
@@ -440,12 +440,12 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
                     }
 
                     text_ben.setText("Beneficiary Details (Tap to Fund Transfer & Long press to delete)");
-                    if (object.has("oldTxnList")) {
-                        if (Integer.parseInt(object.getString("oldTxnCount")) > 0) {
-                            last_tran_layout.setVisibility(View.VISIBLE);
-                            insertLastTransDetails(object.getJSONArray("oldTxnList"));
-                        }
-                    }
+//                    if (object.has("oldTxnList")) {
+//                        if (Integer.parseInt(object.getString("oldTxnCount")) > 0) {
+//                            last_tran_layout.setVisibility(View.VISIBLE);
+//                            insertLastTransDetails(object.getJSONArray("oldTxnList"));
+//                        }
+//                    }
                     if (object.has("beneListDetail")) {
                         if (Integer.parseInt(object.getString("beneCount")) > 0) {
                             beneficiary_layout.setVisibility(View.VISIBLE);
@@ -459,7 +459,7 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
                             customReceiptNew("Transaction Receipt", object, BCTransferFragment.this);
                         } catch (Exception e) {
                             e.printStackTrace();
-                            customDialog_Common("Cannot generate receipt now please try later!", object, pozo, "VerifyLayout", input_name.getText().toString());
+                            customDialog_Common("Cannot generate receipt now please try later!", object, pozo, "VerifyLayout", input_name.getText().toString().trim());
                         }
                     }
                 } else if (object.getString("serviceType").equalsIgnoreCase("ADD_BENEFICIARY_DETAILS")) {
@@ -486,10 +486,10 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
                 break;
             case R.id.btn_sender:
                 hideKeyboard(getActivity());
-                if (!input_name.getText().toString().isEmpty())
+                if (ImageUtils.commonName(input_name.getText().toString()) && !input_name.getText().toString().trim().endsWith("."))
                     new AsyncPostMethod(WebConfig.BCRemittanceApp, addSender().toString(), headerData, BCTransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans)).execute();
                 else
-                    Toast.makeText(getActivity(), "Please enter text", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "Please enter correct text", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.btn_otpsubmit:
                 if (!otpRefId.isEmpty() && !fund_transferId.isEmpty() && !input_otp.getText().toString().isEmpty()) {
@@ -638,6 +638,7 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
         beneficiary_layout.setVisibility(View.GONE);
         last_tran_layout.setVisibility(View.GONE);
         bank_select.setText("Select Bank");
+        input_name.setEnabled(true);
     }
 
     @Override
@@ -659,7 +660,7 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
             jsonObject.put("typeMobileWeb", "mobile");
             jsonObject.put("transactionID", ImageUtils.miliSeconds());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
-            jsonObject.put("senderName", input_name.getText().toString());
+            jsonObject.put("senderName", input_name.getText().toString().trim());
             jsonObject.put("IFSC", ifsc);
             jsonObject.put("accountNo", accountno);
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
@@ -750,7 +751,7 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
             jsonObject.put("transactionID", ImageUtils.miliSeconds());
             jsonObject.put("txnAmmount", amount);
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
-            jsonObject.put("senderName", input_name.getText().toString());
+            jsonObject.put("senderName", input_name.getText().toString().trim());
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
             jsonObject.put("mobileNumber", input_mobile.getText().toString());
             jsonObject.put("beneficiaryId", beneficiaryId);
@@ -789,7 +790,7 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
                 else {
                     String condition = "where " + RapipayDB.COLOMN__BANK_NAME + "='" + bank_select.getText().toString() + "'";
                     ifsc_code = BaseCompactActivity.db.geBankIFSC(condition).get(0);
-                    moneyTransgerFee(alertLayout, object, input_account.getText().toString(), ifsc_code, input_name.getText().toString(), msg, input);
+                    moneyTransgerFee(alertLayout, object, input_account.getText().toString(), ifsc_code, input_name.getText().toString().trim(), msg, input);
                 }
             } else if (type.equalsIgnoreCase("Fund Transfer")) {
                 alertLayout.findViewById(R.id.ben_layout).setVisibility(View.VISIBLE);

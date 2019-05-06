@@ -50,7 +50,7 @@ public class PendingRefundActivity extends BaseCompactActivity implements Wallet
     ArrayList<LastTransactionPozo> transactionPozoArrayList, pendingPozoArrayList, refundPozoArrayList;
     int refundPosition;
     LastTransAdapter adapter;
-
+    LastTransactionPozo pozo;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,9 +81,9 @@ public class PendingRefundActivity extends BaseCompactActivity implements Wallet
             @Override
             public void onClick(View view, int position) {
                 refundPosition = position;
-                LastTransactionPozo pozo = refundPozoArrayList.get(position);
+                pozo = refundPozoArrayList.get(position);
                 if (!pozo.getServiceProviderTXNID().equalsIgnoreCase("DMT"))
-                    new WalletAsyncMethod(WebConfig.BCRemittanceApp, getrefund_Validate(pozo.getRefundTxnId()).toString(), headerData, PendingRefundActivity.this, getString(R.string.responseTimeOut),"BC_Refund").execute();
+                    new WalletAsyncMethod(WebConfig.BCRemittanceApp, getrefund_Validate(pozo).toString(), headerData, PendingRefundActivity.this, getString(R.string.responseTimeOut),"BC_Refund").execute();
                 else
                     new WalletAsyncMethod(WebConfig.WALLETTRANSFER_URL, getrefundDmt(pozo).toString(), headerData, PendingRefundActivity.this, getString(R.string.responseTimeOut),"WALLET_REFUND").execute();
             }
@@ -196,6 +196,9 @@ public class PendingRefundActivity extends BaseCompactActivity implements Wallet
                     else if (hitfrom.equalsIgnoreCase("PROCESS_OTP")) {
 //                        localStorage.setActivityState(LocalStorage.ROUTESTATE, "UPDATE");
                         customDialog_Common("REFUNDTXN", object, null, "REFUND TXN", null, object.getString("responseMessage"), PendingRefundActivity.this);
+                    }else if (hitfrom.equalsIgnoreCase("Verify_Mobile")) {
+//                        localStorage.setActivityState(LocalStorage.ROUTESTATE, "UPDATE");
+                        customDialog_Common("KYCLAYOUTSS", object, null, getResources().getString(R.string.Alert), null, object.getString("responseMessage"), PendingRefundActivity.this);
                     } else
                         change_View(object,hitfrom);
                 } else if (object.getString("responseCode").equalsIgnoreCase("201")) {
@@ -270,7 +273,7 @@ public class PendingRefundActivity extends BaseCompactActivity implements Wallet
         return jsonObject;
     }
 
-    public JSONObject getrefund_Validate(String transactionID) {
+    public JSONObject getrefund_Validate(LastTransactionPozo pozo) {
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("serviceType", "BC_Refund");
@@ -279,7 +282,8 @@ public class PendingRefundActivity extends BaseCompactActivity implements Wallet
             jsonObject.put("transactionID", ImageUtils.miliSeconds());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
-            jsonObject.put("fundtransactionID", transactionID);
+            jsonObject.put("fundtransactionID", pozo.getRefundTxnId());
+            jsonObject.put("senderMobile", pozo.getCustomerId());
             jsonObject.put("reqFor", "BC1");
             jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
 
@@ -358,9 +362,9 @@ public class PendingRefundActivity extends BaseCompactActivity implements Wallet
             for (int i = 0; i < array.length(); i++) {
                 JSONObject object = array.getJSONObject(i);
                 if (object.getString("refundType").equalsIgnoreCase("BC"))
-                    refundPozoArrayList.add(new LastTransactionPozo(object.getString("accountNo"), object.getString("txnAmount"), object.getString("refundTxnId"), object.getString("bankName"), object.getString("refundType"),object.getString("txnRequestDate")));
+                    refundPozoArrayList.add(new LastTransactionPozo(object.getString("accountNo"), object.getString("txnAmount"), object.getString("refundTxnId"), object.getString("bankName"), object.getString("refundType"),object.getString("txnRequestDate"),object.getString("customerId")));
                 else
-                    refundPozoArrayList.add(new LastTransactionPozo(object.getString("accountNo"), object.getString("txnAmount"), object.getString("refundTxnId"), object.getString("bankName"), object.getString("refundType"), object.getString("customerId"),object.getString("txnRequestDate")));
+                    refundPozoArrayList.add(new LastTransactionPozo(object.getString("accountNo"), object.getString("txnAmount"), object.getString("refundTxnId"), object.getString("bankName"), object.getString("refundType"), object.getString("customerId"),object.getString("txnRequestDate"),object.getString("customerId")));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -458,7 +462,7 @@ public class PendingRefundActivity extends BaseCompactActivity implements Wallet
             jsonObject.put("txnRef", ImageUtils.miliSeconds());
             jsonObject.put("agentID", list.get(0).getMobilno());
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
-            jsonObject.put("senderMobileNo", input_mobile.getText().toString());
+            jsonObject.put("senderMobileNo", pozo.getCustomerId());
             jsonObject.put("otpRefId", otpRefId);
             jsonObject.put("otp", otp);
             jsonObject.put("reqFor", "WALLET");
@@ -479,7 +483,7 @@ public class PendingRefundActivity extends BaseCompactActivity implements Wallet
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
-            jsonObject.put("senderMobile", input_mobile.getText().toString());
+            jsonObject.put("senderMobile", pozo.getCustomerId());
             jsonObject.put("fundTransferId", fund_transferId);
             jsonObject.put("otp", otp);
             jsonObject.put("otprefID", otpRefId);

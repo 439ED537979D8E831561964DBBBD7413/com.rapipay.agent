@@ -63,7 +63,7 @@ public class ChannelListAdapter extends ArrayAdapter<ChannelHistoryPozo> {
         viewHolder.btn_p_amounts.setText("Bene Account ID : "+mValues.get(position).getAccount());
         viewHolder.btn_name.setText("Sender Name : " + mValues.get(position).getName());
         viewHolder.p_transid.setText("Transaction Amt : " + format(mValues.get(position).getAmount()));
-        viewHolder.btn_p_bank.setText("RRN : "+mValues.get(position).getServiceProviderTXNID());
+        viewHolder.btn_p_bank.setText("Bank Reference No. : "+mValues.get(position).getServiceProviderTXNID());
         viewHolder.btn_status.setText("Status : "+mValues.get(position).getTxnId());
         viewHolder.transferType.setText("Transaction Type :"+mValues.get(position).getServiceType());
         viewHolder.transferdate.setText("Txn Date : "+mValues.get(position).getTxnRequestDate());

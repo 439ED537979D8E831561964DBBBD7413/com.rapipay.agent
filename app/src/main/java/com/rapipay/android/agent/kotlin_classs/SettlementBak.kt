@@ -16,6 +16,7 @@ import com.rapipay.android.agent.Model.SettlementPozoo
 import com.rapipay.android.agent.R
 import com.rapipay.android.agent.adapter.SettleAdapterBank
 import com.rapipay.android.agent.interfaces.ClickListener
+import com.rapipay.android.agent.interfaces.CustomInterface
 import com.rapipay.android.agent.interfaces.RequestHandler
 import com.rapipay.android.agent.utils.*
 import me.grantland.widget.AutofitTextView
@@ -32,6 +33,9 @@ class SettlementBak : BaseFragment(), RequestHandler {
     var pozoClick: SettlementPozoo? = null
     var textsss: TextView? = null
     var jsonObjects: JSONObject? = null
+    var bankName: TextView? = null
+    var accnum: TextView? = null
+    var holdername: TextView? = null
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         var view = inflater.inflate(R.layout.settle_lay, container, false) as View
         if (BaseCompactActivity.db != null && BaseCompactActivity.db.details_Rapi)
@@ -42,22 +46,25 @@ class SettlementBak : BaseFragment(), RequestHandler {
     }
 
     fun init(v: View) {
+        holdername = v.findViewById<TextView>(R.id.holdername) as TextView
+        accnum = v.findViewById<TextView>(R.id.accnum) as TextView
+        bankName = v.findViewById<TextView>(R.id.bankName) as TextView
         var heading = v.findViewById<EditText>(R.id.headingsearch)
         heading?.onChange()
         trans_details = v.findViewById<RecyclerView>(R.id.trans_details)
         trans_details!!.addOnItemTouchListener(RecyclerTouchListener(activity, trans_details, object : ClickListener {
             override fun onClick(view: View?, position: Int) {
                 pozoClick = transactionPozoArrayList!!.get(position)
-                customDialog_Ben(transactionPozoArrayList!!.get(position), "Network Transfer", "BENLAYOUT", "Transfer Amount")
+                if (pozoClick!!.transferAmount!=0)
+                    customDialog_Ben(transactionPozoArrayList!!.get(position), "Network Transfer", "BENLAYOUT", "Transfer Amount")
+                else
+                    Toast.makeText(activity, "Transfer Amount is not available for fund transfer.", Toast.LENGTH_SHORT).show()
             }
 
             override fun onLongClick(view: View?, position: Int) {
                 TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
             }
         }))
-//            pozoClick = transactionPozoArrayList!!.get(position)
-////            customDialog_Ben(transactionPozoArrayList!!.get(position), "Network Transfer", "BENLAYOUT", pozoClick!!.getConsentStatus(), "Credit To Network")
-
     }
 
     fun loadUrl() {
@@ -73,12 +80,17 @@ class SettlementBak : BaseFragment(), RequestHandler {
             if (`object`!!.has("responseCode") && `object`.getString("responseCode").equals("200", true)) {
                 if (`object`.getString("serviceType").equals("CALCULATE_TRANFSER_AMOUNT", true)) {
                     jsonObjects = `object`
+                    bankName!!.setText("Bank Name : " + `object`.getString("bankName"))
+                    accnum!!.setText("Bank Account Number : " + `object`.getString("bankAccountNumber"))
+                    holdername!!.setText("Account Holder Name : " + `object`.getString("bankAccountName"))
                     if (`object`.has("objTransferAmountList")) {
                         insertLastTransDetails(`object`.getJSONArray("objTransferAmountList"))
                     }
 
                 } else if (`object`.getString("serviceType").equals("C2C_NETWORK_CREDIT", true)) {
-                    customDialog_Ben(null, `object`.getString("responseMessage"), "NETWORK_CREDIT",  "Credit Confirmation")
+                    customDialog_Ben(null, `object`.getString("responseMessage"), "NETWORK_CREDIT", "Credit Confirmation")
+                }else if (`object`.getString("serviceType").equals("INITIATE_STLMNT_TRANSFER_FUND", true)) {
+                    customDialog_Ben(null, `object`.getString("responseMessage"),"KYCLAYOUTS", "Alert")
                 }
             }
         } catch (e: Exception) {
@@ -91,7 +103,7 @@ class SettlementBak : BaseFragment(), RequestHandler {
         try {
             for (i in 0 until array.length()) {
                 val `object` = array.getJSONObject(i)
-                transactionPozoArrayList!!.add(SettlementPozoo(`object`.getString("requestType"), `object`.getString("aepsCount"), `object`.getString("aepsValue"), `object`.getString("usage"), `object`.getString("transferAmount"), `object`.getString("serviceFee"), `object`.getString("iGST") + "/" + `object`.getString("cGST") + "/" + `object`.getString("sGST")))
+                transactionPozoArrayList!!.add(SettlementPozoo(`object`.getString("requestType"), `object`.getString("aepsCount"), `object`.getString("aepsValue"), `object`.getString("usage"), `object`.getInt("transferAmount"), `object`.getString("serviceFee"), `object`.getString("iGST") + "/" + `object`.getString("cGST") + "/" + `object`.getString("sGST")))
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -164,13 +176,16 @@ class SettlementBak : BaseFragment(), RequestHandler {
             p_transid = alertLayout.findViewById<View>(R.id.btn_p_transid) as AutofitTextView
             btn_p_bank = alertLayout.findViewById<View>(R.id.btn_p_bank) as AutofitTextView
             btn_name.text = "Request Type : " + pozo!!.requestType
-            p_transid.text = "Usage : " +  formatss(pozo.usage)!!
-            btn_p_bank.text = "Transfer Amount : " + formatss(pozo.transferAmount)!!
+            p_transid.text = "Usage : " + formatss(pozo.usage)!!
+            btn_p_bank.text = "Transfer Amount : " + pozo.transferAmount
         } else if (type.equals("NETWORK_CREDIT", ignoreCase = true)) {
             btn_cancel.visibility = View.GONE
             val otpView = alertLayout.findViewById<View>(R.id.dialog_msg) as TextView
             otpView.text = msg
             otpView.visibility = View.VISIBLE
+        } else if (type.equals("KYCLAYOUTS", ignoreCase = true)) {
+            btn_cancel.visibility = View.GONE
+            customView(alertLayout, msg, dialog)
         }
         textsss = alertLayout.findViewById<View>(R.id.input_amount_popup) as TextView
         dialog.setContentView(alertLayout)
@@ -183,7 +198,7 @@ class SettlementBak : BaseFragment(), RequestHandler {
                 if (!ImageUtils.commonAmount(textsss!!.getText().toString())) {
                     textsss!!.setError("Please enter valid data")
                     textsss!!.requestFocus()
-                }else if(!(Integer.parseInt(textsss!!.getText().toString())  <= Integer.parseInt(formatss(pozo!!.transferAmount)))){
+                } else if (!(Integer.parseInt(textsss!!.getText().toString()) <= pozo!!.transferAmount!!.toInt())) {
                     textsss!!.setError("Please enter valid amount")
                     textsss!!.requestFocus()
                 } else {
@@ -196,13 +211,16 @@ class SettlementBak : BaseFragment(), RequestHandler {
                 dialog.dismiss()
             } else if (type.equals("BENLAYOUT", ignoreCase = true)) {
                 dialog.dismiss()
-                customDialog_Ben(pozo, "Network Transfer", "AMOUNTTRANSFER", "Credit To Network")
+                customDialog_Ben(pozo, "Network Transfer", "AMOUNTTRANSFER", "Fund Transfer")
+            }else if (type.equals("KYCLAYOUTS", ignoreCase = true)) {
+                dialog.dismiss()
+                loadUrl()
             }
         }
         btn_cancel.setOnClickListener {
             if (type.equals("BENLAYOUT", ignoreCase = true)) {
                 dialog.dismiss()
-                customDialog_Ben(pozo, "Network Transfer", "REVERSETRANSFER", "Credit To Network")
+                customDialog_Ben(pozo, "Network Transfer", "REVERSETRANSFER", "Fund Transfer")
             } else
                 dialog.dismiss()
         }
@@ -232,7 +250,7 @@ class SettlementBak : BaseFragment(), RequestHandler {
         btn_ok.setOnClickListener {
             if (type.equals("CONFIRMATION", ignoreCase = true)) {
                 dialognew.dismiss()
-                AsyncPostMethod(WebConfig.CRNF, getNetwork_Transfer(pozo,amount).toString(), headerData, this@SettlementBak, activity, getString(R.string.responseTimeOut)).execute()
+                AsyncPostMethod(WebConfig.CRNF, getNetwork_Transfer(pozo, amount).toString(), headerData, this@SettlementBak, activity, getString(R.string.responseTimeOut)).execute()
             }
         }
         btn_cancel.setOnClickListener { dialognew.dismiss() }
@@ -241,7 +259,7 @@ class SettlementBak : BaseFragment(), RequestHandler {
         window!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
     }
 
-    fun getNetwork_Transfer(pozo: SettlementPozoo?,txnAmount: String): JSONObject {
+    fun getNetwork_Transfer(pozo: SettlementPozoo?, txnAmount: String): JSONObject {
         val jsonObject = JSONObject()
         try {
             jsonObject.put("serviceType", "INITIATE_STLMNT_TRANSFER_FUND")
@@ -256,7 +274,7 @@ class SettlementBak : BaseFragment(), RequestHandler {
             jsonObject.put("IFSC", jsonObjects!!.getString("bankIFSC"))
             jsonObject.put("reqFor", "STFT")
             jsonObject.put("txnAmmount", txnAmount)
-            jsonObject.put("txnType",pozo!!.requestType)
+            jsonObject.put("txnType", pozo!!.requestType)
             jsonObject.put("checkSum", GenerateChecksum.checkSum(list[0].pinsession, jsonObject.toString()))
 
         } catch (e: Exception) {
@@ -276,5 +294,4 @@ class SettlementBak : BaseFragment(), RequestHandler {
 
         return null
     }
-
 }
