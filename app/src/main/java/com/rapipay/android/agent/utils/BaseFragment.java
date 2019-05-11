@@ -36,7 +36,6 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -76,7 +75,7 @@ import me.grantland.widget.AutofitTextView;
 
 public class BaseFragment extends Fragment {
     protected LocalStorage localStorage;
-    protected Dialog dialog, dialognew;
+    protected Dialog dialog, dialognew,dialognew1;
     //    protected AlertDialog alertDialog, newdialog;
     CustomInterface anInterface;
     protected boolean scan = false;
@@ -86,13 +85,14 @@ public class BaseFragment extends Fragment {
     protected static final int CAMERA_REQUEST = 1888;
     protected int SELECT_FILE = 1;
     protected EditText newtpin;
-    protected TextView ben_amount;
+    protected TextView ben_amount, con_ifsc;
     protected static final int CONTACT_PICKER_RESULT = 1;
     final protected static int PERMISSIONS_REQUEST_CAMERA_STATE = 1;
     final protected static int PERMISSIONS_REQUEST_READ_PHONE_STATE = 0;
     ArrayList<String> left, right, medium, spinner_list;
     ArrayList<HeaderePozo> bottom;
     LinearLayout main_layout;
+    protected boolean isNEFT = false;
 
     @Nullable
     @Override
@@ -309,7 +309,7 @@ public class BaseFragment extends Fragment {
                     @Override
                     public void onClick(View v) {
                         ArrayList<String> list_state = BaseCompactActivity.db.getState_Details();
-                        customSpinner(bank_select, "Select State*", list_state, null);
+                        customSpinner(bank_select, "Select State*", list_state, "");
                     }
                 });
                 dialog.setContentView(alertLayout);
@@ -625,7 +625,7 @@ public class BaseFragment extends Fragment {
 
     protected CustomSpinnerAdapter adapter = null;
 
-    protected void customSpinner(final TextView viewText, final String type, final ArrayList<String> list_spinner, final TextView ifsc_Code) {
+    protected void customSpinner(final TextView viewText, final String type, final ArrayList<String> list_spinner, final String typeCheck) {
         spinner_list = list_spinner;
         dialognew = new Dialog(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
@@ -659,12 +659,22 @@ public class BaseFragment extends Fragment {
         listLeft.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (con_ifsc != null)
+                    con_ifsc.setText("");
                 viewText.setText(list_spinner.get(position));
                 viewText.setError(null);
-                if (ifsc_Code != null) {
+                if (con_ifsc != null) {
                     String condition = "where " + RapipayDB.COLOMN__BANK_NAME + "='" + viewText.getText().toString() + "'";
-                    ifsc_Code.setText(BaseCompactActivity.db.geBankIFSC(condition).get(0));
-                    ifsc_Code.setEnabled(false);
+                    String ifsccode = BaseCompactActivity.db.geBankIFSC(condition).get(0);
+                    if (ifsccode.equalsIgnoreCase("NA") & typeCheck.equalsIgnoreCase("BC")) {
+                        con_ifsc.setVisibility(View.VISIBLE);
+                        isNEFT = true;
+                    } else if (!ifsccode.equalsIgnoreCase("NA") & typeCheck.equalsIgnoreCase("BC")) {
+                        con_ifsc.setVisibility(View.GONE);
+                        isNEFT = false;
+                    } else if (!ifsccode.equalsIgnoreCase("NA")) {
+                        con_ifsc.setText(BaseCompactActivity.db.geBankIFSC(condition).get(0));
+                    }
                 }
                 dialognew.dismiss();
             }
@@ -875,11 +885,15 @@ public class BaseFragment extends Fragment {
         dialog.setContentView(alertLayout);
     }
 
-    protected void customDialog_Ben(View alertLayout, BeneficiaryDetailsPozo pozo) {
+    protected void customDialog_Ben(View alertLayout, BeneficiaryDetailsPozo pozo, Dialog dialog, String transType) {
         TextView btn_name = (TextView) alertLayout.findViewById(R.id.btn_name);
         TextView btn_account = (TextView) alertLayout.findViewById(R.id.btn_account);
         TextView btn_bank = (TextView) alertLayout.findViewById(R.id.btn_bank);
         TextView notverified = (TextView) alertLayout.findViewById(R.id.notverified);
+        TextView btn_trantype = (TextView) alertLayout.findViewById(R.id.btn_trantype);
+        TextView btn_ifsc = (TextView) alertLayout.findViewById(R.id.btn_ifsc);
+        btn_trantype.setText(transType);
+        btn_ifsc.setText(pozo.getIfsc());
         if (!pozo.getAccountno().equalsIgnoreCase("null"))
             btn_account.setText(pozo.getAccountno());
         else
@@ -897,6 +911,20 @@ public class BaseFragment extends Fragment {
         else
             notverified.setVisibility(View.GONE);
         ben_amount = (TextView) alertLayout.findViewById(R.id.input_amount_ben);
+        dialog.setContentView(alertLayout);
+    }
+
+    protected EditText btn_ifsc;
+
+    protected void customAddBeneneft(View alertLayout, String ifsc, String accountNo, String beneName, String beneBank, Dialog dialog, String transType) {
+        TextView btn_name = (TextView) alertLayout.findViewById(R.id.neftbtn_name);
+        TextView btn_account = (TextView) alertLayout.findViewById(R.id.neftbtn_account);
+        TextView btn_bank = (TextView) alertLayout.findViewById(R.id.neftbtn_bank);
+        btn_ifsc = (EditText) alertLayout.findViewById(R.id.edit_ifsc);
+        btn_ifsc.setText(ifsc);
+        btn_account.setText(accountNo);
+        btn_bank.setText(beneBank);
+        btn_name.setText(beneName);
         dialog.setContentView(alertLayout);
     }
 

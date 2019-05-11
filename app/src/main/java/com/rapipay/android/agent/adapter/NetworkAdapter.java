@@ -41,11 +41,11 @@ public class NetworkAdapter extends ArrayAdapter<NetworkTransferPozo>{
             viewHolder = new ViewHolder();
             LayoutInflater inflater = LayoutInflater.from(getContext());
             convertView = inflater.inflate(R.layout.net_adap_layout, parent, false);
-            viewHolder.btn_name = (AutofitTextView) convertView.findViewById(R.id.btn_name);
+//            viewHolder.btn_name = (AutofitTextView) convertView.findViewById(R.id.btn_name);
             viewHolder.btn_p_amounts = (AutofitTextView) convertView.findViewById(R.id.btn_p_amounts);
             viewHolder.p_transid = (AutofitTextView) convertView.findViewById(R.id.btn_p_transid);
             viewHolder.btn_p_bank = (AutofitTextView) convertView.findViewById(R.id.btn_p_bank);
-            viewHolder.agent_category = (AutofitTextView) convertView.findViewById(R.id.agent_category);
+//            viewHolder.agent_category = (AutofitTextView) convertView.findViewById(R.id.agent_category);
             result=convertView;
             convertView.setTag(viewHolder);
         } else {
@@ -53,13 +53,13 @@ public class NetworkAdapter extends ArrayAdapter<NetworkTransferPozo>{
             result=convertView;
         }
         viewHolder.btn_p_amounts.setText(dataSet.get(position).getMobileNo());
-        viewHolder.btn_name.setText(dataSet.get(position).getCompanyName());
-        viewHolder.p_transid.setText(dataSet.get(position).getAgentName());
+//        viewHolder.btn_name.setText(dataSet.get(position).getCompanyName());
+        viewHolder.p_transid.setText(dataSet.get(position).getAgentName()+"("+dataSet.get(position).getCompanyName()+")");
         if (dataSet.get(position).getAgentBalance().matches(".*\\d+.*")) {
             viewHolder.btn_p_bank.setText(format(dataSet.get(position).getAgentBalance()));
         } else
             viewHolder.btn_p_bank.setText(dataSet.get(position).getAgentBalance());
-        viewHolder.agent_category.setText(dataSet.get(position).getAgentCategory());
+//        viewHolder.agent_category.setText(dataSet.get(position).getAgentCategory());
         return convertView;
     }
 

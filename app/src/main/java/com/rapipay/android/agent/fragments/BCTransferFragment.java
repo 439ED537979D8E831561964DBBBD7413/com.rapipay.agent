@@ -57,7 +57,7 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
     ArrayList<LastTransactionPozo> transactionPozoArrayList;
     BeneficiaryDetailsPozo pozo;
     String amount = "", mobileNo;
-    TextView bene_number, bene_name, con_bene_number, newtin;
+    TextView bene_number, bene_name, newtin;
     float limit;
     TextView limit_title;
     BCBeneficiaryAdapter adapter;
@@ -134,7 +134,7 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
             @Override
             public void onClick(View v) {
                 ArrayList<String> list_bank = BaseCompactActivity.db.geBankDetails("");
-                customSpinner(bank_select, "Select Bank", list_bank, null);
+                customSpinner(bank_select, "Select Bank", list_bank, "");
             }
         });
         beneficiary_details.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), beneficiary_details, new ClickListener() {
@@ -142,7 +142,14 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
             public void onClick(View view, int position) {
                 if (beneficiaryDetailsPozoslist.size() != 0) {
                     pozo = beneficiaryDetailsPozoslist.get(position);
-                    customDialog_Common("Fund Transfer", null, pozo, "Sure you want to Transfer?", "");
+                    if (pozo.getIsNEFT().equalsIgnoreCase("N") && pozo.getIsIMPS().equalsIgnoreCase("Y"))
+                        customFundTransfer("Fund Transfer", null, pozo, "Sure you want to Transfer?", "IMPS");
+//                    else if (pozo.getIsNEFT().equalsIgnoreCase("Y")  && pozo.getIsIMPS().equalsIgnoreCase("Y"))
+                    else if (pozo.getIsNEFT().equalsIgnoreCase("Y") && pozo.getIsIMPS().equalsIgnoreCase("N"))
+                        customFundTransfer("Fund Transfer", null, pozo, "Sure you want to Transfer?", "NEFT");
+                    else
+                        customDialog_Common("BENLAYOUT", null, pozo, "Fund Transfer Type", null);
+//                    customDialog_Common("Fund Transfer", null, pozo, "Sure you want to Transfer?", "");
                 }
             }
 
@@ -299,7 +306,7 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
         return jsonObject;
     }
 
-    public JSONObject addBeneAccount(String accountNo, String ifsc_code, String bankAccountName, String CDFlag) {
+    public JSONObject addBeneAccount(String accountNo, String ifsc_code, String bankAccountName, String CDFlag, String transfer_type) {
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("serviceType", "ADD_BENEFICIARY_DETAILS");
@@ -314,6 +321,7 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
             jsonObject.put("senderMobile", input_mobile.getText().toString());
             jsonObject.put("ifscCode", ifsc_code);
             jsonObject.put("accountName", bankAccountName);
+            jsonObject.put("transferType", transfer_type);
             jsonObject.put("CDFlag", CDFlag);
             jsonObject.put("reqFor", "BC1");
             jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
@@ -406,7 +414,7 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
                 } else if (object.getString("serviceType").equalsIgnoreCase("GET_SERVICE_FEE")) {
                     customDialog_Common("Fund Transfer Confirmation", object, pozo, "Sure you want to Transfer?", input_mobile.getText().toString());
                 } else if (object.getString("serviceType").equalsIgnoreCase("Verify_Account")) {
-                    customDialog_Common("Account Verify Details", object, pozo, "VerifyLayout", input_name.getText().toString().trim());
+                    customDialog_Common("Account Verify Details", object, pozo, "VerifyLayout", object.getString("senderName").trim());
                 } else if (object.getString("serviceType").equalsIgnoreCase("Money_Transfer_Bene")) {
                     customDialog_Common("Fund Transfer Details", object, pozo, "VerifyLayout", input_name.getText().toString().trim());
                 } else if (object.getString("serviceType").equalsIgnoreCase("Money_Transfer")) {
@@ -432,10 +440,10 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
                     input_name.setEnabled(false);
                     if (object.has("remainingLimit") && !object.getString("remainingLimit").equalsIgnoreCase("null")) {
                         String split_limit[] = object.getString("remainingLimit").split("~");
-                        for(int i=0;i<split_limit.length;i++){
-                            limit = limit+Float.valueOf(split_limit[i]);
+                        for (int i = 0; i < split_limit.length; i++) {
+                            limit = limit + Float.valueOf(split_limit[i]);
                         }
-                        limit_title.setText("Available Limit : Rs " +object.getString("remainingLimit").replace("~","+"));
+                        limit_title.setText("Available Limit : Rs " + object.getString("remainingLimit").replace("~", "+"));
                         limit_title.setVisibility(View.VISIBLE);
                     }
 
@@ -486,7 +494,7 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
                 break;
             case R.id.btn_sender:
                 hideKeyboard(getActivity());
-                if (ImageUtils.commonName(input_name.getText().toString()) && !input_name.getText().toString().trim().endsWith("."))
+                if (!input_name.getText().toString().isEmpty())
                     new AsyncPostMethod(WebConfig.BCRemittanceApp, addSender().toString(), headerData, BCTransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans)).execute();
                 else
                     Toast.makeText(getActivity(), "Please enter correct text", Toast.LENGTH_SHORT).show();
@@ -538,20 +546,24 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
         AppCompatButton btn_regenerate = (AppCompatButton) alertLayout.findViewById(R.id.btn_regenerate);
         try {
             if (type.equalsIgnoreCase("FUNDTRANSFER")) {
-                btn_ok.setText("Cancel");
-                btn_cancel.setText("Add");
+                dialog_cancel.setVisibility(View.VISIBLE);
+//                btn_ok.setText("Add NEFT Beneficiary");
+                btn_ok.setVisibility(View.GONE);
+                btn_cancel.setTextSize(11);
+                btn_regenerate.setTextSize(11);
+                btn_cancel.setText("Add Beneficiary");
                 btn_regenerate.setText(getResources().getString(R.string.btnverify));
                 btn_regenerate.setVisibility(View.VISIBLE);
                 alertLayout.findViewById(R.id.bc_add_bene_details).setVisibility(View.VISIBLE);
                 bene_number = (TextView) alertLayout.findViewById(R.id.bc_bene_number);
                 bene_name = (TextView) alertLayout.findViewById(R.id.bc_bene_name);
-                con_bene_number = (TextView) alertLayout.findViewById(R.id.bc_con_bene_num);
+                con_ifsc = (TextView) alertLayout.findViewById(R.id.bc_con_bene_num);
                 bank_select_bene = (TextView) alertLayout.findViewById(R.id.bank_select_bene);
                 bank_select_bene.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         ArrayList<String> list_bank = BaseCompactActivity.db.geBankDetails("");
-                        customSpinner(bank_select_bene, "Select Bank", list_bank, null);
+                        customSpinner(bank_select_bene, "Select Bank", list_bank, "BC");
                     }
                 });
                 newtin = (EditText) alertLayout.findViewById(R.id.newpin);
@@ -569,23 +581,27 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
                 if (bank_select_bene.getText().toString().equalsIgnoreCase("Select Bank")) {
                     bank_select_bene.setError("Please enter mandatory field");
                     bank_select_bene.requestFocus();
-                } else if (!ImageUtils.commonAccount(bene_number.getText().toString(), 5, 30)) {
+                } else if (!ImageUtils.commonAccount(bene_number.getText().toString(), 8, 30)) {
                     bene_number.setError("Please enter valid beneficiary account number");
                     bene_number.requestFocus();
                 } else if (bene_name.getText().toString().isEmpty()) {
                     bene_name.setError("Please enter valid data");
                     bene_name.requestFocus();
-                } else if (!ImageUtils.commonAccount(con_bene_number.getText().toString(), 5, 30)) {
-                    con_bene_number.setError("Please enter valid confirm beneficiary account number");
-                    con_bene_number.requestFocus();
-                } else if (!bene_number.getText().toString().equalsIgnoreCase(con_bene_number.getText().toString())) {
-                    con_bene_number.setError("Account number not matched");
-                    con_bene_number.requestFocus();
+                } else if (isNEFT && !con_ifsc.getText().toString().matches("^[a-zA-Z0-9]{1,50}$")) {
+                    con_ifsc.setError("Please enter valid IFSC number");
+                    con_ifsc.requestFocus();
+//                } else if (!bene_number.getText().toString().equalsIgnoreCase(con_bene_number.getText().toString())) {
+//                    con_bene_number.setError("Account number not matched");
+//                    con_bene_number.requestFocus();
                 } else {
                     dialognew.dismiss();
-                    String condition = "where " + RapipayDB.COLOMN__BANK_NAME + "='" + bank_select_bene.getText().toString() + "'";
-                    ifsc_code = BaseCompactActivity.db.geBankIFSC(condition).get(0);
-                    new AsyncPostMethod(WebConfig.BCRemittanceApp, addBeneAccount(bene_number.getText().toString(), ifsc_code, bene_name.getText().toString(), "D").toString(), headerData, BCTransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans)).execute();
+                    if (isNEFT && con_ifsc.getText().toString().matches("^[a-zA-Z0-9]{1,50}$"))
+                        new AsyncPostMethod(WebConfig.BCRemittanceApp, addBeneAccount(bene_number.getText().toString(), con_ifsc.getText().toString(), bene_name.getText().toString(), "D", "NEFT").toString(), headerData, BCTransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans)).execute();
+                    else if (!isNEFT) {
+                        String condition = "where " + RapipayDB.COLOMN__BANK_NAME + "='" + bank_select_bene.getText().toString() + "'";
+                        ifsc_code = BaseCompactActivity.db.geBankIFSC(condition).get(0);
+                        new AsyncPostMethod(WebConfig.BCRemittanceApp, addBeneAccount(bene_number.getText().toString(), ifsc_code, bene_name.getText().toString(), "D", "IMPS").toString(), headerData, BCTransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans)).execute();
+                    }
                 }
             }
         });
@@ -598,32 +614,63 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
                 } else if (!ImageUtils.commonAccount(bene_number.getText().toString(), 5, 30)) {
                     bene_number.setError("Please enter valid beneficiary account number");
                     bene_number.requestFocus();
-                } else if (!ImageUtils.commonAccount(con_bene_number.getText().toString(), 5, 30)) {
-                    con_bene_number.setError("Please enter valid confirm beneficiary account number");
-                    con_bene_number.requestFocus();
-                } else if (!bene_number.getText().toString().equalsIgnoreCase(con_bene_number.getText().toString())) {
-                    con_bene_number.setError("Account number not matched");
-                    con_bene_number.requestFocus();
+                } else if (isNEFT && !con_ifsc.getText().toString().matches("^[a-zA-Z0-9]{1,50}$")) {
+                    con_ifsc.setError("Please enter valid IFSC number");
+                    con_ifsc.requestFocus();
+//                } else if (!bene_number.getText().toString().equalsIgnoreCase(con_bene_number.getText().toString())) {
+//                    con_bene_number.setError("Account number not matched");
+//                    con_bene_number.requestFocus();
 //                } else if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && (newtin.getText().toString().isEmpty() || newtin.getText().toString().length() != 4)) {
 //                    newtin.setError("Please enter TPIN");
 //                    newtin.requestFocus();
                 } else {
                     dialognew.dismiss();
-                    String condition = "where " + RapipayDB.COLOMN__BANK_NAME + "='" + bank_select_bene.getText().toString() + "'";
-                    ifsc_code = BaseCompactActivity.db.geBankIFSC(condition).get(0);
+                    if (isNEFT && con_ifsc.getText().toString().matches("^[a-zA-Z0-9]{1,50}$"))
+                        new AsyncPostMethod(WebConfig.BCRemittanceApp, verify_Account(con_ifsc.getText().toString(), bene_number.getText().toString()).toString(), headerData, BCTransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans)).execute();
+                    else if (!isNEFT) {
+                        String condition = "where " + RapipayDB.COLOMN__BANK_NAME + "='" + bank_select_bene.getText().toString() + "'";
+                        ifsc_code = BaseCompactActivity.db.geBankIFSC(condition).get(0);
 //                    if (newtin.getText().toString().isEmpty())
-                    new AsyncPostMethod(WebConfig.BCRemittanceApp, verify_Account(ifsc_code, bene_number.getText().toString()).toString(), headerData, BCTransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans)).execute();
+                        new AsyncPostMethod(WebConfig.BCRemittanceApp, verify_Account(ifsc_code, bene_number.getText().toString()).toString(), headerData, BCTransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans)).execute();
+                    }
 //                    else
 //                        new AsyncPostMethod(WebConfig.BCRemittanceApp, verify_Account(ifsc_code, bene_number.getText().toString(), newtin.getText().toString()).toString(), headerData, FundTransferActivity.this, getString(R.string.responseTimeOutTrans)).execute();
                 }
             }
         });
-        btn_ok.setOnClickListener(new View.OnClickListener() {
+        dialog_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dialognew.dismiss();
             }
         });
+//        btn_ok.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if (bank_select_bene.getText().toString().equalsIgnoreCase("Select Bank")) {
+//                    bank_select_bene.setError("Please enter mandatory field");
+//                    bank_select_bene.requestFocus();
+//                } else if (!ImageUtils.commonAccount(bene_number.getText().toString(), 8, 30)) {
+//                    bene_number.setError("Please enter valid beneficiary account number");
+//                    bene_number.requestFocus();
+//                } else if (bene_name.getText().toString().isEmpty()) {
+//                    bene_name.setError("Please enter valid data");
+//                    bene_name.requestFocus();
+////                } else if (!ImageUtils.commonAccount(con_bene_number.getText().toString(), 8, 30)) {
+////                    con_bene_number.setError("Please enter valid confirm beneficiary account number");
+////                    con_bene_number.requestFocus();
+////                } else if (!bene_number.getText().toString().equalsIgnoreCase(con_bene_number.getText().toString())) {
+////                    con_bene_number.setError("Account number not matched");
+////                    con_bene_number.requestFocus();
+//                } else {
+//                    dialognew.dismiss();
+//                    String condition = "where " + RapipayDB.COLOMN__BANK_NAME + "='" + bank_select_bene.getText().toString() + "'";
+//                    ifsc_code = BaseCompactActivity.db.geBankIFSC(condition).get(0);
+//                    customAddneft("Fund Transfer",ifsc_code, bene_number.getText().toString(),"Add Beneficiary?",bene_name.getText().toString(),bank_select_bene.getText().toString());
+////                    customFundTransfer("Fund Transfer", null, pozo, "Sure you want to Transfer?", btn_ok.getText().toString());
+//                }
+//            }
+//        });
         dialognew.show();
         Window window = dialognew.getWindow();
         window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -706,7 +753,7 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
             for (int i = 0; i < array.length(); i++) {
                 JSONObject object = array.getJSONObject(i);
                 if (object.getString("bc_BENE_ID").isEmpty() || !object.getString("bc_BENE_ID").equalsIgnoreCase("null"))
-                    beneficiaryDetailsPozoslist.add(new BeneficiaryDetailsPozo(object.getString("bank_ACCOUNT_NAME"), object.getString("account_NUMBER"), object.getString("account_IFSC"), object.getString("bank_Name"), object.getString("bc_BENE_ID")));
+                    beneficiaryDetailsPozoslist.add(new BeneficiaryDetailsPozo(object.getString("bank_ACCOUNT_NAME"), object.getString("account_NUMBER"), object.getString("account_IFSC"), object.getString("bank_Name"), object.getString("bc_BENE_ID"), object.getString("isVerified"), object.getString("isIMPS"), object.getString("isNEFT")));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -756,6 +803,8 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
             jsonObject.put("mobileNumber", input_mobile.getText().toString());
             jsonObject.put("beneficiaryId", beneficiaryId);
             jsonObject.put("reqFor", "BC1");
+            jsonObject.put("transferType", transfer_type);
+            jsonObject.put("IFSC", pozo.getIfsc());
             if (newtpin.getText().toString().isEmpty())
                 jsonObject.put("tPin", "");
             else
@@ -773,15 +822,132 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
 
     }
 
+    protected void customAddneft(final String type, String ifsc, final String accountNo, String msg, final String beneName, String beneBank) {
+        final Dialog dialog = new Dialog(getActivity());
+        LayoutInflater inflater = getLayoutInflater();
+        View alertLayout = inflater.inflate(R.layout.custom_layout_common, null);
+        alertLayout.setKeepScreenOn(true);
+        TextView text = (TextView) alertLayout.findViewById(R.id.dialog_title);
+        text.setText(msg);
+        TextView dialog_cancel = (TextView) alertLayout.findViewById(R.id.dialog_cancel);
+        AppCompatButton btn_cancel = (AppCompatButton) alertLayout.findViewById(R.id.btn_cancel);
+        AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
+        if (type.equalsIgnoreCase("Fund Transfer")) {
+            alertLayout.findViewById(R.id.addneftben_layout).setVisibility(View.VISIBLE);
+            customAddBeneneft(alertLayout, ifsc, accountNo, beneName, beneBank, dialog, "NEFT");
+        }
+        dialog.setCancelable(false);
+        btn_ok.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hideKeyboard(getActivity());
+                if (type.equalsIgnoreCase("Fund Transfer")) {
+                    if (btn_ifsc.getText().toString().isEmpty()) {
+                        btn_ifsc.setError("Please enter valid IFSC Code.");
+                        btn_ifsc.requestFocus();
+                    } else {
+//                        transfer_type=input;
+                        new AsyncPostMethod(WebConfig.BCRemittanceApp, addBeneAccount(accountNo, btn_ifsc.getText().toString(), beneName, "D", "NEFT").toString(), headerData, BCTransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans)).execute();
+                        dialog.dismiss();
+                    }
+                }
+            }
+        });
+        btn_cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                bank_select.setText("Select Bank");
+                input_account.setText("");
+                input_amount.setText("");
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
+        Window window = dialog.getWindow();
+        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+    }
+
+    String transfer_type;
+
+    protected void customFundTransfer(final String type, final JSONObject object, Object ob, String msg, final String input) {
+        final Dialog dialog = new Dialog(getActivity());
+        LayoutInflater inflater = getLayoutInflater();
+        View alertLayout = inflater.inflate(R.layout.custom_layout_common, null);
+        alertLayout.setKeepScreenOn(true);
+        TextView text = (TextView) alertLayout.findViewById(R.id.dialog_title);
+        text.setText(type);
+        TextView dialog_cancel = (TextView) alertLayout.findViewById(R.id.dialog_cancel);
+        AppCompatButton btn_cancel = (AppCompatButton) alertLayout.findViewById(R.id.btn_cancel);
+        AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
+        if (type.equalsIgnoreCase("Fund Transfer")) {
+            alertLayout.findViewById(R.id.ben_layout).setVisibility(View.VISIBLE);
+            customDialog_Ben(alertLayout, (BeneficiaryDetailsPozo) ob, dialog, input);
+        }
+        dialog.setCancelable(false);
+        btn_ok.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hideKeyboard(getActivity());
+                if (type.equalsIgnoreCase("Fund Transfer")) {
+                    if (!ImageUtils.commonAmount(ben_amount.getText().toString())) {
+                        ben_amount.setError("Please enter valid amount.");
+                        ben_amount.requestFocus();
+                    } else if (Integer.parseInt(ben_amount.getText().toString()) > 25000) {
+                        ben_amount.setError("Maximum transfer amount would be 25000.");
+                        ben_amount.requestFocus();
+                    } else if (Integer.parseInt(ben_amount.getText().toString()) > limit) {
+                        ben_amount.setError("Maximum transfer amount would be " + limit + ".");
+                        ben_amount.requestFocus();
+                    } else {
+                        transfer_type = input;
+                        new AsyncPostMethod(WebConfig.BCRemittanceApp, service_fee(ben_amount.getText().toString(), "Money_Transfer_Bene").toString(), headerData, BCTransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans)).execute();
+                        dialog.dismiss();
+                    }
+                }
+            }
+        });
+        btn_cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                bank_select.setText("Select Bank");
+                input_account.setText("");
+                input_amount.setText("");
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
+        Window window = dialog.getWindow();
+        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+    }
+
     protected void customDialog_Common(final String type, final JSONObject object, Object ob, String msg, String input) {
         dialog = new Dialog(getActivity());
         LayoutInflater inflater = getLayoutInflater();
         View alertLayout = inflater.inflate(R.layout.custom_layout_common, null);
         alertLayout.setKeepScreenOn(true);
         TextView text = (TextView) alertLayout.findViewById(R.id.dialog_title);
-        text.setText(type);
-        AppCompatButton btn_cancel = (AppCompatButton) alertLayout.findViewById(R.id.btn_cancel);
-        AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
+        text.setText(msg);
+        TextView dialog_cancel = (TextView) alertLayout.findViewById(R.id.dialog_cancel);
+        final AppCompatButton btn_cancel = (AppCompatButton) alertLayout.findViewById(R.id.btn_cancel);
+        final AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
+        if (type.equalsIgnoreCase("BENLAYOUT")) {
+            btn_cancel.setText("NEFT");
+            btn_cancel.setTextSize(10);
+            btn_ok.setText("IMPS");
+            btn_ok.setTextSize(10);
+            if (pozo.getIsIMPS().equalsIgnoreCase("Y") && pozo.getIsNEFT().equalsIgnoreCase("Y")) {
+                btn_ok.setVisibility(View.VISIBLE);
+                btn_cancel.setVisibility(View.VISIBLE);
+            } else if (!pozo.getIsNEFT().equalsIgnoreCase("Y")) {
+                btn_cancel.setVisibility(View.GONE);
+                btn_ok.setVisibility(View.VISIBLE);
+            } else if (!pozo.getIsIMPS().equalsIgnoreCase("Y")) {
+                btn_ok.setVisibility(View.GONE);
+                btn_cancel.setVisibility(View.VISIBLE);
+            }
+            dialog_cancel.setVisibility(View.VISIBLE);
+            dialog.setContentView(alertLayout);
+        }
         try {
             if (type.equalsIgnoreCase("Fund Transfer Confirmation")) {
                 alertLayout.findViewById(R.id.custom_service).setVisibility(View.VISIBLE);
@@ -794,7 +960,7 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
                 }
             } else if (type.equalsIgnoreCase("Fund Transfer")) {
                 alertLayout.findViewById(R.id.ben_layout).setVisibility(View.VISIBLE);
-                customDialog_Ben(alertLayout, (BeneficiaryDetailsPozo) ob);
+                customDialog_Ben(alertLayout, (BeneficiaryDetailsPozo) ob, dialog, "");
             } else if (type.equalsIgnoreCase("Beneficiary Details")) {
                 btn_cancel.setVisibility(View.VISIBLE);
                 customView(alertLayout, msg, dialog);
@@ -823,7 +989,10 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
             @Override
             public void onClick(View v) {
                 hideKeyboard(getActivity());
-                if (type.equalsIgnoreCase("Fund Transfer Confirmation"))
+                if (type.equalsIgnoreCase("BENLAYOUT")) {
+                    customFundTransfer("Fund Transfer", null, pozo, "Sure you want to Transfer?", btn_ok.getText().toString());
+                    dialog.dismiss();
+                } else if (type.equalsIgnoreCase("Fund Transfer Confirmation"))
                     try {
                         if (!object.getString("subType").equalsIgnoreCase("Money_Transfer")) {
                             if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && newtpin.getText().toString().length() == 4) {
@@ -870,7 +1039,7 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
                     dialog.dismiss();
                     if (type.equalsIgnoreCase("Account Verify Details")) {
                         try {
-                            new AsyncPostMethod(WebConfig.BCRemittanceApp, addBeneAccount(object.getString("accountNo"), object.getString("ifscCode"), object.getString("bankAccountName"), "C").toString(), headerData, BCTransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans)).execute();
+                            new AsyncPostMethod(WebConfig.BCRemittanceApp, addBeneAccount(object.getString("accountNo"), object.getString("ifscCode"), object.getString("bankAccountName"), "C", "IMPS").toString(), headerData, BCTransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans)).execute();
 //                            alertDialog.dismiss();
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -882,9 +1051,18 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
         btn_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (type.equalsIgnoreCase("BENLAYOUT")) {
+                    customFundTransfer("Fund Transfer", null, pozo, "Sure you want to Transfer?", btn_cancel.getText().toString());
+                }
                 bank_select.setText("Select Bank");
                 input_account.setText("");
                 input_amount.setText("");
+                dialog.dismiss();
+            }
+        });
+        dialog_cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 dialog.dismiss();
             }
         });

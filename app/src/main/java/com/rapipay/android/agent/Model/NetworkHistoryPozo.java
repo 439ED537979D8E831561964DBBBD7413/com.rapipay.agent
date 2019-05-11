@@ -6,12 +6,32 @@ public class NetworkHistoryPozo {
     String requestAmount;
     String creditID;
     String createdOn;
+    String sysRemarks;
+    String requestType;
 
-    public NetworkHistoryPozo(String agentID, String requestAmount, String creditID, String createdOn) {
+    public NetworkHistoryPozo(String agentID, String requestAmount, String creditID, String createdOn, String sysRemarks, String requestType) {
         this.agentID = agentID;
         this.requestAmount = requestAmount;
         this.creditID = creditID;
         this.createdOn = createdOn;
+        this.sysRemarks = sysRemarks;
+        this.requestType = requestType;
+    }
+
+    public String getRequestType() {
+        return requestType;
+    }
+
+    public void setRequestType(String requestType) {
+        this.requestType = requestType;
+    }
+
+    public String getSysRemarks() {
+        return sysRemarks;
+    }
+
+    public void setSysRemarks(String sysRemarks) {
+        this.sysRemarks = sysRemarks;
     }
 
     public String getAgentID() {

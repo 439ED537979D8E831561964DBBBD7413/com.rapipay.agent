@@ -100,7 +100,7 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
             public void onClick(View v) {
                 String condition = "where " + RapipayDB.COLOMN_CREDITBANK + "='Y'";
                 ArrayList<String> list_bank = BaseCompactActivity.db.geBankDetails(condition);
-                customSpinner(bank_select, "Select Bank", list_bank, null);
+                customSpinner(bank_select, "Select Bank", list_bank,"");
             }
         });
         list_payment = BaseCompactActivity.db.getPaymenttDetails();

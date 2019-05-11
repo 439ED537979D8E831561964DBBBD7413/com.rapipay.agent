@@ -203,6 +203,56 @@
                                 android:textColor="@color/black"
                                 android:textSize="12sp" />
                         </LinearLayout>
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_margin="3sp"
+                            android:orientation="horizontal"
+                            android:weightSum="800">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="230"
+                                android:inputType="text"
+                                android:text="IFSC"
+                                android:textSize="12sp" />
+
+                            <TextView
+                                android:id="@+id/btn_ifsc"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="570"
+                                android:onClick="onClick"
+                                android:text="@string/p_bank"
+                                android:textColor="@color/black"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_margin="3sp"
+                            android:orientation="horizontal"
+                            android:weightSum="800">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="230"
+                                android:inputType="text"
+                                android:text="Transfer Type"
+                                android:textSize="12sp" />
+
+                            <TextView
+                                android:id="@+id/btn_trantype"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="570"
+                                android:onClick="onClick"
+                                android:text="@string/p_bank"
+                                android:textColor="@color/black"
+                                android:textSize="12sp" />
+                        </LinearLayout>
                     </LinearLayout>
 
                     <android.support.design.widget.TextInputLayout
@@ -229,6 +279,125 @@
                         android:textColor="@color/red"
                         android:textSize="14dp"
                         android:visibility="gone" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/addneftben_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="5dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_margin="3sp"
+                            android:orientation="horizontal"
+                            android:weightSum="800">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="230"
+                                android:inputType="text"
+                                android:text="@string/p_accountno"
+                                android:textSize="12sp" />
+
+                            <TextView
+                                android:id="@+id/neftbtn_account"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="570"
+                                android:onClick="onClick"
+                                android:text="@string/p_accountno"
+                                android:textColor="@color/black"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_margin="3sp"
+                            android:orientation="horizontal"
+                            android:weightSum="800">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="230"
+                                android:inputType="text"
+                                android:text="@string/p_names"
+                                android:textSize="12sp" />
+
+                            <TextView
+                                android:id="@+id/neftbtn_name"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="570"
+                                android:onClick="onClick"
+                                android:text="@string/p_names"
+                                android:textColor="@color/black"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_margin="3sp"
+                            android:orientation="horizontal"
+                            android:weightSum="800">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="230"
+                                android:inputType="text"
+                                android:text="@string/p_bank"
+                                android:textSize="12sp" />
+
+                            <TextView
+                                android:id="@+id/neftbtn_bank"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="570"
+                                android:onClick="onClick"
+                                android:text="@string/p_bank"
+                                android:textColor="@color/black"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_margin="3sp"
+                            android:orientation="horizontal"
+                            android:weightSum="800">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="230"
+                                android:inputType="text"
+                                android:text="IFSC"
+                                android:textSize="12sp" />
+
+                            <EditText
+                                android:id="@+id/edit_ifsc"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="570"
+                                android:onClick="onClick"
+                                android:text="@string/p_bank"
+                                android:textColor="@color/black"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+                    </LinearLayout>
 
                 </LinearLayout>
 
@@ -356,6 +525,13 @@
                             android:maxLength="13"
                             android:textSize="16dp" />
                     </android.support.design.widget.TextInputLayout>
+                    <EditText
+                        android:id="@+id/remarks"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Enter Remarks"
+                        android:textSize="16dp"
+                        android:visibility="gone"/>
                     <EditText
                         android:id="@+id/newtpinss"
                         android:layout_width="match_parent"

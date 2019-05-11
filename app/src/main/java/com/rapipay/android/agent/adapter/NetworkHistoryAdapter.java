@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 
 import com.rapipay.android.agent.Model.NetworkHistoryPozo;
 import com.rapipay.android.agent.R;
@@ -21,7 +22,8 @@ public class NetworkHistoryAdapter extends ArrayAdapter<NetworkHistoryPozo> {
     private Context context;
 
     public static class ViewHolder {
-        public AutofitTextView btn_p_bank, btn_name, p_transid, btn_p_amounts;
+        public AutofitTextView btn_p_bank, btn_name, p_transid, btn_p_amounts,sysRemarks;
+        LinearLayout mainlay;
     }
 
     public NetworkHistoryAdapter(ArrayList<NetworkHistoryPozo> items, Context context) {
@@ -56,19 +58,25 @@ public class NetworkHistoryAdapter extends ArrayAdapter<NetworkHistoryPozo> {
             viewHolder.btn_p_amounts = (AutofitTextView) view.findViewById(R.id.btn_p_amounts);
             viewHolder.p_transid = (AutofitTextView) view.findViewById(R.id.btn_p_transid);
             viewHolder.btn_p_bank = (AutofitTextView) view.findViewById(R.id.btn_p_bank);
+            viewHolder.sysRemarks = (AutofitTextView)view.findViewById(R.id.sysRemarks);
+            viewHolder.mainlay = (LinearLayout)view.findViewById(R.id.mainlay);
             view.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) view.getTag();
         }
-        if (mValues.get(position).getAgentID().contains("Reverse"))
-            viewHolder.btn_name.setBackgroundColor(context.getResources().getColor(R.color.received));
-        else if (mValues.get(position).getAgentID().contains("Received"))
-            viewHolder.btn_name.setBackgroundColor(context.getResources().getColor(R.color.reverse));
-        viewHolder.btn_p_amounts.setText(format(mValues.get(position).getRequestAmount()));
-
+        if (mValues.get(position).getRequestType().contains("Recieved From"))
+            viewHolder.mainlay.setBackgroundColor(context.getResources().getColor(R.color.receivedfrom));
+        else if (mValues.get(position).getRequestType().contains("Reversed BY"))
+            viewHolder.mainlay.setBackgroundColor(context.getResources().getColor(R.color.reverseby));
+        else if (mValues.get(position).getRequestType().contains("Given To"))
+            viewHolder.mainlay.setBackgroundColor(context.getResources().getColor(R.color.givento));
+        else if (mValues.get(position).getRequestType().contains("Reversed From"))
+            viewHolder.mainlay.setBackgroundColor(context.getResources().getColor(R.color.reversefrom));
+        viewHolder.btn_p_amounts.setText(mValues.get(position).getCreatedOn());
         viewHolder.btn_name.setText(mValues.get(position).getAgentID());
-        viewHolder.p_transid.setText(mValues.get(position).getCreditID());
-        viewHolder.btn_p_bank.setText(mValues.get(position).getCreatedOn());
+        viewHolder.p_transid.setText(mValues.get(position).getRequestAmount());
+        viewHolder.btn_p_bank.setText(mValues.get(position).getCreditID());
+        viewHolder.sysRemarks.setText(mValues.get(position).getSysRemarks());
         return view;
     }
 

@@ -14,7 +14,6 @@ import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import com.rapipay.android.agent.Model.NetworkHistoryPozo;
 import com.rapipay.android.agent.Model.RapiPayPozo;
@@ -37,7 +36,7 @@ import java.util.Calendar;
 
 import me.grantland.widget.AutofitTextView;
 
-public class NetworkHistoryFragment extends BaseFragment implements RequestHandler, View.OnClickListener,CustomInterface {
+public class NetworkHistoryFragment extends BaseFragment implements RequestHandler, View.OnClickListener, CustomInterface {
     View rv;
     private int first = 1, last = 25;
     private boolean isLoading;
@@ -69,7 +68,7 @@ public class NetworkHistoryFragment extends BaseFragment implements RequestHandl
     private void initialize(View view) {
         Calendar calendar = Calendar.getInstance();
         selectedDate = calendar.get(Calendar.DAY_OF_MONTH);
-        selectedMonth = calendar.get(Calendar.MONTH)+1;
+        selectedMonth = calendar.get(Calendar.MONTH) + 1;
         selectedYear = calendar.get(Calendar.YEAR);
         date2_text = (AutofitTextView) view.findViewById(R.id.date2);
         date2_text.setOnClickListener(this);
@@ -124,7 +123,7 @@ public class NetworkHistoryFragment extends BaseFragment implements RequestHandl
                 if (totalItemCount != 0 && totalItemCount == last && lastInScreen == totalItemCount && !isLoading) {
                     first = last + 1;
                     last += 25;
-                    new AsyncPostMethod(WebConfig.CommonReport, channel_request(first, last).toString(), headerData, NetworkHistoryFragment.this, getActivity(),getString(R.string.responseTimeOut)).execute();
+                    new AsyncPostMethod(WebConfig.CommonReport, channel_request(first, last).toString(), headerData, NetworkHistoryFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
                     isLoading = true;
                 }
             }
@@ -135,16 +134,17 @@ public class NetworkHistoryFragment extends BaseFragment implements RequestHandl
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_fund:
-                if (payee.isEmpty())
-                    Toast.makeText(getActivity(), "Please select type", Toast.LENGTH_SHORT).show();
-                else if (date2_text.getText().toString().isEmpty()) {
+//                if (payee.isEmpty())
+//                    Toast.makeText(getActivity(), "Please select type", Toast.LENGTH_SHORT).show();
+//                else
+                if (date2_text.getText().toString().isEmpty()) {
                     date2_text.setError("Please enter valid data");
                     date2_text.requestFocus();
                 } else if (date1_text.getText().toString().isEmpty()) {
                     date1_text.setError("Please enter valid data");
                     date1_text.requestFocus();
                 } else if (printDifference(mainDate(date2_text.getText().toString()), mainDate(date1_text.getText().toString())))
-                    new AsyncPostMethod(WebConfig.CommonReport, channel_request(first, last).toString(), headerData, NetworkHistoryFragment.this, getActivity(),getString(R.string.responseTimeOut)).execute();
+                    new AsyncPostMethod(WebConfig.CommonReport, channel_request(first, last).toString(), headerData, NetworkHistoryFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
                 break;
         }
     }
@@ -259,7 +259,7 @@ public class NetworkHistoryFragment extends BaseFragment implements RequestHandl
             jsonObject.put("fromDate", date2_text.getText().toString());
             jsonObject.put("toDate", date1_text.getText().toString());
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
-            jsonObject.put("roleType", payee);
+            jsonObject.put("roleType", "Payee");
             jsonObject.put("userMobile", list.get(0).getMobilno());
             jsonObject.put("fromIndex", String.valueOf(fromIndex));
             jsonObject.put("toIndex", String.valueOf(toIndex));
@@ -294,7 +294,7 @@ public class NetworkHistoryFragment extends BaseFragment implements RequestHandl
         try {
             for (int i = 0; i < array.length(); i++) {
                 JSONObject object = array.getJSONObject(i);
-                transactionPozoArrayList.add(new NetworkHistoryPozo(object.getString("agentID"), object.getString("requestAmount"), object.getString("creditID"), object.getString("createdOn")));
+                transactionPozoArrayList.add(new NetworkHistoryPozo(object.getString("requestID"), object.getString("debitAmount"), object.getString("creditAmount"), object.getString("createdOn"), object.getString("sysRemarks"),object.getString("requestType")));
             }
         } catch (Exception e) {
             e.printStackTrace();

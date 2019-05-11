@@ -24,7 +24,8 @@
             android:orientation="horizontal"
             android:layout_margin="3sp"
             android:weightSum="800"
-            android:focusable="false">
+            android:focusable="false"
+            android:visibility="gone">
 
             <TextView
                 android:layout_width="0dp"
@@ -147,7 +148,8 @@
             android:orientation="horizontal"
             android:layout_margin="3sp"
             android:focusable="false"
-            android:weightSum="800">
+            android:weightSum="800"
+            android:visibility="gone">
 
             <TextView
                 android:layout_width="0dp"

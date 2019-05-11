@@ -43,7 +43,7 @@ import me.grantland.widget.AutofitTextView;
 
 public class SettlementBankFragment extends BaseFragment implements WalletRequestHandler, View.OnClickListener, CustomInterface {
     private View rv = null;
-    EditText ifsc_text, userName, accountNumber;
+    EditText userName, accountNumber;
     String pageType, ifsc_code, filePath = "";
     TextView bank_select, account_verified;
     AutofitTextView image;
@@ -74,7 +74,7 @@ public class SettlementBankFragment extends BaseFragment implements WalletReques
     }
 
     private void initialize(View rv) {
-        ifsc_text = (EditText) rv.findViewById(R.id.input_ifsc);
+        con_ifsc = (EditText) rv.findViewById(R.id.input_ifsc);
         userName = (EditText) rv.findViewById(R.id.input_username);
         accountNumber = (EditText) rv.findViewById(R.id.input_accountNo);
         bank_select = (TextView) rv.findViewById(R.id.bank_select);
@@ -88,7 +88,7 @@ public class SettlementBankFragment extends BaseFragment implements WalletReques
             @Override
             public void onClick(View v) {
                 ArrayList<String> list_bank = BaseCompactActivity.db.geBankDetails("");
-                customSpinner(bank_select, "Select Bank", list_bank, ifsc_text);
+                customSpinner(bank_select, "Select Bank", list_bank, "");
             }
         });
         account_verified = (TextView) rv.findViewById(R.id.account_verified);
@@ -98,6 +98,9 @@ public class SettlementBankFragment extends BaseFragment implements WalletReques
         trans_details = (RecyclerView) rv.findViewById(R.id.trans_details);
         activeaccounts = (CardView) rv.findViewById(R.id.activeaccounts);
         deleteaccounts = (CardView) rv.findViewById(R.id.deleteaccounts);
+        rv.findViewById(R.id.addbanklayout).setVisibility(View.VISIBLE);
+        rv.findViewById(R.id.btn_ok).setVisibility(View.GONE);
+        image.setVisibility(View.VISIBLE);
     }
 
     public JSONObject verify_Account() {
@@ -134,9 +137,9 @@ public class SettlementBankFragment extends BaseFragment implements WalletReques
             jsonObject.put("transactionID", ImageUtils.miliSeconds());
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("agentID", list.get(0).getMobilno());
-            jsonObject.put("agentName", userName.getText().toString());
+            jsonObject.put("agentName", userName.getText().toString().trim());
             jsonObject.put("agentBankName", bank_select.getText().toString());
-            jsonObject.put("agentBankIFSC", ifsc_text.getText().toString());
+            jsonObject.put("agentBankIFSC", con_ifsc.getText().toString());
             jsonObject.put("bankAccountNO", accountNumber.getText().toString());
             jsonObject.put("confirmAccountNo", accountNumber.getText().toString());
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
@@ -228,7 +231,7 @@ public class SettlementBankFragment extends BaseFragment implements WalletReques
             last_tran_layout.setVisibility(View.VISIBLE);
             activeaccounts.setVisibility(View.VISIBLE);
             initializeTransAdapter(activeAccountList);
-        }else {
+        } else {
             last_tran_layout.setVisibility(View.GONE);
             activeaccounts.setVisibility(View.GONE);
         }
@@ -237,7 +240,7 @@ public class SettlementBankFragment extends BaseFragment implements WalletReques
             beneficiary_layout.setVisibility(View.VISIBLE);
             deleteaccounts.setVisibility(View.VISIBLE);
             initializeDeleteAdapter(deleteAccountList);
-        }else {
+        } else {
             beneficiary_layout.setVisibility(View.GONE);
             deleteaccounts.setVisibility(View.GONE);
         }
@@ -291,7 +294,7 @@ public class SettlementBankFragment extends BaseFragment implements WalletReques
                 } else if (bank_select.getText().toString().equalsIgnoreCase("Select Bank")) {
                     bank_select.setError("Please enter mandatory field");
                     bank_select.requestFocus();
-                } else if (!ImageUtils.commonAccount(accountNumber.getText().toString(), 5, 30)) {
+                } else if (!ImageUtils.commonAccount(accountNumber.getText().toString(), 8, 30)) {
                     accountNumber.setError("Please enter valid account number.");
                     accountNumber.requestFocus();
                 } else {
@@ -314,20 +317,32 @@ public class SettlementBankFragment extends BaseFragment implements WalletReques
                 } else if (bank_select.getText().toString().equalsIgnoreCase("Select Bank")) {
                     bank_select.setError("Please enter mandatory field");
                     bank_select.requestFocus();
-                } else if (!ImageUtils.commonAccount(accountNumber.getText().toString(), 5, 30)) {
+                } else if (!ImageUtils.commonAccount(accountNumber.getText().toString(), 8, 30)) {
                     accountNumber.setError("Please enter valid account number.");
                     accountNumber.requestFocus();
+                } else if (!con_ifsc.getText().toString().matches("^[a-zA-Z0-9]{1,50}$")) {
+                    con_ifsc.setError("Please enter valid IFSC number.");
+                    con_ifsc.requestFocus();
                 } else if (pageType.equalsIgnoreCase("S") && image.getText().toString().isEmpty()) {
                     image.setError("Please Select Image");
                     image.requestFocus();
                 } else {
-                    new WalletAsyncMethod(WebConfig.CRNF, addAgentBankDetails().toString(), headerData, SettlementBankFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "ADDBANKLIST").execute();
+//                    if (pageType.equalsIgnoreCase("S")) {
+//                        if (!accountAdded)
+                            new WalletAsyncMethod(WebConfig.CRNF, addAgentBankDetails().toString(), headerData, SettlementBankFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "ADDBANKLIST").execute();
+//                        else {
+//                            customDialog_Common("SESSIONEXPIRRED", null, null, "Error", "", "Request For add Settlement Bank Account is Already Pending.", SettlementBankFragment.this);
+//                        }
+//                    } else if (pageType.equalsIgnoreCase("P")) {
+//                        new WalletAsyncMethod(WebConfig.CRNF, addAgentBankDetails().toString(), headerData, SettlementBankFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "ADDBANKLIST").execute();
+//                    }
                 }
                 break;
             case R.id.images:
                 selectImage();
                 break;
         }
+
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -413,13 +428,12 @@ public class SettlementBankFragment extends BaseFragment implements WalletReques
     private void clearData() {
         userName.setText("");
         bank_select.setText("");
-        ifsc_text.setText("");
+        con_ifsc.setText("");
         accountNumber.setText("");
-        ifsc_text.setEnabled(true);
         account_verified.setVisibility(View.GONE);
-        rv.findViewById(R.id.addbanklayout).setVisibility(View.GONE);
-        rv.findViewById(R.id.btn_ok).setVisibility(View.VISIBLE);
-        image.setVisibility(View.GONE);
+        rv.findViewById(R.id.addbanklayout).setVisibility(View.VISIBLE);
+        rv.findViewById(R.id.btn_ok).setVisibility(View.GONE);
+        image.setVisibility(View.VISIBLE);
         image.setText("Upload Image");
         bank_select.setText("Select Bank");
     }

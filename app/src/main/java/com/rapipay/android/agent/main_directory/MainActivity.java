@@ -625,7 +625,7 @@ public class MainActivity extends BaseCompactActivity
                 } else if (object.getString("serviceType").equalsIgnoreCase("UPDATE_DOWNLAOD_DATA_STATUS")) {
                     loadUrl();
                 } else if (object.getString("serviceType").equalsIgnoreCase("GET_AGENT_BALANCE")) {
-                    bal.setText("Bal:-" + format(object.getString("agentBalance")));
+                    bal.setText("Bal: " + format(object.getString("agentBalance")));
                     bal.setVisibility(View.VISIBLE);
                 } else if (object.getString("serviceType").equalsIgnoreCase("GET_MASTER_DEVICE_DETAILS")) {
                     if (object.has("deviceList")) {

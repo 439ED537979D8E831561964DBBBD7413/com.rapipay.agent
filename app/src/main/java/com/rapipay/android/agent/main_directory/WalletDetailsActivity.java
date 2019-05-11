@@ -282,9 +282,9 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
                     } else if (!ImageUtils.commonAccount(input_account.getText().toString(), 5, 30)) {
                         input_account.setError("Please enter valid account number.");
                         input_account.requestFocus();
-                    } else if (!ImageUtils.commonRegex(input_ben_name.getText().toString(), 150, " ")) {
-                        input_ben_name.setError("Please enter mandatory field");
-                        input_ben_name.requestFocus();
+//                    } else if (!ImageUtils.commonRegex(input_ben_name.getText().toString(), 150, " ")) {
+//                        input_ben_name.setError("Please enter mandatory field");
+//                        input_ben_name.requestFocus();
 //                    } else if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && (newtpin.getText().toString().isEmpty() || newtpin.getText().toString().length() != 4)) {
 //                        newtpin.setError("Please enter TPIN");
 //                        newtpin.requestFocus();
@@ -306,7 +306,7 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
                     input_ben_name.setError("Please enter mandatory field");
                     input_ben_name.requestFocus();
                 } else
-                    new WalletAsyncMethod(WebConfig.WALLETTRANSFER_URL, processPayee("N", "N").toString(), headerData, WalletDetailsActivity.this, getString(R.string.responseTimeOutTrans), "ADDBENEFICIARY").execute();
+                    new WalletAsyncMethod(WebConfig.WALLETTRANSFER_URL, processPayee("N", "N",input_ben_name.getText().toString()).toString(), headerData, WalletDetailsActivity.this, getString(R.string.responseTimeOutTrans), "ADDBENEFICIARY").execute();
                 break;
             case R.id.reset:
                 reset();
@@ -574,7 +574,7 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
         return jsonObject;
     }
 
-    public JSONObject processPayee(String verificationTxnId, String verifyAccountFlag) {
+    public JSONObject processPayee(String verificationTxnId, String verifyAccountFlag,String senderName) {
         JSONObject jsonObject = new JSONObject();
         try {
             String condition = "where " + RapipayDB.COLOMN__BANK_NAME + "='" + bank_select.getText().toString() + "'";
@@ -584,7 +584,7 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
             jsonObject.put("typeMobileWeb", "mobile");
             jsonObject.put("txnRef", ImageUtils.miliSeconds());
             jsonObject.put("agentID", list.get(0).getMobilno());
-            jsonObject.put("beneficiaryName", input_ben_name.getText().toString());
+            jsonObject.put("beneficiaryName", senderName);
             jsonObject.put("accountId", input_account.getText().toString());
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
             jsonObject.put("senderMobileNo", input_mobile.getText().toString());
@@ -901,7 +901,7 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
 //                            if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && radio_Clicked.isEmpty()) {
 //                                Toast.makeText(WalletDetailsActivity.this, "Please select type", Toast.LENGTH_SHORT).show();
 //                            } else
-                            if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && newtpin.getText().toString().length() == 4) {
+                                if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && newtpin.getText().toString().length() == 4) {
                                 new WalletAsyncMethod(WebConfig.WALLETTRANSFER_URL, fund_transfer(beneficiaryDetailsPozoslist.get(benePosition), value, ben_amount.getText().toString()).toString(), headerData, WalletDetailsActivity.this, getString(R.string.responseTimeOutTrans), hitFrom).execute();
                                 dialog.dismiss();
                             } else if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && (newtpin.getText().toString().isEmpty() || newtpin.getText().toString().length() != 4)) {
@@ -922,7 +922,7 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
                             dialog.dismiss();
                         } else if (type.equalsIgnoreCase("VerifyLayout") || type.equalsIgnoreCase("KYCLAYOUTL")) {
                             if (object.getString("serviceType").equalsIgnoreCase("Verify_Account"))
-                                new WalletAsyncMethod(WebConfig.WALLETTRANSFER_URL, processPayee(transactionID, "Y").toString(), headerData, WalletDetailsActivity.this, getString(R.string.responseTimeOutTrans), "VERIFYACCOUNT").execute();
+                                new WalletAsyncMethod(WebConfig.WALLETTRANSFER_URL, processPayee(transactionID, "Y",object.getString("bankAccountName")).toString(), headerData, WalletDetailsActivity.this, getString(R.string.responseTimeOutTrans), "VERIFYACCOUNT").execute();
                             else
                                 new WalletAsyncMethod(WebConfig.WALLETTRANSFER_URL, getSender_Validate("").toString(), headerData, WalletDetailsActivity.this, getString(R.string.responseTimeOutTrans), "WALLETSTATUS").execute();
                             input_account.setText("");

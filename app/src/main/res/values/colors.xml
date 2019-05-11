@@ -7,8 +7,10 @@
     <color name="colorAccent">#000000</color>
     <color name="white">#FFFFFF</color>
     <color name="tab_color">#99292d</color>
-    <color name="received">#ea6c41</color>
-    <color name="reverse">#469408</color>
+    <color name="reversefrom">#90cfee</color>
+    <color name="receivedfrom">#b5dea0</color>
+    <color name="reverseby">#bf98e7</color>
+    <color name="givento">#f788cc</color>
 
     <color name="rapipaybuttoncolor">#2B2348</color>
     <color name="transparent_black">#66000000</color>
