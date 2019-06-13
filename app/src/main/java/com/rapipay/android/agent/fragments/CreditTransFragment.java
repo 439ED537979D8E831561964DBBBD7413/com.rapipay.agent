@@ -155,14 +155,17 @@ public class CreditTransFragment extends BaseFragment implements RequestHandler,
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_fund:
-                if (date2_text.getText().toString().isEmpty()) {
-                    date2_text.setError("Please enter valid data");
-                    date2_text.requestFocus();
-                } else if (date1_text.getText().toString().isEmpty()) {
-                    date1_text.setError("Please enter valid data");
-                    date1_text.requestFocus();
-                } else if (printDifference(mainDate(date2_text.getText().toString()), mainDate(date1_text.getText().toString())))
-                    new AsyncPostMethod(WebConfig.CommonReport, channel_request().toString(), headerData, CreditTransFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    if (date2_text.getText().toString().isEmpty()) {
+                        date2_text.setError("Please enter valid data");
+                        date2_text.requestFocus();
+                    } else if (date1_text.getText().toString().isEmpty()) {
+                        date1_text.setError("Please enter valid data");
+                        date1_text.requestFocus();
+                    } else if (printDifference(mainDate(date2_text.getText().toString()), mainDate(date1_text.getText().toString())))
+                        new AsyncPostMethod(WebConfig.CommonReport, channel_request().toString(), headerData, CreditTransFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
+                }
                 break;
         }
     }

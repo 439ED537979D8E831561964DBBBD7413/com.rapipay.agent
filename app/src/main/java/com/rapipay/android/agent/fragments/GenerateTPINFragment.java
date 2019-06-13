@@ -23,7 +23,7 @@ import com.rapipay.android.agent.utils.WebConfig;
 
 import org.json.JSONObject;
 
-public class GenerateTPINFragment extends BaseFragment implements View.OnClickListener,RequestHandler {
+public class GenerateTPINFragment extends BaseFragment implements View.OnClickListener, RequestHandler {
 
     View rv;
     EditText enterpin, confirmpin;
@@ -52,17 +52,21 @@ public class GenerateTPINFragment extends BaseFragment implements View.OnClickLi
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_login:
-                if (enterpin.length() < 4) {
-                    enterpin.setError("Please enter 4 digin pin");
-                    enterpin.requestFocus();
-                }else if (confirmpin.length() < 4) {
-                    confirmpin.setError("Please enter 4 digin pin");
-                    confirmpin.requestFocus();
-                }else if (!enterpin.getText().toString().equalsIgnoreCase(confirmpin.getText().toString())) {
-                    confirmpin.setError("TPIN Not matched");
-                    confirmpin.requestFocus();
-                }else
-                    new AsyncPostMethod(WebConfig.LOGIN_URL, getJson_Validate().toString(), "", GenerateTPINFragment.this, getActivity(),getString(R.string.responseTimeOut)).execute();
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    if (enterpin.length() < 4) {
+                        enterpin.setError("Please enter 4 digin pin");
+                        enterpin.requestFocus();
+                    } else if (confirmpin.length() < 4) {
+                        confirmpin.setError("Please enter 4 digin pin");
+                        confirmpin.requestFocus();
+                    } else if (!enterpin.getText().toString().equalsIgnoreCase(confirmpin.getText().toString())) {
+                        confirmpin.setError("TPIN Not matched");
+                        confirmpin.requestFocus();
+                    } else
+                        new AsyncPostMethod(WebConfig.LOGIN_URL, getJson_Validate().toString(), "", GenerateTPINFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
+                }
+                handlercontrol();
                 break;
         }
     }
@@ -89,7 +93,7 @@ public class GenerateTPINFragment extends BaseFragment implements View.OnClickLi
         return jsonObject;
     }
 
-    public JSONObject getVerifyOTP(String otp,String otpRefId) {
+    public JSONObject getVerifyOTP(String otp, String otpRefId) {
         JSONObject jsonObject = new JSONObject();
         if (list.size() != 0) {
             try {
@@ -122,9 +126,9 @@ public class GenerateTPINFragment extends BaseFragment implements View.OnClickLi
         try {
             if (object.getString("responseCode").equalsIgnoreCase("200")) {
                 if (object.getString("serviceType").equalsIgnoreCase("Insert_Txn_Pin")) {
-                    customDialog_Ben("OTPLAYOUT",object.getString("otpRefId"),"Enter OTP");
-                }else if (object.getString("serviceType").equalsIgnoreCase("VERIFY_TXN_PIN_OTP")) {
-                    customDialog_Ben("",object.getString("responseMessage"),"Alert");
+                    customDialog_Ben("OTPLAYOUT", object.getString("otpRefId"), "Enter OTP");
+                } else if (object.getString("serviceType").equalsIgnoreCase("VERIFY_TXN_PIN_OTP")) {
+                    customDialog_Ben("", object.getString("responseMessage"), "Alert");
                 }
             }
         } catch (Exception e) {
@@ -150,7 +154,7 @@ public class GenerateTPINFragment extends BaseFragment implements View.OnClickLi
             InputFilter[] filterArray = new InputFilter[1];
             filterArray[0] = new InputFilter.LengthFilter(12);
             otpView.setFilters(filterArray);
-        }else {
+        } else {
             TextView dialog_msg = (TextView) alertLayout.findViewById(R.id.dialog_msg);
             dialog_msg.setText(msg);
             dialog_msg.setVisibility(View.VISIBLE);
@@ -160,15 +164,19 @@ public class GenerateTPINFragment extends BaseFragment implements View.OnClickLi
         btn_ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (type.equalsIgnoreCase("OTPLAYOUT")) {
-                    new AsyncPostMethod(WebConfig.LOGIN_URL, getVerifyOTP(otpView.getText().toString(),msg).toString(), "", GenerateTPINFragment.this, getActivity(),getString(R.string.responseTimeOut)).execute();
-                }else {
-                    enterpin.setText("");
-                    confirmpin.setText("");
-                    enterpin.setHint("Enter New TPIN");
-                    confirmpin.setHint("Confirm New TPIN");
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    if (type.equalsIgnoreCase("OTPLAYOUT")) {
+                        new AsyncPostMethod(WebConfig.LOGIN_URL, getVerifyOTP(otpView.getText().toString(), msg).toString(), "", GenerateTPINFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
+                    } else {
+                        enterpin.setText("");
+                        confirmpin.setText("");
+                        enterpin.setHint("Enter New TPIN");
+                        confirmpin.setHint("Confirm New TPIN");
+                    }
+                    alertDialog.dismiss();
                 }
-                alertDialog.dismiss();
+                handlercontrol();
             }
         });
         btn_cancel.setOnClickListener(new View.OnClickListener() {

@@ -32,7 +32,7 @@ import java.util.Calendar;
 
 import me.grantland.widget.AutofitTextView;
 
-public class CreditTransHistActivity  extends BaseCompactActivity implements RequestHandler, View.OnClickListener, CustomInterface {
+public class CreditTransHistActivity extends BaseCompactActivity implements RequestHandler, View.OnClickListener, CustomInterface {
 
     AutofitTextView date1_text, date2_text;
     RecyclerView trans_details;
@@ -41,6 +41,7 @@ public class CreditTransHistActivity  extends BaseCompactActivity implements Req
     ImageView btn_fund;
     private int selectedDate, selectedMonth, selectedYear;
     String months = null, dayss = null;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,7 +52,7 @@ public class CreditTransHistActivity  extends BaseCompactActivity implements Req
     private void initialize() {
         Calendar calendar = Calendar.getInstance();
         selectedDate = calendar.get(Calendar.DAY_OF_MONTH);
-        selectedMonth = calendar.get(Calendar.MONTH)+1;
+        selectedMonth = calendar.get(Calendar.MONTH) + 1;
         selectedYear = calendar.get(Calendar.YEAR);
         heading = (TextView) findViewById(R.id.toolbar_title);
         heading.setText("Credit Fund History");
@@ -87,7 +88,7 @@ public class CreditTransHistActivity  extends BaseCompactActivity implements Req
         fromimage.setOnClickListener(fromDateClicked);
         fromimage.setColorFilter(getResources().getColor(R.color.colorPrimaryDark));
         if (printDifference(mainDate(date2_text.getText().toString()), mainDate(date1_text.getText().toString())))
-            new AsyncPostMethod(WebConfig.CommonReport, channel_request().toString(), headerData, CreditTransHistActivity.this,getString(R.string.responseTimeOut)).execute();
+            new AsyncPostMethod(WebConfig.CommonReport, channel_request().toString(), headerData, CreditTransHistActivity.this, getString(R.string.responseTimeOut)).execute();
     }
 
     protected View.OnClickListener fromDateClicked = new View.OnClickListener() {
@@ -139,11 +140,13 @@ public class CreditTransHistActivity  extends BaseCompactActivity implements Req
             dialog.show();
         }
     };
+
     @Override
     public void onBackPressed() {
         setBack_click(this);
         finish();
     }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -152,14 +155,18 @@ public class CreditTransHistActivity  extends BaseCompactActivity implements Req
                 finish();
                 break;
             case R.id.btn_fund:
-                if (date2_text.getText().toString().isEmpty()) {
-                    date2_text.setError("Please enter valid data");
-                    date2_text.requestFocus();
-                } else if (date1_text.getText().toString().isEmpty()) {
-                    date1_text.setError("Please enter valid data");
-                    date1_text.requestFocus();
-                } else if (printDifference(mainDate(date2_text.getText().toString()), mainDate(date1_text.getText().toString())))
-                    new AsyncPostMethod(WebConfig.CommonReport, channel_request().toString(), headerData, CreditTransHistActivity.this,getString(R.string.responseTimeOut)).execute();
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    if (date2_text.getText().toString().isEmpty()) {
+                        date2_text.setError("Please enter valid data");
+                        date2_text.requestFocus();
+                    } else if (date1_text.getText().toString().isEmpty()) {
+                        date1_text.setError("Please enter valid data");
+                        date1_text.requestFocus();
+                    } else if (printDifference(mainDate(date2_text.getText().toString()), mainDate(date1_text.getText().toString())))
+                        new AsyncPostMethod(WebConfig.CommonReport, channel_request().toString(), headerData, CreditTransHistActivity.this, getString(R.string.responseTimeOut)).execute();
+                }
+                handlercontrol();
                 break;
         }
     }

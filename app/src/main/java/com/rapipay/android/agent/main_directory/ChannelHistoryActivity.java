@@ -1,5 +1,6 @@
 package com.rapipay.android.agent.main_directory;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.View;
@@ -65,8 +66,11 @@ public class ChannelHistoryActivity extends BaseCompactActivity implements View.
         trans_details.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                ChannelHistoryPozo pozo = transactionPozoArrayList.get(position);
-                new AsyncPostMethod(WebConfig.WALLETRECEIPTURL, receipt_request(pozo).toString(), headerData, ChannelHistoryActivity.this, getString(R.string.responseTimeOut), "RECEIPTREQUEST").execute();
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    ChannelHistoryPozo pozo = transactionPozoArrayList.get(position);
+                    new AsyncPostMethod(WebConfig.WALLETRECEIPTURL, receipt_request(pozo).toString(), headerData, ChannelHistoryActivity.this, getString(R.string.responseTimeOut), "RECEIPTREQUEST").execute();
+                }handlercontrol();
             }
         });
         findViewById(R.id.todate).setOnClickListener(toDateClicked);
@@ -126,16 +130,20 @@ public class ChannelHistoryActivity extends BaseCompactActivity implements View.
                 finish();
                 break;
             case R.id.btn_fund:
-                if (date2_text.getText().toString().isEmpty()) {
-                    date2_text.setError("Please enter mandatory field");
-                    Toast.makeText(this, "Please enter mandatory field", Toast.LENGTH_SHORT).show();
-                } else if (date1_text.getText().toString().isEmpty()) {
-                    date1_text.setError("Please enter mandatory field");
-                    Toast.makeText(this, "Please enter mandatory field", Toast.LENGTH_SHORT).show();
-                } else if (printDifference(mainDate(date2_text.getText().toString()), mainDate(date1_text.getText().toString())))
-                    new AsyncPostMethod(WebConfig.CommonReport, channel_request(first, last).toString(), headerData, ChannelHistoryActivity.this, getString(R.string.responseTimeOut), "TRANSACTIONHISTORY").execute();
-                else
-                    Toast.makeText(ChannelHistoryActivity.this, "Please select correct date", Toast.LENGTH_SHORT).show();
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    if (date2_text.getText().toString().isEmpty()) {
+                        date2_text.setError("Please enter mandatory field");
+                        Toast.makeText(this, "Please enter mandatory field", Toast.LENGTH_SHORT).show();
+                    } else if (date1_text.getText().toString().isEmpty()) {
+                        date1_text.setError("Please enter mandatory field");
+                        Toast.makeText(this, "Please enter mandatory field", Toast.LENGTH_SHORT).show();
+                    } else if (printDifference(mainDate(date2_text.getText().toString()), mainDate(date1_text.getText().toString())))
+                        new AsyncPostMethod(WebConfig.CommonReport, channel_request(first, last).toString(), headerData, ChannelHistoryActivity.this, getString(R.string.responseTimeOut), "TRANSACTIONHISTORY").execute();
+                    else
+                        Toast.makeText(ChannelHistoryActivity.this, "Please select correct date", Toast.LENGTH_SHORT).show();
+                }
+                handlercontrol();
                 break;
         }
     }
@@ -185,11 +193,24 @@ public class ChannelHistoryActivity extends BaseCompactActivity implements View.
         }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (data != null) {
+            if (requestCode == 2) {
+                dialog.dismiss();
+            }
+        } else {
+            if (dialog != null)
+                dialog.dismiss();
+        }
+    }
+
     private void insertLastTransDetails(JSONArray array) {
         try {
             for (int i = 0; i < array.length(); i++) {
                 JSONObject object = array.getJSONObject(i);
-                transactionPozoArrayList.add(new ChannelHistoryPozo(object.getString("senderName") + " ( " + object.getString("mobileNo") + " )", object.getString("accountNo") + " ( " + object.getString("bankName") + " )", object.getString("requestAmt"), object.getString("txnStatus"), object.getString("txnDateTime"), object.getString("serviceProviderTXNID"), object.getString("transferType"), object.getString("userTxnId"), object.getString("serviceType"),object.getString("txnDateTime")));
+                transactionPozoArrayList.add(new ChannelHistoryPozo(object.getString("senderName") + " ( " + object.getString("mobileNo") + " )", object.getString("accountNo") + " ( " + object.getString("bankName") + " )", object.getString("requestAmt"), object.getString("txnStatus"), object.getString("txnDateTime"), object.getString("serviceProviderTXNID"), object.getString("transferType"), object.getString("userTxnId"), object.getString("serviceType"), object.getString("txnDateTime")));
             }
         } catch (Exception e) {
             e.printStackTrace();

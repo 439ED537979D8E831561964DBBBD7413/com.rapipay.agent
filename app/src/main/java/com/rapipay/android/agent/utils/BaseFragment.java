@@ -3,6 +3,7 @@ package com.rapipay.android.agent.utils;
 import android.Manifest;
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -19,6 +20,7 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -57,9 +59,11 @@ import com.rapipay.android.agent.adapter.PermissionCheckAdapter;
 import com.rapipay.android.agent.interfaces.CustomInterface;
 import com.rapipay.android.agent.main_directory.CameraKitActivity;
 import com.rapipay.android.agent.main_directory.LoginScreenActivity;
+import com.rapipay.android.agent.view.EnglishNumberToWords;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.jsoup.Connection;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -67,6 +71,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
@@ -75,7 +81,7 @@ import me.grantland.widget.AutofitTextView;
 
 public class BaseFragment extends Fragment {
     protected LocalStorage localStorage;
-    protected Dialog dialog, dialognew,dialognew1;
+    protected Dialog dialog, dialognew, dialognew1;
     //    protected AlertDialog alertDialog, newdialog;
     CustomInterface anInterface;
     protected boolean scan = false;
@@ -93,11 +99,21 @@ public class BaseFragment extends Fragment {
     ArrayList<HeaderePozo> bottom;
     LinearLayout main_layout;
     protected boolean isNEFT = false;
+    protected boolean btnstatus = false;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         return super.onCreateView(inflater, container, savedInstanceState);
+    }
+
+    protected void handlercontrol() {
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            public void run() {
+                btnstatus = false;
+            }
+        }, 1000);
     }
 
     protected void contactRead(Intent data, TextView input_number) {
@@ -244,6 +260,38 @@ public class BaseFragment extends Fragment {
         customDialog_Common("SESSIONEXPIRE", null, null, "Session Expired", null, "Your current session will get expired.", customInterface);
     }
 
+    protected void customDialog_Common(String msg) {
+        try {
+            final Dialog dialog = new Dialog(getActivity());
+            LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View alertLayout = inflater.inflate(R.layout.customdialoresponse, null);
+            TextView text = (TextView) alertLayout.findViewById(R.id.dialog_title);
+            text.setText(this.getResources().getString(R.string.Alert));
+            TextView dialog_msg = (TextView) alertLayout.findViewById(R.id.dialog_msg);
+            dialog_msg.setText(msg);
+            dialog_msg.setVisibility(View.VISIBLE);
+            alertLayout.findViewById(R.id.btn_cancel).setVisibility(View.GONE);
+            AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
+            dialog.setCancelable(false);
+            btn_ok.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    try {
+                        dialog.dismiss();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            dialog.setContentView(alertLayout);
+            dialog.show();
+            Window window = dialog.getWindow();
+            window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     protected void customDialog_Common(final String type, JSONObject object, final Object ob, String msg, final String input, String output, final CustomInterface anInterface) {
         this.anInterface = anInterface;
         dialog = new Dialog(getActivity());
@@ -321,52 +369,57 @@ public class BaseFragment extends Fragment {
         btn_ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (type.equalsIgnoreCase("PENDINGREFUND")) {
-                    anInterface.okClicked(input, ob);
-                    dialog.dismiss();
-                } else if (type.equalsIgnoreCase("KYCLAYOUTS")) {
-                    anInterface.okClicked(type, ob);
-                    dialog.dismiss();
-                } else if (type.equalsIgnoreCase("TERMCONDITION")) {
-                    anInterface.okClicked(type, ob);
-                    dialog.dismiss();
-                } else if (type.equalsIgnoreCase("KYCLAYOUTS")) {
-                    anInterface.okClicked(type, ob);
-                    dialog.dismiss();
-                } else if (type.equalsIgnoreCase("CREATEAGENT")) {
-                    if (first_name.getText().toString().isEmpty()) {
-                        first_name.setError("Please enter first name");
-                        first_name.requestFocus();
-                    } else if (last_name.getText().toString().isEmpty()) {
-                        last_name.setError("Please enter last name");
-                        last_name.requestFocus();
-                    } else if (mobile_num.getText().toString().length() != 10) {
-                        mobile_num.setError("Please enter mobile number");
-                        mobile_num.requestFocus();
-                    } else if (cree_address.getText().toString().isEmpty()) {
-                        cree_address.setError("Please enter address");
-                        cree_address.requestFocus();
-                    } else if (bank_select.getText().toString().isEmpty()) {
-                        bank_select.setError("Please enter bank");
-                        bank_select.requestFocus();
-                    } else if (pincode.getText().toString().length() != 6) {
-                        pincode.setError("Please enter pincode");
-                        pincode.requestFocus();
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    if (type.equalsIgnoreCase("PENDINGREFUND")) {
+                        anInterface.okClicked(input, ob);
+                        dialog.dismiss();
+                    } else if (type.equalsIgnoreCase("KYCLAYOUTS")) {
+                        anInterface.okClicked(type, ob);
+                        dialog.dismiss();
+                    } else if (type.equalsIgnoreCase("TERMCONDITION")) {
+                        anInterface.okClicked(type, ob);
+                        dialog.dismiss();
+                    } else if (type.equalsIgnoreCase("KYCLAYOUTS")) {
+                        anInterface.okClicked(type, ob);
+                        dialog.dismiss();
+                    } else if (type.equalsIgnoreCase("CREATEAGENT")) {
+                        if (first_name.getText().toString().isEmpty()) {
+                            first_name.setError("Please enter first name");
+                            first_name.requestFocus();
+                        } else if (last_name.getText().toString().isEmpty()) {
+                            last_name.setError("Please enter last name");
+                            last_name.requestFocus();
+                        } else if (mobile_num.getText().toString().length() != 10) {
+                            mobile_num.setError("Please enter mobile number");
+                            mobile_num.requestFocus();
+                        } else if (cree_address.getText().toString().isEmpty()) {
+                            cree_address.setError("Please enter address");
+                            cree_address.requestFocus();
+                        } else if (pincode.getText().toString().length() != 6) {
+                            pincode.setError("Please enter pincode");
+                            pincode.requestFocus();
+                        } else {
+                            anInterface.okClicked(type, ob);
+                            dialog.dismiss();
+                        }
                     } else {
                         anInterface.okClicked(type, ob);
                         dialog.dismiss();
                     }
-                } else {
-                    anInterface.okClicked(type, ob);
-                    dialog.dismiss();
                 }
+                handlercontrol();
             }
         });
         btn_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                anInterface.cancelClicked(type, ob);
-                dialog.dismiss();
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    anInterface.cancelClicked(type, ob);
+                    dialog.dismiss();
+                }
+                handlercontrol();
             }
         });
         btn_regenerate.setOnClickListener(new View.OnClickListener() {
@@ -426,15 +479,23 @@ public class BaseFragment extends Fragment {
         btn_ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                anInterface.okClicked(type, ob);
-                dialognew.dismiss();
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    anInterface.okClicked(type, ob);
+                    dialognew.dismiss();
+                }
+                handlercontrol();
             }
         });
         btn_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                anInterface.cancelClicked(type, ob);
-                dialognew.dismiss();
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    anInterface.cancelClicked(type, ob);
+                    dialognew.dismiss();
+                }
+                handlercontrol();
             }
         });
         btn_regenerate.setOnClickListener(new View.OnClickListener() {
@@ -470,6 +531,27 @@ public class BaseFragment extends Fragment {
         AppCompatButton btn_cancel = (AppCompatButton) alertLayout.findViewById(R.id.btn_cancel);
         AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
         ListView list_view_with_checkbox = (ListView) alertLayout.findViewById(R.id.list_view_with_checkbox);
+        final TextView input_text = (TextView) alertLayout.findViewById(R.id.input_text);
+        increaselimit.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s.length()!=0 && s.length()<10) {
+                    input_text.setText(new EnglishNumberToWords().convert(Integer.parseInt(s.toString())));
+                    input_text.setVisibility(View.VISIBLE);
+                }else
+                    input_text.setVisibility(View.GONE);
+            }
+        });
 //        list_view_with_checkbox.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 //            @Override
 //            public void onItemClick(AdapterView<?> adapterView, View view, int itemIndex, long l) {
@@ -528,24 +610,32 @@ public class BaseFragment extends Fragment {
         btn_ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                arrayList = new ArrayList<>();
-                if (medium != null && medium.size() != 0) {
-                    int size = medium.size();
-                    for (int i = 0; i < size; i++) {
-                        PermissionPozo dto = medium.get(i);
-                        arrayList.add(dto.getServiceId());
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    arrayList = new ArrayList<>();
+                    if (medium != null && medium.size() != 0) {
+                        int size = medium.size();
+                        for (int i = 0; i < size; i++) {
+                            PermissionPozo dto = medium.get(i);
+                            arrayList.add(dto.getServiceId());
+                        }
                     }
+                    if (arrayList.size() != 0)
+                        anInterface.okClicked(type, ob);
+                    dialognew.dismiss();
                 }
-                if (arrayList.size() != 0)
-                    anInterface.okClicked(type, ob);
-                dialognew.dismiss();
+                handlercontrol();
             }
         });
         btn_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                anInterface.cancelClicked(type, ob);
-                dialognew.dismiss();
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    anInterface.cancelClicked(type, ob);
+                    dialognew.dismiss();
+                }
+                handlercontrol();
             }
         });
         dialognew.show();
@@ -670,9 +760,11 @@ public class BaseFragment extends Fragment {
                         con_ifsc.setVisibility(View.VISIBLE);
                         isNEFT = true;
                     } else if (!ifsccode.equalsIgnoreCase("NA") & typeCheck.equalsIgnoreCase("BC")) {
-                        con_ifsc.setVisibility(View.GONE);
+                        con_ifsc.setVisibility(View.VISIBLE);
+                        con_ifsc.setText(ifsccode);
                         isNEFT = false;
                     } else if (!ifsccode.equalsIgnoreCase("NA")) {
+                        con_ifsc.setVisibility(View.VISIBLE);
                         con_ifsc.setText(BaseCompactActivity.db.geBankIFSC(condition).get(0));
                     }
                 }
@@ -798,7 +890,7 @@ public class BaseFragment extends Fragment {
             different = different % minutesInMilli;
 
             long elapsedSeconds = different / secondsInMilli;
-            if (elapsedDays >= 0)
+            if (elapsedDays >= 0 && elapsedDays <= 31)
                 return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -892,6 +984,7 @@ public class BaseFragment extends Fragment {
         TextView notverified = (TextView) alertLayout.findViewById(R.id.notverified);
         TextView btn_trantype = (TextView) alertLayout.findViewById(R.id.btn_trantype);
         TextView btn_ifsc = (TextView) alertLayout.findViewById(R.id.btn_ifsc);
+        final TextView input_text = (TextView) alertLayout.findViewById(R.id.input_texts);
         btn_trantype.setText(transType);
         btn_ifsc.setText(pozo.getIfsc());
         if (!pozo.getAccountno().equalsIgnoreCase("null"))
@@ -911,6 +1004,26 @@ public class BaseFragment extends Fragment {
         else
             notverified.setVisibility(View.GONE);
         ben_amount = (TextView) alertLayout.findViewById(R.id.input_amount_ben);
+        ben_amount.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s.length()!=0 && s.length()<10) {
+                    input_text.setText(new EnglishNumberToWords().convert(Integer.parseInt(s.toString())));
+                    input_text.setVisibility(View.VISIBLE);
+                }else
+                    input_text.setVisibility(View.GONE);
+            }
+        });
         dialog.setContentView(alertLayout);
     }
 
@@ -1059,39 +1172,47 @@ public class BaseFragment extends Fragment {
         btn_ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                anInterface.okClicked(type, object);
-                dialog.dismiss();
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    anInterface.okClicked(type, object);
+                    dialog.dismiss();
+                }
+                handlercontrol();
             }
         });
         share.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Bitmap b = Bitmap.createBitmap(main_layout.getDrawingCache());
-                main_layout.setDrawingCacheEnabled(false);
-                ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-                b.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    Bitmap b = Bitmap.createBitmap(main_layout.getDrawingCache());
+                    main_layout.setDrawingCacheEnabled(false);
+                    ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                    b.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
 
-                File f = new File(Environment.getExternalStorageDirectory() + File.separator + "v2i.jpg");
-                try {
-                    f.createNewFile();
-                    FileOutputStream fo = new FileOutputStream(f);
-                    fo.write(bytes.toByteArray());
-                    fo.flush();
-                    fo.close();
-                    f.setReadable(true, false);
-                    final Intent intent = new Intent(Intent.ACTION_SEND);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    File f = new File(Environment.getExternalStorageDirectory() + File.separator + "v2i.jpg");
+                    try {
+                        f.createNewFile();
+                        FileOutputStream fo = new FileOutputStream(f);
+                        fo.write(bytes.toByteArray());
+                        fo.flush();
+                        fo.close();
+                        f.setReadable(true, false);
+                        final Intent intent = new Intent(Intent.ACTION_SEND);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-                    Uri apkURI = FileProvider.getUriForFile(
-                            getActivity(),
-                            getActivity().getApplicationContext()
-                                    .getPackageName() + ".provider", f);
-                    intent.putExtra(Intent.EXTRA_STREAM, apkURI);
-                    intent.setType("image/png");
-                    startActivity(Intent.createChooser(intent, "Share image via"));
-                } catch (Exception e) {
-                    e.printStackTrace();
+                        Uri apkURI = FileProvider.getUriForFile(
+                                getActivity(),
+                                getActivity().getApplicationContext()
+                                        .getPackageName() + ".provider", f);
+                        intent.putExtra(Intent.EXTRA_STREAM, apkURI);
+                        intent.setType("image/png");
+                        startActivity(Intent.createChooser(intent, "Share image via"));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
+                handlercontrol();
             }
         });
         dialog.show();
@@ -1103,5 +1224,205 @@ public class BaseFragment extends Fragment {
         Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
         imageViews.setImageBitmap(decodedByte);
         imageViews.setVisibility(View.VISIBLE);
+    }
+
+    protected void customReceiptNewTransaction(final String type, final JSONObject object, final CustomInterface anInterface) {
+        this.anInterface = anInterface;
+        left = new ArrayList<>();
+        right = new ArrayList<>();
+        medium = new ArrayList<>();
+        bottom = new ArrayList<>();
+        String medium_value = "";
+        int q = 0;
+        try {
+            JSONArray array = object.getJSONArray("getTxnReceiptDataList");
+            for (int i = 0; i < array.length(); i++) {
+                JSONObject jsonObject = array.getJSONObject(i);
+                if (jsonObject.getString("displayType").equalsIgnoreCase("L")) {
+                    if (jsonObject.getString("headerValue").equalsIgnoreCase("null"))
+                        left.add(jsonObject.getString("headerText") + " " + "NA");
+                    else
+                        left.add(jsonObject.getString("headerText") + " " + jsonObject.getString("headerValue"));
+                }
+                if (jsonObject.getString("displayType").equalsIgnoreCase("R")) {
+                    if (jsonObject.getString("headerValue").equalsIgnoreCase("null"))
+                        right.add(jsonObject.getString("headerText") + " " + "NA");
+                    else
+                        right.add(jsonObject.getString("headerText") + " " + jsonObject.getString("headerValue"));
+                }
+                if (jsonObject.getString("displayType").equalsIgnoreCase("M")) {
+                    if (!jsonObject.getString("headerText").equalsIgnoreCase(medium_value)) {
+                        medium_value = jsonObject.getString("headerText");
+                        q = q + 1;
+                    }
+                    if (jsonObject.getString("headerValue").equalsIgnoreCase("null"))
+                        medium.add(jsonObject.getString("headerText") + " " + "NA");
+                    else
+                        medium.add(jsonObject.getString("headerText") + " " + jsonObject.getString("headerValue"));
+                }
+                if (jsonObject.getString("displayType").equalsIgnoreCase("D")) {
+                    if (jsonObject.getString("headerValue").equalsIgnoreCase("null"))
+                        bottom.add(new HeaderePozo(jsonObject.getString("headerText"), "NA", medium_value));
+                    else
+                        bottom.add(new HeaderePozo(jsonObject.getString("headerText"), jsonObject.getString("headerValue"), medium_value));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        dialog = new Dialog(getActivity());
+        LayoutInflater inflater = getLayoutInflater();
+        View alertLayout = inflater.inflate(R.layout.pmt_receipt_layout, null);
+        alertLayout.setKeepScreenOn(true);
+        ImageView receipt_logo = (ImageView) alertLayout.findViewById(R.id.receipt_logo);
+        String condition = "where " + RapipayDB.IMAGE_NAME + "='invoiceLogo.jpg'";
+        ArrayList<ImagePozo> imagePozoArrayList = BaseCompactActivity.db.getImageDetails(condition);
+        if (imagePozoArrayList.size() != 0) {
+            byteConvert(receipt_logo, imagePozoArrayList.get(0).getImagePath());
+        }
+        main_layout = (LinearLayout) alertLayout.findViewById(R.id.main_layout);
+
+        main_layout.setDrawingCacheEnabled(true);
+        main_layout.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+        main_layout.layout(0, 0, main_layout.getMeasuredWidth(), main_layout.getMeasuredHeight());
+        main_layout.buildDrawingCache(true);
+        AutofitTextView markdate = (AutofitTextView) alertLayout.findViewById(R.id.markdate);
+        TextView signature = (TextView) alertLayout.findViewById(R.id.signature);
+        TextView text = (TextView) alertLayout.findViewById(R.id.dialog_title);
+
+        text.setText(type);
+        LinearLayout listLeft = (LinearLayout) main_layout.findViewById(R.id.listLeft);
+        LinearLayout listRight = (LinearLayout) main_layout.findViewById(R.id.listRight);
+        LinearLayout listbottom = (LinearLayout) main_layout.findViewById(R.id.listbottom);
+        AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
+        ImageView share = (ImageView) alertLayout.findViewById(R.id.share);
+        share.setColorFilter(getResources().getColor(R.color.colorPrimaryDark));
+        medium_value = "";
+        if (left.size() != 0) {
+            for (int k = 0; k < left.size(); k++) {
+                View inflate = inflater.inflate(R.layout.receipt_list, null);
+                TextView recycler_text = (TextView) inflate.findViewById(R.id.recycler_text);
+                if (k == 1)
+                    recycler_text.setTypeface(recycler_text.getTypeface(), Typeface.BOLD);
+                recycler_text.setText(left.get(k));
+                listLeft.addView(inflate);
+            }
+        }
+        if (right.size() != 0) {
+            for (int j = 0; j < right.size(); j++) {
+                View inflate = inflater.inflate(R.layout.receipt_list, null);
+                TextView recycler_text = (TextView) inflate.findViewById(R.id.recycler_text);
+                if (j == 1)
+                    recycler_text.setTypeface(recycler_text.getTypeface(), Typeface.BOLD);
+                recycler_text.setText(right.get(j));
+                listRight.addView(inflate);
+            }
+        }
+//        if (medium.size() == 1)
+//            mediums.setText(medium.get(0));
+        if (bottom.size() != 0) {
+            for (int i = 0; i < bottom.size(); i++) {
+                View inflate = inflater.inflate(R.layout.bottom_layout_pmt, null);
+                TextView mediums = (TextView) inflate.findViewById(R.id.medium_header);
+                if (!bottom.get(i).getHeaderID().equalsIgnoreCase(medium_value)) {
+                    mediums.setText(bottom.get(i).getHeaderID());
+                    medium_value = bottom.get(i).getHeaderID();
+                    mediums.setVisibility(View.VISIBLE);
+                }
+                AutofitTextView btn_name = (AutofitTextView) inflate.findViewById(R.id.btn_name);
+                TextView btn_p_bank = (TextView) inflate.findViewById(R.id.btn_p_bank);
+                LinearLayout top = (LinearLayout) inflate.findViewById(R.id.top);
+                if (i % 2 == 0)
+                    top.setBackgroundColor(getResources().getColor(R.color.colorbackground));
+                else
+                    top.setBackgroundColor(getResources().getColor(R.color.white));
+                if (bottom.get(i).getHeaderValue().equalsIgnoreCase("Txn. ID/RRN/STATUS")) {
+                    top.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
+                    btn_name.setTextColor(getResources().getColor(R.color.white));
+                    btn_p_bank.setTextColor(getResources().getColor(R.color.white));
+                } else {
+                    btn_name.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
+                    btn_p_bank.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
+                }
+                btn_name.setText(bottom.get(i).getHeaderData());
+                btn_p_bank.setText(bottom.get(i).getHeaderValue());
+                listbottom.addView(inflate);
+            }
+        }
+        dialog.setCancelable(false);
+        dialog.setContentView(alertLayout);
+        btn_ok.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                anInterface.okClicked(type, object);
+                dialog.dismiss();
+            }
+        });
+        share.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    Bitmap b = Bitmap.createBitmap(main_layout.getDrawingCache());
+                    main_layout.setDrawingCacheEnabled(false);
+                    ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                    b.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+
+                    File f = new File(Environment.getExternalStorageDirectory() + File.separator + "v2i.jpg");
+                    try {
+                        f.createNewFile();
+                        FileOutputStream fo = new FileOutputStream(f);
+                        fo.write(bytes.toByteArray());
+                        fo.flush();
+                        fo.close();
+                        f.setReadable(true, false);
+                        final Intent intent = new Intent(Intent.ACTION_SEND);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                        Uri apkURI = FileProvider.getUriForFile(
+                                getActivity(),
+                                getActivity().getApplicationContext()
+                                        .getPackageName() + ".provider", f);
+                        intent.putExtra(Intent.EXTRA_STREAM, apkURI);
+                        intent.setType("image/png");
+                        startActivityForResult(Intent.createChooser(intent, "Share image via"), 2);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                handlercontrol();
+            }
+        });
+        dialog.show();
+        Window window = dialog.getWindow();
+        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+    }
+
+    protected boolean date_Different(String fromdate, String toDate, int datedifferent) {
+        String fromDate = fromdate;
+        String ToDate = toDate;
+        String dateBeforeString;
+        String dateAfterString;
+        if (fromDate.contains("/") == true) {
+            dateBeforeString = fromDate.replace("/", "-");
+            dateAfterString = ToDate.replace("/", "-");
+        } else {
+            dateBeforeString = fromDate;
+            dateAfterString = ToDate;
+        }
+        LocalDate dateBefore = null;
+        LocalDate dateAfter = null;
+        long noOfDaysBetween = 0;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            dateBefore = LocalDate.parse(dateBeforeString);
+            dateAfter = LocalDate.parse(dateAfterString);
+            noOfDaysBetween = ChronoUnit.DAYS.between(dateBefore, dateAfter);
+        }
+//calculating number of days in between
+        if (datedifferent <= noOfDaysBetween)
+            return true;
+        else
+            return false;
     }
 }

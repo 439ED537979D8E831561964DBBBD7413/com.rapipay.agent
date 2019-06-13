@@ -19,6 +19,7 @@ import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.interfaces.RequestHandler;
 import com.rapipay.android.agent.utils.AsyncPostMethod;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
+import com.rapipay.android.agent.utils.BaseFragment;
 import com.rapipay.android.agent.utils.GenerateChecksum;
 import com.rapipay.android.agent.utils.ImageUtils;
 import com.rapipay.android.agent.utils.LocalStorage;
@@ -29,7 +30,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class ChangeMobileFragment extends Fragment implements RequestHandler, View.OnClickListener {
+public class ChangeMobileFragment extends BaseFragment implements RequestHandler, View.OnClickListener {
     protected ArrayList<RapiPayPozo> list;
     EditText newmobileno, oldotp, newotp;
     protected String headerData = (WebConfig.BASIC_USERID + ":" + WebConfig.BASIC_PASSWORD);
@@ -37,6 +38,7 @@ public class ChangeMobileFragment extends Fragment implements RequestHandler, Vi
     AppCompatButton sub_btn, sub_btn_oldotp, sub_btn_newotp;
     String otpRefId = null, orgTxnId = null;
     protected LocalStorage localStorage;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
@@ -67,25 +69,37 @@ public class ChangeMobileFragment extends Fragment implements RequestHandler, Vi
         Intent intent = null;
         switch (v.getId()) {
             case R.id.sub_btn:
-                if (!ImageUtils.commonNumber(newmobileno.getText().toString(), 10)) {
-                    newmobileno.setError("Please enter valid data");
-                    newmobileno.requestFocus();
-                } else
-                    new AsyncPostMethod(WebConfig.LOGIN_URL, request_user().toString(), headerData, ChangeMobileFragment.this, getActivity(),getString(R.string.responseTimeOut)).execute();
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    if (!ImageUtils.commonNumber(newmobileno.getText().toString(), 10)) {
+                        newmobileno.setError("Please enter valid data");
+                        newmobileno.requestFocus();
+                    } else
+                        new AsyncPostMethod(WebConfig.LOGIN_URL, request_user().toString(), headerData, ChangeMobileFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
+                }
+                handlercontrol();
                 break;
             case R.id.sub_btn_oldotp:
-                if (!ImageUtils.commonNumber(oldotp.getText().toString(), 6)) {
-                    oldotp.setError("Please enter valid data");
-                    oldotp.requestFocus();
-                } else
-                    new AsyncPostMethod(WebConfig.LOGIN_URL, oldRequest_user().toString(), headerData, ChangeMobileFragment.this, getActivity(),getString(R.string.responseTimeOut)).execute();
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    if (!ImageUtils.commonNumber(oldotp.getText().toString(), 6)) {
+                        oldotp.setError("Please enter valid data");
+                        oldotp.requestFocus();
+                    } else
+                        new AsyncPostMethod(WebConfig.LOGIN_URL, oldRequest_user().toString(), headerData, ChangeMobileFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
+                }
+                handlercontrol();
                 break;
             case R.id.sub_btn_newotp:
-                if (!ImageUtils.commonNumber(newotp.getText().toString(), 6)) {
-                    newotp.setError("Please enter valid data");
-                    newotp.requestFocus();
-                } else
-                    new AsyncPostMethod(WebConfig.LOGIN_URL, newRequest_user().toString(), headerData, ChangeMobileFragment.this, getActivity(),getString(R.string.responseTimeOut)).execute();
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    if (!ImageUtils.commonNumber(newotp.getText().toString(), 6)) {
+                        newotp.setError("Please enter valid data");
+                        newotp.requestFocus();
+                    } else
+                        new AsyncPostMethod(WebConfig.LOGIN_URL, newRequest_user().toString(), headerData, ChangeMobileFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
+                }
+                handlercontrol();
                 break;
         }
     }
@@ -173,7 +187,7 @@ public class ChangeMobileFragment extends Fragment implements RequestHandler, Vi
                     newotp.setText("");
                     new_number.setVisibility(View.GONE);
                     old_number.setVisibility(View.GONE);
-                    Toast.makeText(getActivity(),object.getString("responseMessage"),Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), object.getString("responseMessage"), Toast.LENGTH_SHORT).show();
                     deleteTables("forgot");
                     new RouteClass(getActivity(), null, "", localStorage, "0");
                 }
@@ -182,6 +196,7 @@ public class ChangeMobileFragment extends Fragment implements RequestHandler, Vi
             e.printStackTrace();
         }
     }
+
     protected void deleteTables(String type) {
         SQLiteDatabase dba = BaseCompactActivity.db.getWritableDatabase();
         dba.execSQL("delete from " + RapipayDB.TABLE_BANK);
@@ -194,6 +209,7 @@ public class ChangeMobileFragment extends Fragment implements RequestHandler, Vi
         if (!type.equalsIgnoreCase(""))
             dba.execSQL("delete from " + RapipayDB.TABLE_NAME);
     }
+
     @Override
     public void chechStat(String object) {
 

@@ -8,8 +8,8 @@ android {
 //        applicationId "com.rapipay.android.agent"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 45
-        versionName "0.45"
+        versionCode 52
+        versionName "0.52"
         multiDexEnabled true
         buildConfigField "int", "APPTYPE", "3"
         buildConfigField "String", "USERTYPE", "\"RapiPay\""

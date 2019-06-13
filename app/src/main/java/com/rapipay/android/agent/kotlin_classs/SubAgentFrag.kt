@@ -50,8 +50,12 @@ class SubAgentFrag : BaseFragment(), RequestHandler, CustomInterface, View.OnCli
         trans_details = v.findViewById<RecyclerView>(R.id.trans_details)
         trans_details!!.addOnItemTouchListener(RecyclerTouchListener(activity, trans_details, object : ClickListener {
             override fun onClick(view: View?, position: Int) {
-                pozo = listsubAgent[position]
-                customDialog_Common("SUBAGENTSERVICE", null, pozo, "Select Action", "", "", this@SubAgentFrag)
+                if (btnstatus == false) {
+                    btnstatus = true
+                    pozo = listsubAgent[position]
+                    customDialog_Common("SUBAGENTSERVICE", null, pozo, "Select Action", "", "", this@SubAgentFrag)
+                }
+                handlercontrol()
             }
 
             override fun onLongClick(view: View?, position: Int) {

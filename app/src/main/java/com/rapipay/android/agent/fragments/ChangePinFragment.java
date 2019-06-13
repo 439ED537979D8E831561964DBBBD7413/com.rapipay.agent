@@ -18,6 +18,7 @@ import com.rapipay.android.agent.interfaces.RequestHandler;
 import com.rapipay.android.agent.main_directory.PinVerification;
 import com.rapipay.android.agent.utils.AsyncPostMethod;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
+import com.rapipay.android.agent.utils.BaseFragment;
 import com.rapipay.android.agent.utils.GenerateChecksum;
 import com.rapipay.android.agent.utils.ImageUtils;
 import com.rapipay.android.agent.utils.WebConfig;
@@ -27,7 +28,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class ChangePinFragment extends Fragment implements RequestHandler, View.OnClickListener {
+public class ChangePinFragment extends BaseFragment implements RequestHandler, View.OnClickListener {
 
     View rv;
     protected ArrayList<RapiPayPozo> list;
@@ -55,14 +56,18 @@ public class ChangePinFragment extends Fragment implements RequestHandler, View.
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_login:
-                if (otppinView.length() < 6)
-                    otppinView.setError("Please enter 6 digin pin");
-                else if (pinView.length() < 6)
-                    pinView.setError("Please enter 6 digin pin");
-                else if (otppinView.getText().toString().equalsIgnoreCase(pinView.getText().toString()))
-                    pinView.setError("Old and Current pin cannot be same");
-                else
-                    new AsyncPostMethod(WebConfig.UAT, getJson_Validate().toString(), "", ChangePinFragment.this, getActivity(),getString(R.string.responseTimeOut)).execute();
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    if (otppinView.length() < 6)
+                        otppinView.setError("Please enter 6 digin pin");
+                    else if (pinView.length() < 6)
+                        pinView.setError("Please enter 6 digin pin");
+                    else if (otppinView.getText().toString().equalsIgnoreCase(pinView.getText().toString()))
+                        pinView.setError("Old and Current pin cannot be same");
+                    else
+                        new AsyncPostMethod(WebConfig.UAT, getJson_Validate().toString(), "", ChangePinFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
+                }
+                handlercontrol();
                 break;
         }
     }
@@ -102,7 +107,7 @@ public class ChangePinFragment extends Fragment implements RequestHandler, View.
         try {
             if (object.getString("responseCode").equalsIgnoreCase("200")) {
                 if (object.getString("serviceType").equalsIgnoreCase("ChangePin")) {
-                    customDialog_Ben("Pin Change",object.getString("responseMessage"));
+                    customDialog_Ben("Pin Change", object.getString("responseMessage"));
                 }
             }
         } catch (Exception e) {

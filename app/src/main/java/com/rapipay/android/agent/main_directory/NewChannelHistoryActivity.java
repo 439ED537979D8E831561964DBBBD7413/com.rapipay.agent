@@ -1,5 +1,6 @@
 package com.rapipay.android.agent.main_directory;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.Editable;
@@ -150,16 +151,20 @@ public class NewChannelHistoryActivity extends BaseCompactActivity implements Vi
                 finish();
                 break;
             case R.id.btn_fund:
-                if (date2_text.getText().toString().isEmpty()) {
-                    date2_text.setError("Please enter mandatory field");
-                    Toast.makeText(this, "Please enter mandatory field", Toast.LENGTH_SHORT).show();
-                } else if (date1_text.getText().toString().isEmpty()) {
-                    date1_text.setError("Please enter mandatory field");
-                    Toast.makeText(this, "Please enter mandatory field", Toast.LENGTH_SHORT).show();
-                } else if (printDifference(mainDate(date2_text.getText().toString()), mainDate(date1_text.getText().toString())))
-                    new AsyncPostMethod(WebConfig.CommonReport, channel_request().toString(), headerData, NewChannelHistoryActivity.this, getString(R.string.responseTimeOut), "TRANSACTIONHISTORY").execute();
-                else
-                    Toast.makeText(NewChannelHistoryActivity.this, "Please select correct date", Toast.LENGTH_SHORT).show();
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    if (date2_text.getText().toString().isEmpty()) {
+                        date2_text.setError("Please enter mandatory field");
+                        Toast.makeText(this, "Please enter mandatory field", Toast.LENGTH_SHORT).show();
+                    } else if (date1_text.getText().toString().isEmpty()) {
+                        date1_text.setError("Please enter mandatory field");
+                        Toast.makeText(this, "Please enter mandatory field", Toast.LENGTH_SHORT).show();
+                    } else if (printDifference(mainDate(date2_text.getText().toString()), mainDate(date1_text.getText().toString())))
+                        new AsyncPostMethod(WebConfig.CommonReport, channel_request().toString(), headerData, NewChannelHistoryActivity.this, getString(R.string.responseTimeOut), "TRANSACTIONHISTORY").execute();
+                    else
+                        Toast.makeText(NewChannelHistoryActivity.this, "Please select correct date", Toast.LENGTH_SHORT).show();
+                }
+                handlercontrol();
                 break;
         }
     }
@@ -205,6 +210,19 @@ public class NewChannelHistoryActivity extends BaseCompactActivity implements Vi
             }
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (data != null) {
+            if (requestCode == 2) {
+                dialog.dismiss();
+            }
+        } else {
+            if (dialog != null)
+                dialog.dismiss();
         }
     }
 

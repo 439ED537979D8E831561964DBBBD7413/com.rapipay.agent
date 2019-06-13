@@ -39,7 +39,7 @@ public class RegisterUserActivity extends BaseCompactActivity implements Request
     TextView input_name, input_number, input_address, input_email, input_code;
     TextView select_state;
     String TYPE, mobileNo;
-    static String byteBase64="";
+    static String byteBase64 = "";
     public static int scan_check = 0;
     static Bitmap bitmap_trans = null;
 
@@ -77,7 +77,7 @@ public class RegisterUserActivity extends BaseCompactActivity implements Request
                 customSpinner(select_state, "Select State", list_state);
             }
         });
-        scan_check=0;
+        scan_check = 0;
         if (!mobileNo.isEmpty())
             input_number.setText(mobileNo);
     }
@@ -86,59 +86,71 @@ public class RegisterUserActivity extends BaseCompactActivity implements Request
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.reset:
-                clear();
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    clear();
+                }
+                handlercontrol();
                 break;
             case R.id.back_click:
                 setBack_click(this);
                 finish();
                 break;
             case R.id.btn_fund:
-                if (!ImageUtils.commonRegex(input_name.getText().toString(), 150, " ")) {
-                    input_name.setError("Please enter valid data");
-                    input_name.requestFocus();
-                } else if (!ImageUtils.commonRegex(input_code.getText().toString(), 150, "0-9 .&") && !TYPE.equalsIgnoreCase("internal")) {
-                    input_code.setError("Please enter valid data");
-                    input_code.requestFocus();
-                } else if (input_address.getText().toString().isEmpty()) {
-                    input_address.setError("Please enter valid data");
-                    input_address.requestFocus();
-                } else if (select_state.getText().toString().equalsIgnoreCase("Select State")) {
-                    select_state.setError("Please enter valid data");
-                    select_state.requestFocus();
-                } else if (!Patterns.EMAIL_ADDRESS.matcher(input_email.getText().toString()).matches() && !TYPE.equalsIgnoreCase("internal")) {
-                    input_email.setError("Please enter valid data");
-                    input_email.requestFocus();
-                } else if (!ImageUtils.commonNumber(input_number.getText().toString(), 10)) {
-                    input_number.setError("Please enter valid data");
-                    input_number.requestFocus();
-                } else {
-                    if (TYPE.equalsIgnoreCase("internal")) {
-                        try {
-                            Intent intent = new Intent(RegisterUserActivity.this, WebViewClientActivity.class);
-                            intent.putExtra("mobileNo", mobileNo);
-                            String base64 = input_name.getText().toString() + "~" + input_email.getText().toString().trim() + "~" + input_code.getText().toString().trim() + "~" + input_address.getText().toString() + "~" + select_state.getText().toString() + "~" + scan_check;
-                            byte[] bytes = base64.getBytes("utf-8");
-                            String imageEncoded = Base64.encodeToString(bytes, Base64.DEFAULT);
-                            intent.putExtra("base64", imageEncoded);
-                            intent.putExtra("parentId", list.get(0).getMobilno());
-                            intent.putExtra("sessionKey", list.get(0).getPinsession());
-                            intent.putExtra("sessionRefNo", list.get(0).getAftersessionRefNo());
-                            intent.putExtra("nodeAgent", list.get(0).getMobilno());
-                            intent.putExtra("type", "internal");
-                            startActivity(intent);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    } else
-                        new AsyncPostMethod(WebConfig.LOGIN_URL, request_user().toString(), headerData, RegisterUserActivity.this,getString(R.string.responseTimeOut)).execute();
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    if (!ImageUtils.commonRegex(input_name.getText().toString(), 150, " ")) {
+                        input_name.setError("Please enter valid data");
+                        input_name.requestFocus();
+                    } else if (!ImageUtils.commonRegex(input_code.getText().toString(), 150, "0-9 .&") && !TYPE.equalsIgnoreCase("internal")) {
+                        input_code.setError("Please enter valid data");
+                        input_code.requestFocus();
+                    } else if (input_address.getText().toString().isEmpty()) {
+                        input_address.setError("Please enter valid data");
+                        input_address.requestFocus();
+                    } else if (select_state.getText().toString().equalsIgnoreCase("Select State")) {
+                        select_state.setError("Please enter valid data");
+                        select_state.requestFocus();
+                    } else if (!Patterns.EMAIL_ADDRESS.matcher(input_email.getText().toString()).matches() && !TYPE.equalsIgnoreCase("internal")) {
+                        input_email.setError("Please enter valid data");
+                        input_email.requestFocus();
+                    } else if (!ImageUtils.commonNumber(input_number.getText().toString(), 10)) {
+                        input_number.setError("Please enter valid data");
+                        input_number.requestFocus();
+                    } else {
+                        if (TYPE.equalsIgnoreCase("internal")) {
+                            try {
+                                Intent intent = new Intent(RegisterUserActivity.this, WebViewClientActivity.class);
+                                intent.putExtra("mobileNo", mobileNo);
+                                String base64 = input_name.getText().toString() + "~" + input_email.getText().toString().trim() + "~" + input_code.getText().toString().trim() + "~" + input_address.getText().toString() + "~" + select_state.getText().toString() + "~" + scan_check;
+                                byte[] bytes = base64.getBytes("utf-8");
+                                String imageEncoded = Base64.encodeToString(bytes, Base64.DEFAULT);
+                                intent.putExtra("base64", imageEncoded);
+                                intent.putExtra("parentId", list.get(0).getMobilno());
+                                intent.putExtra("sessionKey", list.get(0).getPinsession());
+                                intent.putExtra("sessionRefNo", list.get(0).getAftersessionRefNo());
+                                intent.putExtra("nodeAgent", list.get(0).getMobilno());
+                                intent.putExtra("type", "internal");
+                                startActivity(intent);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        } else
+                            new AsyncPostMethod(WebConfig.LOGIN_URL, request_user().toString(), headerData, RegisterUserActivity.this, getString(R.string.responseTimeOut)).execute();
+                    }
                 }
+                handlercontrol();
                 break;
             case R.id.btn_scan_submit:
-                bitmap_trans = null;
-                byteBase64 = "";
-                Intent intent = new Intent(RegisterUserActivity.this, BarcodeActivity.class);
-                intent.putExtra("type", "inside");
-                startActivityForResult(intent, 1);
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    bitmap_trans = null;
+                    byteBase64 = "";
+                    Intent intent = new Intent(RegisterUserActivity.this, BarcodeActivity.class);
+                    intent.putExtra("type", "inside");
+                    startActivityForResult(intent, 1);
+                }
+                handlercontrol();
                 break;
         }
     }
@@ -176,9 +188,9 @@ public class RegisterUserActivity extends BaseCompactActivity implements Request
                 String add = object.getString("house") + ", " + object.getString("street") + ", " + object.getString("lm") + ", " + object.getString("vtc").replaceAll("^\\s+", "") + ", " + object.getString("dist");
                 input_address.setText(add);
                 input_address.setEnabled(false);
-            }else if (object.has("street") && object.has("lm") && object.has("vtc") && object.has("dist")) {
-                String add =  object.getString("street") + ", " + object.getString("lm") + ", " + object.getString("vtc").replaceAll("^\\s+", "") + ", " + object.getString("dist");
-                input_address.setText(add.replace("null,",""));
+            } else if (object.has("street") && object.has("lm") && object.has("vtc") && object.has("dist")) {
+                String add = object.getString("street") + ", " + object.getString("lm") + ", " + object.getString("vtc").replaceAll("^\\s+", "") + ", " + object.getString("dist");
+                input_address.setText(add.replace("null,", ""));
                 input_address.setEnabled(false);
             } else if (object.has("house") && object.has("street") && object.has("lm") && object.has("loc") && object.has("vtc") && object.has("dist")) {
                 String add = object.getString("house") + ", " + object.getString("street") + ", " + object.getString("lm") + ", " + object.getString("loc") + ", " + object.getString("vtc").replaceAll("^\\s+", "") + ", " + object.getString("dist");

@@ -52,6 +52,7 @@
                     android:hint="@string/p_cususerid"
                     android:inputType="number"
                     android:maxLength="10"
+                    android:textStyle="bold"
                     android:textSize="16dp" />
             </android.support.design.widget.TextInputLayout>
 
@@ -73,7 +74,8 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Customer Name" />
+                        android:text="Customer Name"
+                        android:textSize="16dp"/>
 
                     <TextView
                         android:id="@+id/input_name"
@@ -81,6 +83,7 @@
                         android:layout_height="wrap_content"
                         android:hint="@string/p_namecust"
                         android:inputType="text"
+                        android:textStyle="bold"
                         android:textSize="16dp" />
                 </LinearLayout>
 

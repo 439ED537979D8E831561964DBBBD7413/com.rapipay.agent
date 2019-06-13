@@ -85,7 +85,14 @@
                 android:maxLength="10"
                 android:textSize="16dp" />
         </android.support.design.widget.TextInputLayout>
-
+        <TextView
+            android:padding="10dp"
+            android:id="@+id/input_texts"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="13dp"
+            android:textColor="@color/red"
+            android:visibility="gone"/>
         <Spinner
             android:id="@+id/select_deviceid"
             style="@style/Widget.AppCompat.Spinner.Underlined"

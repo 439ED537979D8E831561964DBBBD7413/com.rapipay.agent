@@ -86,6 +86,10 @@ public class WalletAsyncMethod extends AsyncTask<String, String, String> {
             alertDialog1.dismiss();
             if (hitFrom != null && hitFrom.equalsIgnoreCase("UPDATE_MPOS")) {
                 handler.chechStat(xmlData, hitFrom);
+            }else if (hitFrom != null && hitFrom.equalsIgnoreCase("BCTRANSFER")) {
+                handler.chechStat(s, hitFrom);
+            }else if (hitFrom != null && hitFrom.equalsIgnoreCase("ACTIVATIONSERVICE")) {
+                handler.chechStat(s,hitFrom);
             } else if (s != null) {
                 if (s.contains("DOCTYPE")) {
                     handler.chechStat(s, hitFrom);

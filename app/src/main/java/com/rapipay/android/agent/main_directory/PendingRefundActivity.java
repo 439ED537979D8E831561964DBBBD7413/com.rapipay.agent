@@ -51,12 +51,13 @@ public class PendingRefundActivity extends BaseCompactActivity implements Wallet
     int refundPosition;
     LastTransAdapter adapter;
     LastTransactionPozo pozo;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.pending_refund_layout);
         initialize();
-        new WalletAsyncMethod(WebConfig.COMMONAPI, getSender_Validate("").toString(), headerData, PendingRefundActivity.this, getString(R.string.responseTimeOut),"GET_PENDING_REFUND_LIST").execute();
+        new WalletAsyncMethod(WebConfig.COMMONAPI, getSender_Validate("").toString(), headerData, PendingRefundActivity.this, getString(R.string.responseTimeOut), "GET_PENDING_REFUND_LIST").execute();
     }
 
     private void initialize() {
@@ -66,8 +67,12 @@ public class PendingRefundActivity extends BaseCompactActivity implements Wallet
         btn_search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                hideKeyboard(PendingRefundActivity.this);
-                loadIMEI();
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    hideKeyboard(PendingRefundActivity.this);
+                    loadIMEI();
+                }
+                handlercontrol();
             }
         });
         input_mobile = (EditText) findViewById(R.id.input_mobile);
@@ -80,12 +85,16 @@ public class PendingRefundActivity extends BaseCompactActivity implements Wallet
         refund_details.addOnItemTouchListener(new RecyclerTouchListener(this, refund_details, new ClickListener() {
             @Override
             public void onClick(View view, int position) {
-                refundPosition = position;
-                pozo = refundPozoArrayList.get(position);
-                if (!pozo.getServiceProviderTXNID().equalsIgnoreCase("DMT"))
-                    new WalletAsyncMethod(WebConfig.BCRemittanceApp, getrefund_Validate(pozo).toString(), headerData, PendingRefundActivity.this, getString(R.string.responseTimeOut),"BC_Refund").execute();
-                else
-                    new WalletAsyncMethod(WebConfig.WALLETTRANSFER_URL, getrefundDmt(pozo).toString(), headerData, PendingRefundActivity.this, getString(R.string.responseTimeOut),"WALLET_REFUND").execute();
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    refundPosition = position;
+                    pozo = refundPozoArrayList.get(position);
+                    if (!pozo.getServiceProviderTXNID().equalsIgnoreCase("DMT"))
+                        new WalletAsyncMethod(WebConfig.BCRemittanceApp, getrefund_Validate(pozo).toString(), headerData, PendingRefundActivity.this, getString(R.string.responseTimeOut), "BC_Refund").execute();
+                    else
+                        new WalletAsyncMethod(WebConfig.WALLETTRANSFER_URL, getrefundDmt(pozo).toString(), headerData, PendingRefundActivity.this, getString(R.string.responseTimeOut), "WALLET_REFUND").execute();
+                }
+                handlercontrol();
             }
 
             @Override
@@ -98,8 +107,12 @@ public class PendingRefundActivity extends BaseCompactActivity implements Wallet
         pending_details.addOnItemTouchListener(new RecyclerTouchListener(this, pending_details, new ClickListener() {
             @Override
             public void onClick(View view, int position) {
-                LastTransactionPozo pozo = pendingPozoArrayList.get(position);
-                new WalletAsyncMethod(WebConfig.BCRemittanceApp, getpending_Validate(pozo.getRefundTxnId()).toString(), headerData, PendingRefundActivity.this, getString(R.string.responseTimeOut),"GET_TXN_STATUS").execute();
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    LastTransactionPozo pozo = pendingPozoArrayList.get(position);
+                    new WalletAsyncMethod(WebConfig.BCRemittanceApp, getpending_Validate(pozo.getRefundTxnId()).toString(), headerData, PendingRefundActivity.this, getString(R.string.responseTimeOut), "GET_TXN_STATUS").execute();
+                }
+                handlercontrol();
             }
 
             @Override
@@ -122,7 +135,7 @@ public class PendingRefundActivity extends BaseCompactActivity implements Wallet
             @Override
             public void afterTextChanged(Editable s) {
                 if (s.length() == 10)
-                    new WalletAsyncMethod(WebConfig.COMMONAPI, getSender_Validate(input_mobile.getText().toString()).toString(), headerData, PendingRefundActivity.this, getString(R.string.responseTimeOut),"GET_PENDING_REFUND_LIST").execute();
+                    new WalletAsyncMethod(WebConfig.COMMONAPI, getSender_Validate(input_mobile.getText().toString()).toString(), headerData, PendingRefundActivity.this, getString(R.string.responseTimeOut), "GET_PENDING_REFUND_LIST").execute();
                 else
                     reset();
             }
@@ -136,7 +149,7 @@ public class PendingRefundActivity extends BaseCompactActivity implements Wallet
         });
     }
 
-    private void change_View(JSONObject object,String hitfrom) {
+    private void change_View(JSONObject object, String hitfrom) {
         try {
             if (hitfrom.equalsIgnoreCase("GET_PENDING_REFUND_LIST") || hitfrom.equalsIgnoreCase("GET_TXN_STATUS")) {
                 last_tran_layout.setVisibility(View.GONE);
@@ -179,7 +192,7 @@ public class PendingRefundActivity extends BaseCompactActivity implements Wallet
     }
 
     @Override
-    public void chechStatus(JSONObject object,String hitfrom) {
+    public void chechStatus(JSONObject object, String hitfrom) {
         try {
             if (object.has("responseCode")) {
                 if (object.getString("responseCode").equalsIgnoreCase("75077")) {
@@ -196,11 +209,11 @@ public class PendingRefundActivity extends BaseCompactActivity implements Wallet
                     else if (hitfrom.equalsIgnoreCase("PROCESS_OTP")) {
 //                        localStorage.setActivityState(LocalStorage.ROUTESTATE, "UPDATE");
                         customDialog_Common("REFUNDTXN", object, null, "REFUND TXN", null, object.getString("responseMessage"), PendingRefundActivity.this);
-                    }else if (hitfrom.equalsIgnoreCase("Verify_Mobile")) {
+                    } else if (hitfrom.equalsIgnoreCase("Verify_Mobile")) {
 //                        localStorage.setActivityState(LocalStorage.ROUTESTATE, "UPDATE");
                         customDialog_Common("KYCLAYOUTSS", object, null, getResources().getString(R.string.Alert), null, object.getString("responseMessage"), PendingRefundActivity.this);
                     } else
-                        change_View(object,hitfrom);
+                        change_View(object, hitfrom);
                 } else if (object.getString("responseCode").equalsIgnoreCase("201")) {
                     if (hitfrom.equalsIgnoreCase("BC_Refund") && object.has("otpRefId"))
                         customDialog_Ben(object.getString("responseMessage"), object.getString("otpRefId"), object.getString("transactionId"), hitfrom);
@@ -335,7 +348,7 @@ public class PendingRefundActivity extends BaseCompactActivity implements Wallet
         try {
             for (int i = 0; i < array.length(); i++) {
                 JSONObject object = array.getJSONObject(i);
-                transactionPozoArrayList.add(new LastTransactionPozo(object.getString("accountNo"), object.getString("txnAmount"), object.getString("refundTxnId"), object.getString("bankName"),""));
+                transactionPozoArrayList.add(new LastTransactionPozo(object.getString("accountNo"), object.getString("txnAmount"), object.getString("refundTxnId"), object.getString("bankName"), ""));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -362,9 +375,9 @@ public class PendingRefundActivity extends BaseCompactActivity implements Wallet
             for (int i = 0; i < array.length(); i++) {
                 JSONObject object = array.getJSONObject(i);
                 if (object.getString("refundType").equalsIgnoreCase("BC"))
-                    refundPozoArrayList.add(new LastTransactionPozo(object.getString("accountNo"), object.getString("txnAmount"), object.getString("refundTxnId"), object.getString("bankName"), object.getString("refundType"),object.getString("txnRequestDate"),object.getString("customerId")));
+                    refundPozoArrayList.add(new LastTransactionPozo(object.getString("accountNo"), object.getString("txnAmount"), object.getString("refundTxnId"), object.getString("bankName"), object.getString("refundType"), object.getString("txnRequestDate"), object.getString("customerId")));
                 else
-                    refundPozoArrayList.add(new LastTransactionPozo(object.getString("accountNo"), object.getString("txnAmount"), object.getString("refundTxnId"), object.getString("bankName"), object.getString("refundType"), object.getString("customerId"),object.getString("txnRequestDate"),object.getString("customerId")));
+                    refundPozoArrayList.add(new LastTransactionPozo(object.getString("accountNo"), object.getString("txnAmount"), object.getString("refundTxnId"), object.getString("bankName"), object.getString("refundType"), object.getString("customerId"), object.getString("txnRequestDate"), object.getString("customerId")));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -385,7 +398,7 @@ public class PendingRefundActivity extends BaseCompactActivity implements Wallet
         try {
             for (int i = 0; i < array.length(); i++) {
                 JSONObject object = array.getJSONObject(i);
-                pendingPozoArrayList.add(new LastTransactionPozo(object.getString("accountNo"), object.getString("txnAmount"), object.getString("refundTxnId"), object.getString("bankName"),object.getString("txnRequestDate")));
+                pendingPozoArrayList.add(new LastTransactionPozo(object.getString("accountNo"), object.getString("txnAmount"), object.getString("refundTxnId"), object.getString("bankName"), object.getString("txnRequestDate")));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -435,10 +448,10 @@ public class PendingRefundActivity extends BaseCompactActivity implements Wallet
             @Override
             public void onClick(View v) {
                 if (!text.getText().toString().isEmpty() && text.length() == 6 && !transactionId.equalsIgnoreCase("") && serviceType.equalsIgnoreCase("BC_Refund")) {
-                    new WalletAsyncMethod(WebConfig.BCRemittanceApp, add_OtpDetails(otpRefId, transactionId, text.getText().toString()).toString(), headerData, PendingRefundActivity.this, getString(R.string.responseTimeOut),"Verify_Mobile").execute();
+                    new WalletAsyncMethod(WebConfig.BCRemittanceApp, add_OtpDetails(otpRefId, transactionId, text.getText().toString()).toString(), headerData, PendingRefundActivity.this, getString(R.string.responseTimeOut), "Verify_Mobile").execute();
                     dialog.dismiss();
                 } else if (!text.getText().toString().isEmpty() && text.length() == 6 && transactionId.equalsIgnoreCase("") && serviceType.equalsIgnoreCase("WALLET_REFUND")) {
-                    new WalletAsyncMethod(WebConfig.WALLETTRANSFER_URL, processOtp(text.getText().toString(), otpRefId).toString(), headerData, PendingRefundActivity.this, getString(R.string.responseTimeOut),"PROCESS_OTP").execute();
+                    new WalletAsyncMethod(WebConfig.WALLETTRANSFER_URL, processOtp(text.getText().toString(), otpRefId).toString(), headerData, PendingRefundActivity.this, getString(R.string.responseTimeOut), "PROCESS_OTP").execute();
                     dialog.dismiss();
                 } else {
                     text.setError("Please Enter Otp");
@@ -502,14 +515,14 @@ public class PendingRefundActivity extends BaseCompactActivity implements Wallet
     }
 
     @Override
-    public void chechStat(String object,String hitfrom) {
+    public void chechStat(String object, String hitfrom) {
 
     }
 
     @Override
     public void okClicked(String type, Object ob) {
         if (!type.equalsIgnoreCase("PENDINGREFUND") && !type.equalsIgnoreCase("KYCLAYOUT") && !type.equalsIgnoreCase("REFUNDTXN") && !type.equalsIgnoreCase("KYCLAYOUTS") && !type.equalsIgnoreCase("KYCLAYOUTSS") && !type.equalsIgnoreCase("KYCEWLAYOUT"))
-            new WalletAsyncMethod(WebConfig.COMMONAPI, getSender_Validate(type).toString(), headerData, PendingRefundActivity.this, getString(R.string.responseTimeOut),"GET_PENDING_REFUND_LIST").execute();
+            new WalletAsyncMethod(WebConfig.COMMONAPI, getSender_Validate(type).toString(), headerData, PendingRefundActivity.this, getString(R.string.responseTimeOut), "GET_PENDING_REFUND_LIST").execute();
         else if (type.equalsIgnoreCase("REFUNDTXN") || type.equalsIgnoreCase("KYCEWLAYOUT")) {
             refundPozoArrayList.remove(refundPosition);
             adapter.notifyDataSetChanged();

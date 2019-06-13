@@ -66,8 +66,12 @@ class FOSTransfer : BaseFragment(), RequestHandler {
             }
         })
         trans_details!!.setOnItemClickListener(AdapterView.OnItemClickListener { parent, view, position, id ->
-            pozoClick = transactionPozoArrayList!!.get(position)
-            customDialog_Ben(transactionPozoArrayList!!.get(position), "Network Transfer", "BENLAYOUT", pozoClick!!.getConsentStatus(), "Credit To Network")
+            if (btnstatus == false) {
+                btnstatus = true
+                pozoClick = transactionPozoArrayList!!.get(position)
+                customDialog_Ben(transactionPozoArrayList!!.get(position), "Network Transfer", "BENLAYOUT", pozoClick!!.getConsentStatus(), "Credit To Network")
+            }
+            handlercontrol()
             //                if (clickedId.equalsIgnoreCase("0"))
             //                    customDialog_Ben(transactionPozoArrayList.get(position), "Network Transfer", "AMOUNTTRANSFER", "", "Credit To Network");
         })
@@ -199,33 +203,41 @@ class FOSTransfer : BaseFragment(), RequestHandler {
         texttitle.text = title
         dialog.setCancelable(false)
         btn_ok.setOnClickListener {
-            if (type.equals("AMOUNTTRANSFER", ignoreCase = true)) {
-                hideKeyboard(activity)
-                if (!ImageUtils.commonAmount(textsss!!.getText().toString())) {
-                    textsss!!.setError("Please enter valid data")
-                    textsss!!.requestFocus()
-                }else if(!(Integer.parseInt(textsss!!.getText().toString())  <= Integer.parseInt(formatss(s!!)))){
-                    textsss!!.setError("Please enter valid amount")
-                    textsss!!.requestFocus()
-                } else {
+            if (btnstatus == false) {
+                btnstatus = true
+                if (type.equals("AMOUNTTRANSFER", ignoreCase = true)) {
+                    hideKeyboard(activity)
+                    if (!ImageUtils.commonAmount(textsss!!.getText().toString())) {
+                        textsss!!.setError("Please enter valid data")
+                        textsss!!.requestFocus()
+                    } else if (!(Integer.parseInt(textsss!!.getText().toString()) <= Integer.parseInt(formatss(s!!)))) {
+                        textsss!!.setError("Please enter valid amount")
+                        textsss!!.requestFocus()
+                    } else {
+                        dialog.dismiss()
+                        customDialogConfirm(pozo, "Are you sure you want to Transfer?", "CONFIRMATION", textsss!!.getText().toString(), "", "Credit Confirmation")
+                    }
+                }
+                if (type.equals("NETWORK_CREDIT", ignoreCase = true)) {
+                    loadUrl()
                     dialog.dismiss()
-                    customDialogConfirm(pozo, "Are you sure you want to Transfer?", "CONFIRMATION", textsss!!.getText().toString(), "", "Credit Confirmation")
+                } else if (type.equals("BENLAYOUT", ignoreCase = true)) {
+                    dialog.dismiss()
+                    customDialog_Ben(pozo, "Network Transfer", "AMOUNTTRANSFER", "", "Credit To Network")
                 }
             }
-             if (type.equals("NETWORK_CREDIT", ignoreCase = true)) {
-                loadUrl()
-                dialog.dismiss()
-            } else if (type.equals("BENLAYOUT", ignoreCase = true)) {
-                dialog.dismiss()
-                customDialog_Ben(pozo, "Network Transfer", "AMOUNTTRANSFER", "", "Credit To Network")
-            }
+            handlercontrol()
         }
         btn_cancel.setOnClickListener {
-            if (type.equals("BENLAYOUT", ignoreCase = true)) {
-                dialog.dismiss()
-                customDialog_Ben(pozo, "Network Transfer", "REVERSETRANSFER", "", "Credit To Network")
-            } else
-                dialog.dismiss()
+            if (btnstatus == false) {
+                btnstatus = true
+                if (type.equals("BENLAYOUT", ignoreCase = true)) {
+                    dialog.dismiss()
+                    customDialog_Ben(pozo, "Network Transfer", "REVERSETRANSFER", "", "Credit To Network")
+                } else
+                    dialog.dismiss()
+            }
+            handlercontrol()
         }
         dialog.show()
         btn_regenerate.setOnClickListener { dialog.dismiss() }
@@ -251,10 +263,14 @@ class FOSTransfer : BaseFragment(), RequestHandler {
         texttitle.text = title
         dialognew.setCancelable(false)
         btn_ok.setOnClickListener {
-            if (type.equals("CONFIRMATION", ignoreCase = true)) {
-                dialognew.dismiss()
-                AsyncPostMethod(WebConfig.CRNF, getNetwork_Transfer(pozo!!.mobileNo, amount, tpin).toString(), headerData, this@FOSTransfer, activity, getString(R.string.responseTimeOut)).execute()
+            if (btnstatus == false) {
+                btnstatus = true
+                if (type.equals("CONFIRMATION", ignoreCase = true)) {
+                    dialognew.dismiss()
+                    AsyncPostMethod(WebConfig.CRNF, getNetwork_Transfer(pozo!!.mobileNo, amount, tpin).toString(), headerData, this@FOSTransfer, activity, getString(R.string.responseTimeOut)).execute()
+                }
             }
+            handlercontrol()
         }
         btn_cancel.setOnClickListener { dialognew.dismiss() }
         dialognew.show()

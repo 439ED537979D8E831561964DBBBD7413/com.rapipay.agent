@@ -29,7 +29,8 @@ public class AsyncPostMethod extends AsyncTask<String, String, String> {
     String responseData;
     String hitFrom;
     Dialog dialogs;
-    public AsyncPostMethod(String url, String xmlData, String strHeaderData, Context handler,String responseData,String hitFrom) {
+
+    public AsyncPostMethod(String url, String xmlData, String strHeaderData, Context handler, String responseData, String hitFrom) {
         this.url = url;
         this.xmlData = xmlData;
         this.strHeaderData = strHeaderData;
@@ -41,7 +42,7 @@ public class AsyncPostMethod extends AsyncTask<String, String, String> {
         dialog = new CustomProgessDialog(handler);
     }
 
-    public AsyncPostMethod(String url, String xmlData, String strHeaderData, Context handler,String responseData) {
+    public AsyncPostMethod(String url, String xmlData, String strHeaderData, Context handler, String responseData) {
         this.url = url;
         this.xmlData = xmlData;
         this.strHeaderData = strHeaderData;
@@ -62,6 +63,7 @@ public class AsyncPostMethod extends AsyncTask<String, String, String> {
         customDialog("Please Wait...");
         dialog = new CustomProgessDialog(context);
     }
+
     public AsyncPostMethod(String url, String xmlData, String strHeaderData, RequestHandler handler, Context context, String responseData, String hitFrom) {
         this.url = url;
         this.xmlData = xmlData;
@@ -86,7 +88,10 @@ public class AsyncPostMethod extends AsyncTask<String, String, String> {
         try {
             String s = null;
             if (isNetworkAvailable(context)) {
-                connector.setServerCert(context);
+                if (url.contains("crm.rapipay.com"))
+                    connector.crmsetServerCert(context);
+                else
+                    connector.setServerCert(context);
                 s = connector.postData(url, xmlData, strHeaderData);
             } else {
                 s = "false";
@@ -103,19 +108,21 @@ public class AsyncPostMethod extends AsyncTask<String, String, String> {
         super.onPostExecute(s);
         dialogs.dismiss();
         try {
-            if (hitFrom!=null && hitFrom.equalsIgnoreCase("AEPS-MATM")) {
+            if (hitFrom != null && hitFrom.equalsIgnoreCase("AEPS-MATM")) {
                 handler.chechStat(hitFrom);
+            }else if (hitFrom != null && hitFrom.equalsIgnoreCase("ACTIVATIONSERVICE")) {
+                handler.chechStat(s);
             } else if (s != null) {
                 if (s.contains("DOCTYPE")) {
                     handler.chechStat(s);
                 } else if (!s.equalsIgnoreCase("false")) {
                     JSONObject object = new JSONObject(s);
                     if (object.has("responseCode")) {
-                        if (object.getString("responseCode").equalsIgnoreCase("201")||object.getString("responseCode").equalsIgnoreCase("1032") || object.getString("responseCode").equalsIgnoreCase("86004") || object.getString("responseCode").equalsIgnoreCase("60236") || object.getString("responseCode").equalsIgnoreCase("200") || object.getString("responseCode").equalsIgnoreCase("300") || object.getString("responseCode").equalsIgnoreCase("101") || object.getString("responseCode").equalsIgnoreCase("75077") || object.getString("responseCode").equalsIgnoreCase("75115") || object.getString("responseCode").equalsIgnoreCase("75062") || object.getString("responseCode").equalsIgnoreCase("75061") || object.getString("responseCode").equalsIgnoreCase("75063") || object.getString("responseCode").equalsIgnoreCase("60116") || object.getString("responseCode").equalsIgnoreCase("86001") || object.getString("responseCode").equalsIgnoreCase("86002")) {
+                        if (object.getString("responseCode").equalsIgnoreCase("75120") || object.getString("responseCode").equalsIgnoreCase("201") || object.getString("responseCode").equalsIgnoreCase("1032") || object.getString("responseCode").equalsIgnoreCase("86004") || object.getString("responseCode").equalsIgnoreCase("60236") || object.getString("responseCode").equalsIgnoreCase("200") || object.getString("responseCode").equalsIgnoreCase("300") || object.getString("responseCode").equalsIgnoreCase("101") || object.getString("responseCode").equalsIgnoreCase("75077") || object.getString("responseCode").equalsIgnoreCase("75115") || object.getString("responseCode").equalsIgnoreCase("75062") || object.getString("responseCode").equalsIgnoreCase("75061") || object.getString("responseCode").equalsIgnoreCase("75063") || object.getString("responseCode").equalsIgnoreCase("60116") || object.getString("responseCode").equalsIgnoreCase("86001") || object.getString("responseCode").equalsIgnoreCase("86002")) {
                             handler.chechStatus(object);
                             if (object.has("apiCommonResposne")) {
                                 JSONObject object1 = object.getJSONObject("apiCommonResposne");
-                                if(object1!=null) {
+                                if (object1 != null) {
                                     String balance = object1.getString("runningBalance");
                                     for (int i = 0; i < MainActivity.pozoArrayList.size(); i++) {
                                         if (MainActivity.pozoArrayList.get(i).getHeaderID().equalsIgnoreCase("1"))
@@ -139,7 +146,7 @@ public class AsyncPostMethod extends AsyncTask<String, String, String> {
                                 responseMSg(object);
                         }
                     } else if (object.has("responsecode")) {
-                        if (object.getString("responsecode").equalsIgnoreCase("201")||object.getString("responsecode").equalsIgnoreCase("200") || object.getString("responsecode").equalsIgnoreCase("101") || object.getString("responsecode").equalsIgnoreCase("300") || object.getString("responsecode").equalsIgnoreCase("75077") || object.getString("responsecode").equalsIgnoreCase("75115") || object.getString("responsecode").equalsIgnoreCase("75062") || object.getString("responsecode").equalsIgnoreCase("75061") || object.getString("responsecode").equalsIgnoreCase("60116") || object.getString("responsecode").equalsIgnoreCase("75063") || object.getString("responsecode").equalsIgnoreCase("86001") || object.getString("responsecode").equalsIgnoreCase("86002")) {
+                        if (object.getString("responsecode").equalsIgnoreCase("201") || object.getString("responsecode").equalsIgnoreCase("200") || object.getString("responsecode").equalsIgnoreCase("101") || object.getString("responsecode").equalsIgnoreCase("300") || object.getString("responsecode").equalsIgnoreCase("75077") || object.getString("responsecode").equalsIgnoreCase("75115") || object.getString("responsecode").equalsIgnoreCase("75062") || object.getString("responsecode").equalsIgnoreCase("75061") || object.getString("responsecode").equalsIgnoreCase("60116") || object.getString("responsecode").equalsIgnoreCase("75063") || object.getString("responsecode").equalsIgnoreCase("86001") || object.getString("responsecode").equalsIgnoreCase("86002")) {
                             handler.chechStatus(object);
                             if (object.has("apiCommonResposne")) {
                                 JSONObject object1 = object.getJSONObject("apiCommonResposne");

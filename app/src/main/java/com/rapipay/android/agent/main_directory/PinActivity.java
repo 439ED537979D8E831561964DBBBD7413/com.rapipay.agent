@@ -83,8 +83,8 @@ public class PinActivity extends BaseCompactActivity implements View.OnClickList
                 jsonObject.put("sessionRefNo", sessionRefNo);
                 jsonObject.put("deviceName", Build.MANUFACTURER);
                 jsonObject.put("osType", "ANDROID");
-                jsonObject.put("domainName",BuildConfig.DOMAINNAME);
-                jsonObject.put("clientRequestIP",ImageUtils.ipAddress(PinActivity.this));
+                jsonObject.put("domainName", BuildConfig.DOMAINNAME);
+                jsonObject.put("clientRequestIP", ImageUtils.ipAddress(PinActivity.this));
                 jsonObject.put("checkSum", GenerateChecksum.checkSum(sessionKey, jsonObject.toString()));
 
             } catch (Exception e) {
@@ -100,7 +100,11 @@ public class PinActivity extends BaseCompactActivity implements View.OnClickList
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_login:
-                new AsyncPostMethod(WebConfig.LOGIN_URL, getJson_Validate().toString(), "", PinActivity.this,getString(R.string.responseTimeOut)).execute();
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    new AsyncPostMethod(WebConfig.LOGIN_URL, getJson_Validate().toString(), "", PinActivity.this, getString(R.string.responseTimeOut)).execute();
+                }
+                handlercontrol();
                 break;
         }
     }
@@ -132,9 +136,9 @@ public class PinActivity extends BaseCompactActivity implements View.OnClickList
                     callBankDetails();
                 } else if (object.getString("serviceType").equalsIgnoreCase("GET_MASTER_DATA")) {
                     if (new MasterClass().getMasterData(object, db))
-                        new AsyncPostMethod(WebConfig.NETWORKTRANSFER_URL, acknowledge().toString(), headerData, PinActivity.this,getString(R.string.responseTimeOut)).execute();
+                        new AsyncPostMethod(WebConfig.NETWORKTRANSFER_URL, acknowledge().toString(), headerData, PinActivity.this, getString(R.string.responseTimeOut)).execute();
                 } else if (object.getString("serviceType").equalsIgnoreCase("UPDATE_DOWNLAOD_DATA_STATUS")) {
-                    new AsyncPostMethod(WebConfig.LOGIN_URL, getWLDetails().toString(), headerData, PinActivity.this,getString(R.string.responseTimeOut)).execute();
+                    new AsyncPostMethod(WebConfig.LOGIN_URL, getWLDetails().toString(), headerData, PinActivity.this, getString(R.string.responseTimeOut)).execute();
                 } else if (object.getString("serviceType").equalsIgnoreCase("WL_DOMAIN_DETAILS")) {
                     if (object.has("invoiceLogo"))
                         insertImages("invoiceLogo", object);
@@ -142,6 +146,7 @@ public class PinActivity extends BaseCompactActivity implements View.OnClickList
                         insertImages("loginLogo", object);
                     if (object.has("leftLogo"))
                         insertImages("leftLogo", object);
+                    localStorage.setActivityState(LocalStorage.ROUTESTATE, "PINVERIFIED");
                     customDialog_Common("KYCLAYOUTS", null, null, "Pin Registration", null, "Pin Registration Successful, Do you want to proceed ?", PinActivity.this);
 
                 }
@@ -214,7 +219,7 @@ public class PinActivity extends BaseCompactActivity implements View.OnClickList
     private void callBankDetails() {
         boolean bank_flag = db.getDetails_Bank();
         if (bank_flag == false) {
-            new AsyncPostMethod(WebConfig.CommonReport, getMaster_Validate().toString(), headerData, PinActivity.this,getString(R.string.responseTimeOut)).execute();
+            new AsyncPostMethod(WebConfig.CommonReport, getMaster_Validate().toString(), headerData, PinActivity.this, getString(R.string.responseTimeOut)).execute();
         }
     }
 

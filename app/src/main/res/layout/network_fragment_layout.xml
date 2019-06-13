@@ -4,7 +4,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
-
+    <EditText
+        android:id="@+id/searchfield"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="2dp"
+        android:background="@drawable/bg_border"
+        android:gravity="left"
+        android:hint="Search"
+        android:padding="5dp"
+        android:textColor="@color/black"
+        android:textSize="14dp" />
     <TextView
         android:id="@+id/header"
         android:layout_width="match_parent"

@@ -213,13 +213,14 @@ class FOSLedger : BaseFragment(), RequestHandler, View.OnClickListener {
 
         return null
     }
+
     private fun insertLastTransDetails(array: JSONArray) {
         if (array.length() != 1)
             transactionPozoArrayList = ArrayList<PassbookPozo>()
         try {
             for (i in 0 until array.length()) {
                 val `object` = array.getJSONObject(i)
-                transactionPozoArrayList!!.add(PassbookPozo(`object`.getString("payeeMobNo"),`object`.getString("txnServiceType"), formatss(`object`.getString("txnAmount")) + " / " + formatss(`object`.getString("crDrAmmount")) + " " + `object`.getString("crDrType"), `object`.getString("txnDate"), formatss(`object`.getString("openingBal")) + " / " + formatss(`object`.getString("closingBal")), `object`.getString("txnStatus")))
+                transactionPozoArrayList!!.add(PassbookPozo(`object`.getString("payeeMobNo"), `object`.getString("txnServiceType"), formatss(`object`.getString("txnAmount")) + " / " + formatss(`object`.getString("crDrAmmount")) + " " + `object`.getString("crDrType"), `object`.getString("txnDate"), formatss(`object`.getString("openingBal")) + " / " + formatss(`object`.getString("closingBal")), `object`.getString("txnStatus")))
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -263,16 +264,18 @@ class FOSLedger : BaseFragment(), RequestHandler, View.OnClickListener {
 
     override fun onClick(v: View?) {
         when (v!!.getId()) {
-            R.id.btn_fund -> if (date2_text!!.getText().toString().isEmpty()) {
-                date2_text!!.setError("Please enter mandatory field")
-                date2_text!!.requestFocus()
-            } else if (date1_text!!.getText().toString().isEmpty()) {
-                date1_text!!.setError("Please enter mandatory field")
-                date1_text!!.requestFocus()
-            } else if (printDifference(mainDate(date2_text!!.getText().toString()), mainDate(date1_text!!.getText().toString())))
-                loadUrl()
-            else
-                Toast.makeText(activity, "Please select correct date", Toast.LENGTH_SHORT).show()
+
+            R.id.btn_fund ->
+                if (date2_text!!.getText().toString().isEmpty()) {
+                    date2_text!!.setError("Please enter mandatory field")
+                    date2_text!!.requestFocus()
+                } else if (date1_text!!.getText().toString().isEmpty()) {
+                    date1_text!!.setError("Please enter mandatory field")
+                    date1_text!!.requestFocus()
+                } else if (printDifference(mainDate(date2_text!!.getText().toString()), mainDate(date1_text!!.getText().toString())))
+                    loadUrl()
+                else
+                    Toast.makeText(activity, "Please select correct date", Toast.LENGTH_SHORT).show()
         }
     }
 }

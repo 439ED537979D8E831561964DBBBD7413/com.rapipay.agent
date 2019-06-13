@@ -137,14 +137,18 @@ public class NetworkHistoryFragment extends BaseFragment implements RequestHandl
 //                if (payee.isEmpty())
 //                    Toast.makeText(getActivity(), "Please select type", Toast.LENGTH_SHORT).show();
 //                else
-                if (date2_text.getText().toString().isEmpty()) {
-                    date2_text.setError("Please enter valid data");
-                    date2_text.requestFocus();
-                } else if (date1_text.getText().toString().isEmpty()) {
-                    date1_text.setError("Please enter valid data");
-                    date1_text.requestFocus();
-                } else if (printDifference(mainDate(date2_text.getText().toString()), mainDate(date1_text.getText().toString())))
-                    new AsyncPostMethod(WebConfig.CommonReport, channel_request(first, last).toString(), headerData, NetworkHistoryFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    if (date2_text.getText().toString().isEmpty()) {
+                        date2_text.setError("Please enter valid data");
+                        date2_text.requestFocus();
+                    } else if (date1_text.getText().toString().isEmpty()) {
+                        date1_text.setError("Please enter valid data");
+                        date1_text.requestFocus();
+                    } else if (printDifference(mainDate(date2_text.getText().toString()), mainDate(date1_text.getText().toString())))
+                        new AsyncPostMethod(WebConfig.CommonReport, channel_request(first, last).toString(), headerData, NetworkHistoryFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
+                }
+                handlercontrol();
                 break;
         }
     }
@@ -294,7 +298,7 @@ public class NetworkHistoryFragment extends BaseFragment implements RequestHandl
         try {
             for (int i = 0; i < array.length(); i++) {
                 JSONObject object = array.getJSONObject(i);
-                transactionPozoArrayList.add(new NetworkHistoryPozo(object.getString("requestID"), object.getString("debitAmount"), object.getString("creditAmount"), object.getString("createdOn"), object.getString("sysRemarks"),object.getString("requestType")));
+                transactionPozoArrayList.add(new NetworkHistoryPozo(object.getString("requestID"), object.getString("debitAmount"), object.getString("creditAmount"), object.getString("createdOn"), object.getString("sysRemarks"), object.getString("requestType")));
             }
         } catch (Exception e) {
             e.printStackTrace();

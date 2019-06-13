@@ -68,15 +68,18 @@ public class NetworkTransferActivity extends BaseCompactActivity implements Requ
         trans_details.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (clickedId.equalsIgnoreCase("2")) {
-                    NetworkTransferPozo pozo = transactionPozoArrayList.get(position);
-                    if (!pozo.getAgentCategory().equalsIgnoreCase("Retailer")) {
-                        logList.add(new NetworkManagePozo(pozo.getMobileNo(), pozo.getMobileNo()));
-                        mobileNo = pozo.getMobileNo();
-                        customDialog_Common("NETWORKLAYOUT", null, pozo, "Network Option", null, null, NetworkTransferActivity.this);
-                    } else
-                        reDirect_Activity(pozo);
-                }
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    if (clickedId.equalsIgnoreCase("2")) {
+                        NetworkTransferPozo pozo = transactionPozoArrayList.get(position);
+                        if (!pozo.getAgentCategory().equalsIgnoreCase("Retailer")) {
+                            logList.add(new NetworkManagePozo(pozo.getMobileNo(), pozo.getMobileNo()));
+                            mobileNo = pozo.getMobileNo();
+                            customDialog_Common("NETWORKLAYOUT", null, pozo, "Network Option", null, null, NetworkTransferActivity.this);
+                        } else
+                            reDirect_Activity(pozo);
+                    }
+                }handlercontrol();
             }
         });
         trans_details.setOnScrollListener(new AbsListView.OnScrollListener() {
@@ -199,12 +202,16 @@ public class NetworkTransferActivity extends BaseCompactActivity implements Requ
                 finish();
                 break;
             case R.id.back_clicked:
-                if (logList.size() != 0) {
-                    new AsyncPostMethod(WebConfig.CommonReport, getNetwork_Validate("GET_MY_NODE_DETAILS", logList.get(logList.size() - 2).getBackMaintain(), first, last).toString(), headerData, NetworkTransferActivity.this, getString(R.string.responseTimeOut), "GETNODEDETAILS").execute();
-                    logList.remove(logList.size() - 1);
-                    if (logList.size() == 1)
-                        back_click.setVisibility(View.GONE);
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    if (logList.size() != 0) {
+                        new AsyncPostMethod(WebConfig.CommonReport, getNetwork_Validate("GET_MY_NODE_DETAILS", logList.get(logList.size() - 2).getBackMaintain(), first, last).toString(), headerData, NetworkTransferActivity.this, getString(R.string.responseTimeOut), "GETNODEDETAILS").execute();
+                        logList.remove(logList.size() - 1);
+                        if (logList.size() == 1)
+                            back_click.setVisibility(View.GONE);
+                    }
                 }
+                handlercontrol();
                 break;
         }
     }
@@ -216,7 +223,7 @@ public class NetworkTransferActivity extends BaseCompactActivity implements Requ
 
     @Override
     public void okClicked(String type, Object ob) {
-        if (type.equalsIgnoreCase("NETWORKLAYOUT"))
+        if (type.equalsIgnoreCase("Details"))
             reDirect_Activity((NetworkTransferPozo) ob);
         else if (type.equalsIgnoreCase("SESSIONEXPIRE"))
             jumpPage();

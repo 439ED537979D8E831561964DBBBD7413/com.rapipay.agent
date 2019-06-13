@@ -16,7 +16,9 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatButton;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -58,6 +60,7 @@ import com.rapipay.android.agent.utils.GenerateChecksum;
 import com.rapipay.android.agent.utils.ImageUtils;
 import com.rapipay.android.agent.utils.WalletAsyncMethod;
 import com.rapipay.android.agent.utils.WebConfig;
+import com.rapipay.android.agent.view.EnglishNumberToWords;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -94,7 +97,7 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
     HostResponse type = null;
     String sign;
     private PaymentInitialization initialization;
-    private String check = "",mobileNo,amount;
+    private String check = "", mobileNo, amount;
     ArrayList<AcquirerEmiDetailsVO> acquirerBanksList;
     private Spinner select_bank;
     private LinearLayout inflate_tenureee;
@@ -356,6 +359,7 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
         select_bank = (Spinner) findViewById(R.id.select_bank);
         inflate_tenureee = (LinearLayout) findViewById(R.id.inflate_tenureee);
         lv_imflate = (ListView) findViewById(R.id.lv_imflate);
+        final TextView input_text = (TextView) findViewById(R.id.input_texts);
         select_bank.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -377,6 +381,26 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                 vo = arrayLists.get(position);
             }
         });
+        input_amount.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s.length()!=0 && s.length()<10) {
+                    input_text.setText(new EnglishNumberToWords().convert(Integer.parseInt(s.toString())));
+                    input_text.setVisibility(View.VISIBLE);
+                }else
+                    input_text.setVisibility(View.GONE);
+            }
+        });
     }
 
     private void inflate_tenure(final ArrayList<AcquirerEmiDetailsVO> arrayList, LinearLayout inflate_tenureee) {
@@ -391,48 +415,60 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_fund_mpos:
-                hideKeyboard(CashOutClass.this);
-                type=null;
-                if (!ImageUtils.commonAmount(input_mobile.getText().toString())) {
-                    input_mobile.setError("Please enter mobile number");
-                    input_mobile.requestFocus();
-                } else if (!ImageUtils.commonAmount(input_amount.getText().toString())) {
-                    input_amount.setError("Please enter amount");
-                    input_amount.requestFocus();
-                } else {
-                    if (accessBluetoothDetails() != null)
-                        new WalletAsyncMethod(WebConfig.CASHOUT_URL, getCashOutDetails(input_mobile.getText().toString(), input_amount.getText().toString(), serviceType, requestChannel, reqFor, requestType, accessBluetoothDetails()).toString(), headerData, CashOutClass.this, getString(R.string.responseTimeOut), typeput).execute();
-                    else
-                        Toast.makeText(CashOutClass.this, "Please pair device through bluetooth", Toast.LENGTH_SHORT).show();
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    hideKeyboard(CashOutClass.this);
+                    type = null;
+                    if (!ImageUtils.commonAmount(input_mobile.getText().toString())) {
+                        input_mobile.setError("Please enter mobile number");
+                        input_mobile.requestFocus();
+                    } else if (!ImageUtils.commonAmount(input_amount.getText().toString())) {
+                        input_amount.setError("Please enter amount");
+                        input_amount.requestFocus();
+                    } else {
+                        if (accessBluetoothDetails() != null)
+                            new WalletAsyncMethod(WebConfig.CASHOUT_URL, getCashOutDetails(input_mobile.getText().toString(), input_amount.getText().toString(), serviceType, requestChannel, reqFor, requestType, accessBluetoothDetails()).toString(), headerData, CashOutClass.this, getString(R.string.responseTimeOut), typeput).execute();
+                        else
+                            Toast.makeText(CashOutClass.this, "Please pair device through bluetooth", Toast.LENGTH_SHORT).show();
+                    }
                 }
+                handlercontrol();
                 break;
             case R.id.back_click:
                 setBack_click(this);
                 finish();
                 break;
             case R.id.getEmidetails:
-                if (!ImageUtils.commonAmount(input_amount.getText().toString())) {
-                    input_amount.setError("Please enter amount");
-                    input_amount.requestFocus();
-                } else if (acquirerEmiDetailsVO == null) {
-                    select_bank.requestFocus();
-                } else {
-                    progessDialog = new CustomProgessDialog(CashOutClass.this);
-                    initialization.getSelectedBankEMITenureList(handler, input_amount.getText().toString(), acquirerEmiDetailsVO);
-                    check = "EMIDETAILS";
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    if (!ImageUtils.commonAmount(input_amount.getText().toString())) {
+                        input_amount.setError("Please enter amount");
+                        input_amount.requestFocus();
+                    } else if (acquirerEmiDetailsVO == null) {
+                        select_bank.requestFocus();
+                    } else {
+                        progessDialog = new CustomProgessDialog(CashOutClass.this);
+                        initialization.getSelectedBankEMITenureList(handler, input_amount.getText().toString(), acquirerEmiDetailsVO);
+                        check = "EMIDETAILS";
+                    }
                 }
+                handlercontrol();
                 break;
             case R.id.getdetails:
-                if (vo != null) {
-                    progessDialog = new CustomProgessDialog(CashOutClass.this);
-                    initialization = new PaymentInitialization(getApplicationContext());
-                    initialization.initiateTransaction(handler, DeviceType.ME30S, accessBluetoothDetails(),
-                            input_amount.getText().toString() + ".00", PaymentTransactionConstants.EMI,
-                            PaymentTransactionConstants.CREDIT, input_mobile.getText().toString(),
-                            mylocation.getLatitude(), mylocation.getLongitude(),
-                            orderID, null, vo, 1);
-                    check = "lastvalidate";
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    if (vo != null) {
+                        progessDialog = new CustomProgessDialog(CashOutClass.this);
+                        initialization = new PaymentInitialization(getApplicationContext());
+                        initialization.initiateTransaction(handler, DeviceType.ME30S, accessBluetoothDetails(),
+                                input_amount.getText().toString() + ".00", PaymentTransactionConstants.EMI,
+                                PaymentTransactionConstants.CREDIT, input_mobile.getText().toString(),
+                                mylocation.getLatitude(), mylocation.getLongitude(),
+                                orderID, null, vo, 1);
+                        check = "lastvalidate";
+                    }
                 }
+                handlercontrol();
                 break;
         }
     }
@@ -714,20 +750,28 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            case REQUEST_CHECK_SETTINGS_GPS:
-                switch (resultCode) {
-                    case Activity.RESULT_OK:
-                        getMyLocation();
-                        break;
-                    case Activity.RESULT_CANCELED:
-                        finish();
-                        break;
-                }
-                break;
-            case CONTACT_PICKER_RESULT:
-                contactRead(data, input_mobile);
-                break;
+        if (data != null) {
+            switch (requestCode) {
+                case REQUEST_CHECK_SETTINGS_GPS:
+                    switch (resultCode) {
+                        case Activity.RESULT_OK:
+                            getMyLocation();
+                            break;
+                        case Activity.RESULT_CANCELED:
+                            finish();
+                            break;
+                    }
+                    break;
+                case CONTACT_PICKER_RESULT:
+                    contactRead(data, input_mobile);
+                    break;
+                case 2:
+                    dialog.dismiss();
+                    break;
+            }
+        } else {
+            if (dialog != null)
+                dialog.dismiss();
         }
     }
 

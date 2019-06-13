@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 
+import com.rapipay.android.agent.Model.BeneficiaryDetailsPozo;
 import com.rapipay.android.agent.Model.NetworkTransferPozo;
 import com.rapipay.android.agent.R;
 
@@ -19,7 +20,7 @@ public class NetworkAdapter extends ArrayAdapter<NetworkTransferPozo>{
 
     private ArrayList<NetworkTransferPozo> dataSet;
     Context mContext;
-
+    private ArrayList<NetworkTransferPozo> arraylist = null;
     private static class ViewHolder {
         public View mView;
         public AutofitTextView btn_p_bank, btn_name, p_transid, btn_p_amounts, agent_category;
@@ -29,6 +30,8 @@ public class NetworkAdapter extends ArrayAdapter<NetworkTransferPozo>{
         super(context, R.layout.net_adap_layout, data);
         this.dataSet = data;
         this.mContext=context;
+        this.arraylist = new ArrayList<NetworkTransferPozo>();
+        this.arraylist.addAll(dataSet);
     }
 
 
@@ -71,5 +74,19 @@ public class NetworkAdapter extends ArrayAdapter<NetworkTransferPozo>{
             e.printStackTrace();
         }
         return null;
+    }
+    public void filter(String charText) {
+        charText = charText.toLowerCase(Locale.getDefault());
+        dataSet.clear();
+        if (charText.length() == 0) {
+            dataSet.addAll(arraylist);
+        } else {
+            for (NetworkTransferPozo wp : arraylist) {
+                if (wp.getAgentName().toLowerCase(Locale.getDefault()).contains(charText)||wp.getCompanyName().toLowerCase(Locale.getDefault()).contains(charText)||wp.getMobileNo().toLowerCase(Locale.getDefault()).contains(charText)) {
+                    dataSet.add(wp);
+                }
+            }
+        }
+        notifyDataSetChanged();
     }
 }

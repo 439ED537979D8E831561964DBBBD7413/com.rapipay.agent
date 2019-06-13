@@ -287,59 +287,71 @@ public class SettlementBankFragment extends BaseFragment implements WalletReques
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_ok:
-                hideKeyboard(getActivity());
-                if (userName.getText().toString().isEmpty()) {
-                    userName.setError("Please enter mandatory field");
-                    userName.requestFocus();
-                } else if (bank_select.getText().toString().equalsIgnoreCase("Select Bank")) {
-                    bank_select.setError("Please enter mandatory field");
-                    bank_select.requestFocus();
-                } else if (!ImageUtils.commonAccount(accountNumber.getText().toString(), 8, 30)) {
-                    accountNumber.setError("Please enter valid account number.");
-                    accountNumber.requestFocus();
-                } else {
-                    if (pageType.equalsIgnoreCase("S")) {
-                        if (!accountAdded)
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    hideKeyboard(getActivity());
+                    if (userName.getText().toString().isEmpty()) {
+                        userName.setError("Please enter mandatory field");
+                        userName.requestFocus();
+                    } else if (bank_select.getText().toString().equalsIgnoreCase("Select Bank")) {
+                        bank_select.setError("Please enter mandatory field");
+                        bank_select.requestFocus();
+                    } else if (!ImageUtils.commonAccount(accountNumber.getText().toString(), 8, 30)) {
+                        accountNumber.setError("Please enter valid account number.");
+                        accountNumber.requestFocus();
+                    } else {
+                        if (pageType.equalsIgnoreCase("S")) {
+                            if (!accountAdded)
+                                new WalletAsyncMethod(WebConfig.BCRemittanceApp, service_fee("1", "Money_Transfer_Bene").toString(), headerData, SettlementBankFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "SERVICEFEE").execute();
+                            else {
+                                customDialog_Common("SESSIONEXPIRRED", null, null, "Error", "", "Request For add Settlement Bank Account is Already Pending.", SettlementBankFragment.this);
+                            }
+                        } else if (pageType.equalsIgnoreCase("P")) {
                             new WalletAsyncMethod(WebConfig.BCRemittanceApp, service_fee("1", "Money_Transfer_Bene").toString(), headerData, SettlementBankFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "SERVICEFEE").execute();
-                        else {
-                            customDialog_Common("SESSIONEXPIRRED", null, null, "Error", "", "Request For add Settlement Bank Account is Already Pending.", SettlementBankFragment.this);
                         }
-                    } else if (pageType.equalsIgnoreCase("P")) {
-                        new WalletAsyncMethod(WebConfig.BCRemittanceApp, service_fee("1", "Money_Transfer_Bene").toString(), headerData, SettlementBankFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "SERVICEFEE").execute();
                     }
                 }
+                handlercontrol();
                 break;
             case R.id.btn_addBank:
-                hideKeyboard(getActivity());
-                if (userName.getText().toString().isEmpty()) {
-                    userName.setError("Please enter mandatory field");
-                    userName.requestFocus();
-                } else if (bank_select.getText().toString().equalsIgnoreCase("Select Bank")) {
-                    bank_select.setError("Please enter mandatory field");
-                    bank_select.requestFocus();
-                } else if (!ImageUtils.commonAccount(accountNumber.getText().toString(), 8, 30)) {
-                    accountNumber.setError("Please enter valid account number.");
-                    accountNumber.requestFocus();
-                } else if (!con_ifsc.getText().toString().matches("^[a-zA-Z0-9]{1,50}$")) {
-                    con_ifsc.setError("Please enter valid IFSC number.");
-                    con_ifsc.requestFocus();
-                } else if (pageType.equalsIgnoreCase("S") && image.getText().toString().isEmpty()) {
-                    image.setError("Please Select Image");
-                    image.requestFocus();
-                } else {
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    hideKeyboard(getActivity());
+                    if (userName.getText().toString().isEmpty()) {
+                        userName.setError("Please enter mandatory field");
+                        userName.requestFocus();
+                    } else if (bank_select.getText().toString().equalsIgnoreCase("Select Bank")) {
+                        bank_select.setError("Please enter mandatory field");
+                        bank_select.requestFocus();
+                    } else if (!ImageUtils.commonAccount(accountNumber.getText().toString(), 8, 30)) {
+                        accountNumber.setError("Please enter valid account number.");
+                        accountNumber.requestFocus();
+                    } else if (!con_ifsc.getText().toString().matches("^[a-zA-Z0-9]{1,50}$")) {
+                        con_ifsc.setError("Please enter valid IFSC number.");
+                        con_ifsc.requestFocus();
+                    } else if (pageType.equalsIgnoreCase("S") && image.getText().toString().isEmpty()) {
+                        image.setError("Please Select Image");
+                        image.requestFocus();
+                    } else {
 //                    if (pageType.equalsIgnoreCase("S")) {
 //                        if (!accountAdded)
-                            new WalletAsyncMethod(WebConfig.CRNF, addAgentBankDetails().toString(), headerData, SettlementBankFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "ADDBANKLIST").execute();
+                        new WalletAsyncMethod(WebConfig.CRNF, addAgentBankDetails().toString(), headerData, SettlementBankFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "ADDBANKLIST").execute();
 //                        else {
 //                            customDialog_Common("SESSIONEXPIRRED", null, null, "Error", "", "Request For add Settlement Bank Account is Already Pending.", SettlementBankFragment.this);
 //                        }
 //                    } else if (pageType.equalsIgnoreCase("P")) {
 //                        new WalletAsyncMethod(WebConfig.CRNF, addAgentBankDetails().toString(), headerData, SettlementBankFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "ADDBANKLIST").execute();
 //                    }
+                    }
                 }
+                handlercontrol();
                 break;
             case R.id.images:
-                selectImage();
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    selectImage();
+                }
+                handlercontrol();
                 break;
         }
 

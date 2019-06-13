@@ -37,6 +37,7 @@ public class PassbookActivity extends BaseCompactActivity implements View.OnClic
     ArrayList<PassbookPozo> transactionPozoArrayList;
     private int first = 1, last = 25;
     PassbookAdapter adapter;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,7 +49,7 @@ public class PassbookActivity extends BaseCompactActivity implements View.OnClic
         TYPE = getIntent().getStringExtra("TYPE");
         Calendar calendar = Calendar.getInstance();
         selectedDate = calendar.get(Calendar.DAY_OF_MONTH);
-        selectedMonth = calendar.get(Calendar.MONTH)+1;
+        selectedMonth = calendar.get(Calendar.MONTH) + 1;
         selectedYear = calendar.get(Calendar.YEAR);
         heading = (TextView) findViewById(R.id.toolbar_title);
         heading.setText("Agent Ledger History");
@@ -59,10 +60,10 @@ public class PassbookActivity extends BaseCompactActivity implements View.OnClic
         findViewById(R.id.date1).setOnClickListener(toDateClicked);
         findViewById(R.id.fromdate).setOnClickListener(fromDateClicked);
         findViewById(R.id.date2).setOnClickListener(fromDateClicked);
-        toimage = (ImageView)findViewById(R.id.toimage);
+        toimage = (ImageView) findViewById(R.id.toimage);
         toimage.setOnClickListener(toDateClicked);
         toimage.setColorFilter(getResources().getColor(R.color.colorPrimaryDark));
-        fromimage = (ImageView)findViewById(R.id.fromimage);
+        fromimage = (ImageView) findViewById(R.id.fromimage);
         fromimage.setOnClickListener(fromDateClicked);
         fromimage.setColorFilter(getResources().getColor(R.color.colorPrimaryDark));
         if (TYPE.equalsIgnoreCase("NODE")) {
@@ -70,7 +71,7 @@ public class PassbookActivity extends BaseCompactActivity implements View.OnClic
             date1_text.setText(selectedYear + "-" + selectedMonth + "-" + selectedDate);
             if (printDifference(mainDate(date2_text.getText().toString()), mainDate(date1_text.getText().toString())))
                 new AsyncPostMethod(WebConfig.CommonReport, channel_request(first, last).toString(), headerData, PassbookActivity.this, getString(R.string.responseTimeOut)).execute();
-        }else {
+        } else {
             date2_text.setText(selectedYear + "-" + selectedMonth + "-" + selectedDate);
             date1_text.setText(selectedYear + "-" + selectedMonth + "-" + selectedDate);
         }
@@ -92,6 +93,7 @@ public class PassbookActivity extends BaseCompactActivity implements View.OnClic
             }
         });
     }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -100,16 +102,20 @@ public class PassbookActivity extends BaseCompactActivity implements View.OnClic
                 finish();
                 break;
             case R.id.btn_fund:
-                if (date2_text.getText().toString().isEmpty()) {
-                    date2_text.setError("Please enter mandatory field");
-                    date2_text.requestFocus();
-                }else if (date1_text.getText().toString().isEmpty()) {
-                    date1_text.setError("Please enter mandatory field");
-                    date1_text.requestFocus();
-                } else if (printDifference(mainDate(date2_text.getText().toString()),mainDate(date1_text.getText().toString())))
-                    new AsyncPostMethod(WebConfig.CommonReport, channel_request(first, last).toString(), headerData, PassbookActivity.this,getString(R.string.responseTimeOut)).execute();
-                else
-                    Toast.makeText(PassbookActivity.this,"Please select correct date",Toast.LENGTH_SHORT).show();
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    if (date2_text.getText().toString().isEmpty()) {
+                        date2_text.setError("Please enter mandatory field");
+                        date2_text.requestFocus();
+                    } else if (date1_text.getText().toString().isEmpty()) {
+                        date1_text.setError("Please enter mandatory field");
+                        date1_text.requestFocus();
+                    } else if (printDifference(mainDate(date2_text.getText().toString()), mainDate(date1_text.getText().toString())))
+                        new AsyncPostMethod(WebConfig.CommonReport, channel_request(first, last).toString(), headerData, PassbookActivity.this, getString(R.string.responseTimeOut)).execute();
+                    else
+                        Toast.makeText(PassbookActivity.this, "Please select correct date", Toast.LENGTH_SHORT).show();
+                }
+                handlercontrol();
                 break;
         }
     }
@@ -156,7 +162,7 @@ public class PassbookActivity extends BaseCompactActivity implements View.OnClic
         try {
             for (int i = 0; i < array.length(); i++) {
                 JSONObject object = array.getJSONObject(i);
-                transactionPozoArrayList.add(new PassbookPozo(object.getString("txnDate"),object.getString("serviceName"), formatss(object.getString("txnAmount")) + " / " + formatss(object.getString("crDrAmount")) + " " + object.getString("crDrType"), object.getString("txnDate"), formatss(object.getString("openingBalance")) + " / " + formatss(object.getString("closingBalance")), object.getString("transactionStatus")));
+                transactionPozoArrayList.add(new PassbookPozo(object.getString("txnDate"), object.getString("serviceName"), formatss(object.getString("txnAmount")) + " / " + formatss(object.getString("crDrAmount")) + " " + object.getString("crDrType"), object.getString("txnDate"), formatss(object.getString("openingBalance")) + " / " + formatss(object.getString("closingBalance")), object.getString("transactionStatus")));
             }
         } catch (Exception e) {
             e.printStackTrace();

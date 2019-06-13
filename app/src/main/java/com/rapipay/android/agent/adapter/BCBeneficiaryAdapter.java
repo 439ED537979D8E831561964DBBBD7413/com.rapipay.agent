@@ -51,10 +51,10 @@ public class BCBeneficiaryAdapter extends RecyclerView.Adapter<BCBeneficiaryAdap
         holder.btn_bank.setText(mValues.get(position).getBank());
         holder.btn_name.setText(mValues.get(position).getName());
         holder.btn_account.setText(mValues.get(position).getAccountno());
-        if (!mValues.get(position).getIfsc().equalsIgnoreCase("NOT-VEREFIED"))
+//        if (!mValues.get(position).getIsVerified().equalsIgnoreCase("NOT-VEREFIED"))
             holder.isverified.setText("VEREFIED");
-        else
-            holder.isverified.setText(mValues.get(position).getIfsc());
+//        else
+//            holder.isverified.setText(mValues.get(position).getIfsc());
     }
 
     @Override

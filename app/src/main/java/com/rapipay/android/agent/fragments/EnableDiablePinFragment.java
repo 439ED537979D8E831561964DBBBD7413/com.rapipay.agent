@@ -56,11 +56,15 @@ public class EnableDiablePinFragment extends BaseFragment implements View.OnClic
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_login:
-                if (enterpin.length() < 4) {
-                    enterpin.setError("Please enter 4 digin pin");
-                    enterpin.requestFocus();
-                } else
-                    new AsyncPostMethod(WebConfig.LOGIN_URL, getJson_Validate().toString(), "", EnableDiablePinFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    if (enterpin.length() < 4) {
+                        enterpin.setError("Please enter 4 digin pin");
+                        enterpin.requestFocus();
+                    } else
+                        new AsyncPostMethod(WebConfig.LOGIN_URL, getJson_Validate().toString(), "", EnableDiablePinFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
+                }
+                handlercontrol();
                 break;
         }
     }
@@ -103,6 +107,10 @@ public class EnableDiablePinFragment extends BaseFragment implements View.OnClic
     public void chechStatus(JSONObject object) {
         try {
             if (object.getString("responseCode").equalsIgnoreCase("200")) {
+                if (object.getString("serviceType").equalsIgnoreCase("Txn_PIN_ENABLE")) {
+                    customDialog_Ben("Alert", object.getString("responseMessage"));
+                }
+            } else if (object.getString("responseCode").equalsIgnoreCase("75120")) {
                 if (object.getString("serviceType").equalsIgnoreCase("Txn_PIN_ENABLE")) {
                     customDialog_Ben("Alert", object.getString("responseMessage"));
                 }

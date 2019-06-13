@@ -2,7 +2,9 @@ package com.rapipay.android.agent.main_directory;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.InputFilter;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -20,6 +22,7 @@ import com.rapipay.android.agent.utils.BaseCompactActivity;
 import com.rapipay.android.agent.utils.GenerateChecksum;
 import com.rapipay.android.agent.utils.ImageUtils;
 import com.rapipay.android.agent.utils.WebConfig;
+import com.rapipay.android.agent.view.EnglishNumberToWords;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -49,8 +52,9 @@ public class ReChargeActivity extends BaseCompactActivity implements View.OnClic
         input_amount = (EditText) findViewById(R.id.input_amount);
         input_number = (EditText) findViewById(R.id.input_number);
         btn_contact = (ImageView) findViewById(R.id.btn_contact);
+        final TextView input_text = (TextView) findViewById(R.id.input_texts);
         newtpin = (EditText) findViewById(R.id.newtpin);
-        if (BaseCompactActivity.ENABLE_TPIN !=null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y"))
+        if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y"))
             newtpin.setVisibility(View.VISIBLE);
         if (operator_clicked.equalsIgnoreCase("DTH")) {
             btn_contact.setVisibility(View.GONE);
@@ -94,6 +98,26 @@ public class ReChargeActivity extends BaseCompactActivity implements View.OnClic
         });
         prepaid = (RadioButton) findViewById(R.id.prepaid);
         postpaid = (RadioButton) findViewById(R.id.postpaid);
+        input_amount.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s.length()!=0 && s.length()<10) {
+                    input_text.setText(new EnglishNumberToWords().convert(Integer.parseInt(s.toString())));
+                    input_text.setVisibility(View.VISIBLE);
+                }else
+                    input_text.setVisibility(View.GONE);
+            }
+        });
     }
 
     @Override
@@ -104,44 +128,52 @@ public class ReChargeActivity extends BaseCompactActivity implements View.OnClic
                 finish();
                 break;
             case R.id.btn_contact:
-                loadIMEI();
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    loadIMEI();
+                }
+                handlercontrol();
                 break;
             case R.id.btn_submit:
-                if (operator_clicked.equalsIgnoreCase("DTH")) {
-                    if (!ImageUtils.commonAccount(input_number.getText().toString(), 8, 15)) {
-                        input_number.setError("Please enter valid mobile number");
-                        input_number.requestFocus();
-                    } else if (!ImageUtils.commonAmount(input_amount.getText().toString())) {
-                        input_amount.setError("Please enter valid data");
-                        input_amount.requestFocus();
-                    } else if (select_operator.getText().toString().equalsIgnoreCase("Select Operator"))
-                        select_operator.setError("Please enter mandatory field");
-                    else if (BaseCompactActivity.ENABLE_TPIN !=null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && (newtpin.getText().toString().isEmpty() || newtpin.getText().toString().length() != 4)) {
-                        newtpin.setError("Please enter TPIN");
-                        newtpin.requestFocus();
-                    } else if (BaseCompactActivity.ENABLE_TPIN !=null && (BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && newtpin.getText().toString().length() == 4) || BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("N"))
-                        new AsyncPostMethod(WebConfig.RECHARGENEW, reCharge_request().toString(), headerData, ReChargeActivity.this, "Response Time Out.Please Check your Transaction leadger or Contact Customer Support ... \\n\n" +
-                                "  Recharge Number  -" + input_number.getText().toString() + "\n" +
-                                "  Amount -" + input_amount.getText().toString() + "\n" +
-                                "  Operater -" + select_operator.getText().toString() + "\n").execute();
-                } else if (operator_clicked.equalsIgnoreCase("PRE") || operator_clicked.equalsIgnoreCase("POST") || operator_clicked.equalsIgnoreCase("MOBILE")) {
-                    if (!ImageUtils.commonNumber(input_number.getText().toString(), 10)) {
-                        input_number.setError("Please enter valid mobile number");
-                        input_number.requestFocus();
-                    } else if (!ImageUtils.commonAmount(input_amount.getText().toString())) {
-                        input_amount.setError("Please enter valid data");
-                        input_amount.requestFocus();
-                    } else if (select_operator.getText().toString().equalsIgnoreCase("Select Operator"))
-                        select_operator.setError("Please enter mandatory field");
-                    else if (BaseCompactActivity.ENABLE_TPIN !=null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && (newtpin.getText().toString().isEmpty() || newtpin.getText().toString().length() != 4)) {
-                        newtpin.setError("Please enter TPIN");
-                        newtpin.requestFocus();
-                    } else if (BaseCompactActivity.ENABLE_TPIN !=null && (BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && newtpin.getText().toString().length() == 4) || BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("N"))
-                        new AsyncPostMethod(WebConfig.RECHARGENEW, reCharge_request().toString(), headerData, ReChargeActivity.this, "Response Time Out.Please Check your Transaction leadger or Contact Customer Support ... \\n\n" +
-                                "  Recharge Number  -" + input_number.getText().toString() + "\n" +
-                                "  Amount -" + input_amount.getText().toString() + "\n" +
-                                "  Operater -" + select_operator.getText().toString() + "\n").execute();
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    if (operator_clicked.equalsIgnoreCase("DTH")) {
+                        if (!ImageUtils.commonAccount(input_number.getText().toString(), 8, 15)) {
+                            input_number.setError("Please enter valid mobile number");
+                            input_number.requestFocus();
+                        } else if (!ImageUtils.commonAmount(input_amount.getText().toString())) {
+                            input_amount.setError("Please enter valid data");
+                            input_amount.requestFocus();
+                        } else if (select_operator.getText().toString().equalsIgnoreCase("Select Operator"))
+                            select_operator.setError("Please enter mandatory field");
+                        else if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && (newtpin.getText().toString().isEmpty() || newtpin.getText().toString().length() != 4)) {
+                            newtpin.setError("Please enter TPIN");
+                            newtpin.requestFocus();
+                        } else if (BaseCompactActivity.ENABLE_TPIN != null && (BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && newtpin.getText().toString().length() == 4) || BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("N"))
+                            new AsyncPostMethod(WebConfig.RECHARGENEW, reCharge_request().toString(), headerData, ReChargeActivity.this, "Response Time Out.Please Check your Transaction leadger or Contact Customer Support ... \\n\n" +
+                                    "  Recharge Number  -" + input_number.getText().toString() + "\n" +
+                                    "  Amount -" + input_amount.getText().toString() + "\n" +
+                                    "  Operater -" + select_operator.getText().toString() + "\n").execute();
+                    } else if (operator_clicked.equalsIgnoreCase("PRE") || operator_clicked.equalsIgnoreCase("POST") || operator_clicked.equalsIgnoreCase("MOBILE")) {
+                        if (!ImageUtils.commonNumber(input_number.getText().toString(), 10)) {
+                            input_number.setError("Please enter valid mobile number");
+                            input_number.requestFocus();
+                        } else if (!ImageUtils.commonAmount(input_amount.getText().toString())) {
+                            input_amount.setError("Please enter valid data");
+                            input_amount.requestFocus();
+                        } else if (select_operator.getText().toString().equalsIgnoreCase("Select Operator"))
+                            select_operator.setError("Please enter mandatory field");
+                        else if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && (newtpin.getText().toString().isEmpty() || newtpin.getText().toString().length() != 4)) {
+                            newtpin.setError("Please enter TPIN");
+                            newtpin.requestFocus();
+                        } else if (BaseCompactActivity.ENABLE_TPIN != null && (BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && newtpin.getText().toString().length() == 4) || BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("N"))
+                            new AsyncPostMethod(WebConfig.RECHARGENEW, reCharge_request().toString(), headerData, ReChargeActivity.this, "Response Time Out.Please Check your Transaction leadger or Contact Customer Support ... \\n\n" +
+                                    "  Recharge Number  -" + input_number.getText().toString() + "\n" +
+                                    "  Amount -" + input_amount.getText().toString() + "\n" +
+                                    "  Operater -" + select_operator.getText().toString() + "\n").execute();
+                    }
                 }
+                handlercontrol();
                 break;
         }
     }
@@ -230,10 +262,17 @@ public class ReChargeActivity extends BaseCompactActivity implements View.OnClic
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK) {
-            if (requestCode == CONTACT_PICKER_RESULT) {
-                contactRead(data, input_number);
+        if (data != null) {
+            if (resultCode == RESULT_OK) {
+                if (requestCode == CONTACT_PICKER_RESULT) {
+                    contactRead(data, input_number);
+                }
+            } else if (requestCode == 2) {
+                dialog.dismiss();
             }
+        } else {
+            if (dialog != null)
+                dialog.dismiss();
         }
     }
 

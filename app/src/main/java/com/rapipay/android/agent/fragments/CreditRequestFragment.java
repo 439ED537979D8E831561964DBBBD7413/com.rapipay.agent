@@ -16,6 +16,8 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatButton;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -42,6 +44,7 @@ import com.rapipay.android.agent.utils.BaseFragment;
 import com.rapipay.android.agent.utils.GenerateChecksum;
 import com.rapipay.android.agent.utils.ImageUtils;
 import com.rapipay.android.agent.utils.WebConfig;
+import com.rapipay.android.agent.view.EnglishNumberToWords;
 
 import org.json.JSONObject;
 
@@ -100,7 +103,7 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
             public void onClick(View v) {
                 String condition = "where " + RapipayDB.COLOMN_CREDITBANK + "='Y'";
                 ArrayList<String> list_bank = BaseCompactActivity.db.geBankDetails(condition);
-                customSpinner(bank_select, "Select Bank", list_bank,"");
+                customSpinner(bank_select, "Select Bank", list_bank, "");
             }
         });
         list_payment = BaseCompactActivity.db.getPaymenttDetails();
@@ -125,6 +128,27 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
         ImageView toimage = (ImageView) rv.findViewById(R.id.toimage);
         toimage.setOnClickListener(toDateClicked);
         toimage.setColorFilter(getResources().getColor(R.color.colorPrimaryDark));
+        final TextView input_text = (TextView) rv.findViewById(R.id.input_textss);
+        input_amount.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s.length()!=0 && s.length()<10) {
+                    input_text.setText(new EnglishNumberToWords().convert(Integer.parseInt(s.toString())));
+                    input_text.setVisibility(View.VISIBLE);
+                }else
+                    input_text.setVisibility(View.GONE);
+            }
+        });
     }
 
     @Override
@@ -172,8 +196,12 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
         btn_ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                clear();
-                dialog.dismiss();
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    clear();
+                    dialog.dismiss();
+                }
+                handlercontrol();
             }
         });
         btn_cancel.setOnClickListener(new View.OnClickListener() {
@@ -272,40 +300,44 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
                 loadIMEI();
                 break;
             case R.id.btn_fund:
-                if (!ImageUtils.commonRegex(input_account.getText().toString(), 150, " ")) {
-                    input_account.setError("Please enter valid data");
-                    input_account.requestFocus();
-                } else if (!ImageUtils.commonRegex(input_code.getText().toString(), 20, "0-9")) {
-                    input_code.setError("Please enter valid data");
-                    input_code.requestFocus();
-                } else if (!ImageUtils.commonAmount(input_amount.getText().toString())) {
-                    input_amount.setError("Please enter valid data");
-                    input_amount.requestFocus();
-                } else if (!ImageUtils.commonRegex(input_transid.getText().toString(), 30, "0-9")) {
-                    input_transid.setError("Please enter valid data");
-                    input_transid.requestFocus();
-                } else if (bank_select.getText().toString().equalsIgnoreCase("Select Bank"))
-                    bank_select.setError("Please enter valid data");
-                else if (paymode.isEmpty())
-                    Toast.makeText(getActivity(), "Please select payment mode.", Toast.LENGTH_SHORT).show();
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    if (!ImageUtils.commonRegex(input_account.getText().toString(), 150, " ")) {
+                        input_account.setError("Please enter valid data");
+                        input_account.requestFocus();
+                    } else if (!ImageUtils.commonRegex(input_code.getText().toString(), 20, "0-9")) {
+                        input_code.setError("Please enter valid data");
+                        input_code.requestFocus();
+                    } else if (!ImageUtils.commonAmount(input_amount.getText().toString())) {
+                        input_amount.setError("Please enter valid data");
+                        input_amount.requestFocus();
+                    } else if (!ImageUtils.commonRegex(input_transid.getText().toString(), 30, "0-9")) {
+                        input_transid.setError("Please enter valid data");
+                        input_transid.requestFocus();
+                    } else if (bank_select.getText().toString().equalsIgnoreCase("Select Bank"))
+                        bank_select.setError("Please enter valid data");
+                    else if (paymode.isEmpty())
+                        Toast.makeText(getActivity(), "Please select payment mode.", Toast.LENGTH_SHORT).show();
 //                else if (BaseCompactActivity.IS_CRIMAGE_REQUIRED == null && image.getText().toString().isEmpty()) {
 //                    image.setError("Please Select Image");
 //                    image.requestFocus();
 //                }
-                else if (BaseCompactActivity.IS_CRIMAGE_REQUIRED != null && BaseCompactActivity.IS_CRIMAGE_REQUIRED.equalsIgnoreCase("Y") && image.getText().toString().isEmpty()) {
-                    image.setError("Please Select Image");
-                    image.requestFocus();
-                } else if (date1_text.getText().toString().isEmpty()) {
-                    date1_text.setError("Please select date");
-                    date1_text.requestFocus();
-                } else if (!paymode.isEmpty() && BaseCompactActivity.IS_CRIMAGE_REQUIRED == null)
-                    new AsyncPostMethod(WebConfig.CRNF, credit_request().toString(), headerData, CreditRequestFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
-                else if (!paymode.isEmpty() && BaseCompactActivity.IS_CRIMAGE_REQUIRED != null && BaseCompactActivity.IS_CRIMAGE_REQUIRED.equalsIgnoreCase("Y") && !imageBase64.isEmpty())
-                    new AsyncPostMethod(WebConfig.CRNF, credit_request().toString(), headerData, CreditRequestFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
-                else if (!paymode.isEmpty() && BaseCompactActivity.IS_CRIMAGE_REQUIRED != null && BaseCompactActivity.IS_CRIMAGE_REQUIRED.equalsIgnoreCase("N"))
-                    new AsyncPostMethod(WebConfig.CRNF, credit_request().toString(), headerData, CreditRequestFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
-                else
-                    Toast.makeText(getActivity(), "Please select mandatory fields", Toast.LENGTH_SHORT).show();
+                    else if (BaseCompactActivity.IS_CRIMAGE_REQUIRED != null && BaseCompactActivity.IS_CRIMAGE_REQUIRED.equalsIgnoreCase("Y") && image.getText().toString().isEmpty()) {
+                        image.setError("Please Select Image");
+                        image.requestFocus();
+                    } else if (date1_text.getText().toString().isEmpty()) {
+                        date1_text.setError("Please select date");
+                        date1_text.requestFocus();
+                    } else if (!paymode.isEmpty() && BaseCompactActivity.IS_CRIMAGE_REQUIRED == null)
+                        new AsyncPostMethod(WebConfig.CRNF, credit_request().toString(), headerData, CreditRequestFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
+                    else if (!paymode.isEmpty() && BaseCompactActivity.IS_CRIMAGE_REQUIRED != null && BaseCompactActivity.IS_CRIMAGE_REQUIRED.equalsIgnoreCase("Y") && !imageBase64.isEmpty())
+                        new AsyncPostMethod(WebConfig.CRNF, credit_request().toString(), headerData, CreditRequestFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
+                    else if (!paymode.isEmpty() && BaseCompactActivity.IS_CRIMAGE_REQUIRED != null && BaseCompactActivity.IS_CRIMAGE_REQUIRED.equalsIgnoreCase("N"))
+                        new AsyncPostMethod(WebConfig.CRNF, credit_request().toString(), headerData, CreditRequestFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
+                    else
+                        Toast.makeText(getActivity(), "Please select mandatory fields", Toast.LENGTH_SHORT).show();
+                }
+                handlercontrol();
                 break;
         }
     }
@@ -409,7 +441,7 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
             String remark = "";
             if (input_remark.getText().toString().isEmpty())
                 remark = "";
-            else if (!ImageUtils.commonRegex(input_remark.getText().toString(), 250, "0-9 ?/,._-"))
+            else if (!ImageUtils.commonRegex(input_remark.getText().toString(), 250, "0-9 ?."))
                 remark = input_remark.getText().toString();
             jsonObject.put("serviceType", "CREDIT_FUND_REQUEST");
             jsonObject.put("requestType", "BC_CHANNEL");

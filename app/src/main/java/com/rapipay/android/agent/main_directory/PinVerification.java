@@ -262,7 +262,7 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
                 customDialog_Common("KYCLAYOUT", null, null, "Forgot Pin", null, "Do you want to reset your pin!.", PinVerification.this);
                 break;
             case R.id.switchuser:
-                customDialog_Common("KYCLAYOUT", null, null, "Forgot Pin", null, "Do you want to switch user!.", PinVerification.this);
+                customDialog_Common("KYCLAYOUT", null, null, "Switch User", null, "Do you want to switch user!.", PinVerification.this);
                 break;
         }
     }

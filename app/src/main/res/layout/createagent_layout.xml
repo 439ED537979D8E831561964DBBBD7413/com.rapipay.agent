@@ -19,7 +19,7 @@
                 android:id="@+id/first_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="First Name"
+                android:hint="First Name*"
                 android:inputType="text"
                 android:textSize="16dp" />
         </android.support.design.widget.TextInputLayout>
@@ -32,7 +32,7 @@
                 android:id="@+id/last_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Last Name"
+                android:hint="Last Name*"
                 android:inputType="text"
                 android:textSize="16dp" />
         </android.support.design.widget.TextInputLayout>
@@ -45,7 +45,7 @@
                 android:id="@+id/mobile_num"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Mobile Number"
+                android:hint="Mobile Number*"
                 android:inputType="number"
                 android:maxLength="10"
                 android:textSize="16dp" />
@@ -59,7 +59,7 @@
                 android:id="@+id/cree_address"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Address"
+                android:hint="Address*"
                 android:inputType="textMultiLine"
                 android:textSize="16dp" />
         </android.support.design.widget.TextInputLayout>
@@ -82,7 +82,7 @@
                 android:id="@+id/pincode"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Pincode"
+                android:hint="Pincode*"
                 android:inputType="number"
                 android:maxLength="6"
                 android:textSize="16sp" />

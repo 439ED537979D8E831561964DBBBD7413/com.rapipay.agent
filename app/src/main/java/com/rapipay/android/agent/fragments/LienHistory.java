@@ -41,6 +41,7 @@ public class LienHistory extends BaseFragment implements WalletRequestHandler, V
     protected String headerData = (WebConfig.BASIC_USERID + ":" + WebConfig.BASIC_PASSWORD);
     private int selectedDate, selectedMonth, selectedYear;
     String months = null, dayss = null;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
@@ -56,7 +57,7 @@ public class LienHistory extends BaseFragment implements WalletRequestHandler, V
     private void initialize(View rv) {
         Calendar calendar = Calendar.getInstance();
         selectedDate = calendar.get(Calendar.DAY_OF_MONTH);
-        selectedMonth = calendar.get(Calendar.MONTH)+1;
+        selectedMonth = calendar.get(Calendar.MONTH) + 1;
         selectedYear = calendar.get(Calendar.YEAR);
         date2_text = (AutofitTextView) rv.findViewById(R.id.date2);
         date2_text.setOnClickListener(this);
@@ -80,10 +81,10 @@ public class LienHistory extends BaseFragment implements WalletRequestHandler, V
     }
 
     private void loadUrl() {
-        new WalletAsyncMethod(WebConfig.CommonReport, lienHistory(date2_text.getText().toString(),date1_text.getText().toString()).toString(), headerData, LienHistory.this, getActivity(), getString(R.string.responseTimeOut), "TRANSACTIONHISTORY").execute();
+        new WalletAsyncMethod(WebConfig.CommonReport, lienHistory(date2_text.getText().toString(), date1_text.getText().toString()).toString(), headerData, LienHistory.this, getActivity(), getString(R.string.responseTimeOut), "TRANSACTIONHISTORY").execute();
     }
 
-    public JSONObject lienHistory(String date2_text,String date1_text) {
+    public JSONObject lienHistory(String date2_text, String date1_text) {
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("serviceType", "GET_AGENT_LIEN_DETAILS");
@@ -157,14 +158,23 @@ public class LienHistory extends BaseFragment implements WalletRequestHandler, V
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_fund:
-                if (date2_text.getText().toString().isEmpty()) {
-                    date2_text.setError("Please enter valid data");
-                    date2_text.requestFocus();
-                } else if (date1_text.getText().toString().isEmpty()) {
-                    date1_text.setError("Please enter valid data");
-                    date1_text.requestFocus();
-                } else if (printDifference(mainDate(date2_text.getText().toString()), mainDate(date1_text.getText().toString())))
-                    loadUrl();
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    if (date2_text.getText().toString().isEmpty()) {
+                        date2_text.setError("Please enter valid data");
+                        date2_text.requestFocus();
+                    } else if (date1_text.getText().toString().isEmpty()) {
+                        date1_text.setError("Please enter valid data");
+                        date1_text.requestFocus();
+                    } else if (printDifference(mainDate(date2_text.getText().toString()), mainDate(date1_text.getText().toString()))) {
+//                    boolean checkval= date_Different(date2_text.getText().toString() ,date1_text.getText().toString(), 31);
+//                    if(!checkval) {
+                        loadUrl();
+                    } else
+                        customDialog_Common("Statement can only view from one month");
+//                }
+                }
+                handlercontrol();
                 break;
         }
     }

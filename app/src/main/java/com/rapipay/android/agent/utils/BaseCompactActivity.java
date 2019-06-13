@@ -23,6 +23,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.PowerManager;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
@@ -146,6 +147,17 @@ public class BaseCompactActivity extends AppCompatActivity {
         hideKeyboard(this);
         if (db != null && db.getDetails_Rapi())
             list = db.getDetails();
+    }
+
+    protected boolean btnstatus = false;
+
+    protected void handlercontrol() {
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            public void run() {
+                btnstatus = false;
+            }
+        }, 1000);
     }
 
     public boolean printDifference(Date startDate, Date endDate) {
@@ -375,6 +387,7 @@ public class BaseCompactActivity extends AppCompatActivity {
             btn_cancel.setText("Network User");
             btn_cancel.setTextSize(10);
             btn_ok.setText("Network Setting");
+            btn_ok.setVisibility(View.GONE);
             btn_ok.setTextSize(10);
             btn_regenerate.setText("Details");
             btn_regenerate.setTextSize(10);
@@ -446,84 +459,96 @@ public class BaseCompactActivity extends AppCompatActivity {
         btn_ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (type.equalsIgnoreCase("PENDINGREFUND")) {
-                    anInterface.okClicked(input, ob);
-                    dialog.dismiss();
-                } else if (type.equalsIgnoreCase("LOGOUT")) {
-                    return_Page();
-                    dialog.dismiss();
-                } else if (type.equalsIgnoreCase("OTPLAYOUT")) {
-                    anInterface.okClicked(type, ob);
-                } else if (type.equalsIgnoreCase("OTPLAYOUTS")) {
-                    if (otpView.getText().toString().isEmpty()) {
-                        otpView.setError("Please enter OTP");
-                        otpView.requestFocus();
-                    } else if (otpView.getText().toString().length() != 6) {
-                        otpView.setError("Please enter OTP");
-                        otpView.requestFocus();
-                    } else {
-                        anInterface.okClicked(type, object);
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    if (type.equalsIgnoreCase("PENDINGREFUND")) {
+                        anInterface.okClicked(input, ob);
                         dialog.dismiss();
-                    }
-                } else if (type.equalsIgnoreCase("CONSENTLAYOUT")) {
-                    if (checkBox.isChecked()) {
-                        anInterface.okClicked(type, object);
+                    } else if (type.equalsIgnoreCase("LOGOUT")) {
+                        return_Page();
                         dialog.dismiss();
-                    } else
-                        Toast.makeText(BaseCompactActivity.this, "Please check then proceed", Toast.LENGTH_SHORT).show();
-                } else if (type.equalsIgnoreCase("Fund Transfer Confirmation")) {
-                    if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && (newtpin.getText().toString().isEmpty() || newtpin.getText().toString().length() != 4)) {
-                        newtpin.setError("Please enter TPIN");
-                        newtpin.requestFocus();
+                    } else if (type.equalsIgnoreCase("OTPLAYOUT")) {
+                        anInterface.okClicked(type, ob);
+                    } else if (type.equalsIgnoreCase("OTPLAYOUTS")) {
+                        if (otpView.getText().toString().isEmpty()) {
+                            otpView.setError("Please enter OTP");
+                            otpView.requestFocus();
+                        } else if (otpView.getText().toString().length() != 6) {
+                            otpView.setError("Please enter OTP");
+                            otpView.requestFocus();
+                        } else {
+                            anInterface.okClicked(type, object);
+                            dialog.dismiss();
+                        }
+                    } else if (type.equalsIgnoreCase("CONSENTLAYOUT")) {
+                        if (checkBox.isChecked()) {
+                            anInterface.okClicked(type, object);
+                            dialog.dismiss();
+                        } else
+                            Toast.makeText(BaseCompactActivity.this, "Please check then proceed", Toast.LENGTH_SHORT).show();
+                    } else if (type.equalsIgnoreCase("Fund Transfer Confirmation")) {
+                        if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && (newtpin.getText().toString().isEmpty() || newtpin.getText().toString().length() != 4)) {
+                            newtpin.setError("Please enter TPIN");
+                            newtpin.requestFocus();
+                        } else {
+                            anInterface.okClicked(type, ob);
+//                        dialog.dismiss();
+                        }
+                    } else if (type.equalsIgnoreCase("CREATEAGENT")) {
+                        if (first_name.getText().toString().isEmpty()) {
+                            first_name.setError("Please enter first name");
+                            first_name.requestFocus();
+                        } else if (last_name.getText().toString().isEmpty()) {
+                            last_name.setError("Please enter last name");
+                            last_name.requestFocus();
+                        } else if (mobile_num.getText().toString().length() != 10) {
+                            mobile_num.setError("Please enter mobile number");
+                            mobile_num.requestFocus();
+                        } else if (cree_address.getText().toString().isEmpty()) {
+                            cree_address.setError("Please enter address");
+                            cree_address.requestFocus();
+                        } else if (bank_select.getText().toString().isEmpty()) {
+                            bank_select.setError("Please enter bank");
+                            bank_select.requestFocus();
+                        } else if (pincode.getText().toString().length() != 6) {
+                            pincode.setError("Please enter pincode");
+                            pincode.requestFocus();
+                        } else {
+                            anInterface.okClicked(type, object);
+                            dialog.dismiss();
+                        }
                     } else {
                         anInterface.okClicked(type, ob);
                         dialog.dismiss();
                     }
-                } else if (type.equalsIgnoreCase("CREATEAGENT")) {
-                    if (first_name.getText().toString().isEmpty()) {
-                        first_name.setError("Please enter first name");
-                        first_name.requestFocus();
-                    } else if (last_name.getText().toString().isEmpty()) {
-                        last_name.setError("Please enter last name");
-                        last_name.requestFocus();
-                    } else if (mobile_num.getText().toString().length() != 10) {
-                        mobile_num.setError("Please enter mobile number");
-                        mobile_num.requestFocus();
-                    } else if (cree_address.getText().toString().isEmpty()) {
-                        cree_address.setError("Please enter address");
-                        cree_address.requestFocus();
-                    } else if (bank_select.getText().toString().isEmpty()) {
-                        bank_select.setError("Please enter bank");
-                        bank_select.requestFocus();
-                    } else if (pincode.getText().toString().length() != 6) {
-                        pincode.setError("Please enter pincode");
-                        pincode.requestFocus();
-                    } else {
-                        anInterface.okClicked(type, object);
-                        dialog.dismiss();
-                    }
-                } else {
-                    anInterface.okClicked(type, ob);
-                    dialog.dismiss();
                 }
+                handlercontrol();
             }
         });
         btn_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (type.equalsIgnoreCase("TERMCONDITION"))
-                    return_Page();
-                else
-                    anInterface.cancelClicked(type, ob);
-                dialog.dismiss();
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    if (type.equalsIgnoreCase("TERMCONDITION"))
+                        return_Page();
+                    else
+                        anInterface.cancelClicked(type, ob);
+                    dialog.dismiss();
+                }
+                handlercontrol();
             }
         });
         btn_regenerate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (type.equalsIgnoreCase("NETWORKLAYOUT"))
-                    anInterface.okClicked("DETAILS", ob);
-                dialog.dismiss();
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    if (type.equalsIgnoreCase("NETWORKLAYOUT"))
+                        anInterface.okClicked("Details", ob);
+                    dialog.dismiss();
+                }
+                handlercontrol();
             }
         });
         dialog_cancel.setOnClickListener(new View.OnClickListener() {
@@ -730,7 +755,7 @@ public class BaseCompactActivity extends AppCompatActivity {
             otpView.setHint("Enter OTP");
         otpView.setInputType(InputType.TYPE_CLASS_NUMBER);
         InputFilter[] filterArray = new InputFilter[1];
-        filterArray[0] = new InputFilter.LengthFilter(12);
+        filterArray[0] = new InputFilter.LengthFilter(6);
         otpView.setFilters(filterArray);
         dialog.setContentView(alertLayout);
     }
@@ -1253,39 +1278,47 @@ public class BaseCompactActivity extends AppCompatActivity {
         btn_ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                anInterface.okClicked(type, null);
-                dialog.dismiss();
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    anInterface.okClicked(type, null);
+                    dialog.dismiss();
+                }
+                handlercontrol();
             }
         });
         share.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Bitmap b = Bitmap.createBitmap(main_layout.getDrawingCache());
-                main_layout.setDrawingCacheEnabled(false);
-                ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-                b.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    Bitmap b = Bitmap.createBitmap(main_layout.getDrawingCache());
+                    main_layout.setDrawingCacheEnabled(false);
+                    ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                    b.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
 
-                File f = new File(Environment.getExternalStorageDirectory() + File.separator + "v2i.jpg");
-                try {
-                    f.createNewFile();
-                    FileOutputStream fo = new FileOutputStream(f);
-                    fo.write(bytes.toByteArray());
-                    fo.flush();
-                    fo.close();
-                    f.setReadable(true, false);
-                    final Intent intent = new Intent(Intent.ACTION_SEND);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    File f = new File(Environment.getExternalStorageDirectory() + File.separator + "v2i.jpg");
+                    try {
+                        f.createNewFile();
+                        FileOutputStream fo = new FileOutputStream(f);
+                        fo.write(bytes.toByteArray());
+                        fo.flush();
+                        fo.close();
+                        f.setReadable(true, false);
+                        final Intent intent = new Intent(Intent.ACTION_SEND);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-                    Uri apkURI = FileProvider.getUriForFile(
-                            BaseCompactActivity.this,
-                            BaseCompactActivity.this.getApplicationContext()
-                                    .getPackageName() + ".provider", f);
-                    intent.putExtra(Intent.EXTRA_STREAM, apkURI);
-                    intent.setType("image/png");
-                    startActivity(Intent.createChooser(intent, "Share image via"));
-                } catch (Exception e) {
-                    e.printStackTrace();
+                        Uri apkURI = FileProvider.getUriForFile(
+                                BaseCompactActivity.this,
+                                BaseCompactActivity.this.getApplicationContext()
+                                        .getPackageName() + ".provider", f);
+                        intent.putExtra(Intent.EXTRA_STREAM, apkURI);
+                        intent.setType("image/png");
+                        startActivityForResult(Intent.createChooser(intent, "Share image via"), 2);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
+                handlercontrol();
             }
         });
         dialog.show();
@@ -1437,7 +1470,7 @@ public class BaseCompactActivity extends AppCompatActivity {
                                     .getPackageName() + ".provider", f);
                     intent.putExtra(Intent.EXTRA_STREAM, apkURI);
                     intent.setType("image/png");
-                    startActivity(Intent.createChooser(intent, "Share image via"));
+                    startActivityForResult(Intent.createChooser(intent, "Share image via"), 2);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -1577,39 +1610,47 @@ public class BaseCompactActivity extends AppCompatActivity {
         btn_ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                anInterface.okClicked(type, object);
-                dialog.dismiss();
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    anInterface.okClicked(type, object);
+                    dialog.dismiss();
+                }
+                handlercontrol();
             }
         });
         share.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Bitmap b = Bitmap.createBitmap(main_layout.getDrawingCache());
-                main_layout.setDrawingCacheEnabled(false);
-                ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-                b.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    Bitmap b = Bitmap.createBitmap(main_layout.getDrawingCache());
+                    main_layout.setDrawingCacheEnabled(false);
+                    ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                    b.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
 
-                File f = new File(Environment.getExternalStorageDirectory() + File.separator + "v2i.jpg");
-                try {
-                    f.createNewFile();
-                    FileOutputStream fo = new FileOutputStream(f);
-                    fo.write(bytes.toByteArray());
-                    fo.flush();
-                    fo.close();
-                    f.setReadable(true, false);
-                    final Intent intent = new Intent(Intent.ACTION_SEND);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    File f = new File(Environment.getExternalStorageDirectory() + File.separator + "v2i.jpg");
+                    try {
+                        f.createNewFile();
+                        FileOutputStream fo = new FileOutputStream(f);
+                        fo.write(bytes.toByteArray());
+                        fo.flush();
+                        fo.close();
+                        f.setReadable(true, false);
+                        final Intent intent = new Intent(Intent.ACTION_SEND);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-                    Uri apkURI = FileProvider.getUriForFile(
-                            BaseCompactActivity.this,
-                            BaseCompactActivity.this.getApplicationContext()
-                                    .getPackageName() + ".provider", f);
-                    intent.putExtra(Intent.EXTRA_STREAM, apkURI);
-                    intent.setType("image/png");
-                    startActivity(Intent.createChooser(intent, "Share image via"));
-                } catch (Exception e) {
-                    e.printStackTrace();
+                        Uri apkURI = FileProvider.getUriForFile(
+                                BaseCompactActivity.this,
+                                BaseCompactActivity.this.getApplicationContext()
+                                        .getPackageName() + ".provider", f);
+                        intent.putExtra(Intent.EXTRA_STREAM, apkURI);
+                        intent.setType("image/png");
+                        startActivityForResult(Intent.createChooser(intent, "Share image via"), 2);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
+                handlercontrol();
             }
         });
         dialog.show();

@@ -1,5 +1,6 @@
 package com.rapipay.android.agent.main_directory;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
@@ -59,7 +60,7 @@ public class RechargeHistory extends BaseCompactActivity implements View.OnClick
     private void initialize() {
         Calendar calendar = Calendar.getInstance();
         selectedDate = calendar.get(Calendar.DAY_OF_MONTH);
-        selectedMonth = calendar.get(Calendar.MONTH)+1;
+        selectedMonth = calendar.get(Calendar.MONTH) + 1;
         selectedYear = calendar.get(Calendar.YEAR);
         select_state = (Spinner) findViewById(R.id.select_state);
         select_state.setVisibility(View.VISIBLE);
@@ -105,8 +106,12 @@ public class RechargeHistory extends BaseCompactActivity implements View.OnClick
         trans_details.addOnItemTouchListener(new RecyclerTouchListener(this, trans_details, new ClickListener() {
             @Override
             public void onClick(View view, int position) {
-                RechargePozo pozo = transactionPozoArrayList.get(position);
-                new AsyncPostMethod(WebConfig.WALLETRECEIPTURL, receipt_request(pozo).toString(), headerData, RechargeHistory.this,getString(R.string.responseTimeOut)).execute();
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    RechargePozo pozo = transactionPozoArrayList.get(position);
+                    new AsyncPostMethod(WebConfig.WALLETRECEIPTURL, receipt_request(pozo).toString(), headerData, RechargeHistory.this, getString(R.string.responseTimeOut)).execute();
+                }
+                handlercontrol();
             }
 
             @Override
@@ -144,18 +149,22 @@ public class RechargeHistory extends BaseCompactActivity implements View.OnClick
                 finish();
                 break;
             case R.id.btn_fund:
-                if (payee.isEmpty())
-                    Toast.makeText(this, "Please select recharge type", Toast.LENGTH_SHORT).show();
-                else if (date2_text.getText().toString().isEmpty()) {
-                    date2_text.setError("Please enter mandatory field");
-                    date2_text.requestFocus();
-                } else if (date1_text.getText().toString().isEmpty()) {
-                    date1_text.setError("Please enter mandatory field");
-                    date1_text.requestFocus();
-                } else if (printDifference(mainDate(date2_text.getText().toString()),mainDate(date1_text.getText().toString())))
-                    new AsyncPostMethod(WebConfig.RECHARGE_URL, channel_request(0, 5).toString(), headerData, RechargeHistory.this,getString(R.string.responseTimeOut)).execute();
-                else
-                    Toast.makeText(RechargeHistory.this,"Please select correct date",Toast.LENGTH_SHORT).show();
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    if (payee.isEmpty())
+                        Toast.makeText(this, "Please select recharge type", Toast.LENGTH_SHORT).show();
+                    else if (date2_text.getText().toString().isEmpty()) {
+                        date2_text.setError("Please enter mandatory field");
+                        date2_text.requestFocus();
+                    } else if (date1_text.getText().toString().isEmpty()) {
+                        date1_text.setError("Please enter mandatory field");
+                        date1_text.requestFocus();
+                    } else if (printDifference(mainDate(date2_text.getText().toString()), mainDate(date1_text.getText().toString())))
+                        new AsyncPostMethod(WebConfig.RECHARGE_URL, channel_request(0, 5).toString(), headerData, RechargeHistory.this, getString(R.string.responseTimeOut)).execute();
+                    else
+                        Toast.makeText(RechargeHistory.this, "Please select correct date", Toast.LENGTH_SHORT).show();
+                }
+                handlercontrol();
                 break;
         }
     }
@@ -203,6 +212,19 @@ public class RechargeHistory extends BaseCompactActivity implements View.OnClick
             }
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (data != null) {
+            if (requestCode == 2) {
+                dialog.dismiss();
+            }
+        } else {
+            if (dialog != null)
+                dialog.dismiss();
         }
     }
 

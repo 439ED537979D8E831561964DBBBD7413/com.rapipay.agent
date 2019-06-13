@@ -62,19 +62,23 @@ public class ChangePassword extends BaseFragment implements RequestHandler, View
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_login:
-                if (otppinView.getText().toString().isEmpty()) {
-                    otppinView.setError("Please enter current password");
-                    otppinView.requestFocus();
-                } else if (pinView.getText().toString().isEmpty()) {
-                    pinView.setError("Please enter new password");
-                    pinView.requestFocus();
-                } else if (confirmpinView.getText().toString().isEmpty()) {
-                    confirmpinView.setError("Please confirm new password");
-                    confirmpinView.requestFocus();
-                } else if (!pinView.getText().toString().equalsIgnoreCase(confirmpinView.getText().toString()))
-                    pinView.setError("New and Confirm password cannot be different");
-                else
-                    new AsyncPostMethod(WebConfig.LOGIN_URL, getJson_Validate().toString(), "", ChangePassword.this, getActivity(),getString(R.string.responseTimeOut)).execute();
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    if (otppinView.getText().toString().isEmpty()) {
+                        otppinView.setError("Please enter current password");
+                        otppinView.requestFocus();
+                    } else if (pinView.getText().toString().isEmpty()) {
+                        pinView.setError("Please enter new password");
+                        pinView.requestFocus();
+                    } else if (confirmpinView.getText().toString().isEmpty()) {
+                        confirmpinView.setError("Please confirm new password");
+                        confirmpinView.requestFocus();
+                    } else if (!pinView.getText().toString().equalsIgnoreCase(confirmpinView.getText().toString()))
+                        pinView.setError("New and Confirm password cannot be different");
+                    else
+                        new AsyncPostMethod(WebConfig.LOGIN_URL, getJson_Validate().toString(), "", ChangePassword.this, getActivity(), getString(R.string.responseTimeOut)).execute();
+                }
+                handlercontrol();
                 break;
         }
     }
@@ -157,6 +161,7 @@ public class ChangePassword extends BaseFragment implements RequestHandler, View
         Window window = dialog.getWindow();
         window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
     }
+
     protected void deleteTables(String type) {
         SQLiteDatabase dba = BaseCompactActivity.db.getWritableDatabase();
         dba.execSQL("delete from " + RapipayDB.TABLE_BANK);

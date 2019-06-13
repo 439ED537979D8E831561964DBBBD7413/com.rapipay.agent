@@ -157,14 +157,18 @@ public class FOSLoginActivity extends BaseCompactActivity implements View.OnClic
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_login:
-                if (input_subuser.getText().toString().length() != 10)
-                    input_subuser.setError("Please enter mandatory field");
-                else if (input_user.getText().toString().length() != 10)
-                    input_user.setError("Please enter mandatory field");
-                else if (input_password.getText().toString().isEmpty())
-                    input_password.setError("Please enter mandatory field");
-                else
-                    loadVersion(imei);
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    if (input_subuser.getText().toString().length() != 10)
+                        input_subuser.setError("Please enter mandatory field");
+                    else if (input_user.getText().toString().length() != 10)
+                        input_user.setError("Please enter mandatory field");
+                    else if (input_password.getText().toString().isEmpty())
+                        input_password.setError("Please enter mandatory field");
+                    else
+                        loadVersion(imei);
+                }
+                handlercontrol();
                 break;
         }
     }

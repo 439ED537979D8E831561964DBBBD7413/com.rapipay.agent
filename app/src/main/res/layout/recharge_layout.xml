@@ -54,7 +54,7 @@
                     android:text="@string/postpaid" />
 
             </RadioGroup>
-            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -101,7 +101,14 @@
                     android:maxLength="13"
                     android:textSize="16dp" />
             </android.support.design.widget.TextInputLayout>
-
+            <TextView
+                android:padding="10dp"
+                android:id="@+id/input_texts"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="13dp"
+                android:textColor="@color/red"
+                android:visibility="gone"/>
             <TextView
                 android:id="@+id/select_operator"
                 style="@style/Widget.AppCompat.Spinner.Underlined"

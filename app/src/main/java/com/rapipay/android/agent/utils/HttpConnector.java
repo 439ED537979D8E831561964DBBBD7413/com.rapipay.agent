@@ -79,6 +79,48 @@ public class HttpConnector {
             ex.printStackTrace();
         }
     }
+    public static void crmsetServerCert(Context cert) {
+        try {
+            // Load CAs from an InputStream
+            // (could be from a resource or ByteArrayInputStream or ...)
+            CertificateFactory cf = CertificateFactory.getInstance("X.509");
+            InputStream in = cert.getResources().openRawResource(R.raw.crmcertificate);
+            InputStream caInput = new BufferedInputStream(in);
+            Certificate ca;
+            try {
+                ca = cf.generateCertificate(caInput);
+                System.out.println("ca=" + ((X509Certificate) ca).getSubjectDN());
+            } finally {
+                caInput.close();
+            }
+            // Create a KeyStore containing our trusted CAs
+            String keyStoreType = KeyStore.getDefaultType();
+            KeyStore keyStore = KeyStore.getInstance(keyStoreType);
+            keyStore.load(null, null);
+            keyStore.setCertificateEntry("ca", ca);
+
+            // Create a TrustManager that trusts the CAs in our KeyStore
+            String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
+            TrustManagerFactory tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
+            tmf.init(keyStore);
+
+            // Create an SSLContext that uses our TrustManager
+            context = SSLContext.getInstance("TLS");
+            context.init(null, tmf.getTrustManagers(), null);
+
+            // Create an HostnameVerifier that hardwires the expected hostname.
+            // Note that is different than the URL's hostname:
+            // example.com versus example.org
+            hostnameVerifier = new HostnameVerifier() {
+                @Override
+                public boolean verify(String hostname, SSLSession session) {
+                    return true;
+                }
+            };
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
 
     private HttpConnector() {
 
@@ -126,8 +168,8 @@ public class HttpConnector {
             urlConnection.setDoOutput(true);
             urlConnection.setRequestMethod("POST");
             urlConnection.setRequestProperty("Content-Type", "application/json");
-            urlConnection.setConnectTimeout(150000);
-            urlConnection.setReadTimeout(150000);
+            urlConnection.setConnectTimeout(3600);
+            urlConnection.setReadTimeout(3600);
             urlConnection.setRequestProperty("Content-Length", Integer.toString(xmlData.length()));
             urlConnection.setFixedLengthStreamingMode(xmlData.length());
             urlConnection.setUseCaches(false);

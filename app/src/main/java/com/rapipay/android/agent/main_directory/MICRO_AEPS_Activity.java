@@ -17,7 +17,9 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -55,6 +57,7 @@ import com.rapipay.android.agent.utils.GenerateChecksum;
 import com.rapipay.android.agent.utils.ImageUtils;
 import com.rapipay.android.agent.utils.RecyclerTouchListener;
 import com.rapipay.android.agent.utils.WebConfig;
+import com.rapipay.android.agent.view.EnglishNumberToWords;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -119,6 +122,7 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
         btn_submit_aeps.setOnClickListener(this);
         pending_tran_layout = (LinearLayout) findViewById(R.id.pending_tran_layout);
         pendingtrans_details = (RecyclerView) findViewById(R.id.pendingtrans_details);
+        final TextView input_text = (TextView) findViewById(R.id.input_texts);
         if (typeput.equalsIgnoreCase("Balance Enquiry")) {
             input_amount.setText("0");
             input_amount.setEnabled(false);
@@ -144,9 +148,12 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
         pendingtrans_details.addOnItemTouchListener(new RecyclerTouchListener(this, pendingtrans_details, new ClickListener() {
             @Override
             public void onClick(View view, int position) {
-                if (pendingPozoArrayList.size() != 0) {
-                    new AsyncPostMethod(WebConfig.CASHOUT_URL, getTransactionStatus(pendingPozoArrayList.get(position).getTransactionID()).toString(), headerData, MICRO_AEPS_Activity.this, getString(R.string.responseTimeOut), typeput).execute();
-                }
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    if (pendingPozoArrayList.size() != 0) {
+                        new AsyncPostMethod(WebConfig.CASHOUT_URL, getTransactionStatus(pendingPozoArrayList.get(position).getTransactionID()).toString(), headerData, MICRO_AEPS_Activity.this, getString(R.string.responseTimeOut), typeput).execute();
+                    }
+                }handlercontrol();
             }
 
             @Override
@@ -154,6 +161,26 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
 
             }
         }));
+        input_amount.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s.length()!=0 && s.length()<10) {
+                    input_text.setText(new EnglishNumberToWords().convert(Integer.parseInt(s.toString())));
+                    input_text.setVisibility(View.VISIBLE);
+                }else
+                    input_text.setVisibility(View.GONE);
+            }
+        });
     }
 
     public JSONObject getPendingTransaction() {
@@ -309,46 +336,70 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            case REQUEST_CHECK_SETTINGS_GPS:
-                switch (resultCode) {
-                    case Activity.RESULT_OK:
-                        getMyLocation();
-                        break;
-                    case Activity.RESULT_CANCELED:
-                        finish();
-                        break;
-                }
-                break;
-            case CONTACT_PICKER_RESULT:
-                contactRead(data, input_mobile);
-                break;
-            case MATM_AEPS_Resposne:
-                String response;
-                if (data != null) {
-                    if (data.hasExtra("ClientResponse")) {
-                        response = data.getStringExtra("ClientResponse");
-                        strDecryptResponse = AES_BC.getInstance().decryptDecode(Utils.replaceNewLine(response), requestKey);
-                        new AsyncPostMethod(WebConfig.CASHOUT_URL, updateDetails(updateDetailsResponseData(response, "0").toString(), transactionIDAEPS).toString(), headerData, MICRO_AEPS_Activity.this, getString(R.string.responseTimeOut), "AEPS-MATM").execute();
-//                    Utils.showOneBtnDialog(this, getString(com.finopaytech.finosdk.R.string.STR_INFO), strDecryptResponse, false);
-                    } else if (data.hasExtra("ErrorDtls")) {
-                        response = data.getStringExtra("ErrorDtls");
-                        String errorMsg = "", errorDtlsMsg = "";
-                        if (!response.equalsIgnoreCase("")) {
-                            try {
-                                String[] error_dtls = response.split("\\|");
-                                if (error_dtls.length > 0) {
-                                    strDecryptResponse = error_dtls[0];
-                                    new AsyncPostMethod(WebConfig.CASHOUT_URL, updateDetails(updateDetailsResponseData(strDecryptResponse, "1").toString(), transactionIDAEPS).toString(), headerData, MICRO_AEPS_Activity.this, getString(R.string.responseTimeOut), "AEPS-MATM").execute();
-//                                Utils.showOneBtnDialog(this, getString(com.finopaytech.finosdk.R.string.STR_INFO), "Error Message : " + errorMsg , false);
-                                }
-                            } catch (ArrayIndexOutOfBoundsException exp) {
+        if (data != null) {
+            switch (requestCode) {
+                case REQUEST_CHECK_SETTINGS_GPS:
+                    switch (resultCode) {
+                        case Activity.RESULT_OK:
+                            if (btnstatus == false) {
+                                btnstatus = true;
+                                getMyLocation();
                             }
+                            handlercontrol();
+                            break;
+                        case Activity.RESULT_CANCELED:
+                            if (btnstatus == false) {
+                                btnstatus = true;
+                                finish();
+                            }
+                            handlercontrol();
+                            break;
+                    }
+                    break;
+                case CONTACT_PICKER_RESULT:
+                    if (btnstatus == false) {
+                        btnstatus = true;
+                        contactRead(data, input_mobile);
+                    }
+                    handlercontrol();
+                    break;
+                case MATM_AEPS_Resposne:
+                    if (btnstatus == false) {
+                        btnstatus = true;
+                        String response;
+                        if (data != null) {
+                            if (data.hasExtra("ClientResponse")) {
+                                response = data.getStringExtra("ClientResponse");
+                                strDecryptResponse = AES_BC.getInstance().decryptDecode(Utils.replaceNewLine(response), requestKey);
+                                new AsyncPostMethod(WebConfig.CASHOUT_URL, updateDetails(updateDetailsResponseData(response, "0").toString(), transactionIDAEPS).toString(), headerData, MICRO_AEPS_Activity.this, getString(R.string.responseTimeOut), "AEPS-MATM").execute();
+//                    Utils.showOneBtnDialog(this, getString(com.finopaytech.finosdk.R.string.STR_INFO), strDecryptResponse, false);
+                            } else if (data.hasExtra("ErrorDtls")) {
+                                response = data.getStringExtra("ErrorDtls");
+                                String errorMsg = "", errorDtlsMsg = "";
+                                if (!response.equalsIgnoreCase("")) {
+                                    try {
+                                        String[] error_dtls = response.split("\\|");
+                                        if (error_dtls.length > 0) {
+                                            strDecryptResponse = error_dtls[0];
+                                            new AsyncPostMethod(WebConfig.CASHOUT_URL, updateDetails(updateDetailsResponseData(strDecryptResponse, "1").toString(), transactionIDAEPS).toString(), headerData, MICRO_AEPS_Activity.this, getString(R.string.responseTimeOut), "AEPS-MATM").execute();
+//                                Utils.showOneBtnDialog(this, getString(com.finopaytech.finosdk.R.string.STR_INFO), "Error Message : " + errorMsg , false);
+                                        }
+                                    } catch (ArrayIndexOutOfBoundsException exp) {
+                                    }
+                                }
+                            }
+                            ErrorSingletone.getFreshInstance();
                         }
                     }
-                    ErrorSingletone.getFreshInstance();
-                }
-                break;
+                    handlercontrol();
+                    break;
+                case 2:
+                    dialog.dismiss();
+                    break;
+            }
+        } else {
+            if (dialog != null)
+                dialog.dismiss();
         }
     }
 
@@ -555,6 +606,10 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
         }
         input_mobile.setText("");
         input_deviceid.setText("");
+        requestData = "";
+        requestKey = "";
+        headerDatas = "";
+        clientRefID = "";
     }
 
     @Override
@@ -643,35 +698,51 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_contact:
-                loadIMEI();
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    loadIMEI();
+                }
+                handlercontrol();
                 break;
             case R.id.btn_submit_aeps:
-                hideKeyboard(MICRO_AEPS_Activity.this);
-                if (!ImageUtils.commonAmount(input_mobile.getText().toString())) {
-                    input_mobile.setError("Please enter mobile number");
-                    input_mobile.requestFocus();
-                } else if (!ImageUtils.commonAmount(input_amount.getText().toString())) {
-                    input_amount.setError("Please enter amount");
-                    input_amount.requestFocus();
-                }else if (reqFor.equalsIgnoreCase("MATM") && !input_amount.getText().toString().isEmpty() && (Integer.valueOf(input_amount.getText().toString())%100!=0)) {
-                    input_amount.setError("Please enter amount in multiple of hundred");
-                    input_amount.requestFocus();
-                } else {
-                    if (reqFor.equalsIgnoreCase("MATM") && accessBluetoothDetails() != null && !accessBluetoothDetails().equalsIgnoreCase(""))
-                        new AsyncPostMethod(WebConfig.CASHOUT_URL, getCashOutDetails(input_mobile.getText().toString(), input_amount.getText().toString(), serviceType, requestChannel, reqFor, requestType, accessBluetoothDetails()).toString(), headerData, MICRO_AEPS_Activity.this, getString(R.string.responseTimeOut), typeput).execute();
-                    else if (reqFor.equalsIgnoreCase("AEPS") && !input_deviceid.getText().toString().isEmpty())
-                        new AsyncPostMethod(WebConfig.CASHOUT_URL, getCashOutDetails(input_mobile.getText().toString(), input_amount.getText().toString(), serviceType, requestChannel, reqFor, requestType, input_deviceid.getText().toString()).toString(), headerData, MICRO_AEPS_Activity.this, getString(R.string.responseTimeOut), typeput).execute();
-                    else
-                        Toast.makeText(MICRO_AEPS_Activity.this, "Please pair device through bluetooth", Toast.LENGTH_SHORT).show();
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    hideKeyboard(MICRO_AEPS_Activity.this);
+                    if (!ImageUtils.commonAmount(input_mobile.getText().toString())) {
+                        input_mobile.setError("Please enter mobile number");
+                        input_mobile.requestFocus();
+                    } else if (!ImageUtils.commonAmount(input_amount.getText().toString())) {
+                        input_amount.setError("Please enter amount");
+                        input_amount.requestFocus();
+                    } else if (reqFor.equalsIgnoreCase("MATM") && !input_amount.getText().toString().isEmpty() && (Integer.valueOf(input_amount.getText().toString()) % 100 != 0)) {
+                        input_amount.setError("Please enter amount in multiple of hundred");
+                        input_amount.requestFocus();
+                    } else {
+                        if (reqFor.equalsIgnoreCase("MATM") && accessBluetoothDetails() != null && !accessBluetoothDetails().equalsIgnoreCase(""))
+                            new AsyncPostMethod(WebConfig.CASHOUT_URL, getCashOutDetails(input_mobile.getText().toString(), input_amount.getText().toString(), serviceType, requestChannel, reqFor, requestType, accessBluetoothDetails()).toString(), headerData, MICRO_AEPS_Activity.this, getString(R.string.responseTimeOut), typeput).execute();
+                        else if (reqFor.equalsIgnoreCase("AEPS") && !input_deviceid.getText().toString().isEmpty())
+                            new AsyncPostMethod(WebConfig.CASHOUT_URL, getCashOutDetails(input_mobile.getText().toString(), input_amount.getText().toString(), serviceType, requestChannel, reqFor, requestType, input_deviceid.getText().toString()).toString(), headerData, MICRO_AEPS_Activity.this, getString(R.string.responseTimeOut), typeput).execute();
+                        else
+                            Toast.makeText(MICRO_AEPS_Activity.this, "Please pair device through bluetooth", Toast.LENGTH_SHORT).show();
+                    }
                 }
+                handlercontrol();
                 break;
             case R.id.back_click:
-                setBack_click(this);
-                finish();
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    setBack_click(this);
+                    finish();
+                }
+                handlercontrol();
                 break;
             case R.id.reset:
-                if (!typeput.equalsIgnoreCase("Balance Enquiry"))
-                loadUrl();
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    if (!typeput.equalsIgnoreCase("Balance Enquiry"))
+                        loadUrl();
+                }
+                handlercontrol();
                 break;
         }
     }

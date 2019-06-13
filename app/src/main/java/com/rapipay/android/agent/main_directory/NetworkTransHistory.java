@@ -155,14 +155,18 @@ public class NetworkTransHistory extends BaseCompactActivity implements RequestH
                 finish();
                 break;
             case R.id.btn_fund:
-                if (date2_text.getText().toString().isEmpty()) {
-                    date2_text.setError("Please enter valid data");
-                    date2_text.requestFocus();
-                } else if (date1_text.getText().toString().isEmpty()) {
-                    date1_text.setError("Please enter valid data");
-                    date1_text.requestFocus();
-                } else if (printDifference(mainDate(date2_text.getText().toString()), mainDate(date1_text.getText().toString())))
-                    new AsyncPostMethod(WebConfig.CommonReport, channel_request().toString(), headerData, NetworkTransHistory.this, getString(R.string.responseTimeOut)).execute();
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    if (date2_text.getText().toString().isEmpty()) {
+                        date2_text.setError("Please enter valid data");
+                        date2_text.requestFocus();
+                    } else if (date1_text.getText().toString().isEmpty()) {
+                        date1_text.setError("Please enter valid data");
+                        date1_text.requestFocus();
+                    } else if (printDifference(mainDate(date2_text.getText().toString()), mainDate(date1_text.getText().toString())))
+                        new AsyncPostMethod(WebConfig.CommonReport, channel_request().toString(), headerData, NetworkTransHistory.this, getString(R.string.responseTimeOut)).execute();
+                }
+                handlercontrol();
                 break;
         }
     }
@@ -255,7 +259,7 @@ public class NetworkTransHistory extends BaseCompactActivity implements RequestH
         try {
             for (int i = 0; i < array.length(); i++) {
                 JSONObject object = array.getJSONObject(i);
-                transactionPozoArrayList.add(new NetworkTransHistPozo(object.getString("payeeMobileNo"), object.getString("payeeName"), object.getString("transactionDate"), object.getString("lastTxnAmount") ,  object.getString("totalAmount") , object.getString("companyName")));
+                transactionPozoArrayList.add(new NetworkTransHistPozo(object.getString("payeeMobileNo"), object.getString("payeeName"), object.getString("transactionDate"), object.getString("lastTxnAmount"), object.getString("totalAmount"), object.getString("companyName")));
             }
         } catch (Exception e) {
             e.printStackTrace();

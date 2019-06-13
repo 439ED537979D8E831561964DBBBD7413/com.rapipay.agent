@@ -1,37 +1,178 @@
 package com.rapipay.android.agent.kotlin_classs
 
+import android.app.Dialog
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.DatePicker
+import android.widget.ImageView
 import android.widget.ListView
 import com.rapipay.android.agent.Model.ChannelHistoryPozo
 import com.rapipay.android.agent.R
 import com.rapipay.android.agent.adapter.ChannelListAdapter
 import com.rapipay.android.agent.interfaces.RequestHandler
 import com.rapipay.android.agent.utils.*
+import me.grantland.widget.AutofitTextView
 import org.json.JSONArray
 import org.json.JSONObject
 import java.lang.Exception
-import java.util.ArrayList
+import java.util.*
 
-class TransferHistory : BaseFragment(), RequestHandler {
+class TransferHistory : BaseFragment(), RequestHandler,View.OnClickListener {
     protected var headerData = WebConfig.BASIC_USERID + ":" + WebConfig.BASIC_PASSWORD
     var transactionPozoArrayList : ArrayList<ChannelHistoryPozo>? = null
     var reqFor: String? = null
     var adapters: ChannelListAdapter? = null
     var trans_details: ListView? = null
-
+    protected var date2_text: AutofitTextView? = null
+    protected var date1_text: AutofitTextView? = null
+    protected var toimage: ImageView? = null
+    protected var fromimage: ImageView? = null
+    protected var selectedDate: Int = 0
+    protected var selectedMonth: Int = 0
+    protected var selectedYear: Int = 0
+    internal var months: String? = null
+    internal var dayss: String? = null
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        var view = inflater.inflate(R.layout.txn_history_layout, container, false);
+        var v = inflater.inflate(R.layout.txn_history_layout, container, false);
         reqFor = arguments!!.getString("reqFor")
         if (BaseCompactActivity.db != null && BaseCompactActivity.db.details_Rapi)
             list = BaseCompactActivity.db.details
-        trans_details = view.findViewById<View>(R.id.trans_details) as ListView
-        loadUrl()
-        return view;
+        trans_details = v.findViewById<View>(R.id.trans_details) as ListView
+        date2_text = v.findViewById<View>(R.id.date2) as AutofitTextView
+        date1_text = v.findViewById<View>(R.id.date1) as AutofitTextView
+        v.findViewById<View>(R.id.todate).setOnClickListener(toDateClicked)
+        v.findViewById<View>(R.id.date1).setOnClickListener(toDateClicked)
+        v.findViewById<View>(R.id.fromdate).setOnClickListener(fromDateClicked)
+        v.findViewById<View>(R.id.date2).setOnClickListener(fromDateClicked)
+        toimage = v.findViewById<View>(R.id.toimage) as ImageView
+        v.findViewById<View>(R.id.btn_fund).setOnClickListener(this)
+        toimage!!.setOnClickListener(toDateClicked)
+//        toimage!!.setColorFilter(resources.getColor(R.color.colorPrimaryDark))
+        fromimage = v.findViewById<View>(R.id.fromimage) as ImageView
+        fromimage!!.setOnClickListener(fromDateClicked)
+//        loadUrl()
+        return v
     }
+    protected var toDateClicked: View.OnClickListener = View.OnClickListener {
+        val dialog = Dialog(activity)
+        dialog.setContentView(R.layout.datepickerview)
+        dialog.setTitle("")
 
+        val datePicker = dialog.findViewById<DatePicker>(R.id.datePicker1)
+        val calendar = Calendar.getInstance()
+        calendar.timeInMillis = System.currentTimeMillis()
+        selectedDate = calendar.get(Calendar.DAY_OF_MONTH)
+        selectedMonth = calendar.get(Calendar.MONTH)
+        selectedYear = calendar.get(Calendar.YEAR)
+        datePicker.init(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)) { datePicker, year, month, dayOfMonth ->
+            Log.e("Date", "Year=" + year + " Month=" + (month + 1) + " day=" + dayOfMonth)
+            if ((month + 1).toString().length == 1)
+                months = "0" + (month + 1).toString()
+            else
+                months = (month + 1).toString()
+            if (dayOfMonth.toString().length == 1)
+                dayss = "0$dayOfMonth"
+            else
+                dayss = dayOfMonth.toString()
+            if (selectedDate == dayOfMonth && selectedMonth == month && selectedYear == year) {
+                date1_text!!.setText("$year-$months-$dayss")
+                dialog.dismiss()
+            } else {
+
+                if (selectedDate != dayOfMonth) {
+                    date1_text!!.setText("$year-$months-$dayss")
+                    dialog.dismiss()
+                } else {
+                    if (selectedMonth != month) {
+                        date1_text!!.setText("$year-$months-$dayss")
+                        dialog.dismiss()
+                    }
+                }
+            }
+            date1_text!!.setError(null)
+            selectedDate = dayOfMonth
+            selectedMonth = month
+            selectedYear = year
+        }
+        dialog.show()
+    }
+    protected var fromDateClicked: View.OnClickListener = View.OnClickListener {
+        val dialog = Dialog(activity)
+        dialog.setContentView(R.layout.datepickerview)
+        dialog.setTitle("")
+
+        val datePicker = dialog.findViewById<DatePicker>(R.id.datePicker1)
+        val calendar = Calendar.getInstance()
+        calendar.timeInMillis = System.currentTimeMillis()
+        selectedDate = calendar.get(Calendar.DAY_OF_MONTH)
+        selectedMonth = calendar.get(Calendar.MONTH)
+        selectedYear = calendar.get(Calendar.YEAR)
+        datePicker.init(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)) { datePicker, year, month, dayOfMonth ->
+            Log.e("Date", "Year=" + year + " Month=" + (month + 1) + " day=" + dayOfMonth)
+            if ((month + 1).toString().length == 1)
+                months = "0" + (month + 1).toString()
+            else
+                months = (month + 1).toString()
+            if (dayOfMonth.toString().length == 1)
+                dayss = "0$dayOfMonth"
+            else
+                dayss = dayOfMonth.toString()
+            if (selectedDate == dayOfMonth && selectedMonth == month && selectedYear == year) {
+                date2_text!!.setText("$year-$months-$dayss")
+                dialog.dismiss()
+            } else {
+
+                if (selectedDate != dayOfMonth) {
+                    date2_text!!.setText("$year-$months-$dayss")
+                    dialog.dismiss()
+                } else {
+                    if (selectedMonth != month) {
+                        date2_text!!.setText("$year-$months-$dayss")
+                        dialog.dismiss()
+                    }
+                }
+            }
+            date2_text!!.setError(null)
+            selectedDate = dayOfMonth
+            selectedMonth = month
+            selectedYear = year
+        }
+        dialog.show()
+    }
+    override fun onClick(v: View?) {
+        when (v!!.getId()) {
+            R.id.btn_fund -> if (date2_text!!.getText().toString().isEmpty()) {
+                date2_text!!.setError("Please enter mandatory field")
+                date2_text!!.requestFocus()
+            } else if (date1_text!!.getText().toString().isEmpty()) {
+                date1_text!!.setError("Please enter mandatory field")
+                date1_text!!.requestFocus()
+            } else if (printDifference(mainDate(date2_text!!.getText().toString()), mainDate(date1_text!!.getText().toString()))) {
+//                val fromDate = date1_text!!.getText().toString()
+//                val ToDate = date2_text!!.getText().toString()
+//
+//                /* val dateBeforeString = fromDate.replace("/", "-")
+//                 val dateAfterString = ToDate.replace("/", "-")
+//                 val dateBefore = LocalDate.parse(dateBeforeString)
+//                 val dateAfter = LocalDate.parse(dateAfterString)
+//                 //calculating number of days in between
+//                 val noOfDaysBetween = ChronoUnit.DAYS.between(ToDate ,fromDate)*/
+////                var checkval: Boolean? = false
+//                var checkval= date_Different(ToDate ,fromDate, 31)
+//                if(!checkval) {
+                loadUrl()
+            } else {
+                customDialog_Common("Statement can only view from one month")
+//                    transactionPozoArrayList = ArrayList<ChannelHistoryPozo>()
+//                    initializeTransAdapter(transactionPozoArrayList!!)
+            }
+//            }else
+//                Toast.makeText(activity, "Please select correct date", Toast.LENGTH_SHORT).show()
+        }
+    }
     fun loadUrl() {
         AsyncPostMethod(WebConfig.CommonReport, getSubAgent().toString(), headerData, this, activity, getString(R.string.responseTimeOut)).execute()
     }
@@ -42,8 +183,8 @@ class TransferHistory : BaseFragment(), RequestHandler {
             jsonObject.put("serviceType", "GET_TXN_HISTORY_BY_SERVICE")
             jsonObject.put("transactionID", ImageUtils.miliSeconds())
             jsonObject.put("nodeAgentId", list[0].mobilno)
-            jsonObject.put("fromTxnDate", "")
-            jsonObject.put("toTxnDate", "")
+            jsonObject.put("fromTxnDate", date2_text!!.getText().toString())
+            jsonObject.put("toTxnDate", date1_text!!.getText().toString())
             jsonObject.put("fromIndex", 1)
             jsonObject.put("toIndex", 5)
             jsonObject.put("reqFor", reqFor)

@@ -75,19 +75,22 @@ public class PendingKyc extends BaseFragment implements RequestHandler {
         trans_details.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                PendingKYCPozo pendingKYCPozo = transactionPozoArrayList.get(position);
-                if (pendingKYCPozo.getIsKycSubmitted().equalsIgnoreCase("N") && pendingKYCPozo.getStatusAction().equalsIgnoreCase("DENIED")) {
-                    try {
-                        String formData = getsession_ValidateKyc(customerType, pendingKYCPozo);
-                        Intent intent = new Intent(getActivity(), WebViewVerify.class);
-                        intent.putExtra("persons", "pending");
-                        intent.putExtra("mobileNo", pendingKYCPozo.getMobileNo());
-                        intent.putExtra("formData", formData);
-                        startActivity(intent);
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    PendingKYCPozo pendingKYCPozo = transactionPozoArrayList.get(position);
+                    if (pendingKYCPozo.getIsKycSubmitted().equalsIgnoreCase("N") && pendingKYCPozo.getStatusAction().equalsIgnoreCase("DENIED")) {
+                        try {
+                            String formData = getsession_ValidateKyc(customerType, pendingKYCPozo);
+                            Intent intent = new Intent(getActivity(), WebViewVerify.class);
+                            intent.putExtra("persons", "pending");
+                            intent.putExtra("mobileNo", pendingKYCPozo.getMobileNo());
+                            intent.putExtra("formData", formData);
+                            startActivity(intent);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
-                }
+                }handlercontrol();
             }
         });
     }

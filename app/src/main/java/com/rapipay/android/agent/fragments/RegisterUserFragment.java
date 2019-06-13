@@ -34,6 +34,7 @@ import com.rapipay.android.agent.main_directory.BarcodeActivity;
 import com.rapipay.android.agent.main_directory.WebViewClientActivity;
 import com.rapipay.android.agent.utils.AsyncPostMethod;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
+import com.rapipay.android.agent.utils.BaseFragment;
 import com.rapipay.android.agent.utils.GenerateChecksum;
 import com.rapipay.android.agent.utils.ImageUtils;
 import com.rapipay.android.agent.utils.WebConfig;
@@ -49,7 +50,7 @@ import java.util.Random;
 
 import static android.app.Activity.RESULT_OK;
 
-public class RegisterUserFragment extends Fragment implements RequestHandler, View.OnClickListener, CustomInterface {
+public class RegisterUserFragment extends BaseFragment implements RequestHandler, View.OnClickListener, CustomInterface {
     final private static int PERMISSIONS_REQUEST_READ_PHONE_STATE = 0;
     TextView input_name, input_number, input_address, input_email, input_code;
     TextView select_state;
@@ -100,52 +101,60 @@ public class RegisterUserFragment extends Fragment implements RequestHandler, Vi
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_fund:
-                if (!ImageUtils.commonRegex(input_name.getText().toString(), 150, " ")) {
-                    input_name.setError("Please enter valid data");
-                    input_name.requestFocus();
-                } else if (!ImageUtils.commonRegex(input_code.getText().toString(), 150, "0-9 .&") && !TYPE.equalsIgnoreCase("internal")) {
-                    input_code.setError("Please enter valid data");
-                    input_code.requestFocus();
-                } else if (input_address.getText().toString().isEmpty()) {
-                    input_address.setError("Please enter valid data");
-                    input_address.requestFocus();
-                } else if (select_state.getText().toString().equalsIgnoreCase("Select State")) {
-                    select_state.setError("Please enter valid data");
-                    select_state.requestFocus();
-                } else if (!Patterns.EMAIL_ADDRESS.matcher(input_email.getText().toString()).matches() && !TYPE.equalsIgnoreCase("internal")) {
-                    input_email.setError("Please enter valid data");
-                    input_email.requestFocus();
-                } else if (!ImageUtils.commonNumber(input_number.getText().toString(), 10)) {
-                    input_number.setError("Please enter valid data");
-                    input_number.requestFocus();
-                } else {
-                    if (TYPE.equalsIgnoreCase("internal")) {
-                        try {
-                            Intent intent = new Intent(getActivity(), WebViewClientActivity.class);
-                            intent.putExtra("mobileNo", mobileNo);
-                            String base64 = input_name.getText().toString() + "~" + input_email.getText().toString().trim() + "~" + input_code.getText().toString().trim() + "~" + input_address.getText().toString() + "~" + select_state.getText().toString() + "~" + scan_check;
-                            byte[] bytes = base64.getBytes("utf-8");
-                            String imageEncoded = Base64.encodeToString(bytes, Base64.DEFAULT);
-                            intent.putExtra("base64", imageEncoded);
-                            intent.putExtra("parentId", list.get(0).getMobilno());
-                            intent.putExtra("sessionKey", list.get(0).getPinsession());
-                            intent.putExtra("sessionRefNo", list.get(0).getAftersessionRefNo());
-                            intent.putExtra("nodeAgent", list.get(0).getMobilno());
-                            intent.putExtra("type", "internal");
-                            startActivity(intent);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    } else
-                        new AsyncPostMethod(WebConfig.LOGIN_URL, request_user().toString(), headerData, RegisterUserFragment.this, getActivity(),getString(R.string.responseTimeOut)).execute();
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    if (!ImageUtils.commonRegex(input_name.getText().toString(), 150, " ")) {
+                        input_name.setError("Please enter valid data");
+                        input_name.requestFocus();
+                    } else if (!ImageUtils.commonRegex(input_code.getText().toString(), 150, "0-9 .&") && !TYPE.equalsIgnoreCase("internal")) {
+                        input_code.setError("Please enter valid data");
+                        input_code.requestFocus();
+                    } else if (input_address.getText().toString().isEmpty()) {
+                        input_address.setError("Please enter valid data");
+                        input_address.requestFocus();
+                    } else if (select_state.getText().toString().equalsIgnoreCase("Select State")) {
+                        select_state.setError("Please enter valid data");
+                        select_state.requestFocus();
+                    } else if (!Patterns.EMAIL_ADDRESS.matcher(input_email.getText().toString()).matches() && !TYPE.equalsIgnoreCase("internal")) {
+                        input_email.setError("Please enter valid data");
+                        input_email.requestFocus();
+                    } else if (!ImageUtils.commonNumber(input_number.getText().toString(), 10)) {
+                        input_number.setError("Please enter valid data");
+                        input_number.requestFocus();
+                    } else {
+                        if (TYPE.equalsIgnoreCase("internal")) {
+                            try {
+                                Intent intent = new Intent(getActivity(), WebViewClientActivity.class);
+                                intent.putExtra("mobileNo", mobileNo);
+                                String base64 = input_name.getText().toString() + "~" + input_email.getText().toString().trim() + "~" + input_code.getText().toString().trim() + "~" + input_address.getText().toString() + "~" + select_state.getText().toString() + "~" + scan_check;
+                                byte[] bytes = base64.getBytes("utf-8");
+                                String imageEncoded = Base64.encodeToString(bytes, Base64.DEFAULT);
+                                intent.putExtra("base64", imageEncoded);
+                                intent.putExtra("parentId", list.get(0).getMobilno());
+                                intent.putExtra("sessionKey", list.get(0).getPinsession());
+                                intent.putExtra("sessionRefNo", list.get(0).getAftersessionRefNo());
+                                intent.putExtra("nodeAgent", list.get(0).getMobilno());
+                                intent.putExtra("type", "internal");
+                                startActivity(intent);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        } else
+                            new AsyncPostMethod(WebConfig.LOGIN_URL, request_user().toString(), headerData, RegisterUserFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
+                    }
                 }
+                handlercontrol();
                 break;
             case R.id.btn_scan_submit:
-                bitmap_trans = null;
-                byteBase64 = "";
-                Intent intent = new Intent(getActivity(), BarcodeActivity.class);
-                intent.putExtra("type", "Outside");
-                startActivityForResult(intent, 1);
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    bitmap_trans = null;
+                    byteBase64 = "";
+                    Intent intent = new Intent(getActivity(), BarcodeActivity.class);
+                    intent.putExtra("type", "Outside");
+                    startActivityForResult(intent, 1);
+                }
+                handlercontrol();
                 break;
         }
     }

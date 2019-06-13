@@ -44,7 +44,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NetworkTab extends BaseCompactActivity implements View.OnClickListener,RequestHandler,CustomInterface, GoogleApiClient.ConnectionCallbacks,
+public class NetworkTab extends BaseCompactActivity implements View.OnClickListener, RequestHandler, CustomInterface, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener {
 
@@ -52,7 +52,8 @@ public class NetworkTab extends BaseCompactActivity implements View.OnClickListe
     NetworkTransFragment fragment_credit;
     NetworkHistoryFragment transFragment;
     TextView consent;
-    String version=null;
+    String version = null;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,9 +62,9 @@ public class NetworkTab extends BaseCompactActivity implements View.OnClickListe
         initialize();
     }
 
-    private void initialize(){
+    private void initialize() {
         tabLayout = (TabLayout) findViewById(R.id.bottomNavigation);
-        consent = (TextView)findViewById(R.id.consent);
+        consent = (TextView) findViewById(R.id.consent);
         consent.setVisibility(View.VISIBLE);
         bindWidgetsWithAnEvent();
         setupTabLayout();
@@ -111,6 +112,7 @@ public class NetworkTab extends BaseCompactActivity implements View.OnClickListe
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
         ft.commit();
     }
+
     @Override
     public void onBackPressed() {
         setBack_click(this);
@@ -125,7 +127,11 @@ public class NetworkTab extends BaseCompactActivity implements View.OnClickListe
                 finish();
                 break;
             case R.id.consent:
-                new AsyncPostMethod(WebConfig.CRNF, getConsentDetails().toString(), headerData, NetworkTab.this,getString(R.string.responseTimeOut)).execute();
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    new AsyncPostMethod(WebConfig.CRNF, getConsentDetails().toString(), headerData, NetworkTab.this, getString(R.string.responseTimeOut)).execute();
+                }
+                handlercontrol();
                 break;
         }
     }
@@ -160,9 +166,9 @@ public class NetworkTab extends BaseCompactActivity implements View.OnClickListe
             jsonObject.put("agentID", list.get(0).getMobilno());
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
             jsonObject.put("parentID", MainActivity.Parent_Mobile);
-            jsonObject.put("clientIP",ImageUtils.ipAddress(NetworkTab.this));
+            jsonObject.put("clientIP", ImageUtils.ipAddress(NetworkTab.this));
             jsonObject.put("geoLogitude", String.valueOf(mylocation.getLongitude()));
-            jsonObject.put("geoLatitude",String.valueOf(mylocation.getLatitude()));
+            jsonObject.put("geoLatitude", String.valueOf(mylocation.getLatitude()));
             jsonObject.put("tbcFileVersion", object.getString("version"));
             jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
 
@@ -171,6 +177,7 @@ public class NetworkTab extends BaseCompactActivity implements View.OnClickListe
         }
         return jsonObject;
     }
+
     public JSONObject getVerifyOTPDetails(JSONObject object) {
         JSONObject jsonObject = new JSONObject();
         try {
@@ -182,9 +189,9 @@ public class NetworkTab extends BaseCompactActivity implements View.OnClickListe
             jsonObject.put("agentID", list.get(0).getMobilno());
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
             jsonObject.put("parentID", MainActivity.Parent_Mobile);
-            jsonObject.put("clientIP",ImageUtils.ipAddress(NetworkTab.this));
+            jsonObject.put("clientIP", ImageUtils.ipAddress(NetworkTab.this));
             jsonObject.put("geoLogitude", String.valueOf(mylocation.getLongitude()));
-            jsonObject.put("geoLatitude",String.valueOf(mylocation.getLatitude()));
+            jsonObject.put("geoLatitude", String.valueOf(mylocation.getLatitude()));
             jsonObject.put("tbcFileVersion", version);
             jsonObject.put("otp", otpView.getText().toString());
             jsonObject.put("otpRefId", object.getString("otpRefId"));
@@ -208,10 +215,10 @@ public class NetworkTab extends BaseCompactActivity implements View.OnClickListe
                 if (object.getString("serviceType").equalsIgnoreCase("GET_REVERSAL_CONSENT_DETAILS")) {
                     version = object.getString("version");
                     customDialog_Common("CONSENTLAYOUT", object, null, "Consent Details", object.getString("status"), object.getString("consentDetails"), NetworkTab.this);
-                }else if (object.getString("serviceType").equalsIgnoreCase("AUTO_REVERSAL_CONSENT_INITIATE")) {
-                    customDialog_Common("OTPLAYOUTS", object, null, "Enter OTP", null, null,NetworkTab.this);
-                }else if (object.getString("serviceType").equalsIgnoreCase("AUTO_REVERSAL_CONSENT_VERIFY")) {
-                    customDialog_Common("KYCLAYOUT", object, null, "Successfull", null, object.getString("responseMessage"),NetworkTab.this);
+                } else if (object.getString("serviceType").equalsIgnoreCase("AUTO_REVERSAL_CONSENT_INITIATE")) {
+                    customDialog_Common("OTPLAYOUTS", object, null, "Enter OTP", null, null, NetworkTab.this);
+                } else if (object.getString("serviceType").equalsIgnoreCase("AUTO_REVERSAL_CONSENT_VERIFY")) {
+                    customDialog_Common("KYCLAYOUT", object, null, "Successfull", null, object.getString("responseMessage"), NetworkTab.this);
                 }
             }
         } catch (Exception e) {
@@ -221,10 +228,10 @@ public class NetworkTab extends BaseCompactActivity implements View.OnClickListe
 
     @Override
     public void okClicked(String type, Object ob) {
-        if(type.equalsIgnoreCase("CONSENTLAYOUT")){
-            new AsyncPostMethod(WebConfig.CRNF, getConsentOTPDetails((JSONObject)ob).toString(), headerData, NetworkTab.this,getString(R.string.responseTimeOut)).execute();
-        }else if(type.equalsIgnoreCase("OTPLAYOUTS")){
-            new AsyncPostMethod(WebConfig.CRNF, getVerifyOTPDetails((JSONObject)ob).toString(), headerData, NetworkTab.this,getString(R.string.responseTimeOut)).execute();
+        if (type.equalsIgnoreCase("CONSENTLAYOUT")) {
+            new AsyncPostMethod(WebConfig.CRNF, getConsentOTPDetails((JSONObject) ob).toString(), headerData, NetworkTab.this, getString(R.string.responseTimeOut)).execute();
+        } else if (type.equalsIgnoreCase("OTPLAYOUTS")) {
+            new AsyncPostMethod(WebConfig.CRNF, getVerifyOTPDetails((JSONObject) ob).toString(), headerData, NetworkTab.this, getString(R.string.responseTimeOut)).execute();
         }
 
     }

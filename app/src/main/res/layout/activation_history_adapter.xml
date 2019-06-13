@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:autofit="http://schemas.android.com/tools"
+    android:elevation="10dp"
+    android:layout_margin="5dp"
+    android:layout_marginTop="3dp"
+    android:layout_marginBottom="3dp"
+    android:focusable="false"
+    app:cardBackgroundColor="@color/white">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="5dp"
+        android:focusable="false">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_margin="3sp"
+            android:weightSum="800"
+            android:focusable="false"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="300"
+                android:inputType="text"
+                android:focusable="false"
+                android:text="@string/p_comnames"
+                android:textSize="12sp" />
+
+            <me.grantland.widget.AutofitTextView
+                android:id="@+id/btn_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="500"
+                android:text="@string/p_accountno"
+                android:focusable="false"
+                android:textColor="@color/black"
+                android:textSize="12sp"
+                android:singleLine="true"
+                android:maxLines="1"
+                autofit:minTextSize="8sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:focusable="false"
+            android:layout_margin="3sp"
+            android:weightSum="800">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="300"
+                android:inputType="text"
+                android:focusable="false"
+                android:text="Coupon Serial Number"
+                android:textSize="12sp" />
+
+            <me.grantland.widget.AutofitTextView
+                android:id="@+id/btn_p_amounts"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="500"
+                android:text="@string/p_amounts"
+                android:focusable="false"
+                android:textColor="@color/black"
+                android:textSize="12sp"
+                android:singleLine="true"
+                android:maxLines="1"
+                autofit:minTextSize="8sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:focusable="false"
+            android:layout_margin="3sp"
+            android:weightSum="800">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="300"
+                android:inputType="text"
+                android:focusable="false"
+                android:text="Service Type"
+                android:textSize="12sp" />
+
+            <me.grantland.widget.AutofitTextView
+                android:id="@+id/btn_p_transid"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:focusable="false"
+                android:layout_weight="500"
+                android:text="@string/p_transid"
+                android:textColor="@color/black"
+                android:textSize="12sp"
+                android:singleLine="true"
+                android:maxLines="1"
+                autofit:minTextSize="8sp"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:focusable="false"
+            android:layout_margin="3sp"
+            android:weightSum="800">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="300"
+                android:inputType="text"
+                android:text="Status"
+                android:focusable="false"
+                android:textSize="12sp" />
+
+            <me.grantland.widget.AutofitTextView
+                android:id="@+id/btn_p_bank"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="500"
+                android:text="@string/agentBalance"
+                android:textColor="@color/black"
+                android:textSize="12sp"
+                android:focusable="false"
+                android:singleLine="true"
+                android:maxLines="1"
+                autofit:minTextSize="8sp"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_margin="3sp"
+            android:focusable="false"
+            android:weightSum="800"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="300"
+                android:focusable="false"
+                android:inputType="text"
+                android:text="@string/p_category"
+                android:textSize="12sp" />
+
+            <me.grantland.widget.AutofitTextView
+                android:id="@+id/agent_category"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="500"
+                android:focusable="false"
+                android:text="@string/agentBalance"
+                android:textColor="@color/black"
+                android:textSize="12sp"
+                android:singleLine="true"
+                android:maxLines="1"
+                autofit:minTextSize="8sp"/>
+        </LinearLayout>
+    </LinearLayout>
+
+</android.support.v7.widget.CardView>

@@ -26,6 +26,7 @@ import com.rapipay.android.agent.adapter.ProfileAdapter;
 import com.rapipay.android.agent.interfaces.RequestHandler;
 import com.rapipay.android.agent.utils.AsyncPostMethod;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
+import com.rapipay.android.agent.utils.BaseFragment;
 import com.rapipay.android.agent.utils.GenerateChecksum;
 import com.rapipay.android.agent.utils.ImageUtils;
 import com.rapipay.android.agent.utils.LocalStorage;
@@ -38,7 +39,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 
-public class ProfileFragment extends Fragment implements RequestHandler, View.OnClickListener {
+public class ProfileFragment extends BaseFragment implements RequestHandler, View.OnClickListener {
 
     View rv;
     protected ArrayList<RapiPayPozo> list;
@@ -65,7 +66,7 @@ public class ProfileFragment extends Fragment implements RequestHandler, View.On
     }
 
     private void loadApi() {
-        new AsyncPostMethod(WebConfig.LOGIN_URL, getJson_Validate().toString(), "", ProfileFragment.this, getActivity(),getString(R.string.responseTimeOut)).execute();
+        new AsyncPostMethod(WebConfig.LOGIN_URL, getJson_Validate().toString(), "", ProfileFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
     }
 
     public JSONObject getJson_Validate() {
@@ -130,8 +131,12 @@ public class ProfileFragment extends Fragment implements RequestHandler, View.On
         btn_ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                loadApi();
-                alertDialog.dismiss();
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    loadApi();
+                    alertDialog.dismiss();
+                }
+                handlercontrol();
             }
         });
         btn_cancel.setOnClickListener(new View.OnClickListener() {
@@ -227,8 +232,12 @@ public class ProfileFragment extends Fragment implements RequestHandler, View.On
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_login:
-                HashMap<String, String> list = headerePozoArrayList;
-                new AsyncPostMethod(WebConfig.LOGIN_URL, updateJson_Validate(list).toString(), "", ProfileFragment.this, getActivity(),getString(R.string.responseTimeOut)).execute();
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    HashMap<String, String> list = headerePozoArrayList;
+                    new AsyncPostMethod(WebConfig.LOGIN_URL, updateJson_Validate(list).toString(), "", ProfileFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
+                }
+                handlercontrol();
                 break;
         }
     }

@@ -1,18 +1,16 @@
 package com.rapipay.android.agent.kotlin_classs
 
 import android.app.Dialog
-import android.content.Intent
 import android.os.Bundle
-import android.util.Log
+import android.support.v7.app.AlertDialog
+import android.support.v7.widget.AppCompatButton
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import android.widget.Toast.makeText
-import com.rapipay.android.agent.Model.ChannelHistoryPozo
+import com.rapipay.android.agent.Model.ActiveDataList
 import com.rapipay.android.agent.R
-import com.rapipay.android.agent.adapter.ChannelListAdapter
-import com.rapipay.android.agent.interfaces.CustomInterface
+import com.rapipay.android.agent.adapter.ActivationHistoryAdapter
 import com.rapipay.android.agent.interfaces.RequestHandler
 import com.rapipay.android.agent.utils.*
 import me.grantland.widget.AutofitTextView
@@ -21,11 +19,10 @@ import org.json.JSONObject
 import java.lang.Exception
 import java.util.*
 
-class TransactionReports : BaseFragment(), RequestHandler, View.OnClickListener, CustomInterface {
+class ActivationHistory : BaseFragment(), RequestHandler, View.OnClickListener {
     protected var headerData = WebConfig.BASIC_USERID + ":" + WebConfig.BASIC_PASSWORD
-    var transactionPozoArrayList: ArrayList<ChannelHistoryPozo>? = null
-    var reqFor: String? = null
-    var adapters: ChannelListAdapter? = null
+    var transactionPozoArrayList: ArrayList<ActiveDataList>? = null
+    var adapters: ActivationHistoryAdapter? = null
     var trans_details: ListView? = null
     protected var date2_text: AutofitTextView? = null
     protected var date1_text: AutofitTextView? = null
@@ -39,19 +36,26 @@ class TransactionReports : BaseFragment(), RequestHandler, View.OnClickListener,
     var last = 25
     internal var months: String? = null
     internal var dayss: String? = null
-    private var isLoading: Boolean = false
+
+    var enterpin: EditText? = null
+    var confirmpin: EditText? = null
+    var btn_login: AppCompatButton? = null
+    var belowlay: LinearLayout? = null
+    var calendersss: LinearLayout? = null
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        var view = inflater.inflate(R.layout.txn_report_layout, container, false);
-        reqFor = arguments!!.getString("reqFor")
+        var view = inflater.inflate(R.layout.enable_service_layout, container, false);
         if (BaseCompactActivity.db != null && BaseCompactActivity.db.details_Rapi)
             list = BaseCompactActivity.db.details
         init(view)
+        loadUrl()
         return view;
     }
 
     fun init(v: View) {
         trans_details = v.findViewById<ListView>(R.id.trans_details)
         val calendar = Calendar.getInstance()
+        belowlay = v.findViewById<LinearLayout>(R.id.belowlay)
+        calendersss = v.findViewById<LinearLayout>(R.id.calendersss)
         selectedDate = calendar.get(Calendar.DAY_OF_MONTH)
         selectedMonth = calendar.get(Calendar.MONTH) + 1
         selectedYear = calendar.get(Calendar.YEAR)
@@ -67,59 +71,14 @@ class TransactionReports : BaseFragment(), RequestHandler, View.OnClickListener,
 //        toimage!!.setColorFilter(resources.getColor(R.color.colorPrimaryDark))
         fromimage = v.findViewById<View>(R.id.fromimage) as ImageView
         fromimage!!.setOnClickListener(fromDateClicked)
+        date2_text!!.setText("$selectedYear-$selectedMonth-$selectedDate")
+        date1_text!!.setText("$selectedYear-$selectedMonth-$selectedDate")
+        enterpin = v.findViewById<View>(R.id.input_user) as EditText
+        confirmpin = v.findViewById<View>(R.id.input_password) as EditText
+        btn_login = v.findViewById<View>(R.id.btn_login) as AppCompatButton
+        btn_login?.setOnClickListener(this)
 //        fromimage!!.setColorFilter(resources.getColor(R.color.colorPrimaryDark))
-        trans_details!!.setOnItemClickListener(AdapterView.OnItemClickListener { parent, view, position, id ->
-            if (btnstatus == false) {
-                btnstatus = true
-                val pozo = transactionPozoArrayList!!.get(position)
-                AsyncPostMethod(WebConfig.WALLETRECEIPTURL, receipt_request(pozo).toString(), headerData, this@TransactionReports, activity, getString(R.string.responseTimeOut), "RECEIPTREQUEST").execute()
-            }
-            handlercontrol()
-        })
-        trans_details!!.setOnScrollListener(object : AbsListView.OnScrollListener {
-            override fun onScrollStateChanged(view: AbsListView, scrollState: Int) {
 
-            }
-
-            override fun onScroll(view: AbsListView, firstVisibleItem: Int, visibleItemCount: Int, totalItemCount: Int) {
-                val lastInScreen = firstVisibleItem + visibleItemCount
-                if (totalItemCount != 0 && totalItemCount == last && lastInScreen == totalItemCount && !isLoading) {
-                    first = last + 1
-                    last += 25
-                    AsyncPostMethod(WebConfig.CommonReport, getSubAgent(first, last).toString(), headerData, this@TransactionReports, activity, getString(R.string.responseTimeOut)).execute()
-                    isLoading = true
-                }
-            }
-        })
-    }
-
-    override fun okClicked(type: String?, ob: Any?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun cancelClicked(type: String?, ob: Any?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    fun receipt_request(pozo: ChannelHistoryPozo): JSONObject {
-        val jsonObject = JSONObject()
-        try {
-            jsonObject.put("serviceType", "Get_Txn_Recipt")
-            jsonObject.put("requestType", "DMT_CHANNEL")
-            jsonObject.put("typeMobileWeb", "mobile")
-            jsonObject.put("txnRef", ImageUtils.miliSeconds())
-            jsonObject.put("nodeAgentId", list[0].mobilno)
-            jsonObject.put("agentId", list[0].mobilno)
-            jsonObject.put("orgTxnRef", pozo.orgTxnid)
-            jsonObject.put("sessionRefNo", list[0].aftersessionRefNo)
-            jsonObject.put("routeType", pozo.transferType)
-            jsonObject.put("checkSum", GenerateChecksum.checkSum(list[0].pinsession, jsonObject.toString()))
-
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-
-        return jsonObject
     }
 
     protected var toDateClicked: View.OnClickListener = View.OnClickListener {
@@ -134,7 +93,7 @@ class TransactionReports : BaseFragment(), RequestHandler, View.OnClickListener,
         selectedMonth = calendar.get(Calendar.MONTH)
         selectedYear = calendar.get(Calendar.YEAR)
         datePicker.init(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)) { datePicker, year, month, dayOfMonth ->
-            Log.e("Date", "Year=" + year + " Month=" + (month + 1) + " day=" + dayOfMonth)
+
             if ((month + 1).toString().length == 1)
                 months = "0" + (month + 1).toString()
             else
@@ -177,7 +136,7 @@ class TransactionReports : BaseFragment(), RequestHandler, View.OnClickListener,
         selectedMonth = calendar.get(Calendar.MONTH)
         selectedYear = calendar.get(Calendar.YEAR)
         datePicker.init(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)) { datePicker, year, month, dayOfMonth ->
-            Log.e("Date", "Year=" + year + " Month=" + (month + 1) + " day=" + dayOfMonth)
+
             if ((month + 1).toString().length == 1)
                 months = "0" + (month + 1).toString()
             else
@@ -211,23 +170,21 @@ class TransactionReports : BaseFragment(), RequestHandler, View.OnClickListener,
 
 
     fun loadUrl() {
-        AsyncPostMethod(WebConfig.CommonReport, getSubAgent(first, last).toString(), headerData, this, activity, getString(R.string.responseTimeOut)).execute()
+        AsyncPostMethod(WebConfig.SCRATCH_URL, getSubAgent().toString(), headerData, this, activity, getString(R.string.responseTimeOut), "ACTIVATIONSERVICE").execute()
     }
 
-    fun getSubAgent(first: Int, last: Int): JSONObject {
+    fun getSubAgent(): JSONObject {
         var jsonObject = JSONObject()
         try {
-            jsonObject.put("serviceType", "GET_TXN_HISTORY_BY_SERVICE")
+            jsonObject.put("serviceType", "ACTIVATION_HISTORY")
             jsonObject.put("transactionID", ImageUtils.miliSeconds())
             jsonObject.put("nodeAgentId", list[0].mobilno)
-            jsonObject.put("fromTxnDate", date2_text!!.getText().toString())
-            jsonObject.put("toTxnDate", date1_text!!.getText().toString())
-            jsonObject.put("fromIndex", first)
-            jsonObject.put("toIndex", last)
-            jsonObject.put("reqFor", reqFor)
+            jsonObject.put("agentID", list[0].mobilno)
             jsonObject.put("typeMobileWeb", "mobile")
-            jsonObject.put("requestType", "BC_CHANNEL")
+            jsonObject.put("requestType", "COUPON_CHANNEL")
             jsonObject.put("sessionRefNo", list.get(0).aftersessionRefNo)
+            jsonObject.put("fromDate", date2_text!!.getText().toString())
+            jsonObject.put("toDate", date1_text!!.getText().toString())
             jsonObject.put("checkSum", GenerateChecksum.checkSum(list[0].pinsession, jsonObject.toString()))
 
         } catch (e: Exception) {
@@ -245,91 +202,137 @@ class TransactionReports : BaseFragment(), RequestHandler, View.OnClickListener,
                 date1_text!!.setError("Please enter mandatory field")
                 date1_text!!.requestFocus()
             } else if (printDifference(mainDate(date2_text!!.getText().toString()), mainDate(date1_text!!.getText().toString()))) {
-//                val fromDate = date1_text!!.getText().toString()
-//                val ToDate = date2_text!!.getText().toString()
-//
-//                /* val dateBeforeString = fromDate.replace("/", "-")
-//                 val dateAfterString = ToDate.replace("/", "-")
-//                 val dateBefore = LocalDate.parse(dateBeforeString)
-//                 val dateAfter = LocalDate.parse(dateAfterString)
-//                 //calculating number of days in between
-//                 val noOfDaysBetween = ChronoUnit.DAYS.between(ToDate ,fromDate)*/
-////                var checkval: Boolean? = false
-//                var checkval= date_Different(ToDate ,fromDate, 31)
-//                if(!checkval) {
                 loadUrl()
             } else {
                 customDialog_Common("Statement can only view from one month")
-//                    transactionPozoArrayList = ArrayList<ChannelHistoryPozo>()
-//                    initializeTransAdapter(transactionPozoArrayList!!)
             }
-//            }else
-//                Toast.makeText(activity, "Please select correct date", Toast.LENGTH_SHORT).show()
+            R.id.btn_login -> {
+                if (btnstatus == false) {
+                    btnstatus = true
+                    if (enterpin!!.text.toString().isEmpty()) {
+                        enterpin?.error = "Please enter serial number"
+                        enterpin?.requestFocus()
+                    } else if (confirmpin!!.text.toString().isEmpty()) {
+                        confirmpin?.error = "Please enter coupon number"
+                        confirmpin?.requestFocus()
+                    } else
+                        AsyncPostMethod(WebConfig.SCRATCH_URL, getJson_Validate().toString(), headerData, this@ActivationHistory, getActivity(), getString(R.string.responseTimeOut), "ACTIVATIONSERVICE").execute()
+                }
+                handlercontrol()
+            }
         }
     }
 
-    override fun chechStat(`object`: String?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    fun getJson_Validate(): JSONObject {
+        val jsonObject = JSONObject()
+        if (list.size != 0) {
+            try {
+                jsonObject.put("serviceType", "ENABLE_SERVICES")
+                jsonObject.put("requestType", "COUPON_CHANNEL")
+                jsonObject.put("typeMobileWeb", "mobile")
+                jsonObject.put("transactionID", ImageUtils.miliSeconds())
+                jsonObject.put("agentID", list.get(0).getMobilno())
+                jsonObject.put("nodeAgentId", list.get(0).getMobilno())
+                jsonObject.put("serialNumber", enterpin?.text.toString())
+                jsonObject.put("couponNumber", confirmpin?.text.toString())
+                jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo())
+                jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()))
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (data != null) {
-            if (requestCode == 2) {
-                dialog.dismiss()
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
-        } else {
-            if (dialog != null)
-                dialog.dismiss()
+
         }
+        return jsonObject
     }
 
     override fun chechStatus(`object`: JSONObject?) {
-        try {
-            if (`object`!!.getString("responseCode").equals("200")) {
-                if (`object`.getString("serviceType").equals("GET_TXN_HISTORY_BY_SERVICE")) {
-                    if (`object`.has("getTxnHistory")) {
-                        insertLastTransDetails(`object`.getJSONArray("getTxnHistory"))
-                    }
-                } else if (`object`.getString("serviceType").equals("Get_Txn_Recipt", ignoreCase = true)) {
-                    if (`object`.has("getTxnReceiptDataList"))
-                        try {
-                            val array = `object`.getJSONArray("getTxnReceiptDataList")
-                            customReceiptNewTransaction("Transaction Receipt", `object`, this@TransactionReports)
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                            customDialog_Common("KYCLAYOUTS", null, null, "Transaction Receipt", "", "Cannot generate receipt now please try later!", this@TransactionReports)
-                        }
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
 
+    override fun chechStat(s: String?) {
+        if (s != null) {
+            try {
+                val `object` = JSONObject(s)
+                if (`object`!!.getString("responseCode").equals("200")) {
+                    if (`object`.getString("serviceType").equals("ACTIVATION_HISTORY")) {
+                        if (`object`.has("historyCount") && `object`.getString("historyCount").length != 0) {
+                            insertLastTransDetails(`object`.getJSONArray("activeDataList"))
+                        } else {
+                            calendersss?.visibility = View.GONE
+                            belowlay?.visibility = View.VISIBLE
+                        }
+                    } else if (`object`.getString("responseCode").equals("200", ignoreCase = true)) {
+                        if (`object`.getString("serviceType").equals("ENABLE_SERVICES", ignoreCase = true)) {
+                            customDialog_Ben("Alert", `object`.getString("responseMessage"))
+                        }
+                    }
+                } else {
+                    calendersss?.visibility = View.GONE
+                    belowlay?.visibility = View.VISIBLE
                 }
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
+        } else {
+            calendersss?.visibility = View.GONE
+            belowlay?.visibility = View.VISIBLE
         }
     }
 
     private fun insertLastTransDetails(array: JSONArray) {
         try {
-            transactionPozoArrayList = ArrayList<ChannelHistoryPozo>()
+            transactionPozoArrayList = ArrayList<ActiveDataList>()
             for (i in 0 until array.length()) {
                 val `object` = array.getJSONObject(i)
-                transactionPozoArrayList!!.add(ChannelHistoryPozo(`object`.getString("senderName") + " ( " + `object`.getString("mobileNo") + " )", `object`.getString("accountNo") + " ( " + `object`.getString("bankName") + " )", `object`.getString("requestAmt"), `object`.getString("txnStatus"), `object`.getString("txnDateTime"), `object`.getString("serviceProviderTXNID"), `object`.getString("transferType"), `object`.getString("userTxnId"), `object`.getString("serviceType"), `object`.getString("txnDateTime")))
+                transactionPozoArrayList!!.add(ActiveDataList(`object`.getString("serialNumber"), `object`.getString("status"), `object`.getString("serviceName")))
             }
         } catch (e: Exception) {
             e.printStackTrace()
         }
 
-        if (transactionPozoArrayList!!.size != 0)
+        if (transactionPozoArrayList!!.size != 0) {
             initializeTransAdapter(transactionPozoArrayList!!)
+            calendersss?.visibility = View.VISIBLE
+            belowlay?.visibility = View.GONE
+        } else {
+            calendersss?.visibility = View.GONE
+            belowlay?.visibility = View.VISIBLE
+        }
     }
 
-    private fun initializeTransAdapter(list: ArrayList<ChannelHistoryPozo>) {
-        if (first == 1) {
-            adapters = ChannelListAdapter(list, activity)
-            trans_details!!.setAdapter(adapters)
-        } else {
-            adapters!!.addAll(list)
-            adapters!!.notifyDataSetChanged()
+    private fun initializeTransAdapter(list: ArrayList<ActiveDataList>) {
+        adapters = ActivationHistoryAdapter(list, activity)
+        trans_details!!.setAdapter(adapters)
+    }
+
+
+    var alertDialog: AlertDialog? = null
+
+    private fun customDialog_Ben(msg: String, title: String) {
+        val dialog = AlertDialog.Builder(getActivity()!!)
+        val inflater = getLayoutInflater()
+        val alertLayout = inflater.inflate(R.layout.custom_layout_common, null)
+        val btn_cancel = alertLayout.findViewById(R.id.btn_cancel) as AppCompatButton
+        btn_cancel.visibility = View.GONE
+        val btn_ok = alertLayout.findViewById(R.id.btn_ok) as AppCompatButton
+        val otpView = alertLayout.findViewById(R.id.dialog_msg) as TextView
+        otpView.text = title
+        otpView.visibility = View.VISIBLE
+        val texttitle = alertLayout.findViewById(R.id.dialog_title) as TextView
+        texttitle.text = msg
+        dialog.setView(alertLayout)
+        dialog.setCancelable(false)
+        btn_ok.setOnClickListener {
+
+            enterpin?.setText("")
+            enterpin?.hint = "Enter Serial Number*"
+            confirmpin?.setText("")
+            confirmpin?.hint = "Enter Coupon Number*"
+            loadUrl()
+            alertDialog?.dismiss()
         }
-        isLoading = false
+        btn_cancel.setOnClickListener { alertDialog?.dismiss() }
+        alertDialog = dialog.show()
     }
 }

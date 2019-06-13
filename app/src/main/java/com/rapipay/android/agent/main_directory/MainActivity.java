@@ -46,6 +46,8 @@ import com.rapipay.android.agent.fragments.SettlementBankFragment;
 import com.rapipay.android.agent.fragments.TpinTab;
 import com.rapipay.android.agent.interfaces.CustomInterface;
 import com.rapipay.android.agent.interfaces.RequestHandler;
+import com.rapipay.android.agent.kotlin_classs.AEPSServiceActivation;
+import com.rapipay.android.agent.kotlin_classs.ActivationHistory;
 import com.rapipay.android.agent.kotlin_classs.SettlementTab;
 import com.rapipay.android.agent.kotlin_classs.SubAgentFrag;
 import com.rapipay.android.agent.kotlin_classs.TransactionReports;
@@ -77,7 +79,7 @@ public class MainActivity extends BaseCompactActivity
     private static final int dpPhoto1 = 2001;
     private static final int dpPhoto2 = 2002;
     public static String bankdetails = null;
-    public static String Parent_Mobile = null;
+    public static String Parent_Mobile = null,FN_TIME_OUT=null;
     public static String regBankDetails = null;
     public static ArrayList<HeaderePozo> pozoArrayList;
     public static boolean relailerDetails = false;
@@ -265,32 +267,34 @@ public class MainActivity extends BaseCompactActivity
 
     private void prepareMenuData() {
 
-        MenuModel menuModel = new MenuModel("Home", true, false, "https://www.journaldev.com/9333/android-webview-example-tutorial"); //Menu of Android Tutorial. No sub menus
+        MenuModel menuModel = new MenuModel("Home", true, false, ""); //Menu of Android Tutorial. No sub menus
         headerList.add(menuModel);
 
         if (!menuModel.hasChildren) {
             childList.put(menuModel, null);
         }
-        menuModel = new MenuModel("Profile", true, false, "https://www.journaldev.com/9333/android-webview-example-tutorial"); //Menu of Android Tutorial. No sub menus
+        menuModel = new MenuModel("Profile", true, false, ""); //Menu of Android Tutorial. No sub menus
         headerList.add(menuModel);
 
         if (!menuModel.hasChildren) {
             childList.put(menuModel, null);
         }
 
-        menuModel = new MenuModel("Manage FOS", true, false, "https://www.journaldev.com/9333/android-webview-example-tutorial"); //Menu of Android Tutorial. No sub menus
+        menuModel = new MenuModel("Manage FOS", true, false, ""); //Menu of Android Tutorial. No sub menus
         headerList.add(menuModel);
 
         if (!menuModel.hasChildren) {
             childList.put(menuModel, null);
         }
-        menuModel = new MenuModel("Credit Banks", true, false, "https://www.journaldev.com/9333/android-webview-example-tutorial"); //Menu of Android Tutorial. No sub menus
+        menuModel = new MenuModel("Credit Banks", true, false, ""); //Menu of Android Tutorial. No sub menus
         headerList.add(menuModel);
 
         if (!menuModel.hasChildren) {
             childList.put(menuModel, null);
         }
-        menuModel = new MenuModel("Bank Settlement", true, false, "https://www.journaldev.com/9333/android-webview-example-tutorial"); //Menu of Android Tutorial. No sub menus
+        menuModel = new MenuModel("Bank Settlement", true, false, ""); //Menu of Android Tutorial. No sub menus
+        headerList.add(menuModel);
+        menuModel = new MenuModel("Service Activation", true, false, ""); //Menu of Android Tutorial. No sub menus
         headerList.add(menuModel);
 
         if (!menuModel.hasChildren) {
@@ -300,15 +304,15 @@ public class MainActivity extends BaseCompactActivity
         menuModel = new MenuModel("Settings", true, true, ""); //Menu of Java Tutorials
         headerList.add(menuModel);
         List<MenuModel> childModelsList = new ArrayList<>();
-        MenuModel childModel = new MenuModel("Change Password", false, false, "https://www.journaldev.com/7153/core-java-tutorial");
+        MenuModel childModel = new MenuModel("Change Password", false, false, "");
         childModelsList.add(childModel);
 
-        childModel = new MenuModel("Change TPIN", false, false, "https://www.journaldev.com/19187/java-fileinputstream");
+        childModel = new MenuModel("Change TPIN", false, false, "");
         childModelsList.add(childModel);
 
-        childModel = new MenuModel("Change Login Pin", false, false, "https://www.journaldev.com/19115/java-filereader");
+        childModel = new MenuModel("Change Login Pin", false, false, "");
         childModelsList.add(childModel);
-        childModel = new MenuModel("Change Mobile", false, false, "https://www.journaldev.com/19115/java-filereader");
+        childModel = new MenuModel("Change Mobile", false, false, "");
         childModelsList.add(childModel);
 
 
@@ -320,12 +324,12 @@ public class MainActivity extends BaseCompactActivity
         childModelsList = new ArrayList<>();
         menuModel = new MenuModel("Accounts Details", true, true, ""); //Menu of Python Tutorials
         headerList.add(menuModel);
-        childModel = new MenuModel("Bank Settlement Account", false, false, "https://www.journaldev.com/19243/python-ast-abstract-syntax-tree");
+        childModel = new MenuModel("Bank Settlement Account", false, false, "");
         childModelsList.add(childModel);
 
-        childModel = new MenuModel("Whitelist Bank Account(Auto Credit)", false, false, "https://www.journaldev.com/19226/python-fractions");
+        childModel = new MenuModel("Whitelist Bank Account(Auto Credit)", false, false, "");
         childModelsList.add(childModel);
-        childModel = new MenuModel("Lien History", false, false, "https://www.journaldev.com/19226/python-fractions");
+        childModel = new MenuModel("Lien History", false, false, "");
         childModelsList.add(childModel);
 
         if (menuModel.hasChildren) {
@@ -335,16 +339,16 @@ public class MainActivity extends BaseCompactActivity
         childModelsList = new ArrayList<>();
         menuModel = new MenuModel("Transaction Reports", true, true, ""); //Menu of Python Tutorials
         headerList.add(menuModel);
-        childModel = new MenuModel("BC Fund Transfer History", false, false, "https://www.journaldev.com/19243/python-ast-abstract-syntax-tree");
+        childModel = new MenuModel("BC Fund Transfer History", false, false, "");
         childModelsList.add(childModel);
 
-        childModel = new MenuModel("Wallet Fund Transfer History", false, false, "https://www.journaldev.com/19226/python-fractions");
+        childModel = new MenuModel("Wallet Fund Transfer History", false, false, "");
         childModelsList.add(childModel);
-        childModel = new MenuModel("Indo-Nepal Fund Transfer History", false, false, "https://www.journaldev.com/19226/python-fractions");
+        childModel = new MenuModel("Indo-Nepal Fund Transfer History", false, false, "");
         childModelsList.add(childModel);
-        childModel = new MenuModel("MPOS Transaction History", false, false, "https://www.journaldev.com/19226/python-fractions");
+        childModel = new MenuModel("MPOS Transaction History", false, false, "");
         childModelsList.add(childModel);
-        childModel = new MenuModel("AEPS/ MATM Transaction History", false, false, "https://www.journaldev.com/19226/python-fractions");
+        childModel = new MenuModel("AEPS/ MATM Transaction History", false, false, "");
         childModelsList.add(childModel);
 
         if (menuModel.hasChildren) {
@@ -380,14 +384,12 @@ public class MainActivity extends BaseCompactActivity
 
                 if (childList.get(headerList.get(groupPosition)) != null) {
                     MenuModel model = childList.get(headerList.get(groupPosition)).get(childPosition);
-                    if (model.url.length() > 0) {
                         int index = parent.getFlatListPosition(ExpandableListView.getPackedPositionForChild(groupPosition, childPosition));
                         parent.setItemChecked(index, true);
                         openChildfragment(groupPosition, childPosition);
 //                        WebView webView = findViewById(R.id.webView);
 //                        webView.loadUrl(model.url);
                         closeDrawer();
-                    }
                 }
 
                 return false;
@@ -462,25 +464,25 @@ public class MainActivity extends BaseCompactActivity
 
     private void openChildfragment(int head, int child) {
         Fragment fragment = null;
-        if (head == 5 && child == 2) {
+        if (head == 6 && child == 2) {
             isUrl = true;
             reset.setVisibility(View.GONE);
             bankde.setVisibility(View.GONE);
             isclicked = false;
             fragment = new ChangePinFragment();
-        } else if (head == 5 && child == 0) {
+        } else if (head == 6 && child == 0) {
             isUrl = true;
             reset.setVisibility(View.GONE);
             bankde.setVisibility(View.GONE);
             isclicked = false;
             fragment = new ChangePassword();
-        } else if (head == 5 && child == 3) {
+        } else if (head == 6 && child == 3) {
             isUrl = true;
             reset.setVisibility(View.GONE);
             bankde.setVisibility(View.GONE);
             isclicked = false;
             fragment = new ChangeMobileFragment();
-        } else if (head == 6 && child == 0) {
+        } else if (head == 7 && child == 0) {
             isUrl = true;
             reset.setVisibility(View.GONE);
             bankde.setVisibility(View.GONE);
@@ -489,7 +491,7 @@ public class MainActivity extends BaseCompactActivity
             isclicked = false;
             fragment = new SettlementBankFragment();
             fragment.setArguments(bundle);
-        } else if (head == 6 && child == 1) {
+        } else if (head == 7 && child == 1) {
             isUrl = true;
             reset.setVisibility(View.GONE);
             bankde.setVisibility(View.GONE);
@@ -498,19 +500,19 @@ public class MainActivity extends BaseCompactActivity
             isclicked = false;
             fragment = new SettlementBankFragment();
             fragment.setArguments(bundle);
-        } else if (head == 6 && child == 2) {
+        } else if (head == 7 && child == 2) {
             isUrl = true;
             reset.setVisibility(View.GONE);
             bankde.setVisibility(View.GONE);
             isclicked = false;
             fragment = new LienHistory();
-        } else if (head == 5 && child == 1) {
+        } else if (head == 6 && child == 1) {
             isUrl = true;
             reset.setVisibility(View.GONE);
             bankde.setVisibility(View.GONE);
             isclicked = false;
             fragment = new TpinTab();
-        } else if (head == 7 && child == 0) {
+        } else if (head == 8 && child == 0) {
             isUrl = true;
             reset.setVisibility(View.GONE);
             bankde.setVisibility(View.GONE);
@@ -519,7 +521,7 @@ public class MainActivity extends BaseCompactActivity
             isclicked = false;
             fragment = new TransactionReports();
             fragment.setArguments(bundle);
-        } else if (head == 7 && child == 1) {
+        } else if (head == 8 && child == 1) {
             isUrl = true;
             reset.setVisibility(View.GONE);
             bankde.setVisibility(View.GONE);
@@ -528,7 +530,7 @@ public class MainActivity extends BaseCompactActivity
             isclicked = false;
             fragment = new TransactionReports();
             fragment.setArguments(bundle);
-        } else if (head == 7 && child == 2) {
+        } else if (head == 8 && child == 2) {
             isUrl = true;
             reset.setVisibility(View.GONE);
             bankde.setVisibility(View.GONE);
@@ -537,7 +539,7 @@ public class MainActivity extends BaseCompactActivity
             isclicked = false;
             fragment = new TransactionReports();
             fragment.setArguments(bundle);
-        } else if (head == 7 && child == 3) {
+        } else if (head == 8 && child == 3) {
             isUrl = true;
             reset.setVisibility(View.GONE);
             bankde.setVisibility(View.GONE);
@@ -546,7 +548,7 @@ public class MainActivity extends BaseCompactActivity
             isclicked = false;
             fragment = new TransactionReports();
             fragment.setArguments(bundle);
-        } else if (head == 7 && child == 4) {
+        } else if (head == 8 && child == 4) {
             isUrl = true;
             reset.setVisibility(View.GONE);
             bankde.setVisibility(View.GONE);
@@ -600,6 +602,12 @@ public class MainActivity extends BaseCompactActivity
             bundle.putString("reqFor", "STLMNT");
             fragment = new SettlementTab();
             fragment.setArguments(bundle);
+        }else if (id == 5) {
+            isUrl = true;
+            isclicked = false;
+            reset.setVisibility(View.GONE);
+            bankde.setVisibility(View.GONE);
+            fragment = new ActivationHistory();
         } else if (fragment == null)
             Toast.makeText(MainActivity.this, "Under Process", Toast.LENGTH_SHORT).show();
         if (fragment != null)
@@ -658,6 +666,8 @@ public class MainActivity extends BaseCompactActivity
                 JSONObject object = array.getJSONObject(i);
                 if (object.getString("headerData").equalsIgnoreCase("Retailer") && object.getString("headerValue").equalsIgnoreCase("CATEGORY"))
                     relailerDetails = true;
+                if (object.getString("headerValue").equalsIgnoreCase("FN_TIME_OUT"))
+                    FN_TIME_OUT = object.getString("headerData");
                 if (object.getString("headerValue").equalsIgnoreCase("Parent Mobile"))
                     Parent_Mobile = object.getString("headerData");
                 if (object.getString("displayFlag").equalsIgnoreCase("D"))

@@ -156,17 +156,25 @@ public class LoginScreenActivity extends BaseCompactActivity implements View.OnC
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_login:
-                if (input_user.getText().toString().length() != 10)
-                    input_user.setError("Please enter mandatory field");
-                else if (input_password.getText().toString().isEmpty())
-                    input_password.setError("Please enter mandatory field");
-                else
-                    loadVersion(imei);
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    if (input_user.getText().toString().length() != 10)
+                        input_user.setError("Please enter mandatory field");
+                    else if (input_password.getText().toString().isEmpty())
+                        input_password.setError("Please enter mandatory field");
+                    else
+                        loadVersion(imei);
+                }
+                handlercontrol();
                 break;
             case R.id.btn_fosuser:
-                Intent intent = new Intent(LoginScreenActivity.this, FOSLoginActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                startActivity(intent);
+                if (btnstatus == false) {
+                    btnstatus = true;
+                    Intent intent = new Intent(LoginScreenActivity.this, FOSLoginActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                }
+                handlercontrol();
                 break;
         }
     }

@@ -408,143 +408,194 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
         try {
             switch (v.getId()) {
                 case R.id.delete_all:
-                    db.deleteRow(mobileNo, "verify");
-                    clearVerify();
+                    if (btnstatus == false) {
+                        btnstatus = true;
+                        db.deleteRow(mobileNo, "verify");
+                        clearVerify();
+                    }
+                    handlercontrol();
                     break;
                 case R.id.back_click:
                     finish();
                     break;
                 case R.id.documentfront:
-                    selectImage(DOCUMENT_FRONT1, DOCUMENT_FRONT2, "uploadFront");
+                    if (btnstatus == false) {
+                        btnstatus = true;
+                        selectImage(DOCUMENT_FRONT1, DOCUMENT_FRONT2, "uploadFront");
+                    }
+                    handlercontrol();
                     break;
                 case R.id.passportphoto:
-                    selectImage(passportphoto1, passportphoto2, "passportPhoto");
+                    if (btnstatus == false) {
+                        btnstatus = true;
+                        selectImage(passportphoto1, passportphoto2, "passportPhoto");
+                    }
+                    handlercontrol();
                     break;
                 case R.id.documentback:
-                    selectImage(DOCUMENT_BACK1, DOCUMENT_BACK2, "uploadBack");
+                    if (btnstatus == false) {
+                        btnstatus = true;
+                        selectImage(DOCUMENT_BACK1, DOCUMENT_BACK2, "uploadBack");
+                    }
+                    handlercontrol();
                     break;
                 case R.id.pan_photo:
-                    if (persons.equalsIgnoreCase("internal") || persons.equalsIgnoreCase("outside"))
-                        if (!pan_no.getText().toString().isEmpty())
-                            selectImage(PANPIC1, PANPIC2, "pancardImg");
-                        else
-                            Toast.makeText(KYCFormActivity.this, "Please enter pancard number first.", Toast.LENGTH_SHORT).show();
-
+                    if (btnstatus == false) {
+                        btnstatus = true;
+                        if (persons.equalsIgnoreCase("internal") || persons.equalsIgnoreCase("outside"))
+                            if (!pan_no.getText().toString().isEmpty())
+                                selectImage(PANPIC1, PANPIC2, "pancardImg");
+                            else
+                                Toast.makeText(KYCFormActivity.this, "Please enter pancard number first.", Toast.LENGTH_SHORT).show();
+                    }
+                    handlercontrol();
                     break;
                 case R.id.cust_pan_photo:
-                    selectImage(CUSTPANPIC1, CUSTPANPIC2, "custpanphoto");
+                    if (btnstatus == false) {
+                        btnstatus = true;
+                        selectImage(CUSTPANPIC1, CUSTPANPIC2, "custpanphoto");
+                    }
+                    handlercontrol();
                     break;
                 case R.id.shop_photo:
-                    selectImage(SHOPPIC1, SHOPPIC2, "shopPhoto");
+                    if (btnstatus == false) {
+                        btnstatus = true;
+                        selectImage(SHOPPIC1, SHOPPIC2, "shopPhoto");
+                    }
+                    handlercontrol();
                     break;
                 case R.id.self_photo:
-                    selectImage(selfphoto1, selfphoto2, "selfPhoto");
+                    if (btnstatus == false) {
+                        btnstatus = true;
+                        selectImage(selfphoto1, selfphoto2, "selfPhoto");
+                    }
+                    handlercontrol();
                     break;
                 case R.id.sign_photo:
-                    selectImage(signphoto1, signphoto2, "signPhoto");
+                    if (btnstatus == false) {
+                        btnstatus = true;
+                        selectImage(signphoto1, signphoto2, "signPhoto");
+                    }
+                    handlercontrol();
                     break;
                 case R.id.sub_btn_present:
-                    if (personalValidation()) {
-                        kycMapData.put("mobileNo", input_number.getText().toString());
-                        kycMapData.put("dob", date1_text.getText().toString());
-                        kycMapData.put("email", input_email.getText().toString());
-                        kycMapData.put("companyName", input_comp.getText().toString());
-                        String[] token = input_name.getText().toString().split(" ");
-                        kycMapData.put("firstName", token[0]);
-                        int count = token.length;
-                        if (count > 2) {
-                            kycMapData.put("middleName", token[1]);
-                            StringBuilder builder = new StringBuilder();
-                            for (int i = 2; i < count; i++) {
-                                builder.append(token[i] + " ");
+                    if (btnstatus == false) {
+                        btnstatus = true;
+                        if (personalValidation()) {
+                            kycMapData.put("mobileNo", input_number.getText().toString());
+                            kycMapData.put("dob", date1_text.getText().toString());
+                            kycMapData.put("email", input_email.getText().toString());
+                            kycMapData.put("companyName", input_comp.getText().toString());
+                            String[] token = input_name.getText().toString().split(" ");
+                            kycMapData.put("firstName", token[0]);
+                            int count = token.length;
+                            if (count > 2) {
+                                kycMapData.put("middleName", token[1]);
+                                StringBuilder builder = new StringBuilder();
+                                for (int i = 2; i < count; i++) {
+                                    builder.append(token[i] + " ");
+                                }
+                                kycMapData.put("lastName", builder.toString());
+                            } else if (count >= 2)
+                                kycMapData.put("lastName", token[1]);
+                            findViewById(R.id.personal_layout).setVisibility(View.GONE);
+                            findViewById(R.id.address_details).setVisibility(View.VISIBLE);
+                            if (getIntent().hasExtra("localAddress"))
+                                getAddressDetails();
+                            parseAddressJson(scandata);
+                            if (type.equalsIgnoreCase("SCAN")) {
+                                if (customerType.equalsIgnoreCase("C")) {
+                                    if (CustomerKYCActivity.bitmap_trans != null)
+                                        kycMapImage.put("kycImage", getBase64(CustomerKYCActivity.bitmap_trans, 100));
+                                    else
+                                        kycMapImage.put("kycImage", null);
+                                } else if (customerType.equalsIgnoreCase("A")) {
+                                    if (AgentKYCFragment.bitmap_trans != null)
+                                        kycMapImage.put("kycImage", getBase64(AgentKYCFragment.bitmap_trans, 100));
+                                    else
+                                        kycMapImage.put("kycImage", null);
+                                }
                             }
-                            kycMapData.put("lastName", builder.toString());
-                        } else if (count >= 2)
-                            kycMapData.put("lastName", token[1]);
-                        findViewById(R.id.personal_layout).setVisibility(View.GONE);
-                        findViewById(R.id.address_details).setVisibility(View.VISIBLE);
-                        if (getIntent().hasExtra("localAddress"))
-                            getAddressDetails();
-                        parseAddressJson(scandata);
-                        if (type.equalsIgnoreCase("SCAN")) {
-                            if (customerType.equalsIgnoreCase("C")) {
-                                if (CustomerKYCActivity.bitmap_trans != null)
-                                    kycMapImage.put("kycImage", getBase64(CustomerKYCActivity.bitmap_trans, 100));
-                                else
-                                    kycMapImage.put("kycImage", null);
-                            } else if (customerType.equalsIgnoreCase("A")) {
-                                if (AgentKYCFragment.bitmap_trans != null)
-                                    kycMapImage.put("kycImage", getBase64(AgentKYCFragment.bitmap_trans, 100));
-                                else
-                                    kycMapImage.put("kycImage", null);
-                            }
+                            if (getIntent().getStringExtra("localPersonal").equalsIgnoreCase("false"))
+                                insertPersonal(kycMapData, kycMapImage, input_name.getText().toString(), documentID, documentType, customerType);
+                            clicked = "personal";
                         }
-                        if (getIntent().getStringExtra("localPersonal").equalsIgnoreCase("false"))
-                            insertPersonal(kycMapData, kycMapImage, input_name.getText().toString(), documentID, documentType, customerType);
-                        clicked = "personal";
                     }
+                    handlercontrol();
                     break;
                 case R.id.sub_btn_address:
-                    if (addressValidation()) {
-                        kycMapData.put("address", input_address.getText().toString());
-                        kycMapData.put("city", city_name.getText().toString());
-                        kycMapData.put("state", select_state.getText().toString());
-                        kycMapData.put("pinCode", pin_code.getText().toString());
-                        kycMapData.put("documentId", document_id.getText().toString());
-                        kycMapData.put("documentType", documentType);
-                        findViewById(R.id.personal_layout).setVisibility(View.GONE);
-                        findViewById(R.id.address_details).setVisibility(View.GONE);
-                        findViewById(R.id.business_detail).setVisibility(View.VISIBLE);
-                        if (getIntent().hasExtra("localAddress")) {
-                            if (getIntent().getStringExtra("localAddress").equalsIgnoreCase("false"))
+                    if (btnstatus == false) {
+                        btnstatus = true;
+                        if (addressValidation()) {
+                            kycMapData.put("address", input_address.getText().toString());
+                            kycMapData.put("city", city_name.getText().toString());
+                            kycMapData.put("state", select_state.getText().toString());
+                            kycMapData.put("pinCode", pin_code.getText().toString());
+                            kycMapData.put("documentId", document_id.getText().toString());
+                            kycMapData.put("documentType", documentType);
+                            findViewById(R.id.personal_layout).setVisibility(View.GONE);
+                            findViewById(R.id.address_details).setVisibility(View.GONE);
+                            findViewById(R.id.business_detail).setVisibility(View.VISIBLE);
+                            if (getIntent().hasExtra("localAddress")) {
+                                if (getIntent().getStringExtra("localAddress").equalsIgnoreCase("false"))
+                                    insertAddress(kycMapData, kycMapImage, documentID, documentType, customerType);
+                            } else if (clicked.equalsIgnoreCase("personal")) {
                                 insertAddress(kycMapData, kycMapImage, documentID, documentType, customerType);
-                        } else if (clicked.equalsIgnoreCase("personal")) {
-                            insertAddress(kycMapData, kycMapImage, documentID, documentType, customerType);
-                            clicked = "address";
+                                clicked = "address";
+                            }
+                            if (getIntent().hasExtra("localBusiness"))
+                                getBusinessDetails();
                         }
-                        if (getIntent().hasExtra("localBusiness"))
-                            getBusinessDetails();
                     }
+                    handlercontrol();
                     break;
                 case R.id.sub_btn_buisness:
-                    if (buisnessValidation()) {
-                        kycMapData.put("panNo", pan_no.getText().toString());
-                        kycMapData.put("gstIN", gsin_no.getText().toString());
-                        findViewById(R.id.personal_layout).setVisibility(View.GONE);
-                        findViewById(R.id.address_details).setVisibility(View.GONE);
-                        findViewById(R.id.business_detail).setVisibility(View.GONE);
-                        findViewById(R.id.verification_layout).setVisibility(View.VISIBLE);
-                        if (getIntent().hasExtra("localBusiness")) {
-                            if (getIntent().getStringExtra("localBusiness").equalsIgnoreCase("false"))
+                    if (btnstatus == false) {
+                        btnstatus = true;
+                        if (buisnessValidation()) {
+                            kycMapData.put("panNo", pan_no.getText().toString());
+                            kycMapData.put("gstIN", gsin_no.getText().toString());
+                            findViewById(R.id.personal_layout).setVisibility(View.GONE);
+                            findViewById(R.id.address_details).setVisibility(View.GONE);
+                            findViewById(R.id.business_detail).setVisibility(View.GONE);
+                            findViewById(R.id.verification_layout).setVisibility(View.VISIBLE);
+                            if (getIntent().hasExtra("localBusiness")) {
+                                if (getIntent().getStringExtra("localBusiness").equalsIgnoreCase("false"))
+                                    insertBuisness(kycMapData, kycMapImage, documentID, documentType, customerType);
+                            } else if (clicked.equalsIgnoreCase("address")) {
                                 insertBuisness(kycMapData, kycMapImage, documentID, documentType, customerType);
-                        } else if (clicked.equalsIgnoreCase("address")) {
-                            insertBuisness(kycMapData, kycMapImage, documentID, documentType, customerType);
-                            clicked = "business";
+                                clicked = "business";
+                            }
+                            if (getIntent().hasExtra("localVerify"))
+                                getVerifyDetails();
                         }
-                        if (getIntent().hasExtra("localVerify"))
-                            getVerifyDetails();
                     }
+                    handlercontrol();
                     break;
                 case R.id.sub_btn_verify:
-                    if (getIntent().hasExtra("localPersonal"))
-                        getPersonalDetails();
-                    if (getIntent().hasExtra("localAddress"))
-                        getAddressDetails();
-                    if (getIntent().hasExtra("localBusiness"))
-                        getBusinessDetails();
-                    if (personalValidation())
-                        if (addressValidation())
-                            if (buisnessValidation())
-                                if (oursValidation()) {
-                                    if (getIntent().hasExtra("localVerify")) {
-                                        if (getIntent().getStringExtra("localVerify").equalsIgnoreCase("false"))
+                    if (btnstatus == false) {
+                        btnstatus = true;
+                        if (getIntent().hasExtra("localPersonal"))
+                            getPersonalDetails();
+                        if (getIntent().hasExtra("localAddress"))
+                            getAddressDetails();
+                        if (getIntent().hasExtra("localBusiness"))
+                            getBusinessDetails();
+                        if (personalValidation())
+                            if (addressValidation())
+                                if (buisnessValidation())
+                                    if (oursValidation()) {
+                                        if (getIntent().hasExtra("localVerify")) {
+                                            if (getIntent().getStringExtra("localVerify").equalsIgnoreCase("false"))
+                                                insertVerify(kycMapData, kycMapImage, documentID, documentType, customerType);
+                                        } else if (clicked.equalsIgnoreCase("business")) {
                                             insertVerify(kycMapData, kycMapImage, documentID, documentType, customerType);
-                                    } else if (clicked.equalsIgnoreCase("business")) {
-                                        insertVerify(kycMapData, kycMapImage, documentID, documentType, customerType);
-                                        clicked = "verify";
+                                            clicked = "verify";
+                                        }
+                                        reDirectWebView();
                                     }
-                                    reDirectWebView();
-                                }
+                    }
+                    handlercontrol();
                     break;
             }
         } catch (Exception e) {
