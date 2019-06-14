@@ -350,6 +350,10 @@ public class MainActivity extends BaseCompactActivity
         childModelsList.add(childModel);
         childModel = new MenuModel("AEPS/ MATM Transaction History", false, false, "");
         childModelsList.add(childModel);
+        childModel = new MenuModel("Recharge/ Bill Payment History", false, false, "");
+        childModelsList.add(childModel);
+        childModel = new MenuModel("DTH Recharge History", false, false, "");
+        childModelsList.add(childModel);
 
         if (menuModel.hasChildren) {
             childList.put(menuModel, childModelsList);
@@ -554,6 +558,24 @@ public class MainActivity extends BaseCompactActivity
             bankde.setVisibility(View.GONE);
             Bundle bundle = new Bundle();
             bundle.putString("reqFor", "AEPSMATM");
+            isclicked = false;
+            fragment = new TransactionReports();
+            fragment.setArguments(bundle);
+        }else if (head == 8 && child == 5) {
+            isUrl = true;
+            reset.setVisibility(View.GONE);
+            bankde.setVisibility(View.GONE);
+            Bundle bundle = new Bundle();
+            bundle.putString("reqFor", "RECBIL");
+            isclicked = false;
+            fragment = new TransactionReports();
+            fragment.setArguments(bundle);
+        }else if (head == 8 && child == 6) {
+            isUrl = true;
+            reset.setVisibility(View.GONE);
+            bankde.setVisibility(View.GONE);
+            Bundle bundle = new Bundle();
+            bundle.putString("reqFor", "DTH");
             isclicked = false;
             fragment = new TransactionReports();
             fragment.setArguments(bundle);

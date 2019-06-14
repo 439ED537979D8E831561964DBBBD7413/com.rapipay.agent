@@ -3,7 +3,7 @@ package com.rapipay.android.agent.utils;
 public class WebConfig {
 //    public static String WEBMain = "http://192.168.1.110:8080/";
     public static String WEBMain = "https://rapipay.com/";
-//    public static String KYCURL = "http://crm.rapipay.com/";
+    public static String KYCACT = "http://rpt.rapipay.com/";
     public static String WEB = WEBMain + "RapiPayAPIHub/";
     public static String UAT = WEB + "HandsetRegistration";
     public static String WALLET = WEBMain + "DMTWalletService/";
@@ -29,7 +29,7 @@ public class WebConfig {
     public static String COMMONAPI = WEBMain+"CommonApiApp/CommonApi";
     public static String COMMONAPIS = WEBMain+"CommonApiApp/SubAgentCommonService";
     public static String LOGIN_URL=WEBMain+"SecLogOnApp/SecLogOnService";
-    public static String SCRATCH_URL=WEBMain+"ScratchCouponAPP/CouponServiceApi";
+    public static String SCRATCH_URL=KYCACT+"ScratchCouponAPP/CouponServiceApi";
     public static String SUBAGENT=WEBMain+"SecLogOnApp/SubAgentService";
     public static String PMTSERVICE_DETAILS=WEBMain+"IndoNepalFTAPP/PMTService";
     public static String BCRemittanceApp = WEBMain + "BCRemittanceApp/BCService";

@@ -175,7 +175,7 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
             @Override
             public void afterTextChanged(Editable s) {
                 if (s.length()!=0 && s.length()<10) {
-                    input_text.setText(new EnglishNumberToWords().convert(Integer.parseInt(s.toString())));
+                    input_text.setText(EnglishNumberToWords.convert(Integer.parseInt(s.toString())));
                     input_text.setVisibility(View.VISIBLE);
                 }else
                     input_text.setVisibility(View.GONE);

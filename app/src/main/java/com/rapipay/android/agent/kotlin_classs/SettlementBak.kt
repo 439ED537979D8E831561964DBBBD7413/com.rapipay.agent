@@ -205,7 +205,7 @@ class SettlementBak : BaseFragment(), RequestHandler {
 
             override fun afterTextChanged(s: Editable) {
                 if (s.length != 0 && s.length < 10) {
-                    input_text.text = EnglishNumberToWords().convert(Integer.parseInt(s.toString()))
+                    input_text.text = EnglishNumberToWords.convert(Integer.parseInt(s.toString()))
                     input_text.visibility = View.VISIBLE
                 } else
                     input_text.visibility = View.GONE
