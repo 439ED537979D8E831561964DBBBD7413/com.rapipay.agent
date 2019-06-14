@@ -18,6 +18,7 @@ public class BCBeneficiaryAdapter extends RecyclerView.Adapter<BCBeneficiaryAdap
     private ArrayList<BeneficiaryDetailsPozo> mValues;
     private Context context;
     private ArrayList<BeneficiaryDetailsPozo> arraylist = null;
+
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
         public final TextView btn_name, btn_account, btn_bank, isverified;
@@ -52,9 +53,9 @@ public class BCBeneficiaryAdapter extends RecyclerView.Adapter<BCBeneficiaryAdap
         holder.btn_name.setText(mValues.get(position).getName());
         holder.btn_account.setText(mValues.get(position).getAccountno());
 //        if (!mValues.get(position).getIsVerified().equalsIgnoreCase("NOT-VEREFIED"))
-            holder.isverified.setText("VEREFIED");
+//            holder.isverified.setText("VEREFIED");
 //        else
-//            holder.isverified.setText(mValues.get(position).getIfsc());
+        holder.isverified.setText(mValues.get(position).getIsVerified());
     }
 
     @Override
@@ -69,7 +70,7 @@ public class BCBeneficiaryAdapter extends RecyclerView.Adapter<BCBeneficiaryAdap
             mValues.addAll(arraylist);
         } else {
             for (BeneficiaryDetailsPozo wp : arraylist) {
-                if (wp.getName().toLowerCase(Locale.getDefault()).contains(charText)||wp.getBank().toLowerCase(Locale.getDefault()).contains(charText)||wp.getAccountno().toLowerCase(Locale.getDefault()).contains(charText)) {
+                if (wp.getName().toLowerCase(Locale.getDefault()).contains(charText) || wp.getBank().toLowerCase(Locale.getDefault()).contains(charText) || wp.getAccountno().toLowerCase(Locale.getDefault()).contains(charText)) {
                     mValues.add(wp);
                 }
             }

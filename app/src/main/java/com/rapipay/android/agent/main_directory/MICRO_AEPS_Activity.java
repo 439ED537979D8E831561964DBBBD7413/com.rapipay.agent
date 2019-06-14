@@ -518,12 +518,12 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
                     }
                 }
                 if (!isPosPaired) {
-                    return "";
+                    return null;
                 }
             } else {
-                return "";
+                return null;
             }
-        return "";
+        return null;
     }
 
     @Override
