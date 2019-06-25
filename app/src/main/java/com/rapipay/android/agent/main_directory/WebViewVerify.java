@@ -40,7 +40,7 @@ import java.util.Set;
 public class WebViewVerify extends BaseCompactActivity implements CustomInterface, View.OnClickListener {
     WebView web;
     private ValueCallback<Uri[]> mUploadMessage;
-    private String mobileNo, formData;
+    private String mobileNo, formData,documentType,documentID;
     private static final int INPUT_FILE_REQUEST_CODE = 1;
     private long size = 0;
     @Override
@@ -55,6 +55,8 @@ public class WebViewVerify extends BaseCompactActivity implements CustomInterfac
         heading.setText("KYC Registration");
         TYPE = getIntent().getStringExtra("persons");
         mobileNo = getIntent().getStringExtra("mobileNo");
+        documentType = getIntent().getStringExtra("documentType");
+        documentID = getIntent().getStringExtra("documentID");
         web = (WebView) findViewById(R.id.webview01);
         WebSettings webSettings = web.getSettings();
         webSettings.setAppCacheEnabled(true);
@@ -277,10 +279,10 @@ public class WebViewVerify extends BaseCompactActivity implements CustomInterfac
     @Override
     public void okClicked(String type, Object ob) {
         if (type.equalsIgnoreCase("KYCLAYOUTS")) {
-            db.deleteRow(mobileNo, "");
+            dbRealm.deleteRow(mobileNo, "",documentID,documentType);
             setBack_click(this);
             finish();
-        }else if (type.equalsIgnoreCase("KYCLAYOUTSS")) {
+        } else if (type.equalsIgnoreCase("KYCLAYOUTSS")) {
             setBack_click(this);
             finish();
         }

@@ -12,6 +12,8 @@ import android.widget.Toast;
 
 import com.rapipay.android.agent.BuildConfig;
 import com.rapipay.android.agent.Database.RapipayDB;
+import com.rapipay.android.agent.Model.ImagePozo;
+import com.rapipay.android.agent.Model.RapiPayPozo;
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.interfaces.CustomInterface;
 import com.rapipay.android.agent.interfaces.RequestHandler;
@@ -25,10 +27,13 @@ import com.rapipay.android.agent.utils.RouteClass;
 import com.rapipay.android.agent.utils.WebConfig;
 import com.rapipay.android.agent.view.PinEntryEditText;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import io.realm.Realm;
 
 public class PinActivity extends BaseCompactActivity implements View.OnClickListener, RequestHandler, CustomInterface {
 
@@ -59,8 +64,8 @@ public class PinActivity extends BaseCompactActivity implements View.OnClickList
         pinView = (PinEntryEditText) findViewById(R.id.pinView);
         confirmpinView = (PinEntryEditText) findViewById(R.id.confirmpinView);
         otppinView = (PinEntryEditText) findViewById(R.id.otppinView);
-        if (db != null)
-            flag_rapi = db.getDetails_Rapi();
+        if (dbRealm != null)
+            flag_rapi = dbRealm.getDetails_Rapi();
         else
             dbNull(PinActivity.this);
     }
@@ -108,34 +113,54 @@ public class PinActivity extends BaseCompactActivity implements View.OnClickList
                 break;
         }
     }
-
+    RapiPayPozo rapiPayPozo;
     @Override
-    public void chechStatus(JSONObject object) {
+    public void chechStatus(final JSONObject object) {
         try {
+           rapiPayPozo = new RapiPayPozo();
             if (object.getString("responseCode").equalsIgnoreCase("200")) {
                 if (object.getString("serviceType").equalsIgnoreCase("ProcessHandsetRegistration")) {
                     if (!flag_rapi) {
-                        String insertSQL = "INSERT INTO " + RapipayDB.TABLE_NAME + "\n" +
-                                "(" + RapipayDB.COLOMN_SESSION + "," + RapipayDB.COLOMN_APIKEY + "," + RapipayDB.COLOMN_IMEI + "," + RapipayDB.COLOMN_MOBILENO + "," + RapipayDB.COLOMN_PRTXNID + "," + RapipayDB.COLOMN_SESSIONREFNO + "," + RapipayDB.COLOMN_AGENTNAME + ")\n" +
-                                "VALUES \n" +
-                                "( ?, ?, ?, ?, ?, ?,?);";
-                        SQLiteDatabase dba = db.getWritableDatabase();
-                        dba.execSQL(insertSQL, new String[]{object.getString("sessionId"), object.getString("agentApiKey"), imeiNo, agentId, object.getString("txnRefId"), object.getString("sessionRefNo"), object.getString("agentName")});
+                        realm.executeTransaction(new Realm.Transaction() {
+                            @Override
+                            public void execute(Realm realm) {
+                                try {
+                                    rapiPayPozo.setSession(object.getString("sessionId"));
+                                    rapiPayPozo.setApikey(object.getString("agentApiKey"));
+                                    rapiPayPozo.setImei(imeiNo);
+                                    rapiPayPozo.setMobilno(agentId);
+                                    rapiPayPozo.setTxnRefId(object.getString("txnRefId"));
+                                    rapiPayPozo.setSessionRefNo(object.getString("sessionRefNo"));
+                                    rapiPayPozo.setAgentName(object.getString("agentName"));
+                                    realm.copyToRealm(rapiPayPozo);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
                     } else {
-                        list = db.getDetails();
-                        SQLiteDatabase dba = db.getWritableDatabase();
-                        ContentValues contentValues = new ContentValues();
-                        contentValues.put(RapipayDB.COLOMN_SESSION, object.getString("sessionId"));
-                        contentValues.put(RapipayDB.COLOMN_APIKEY, object.getString("agentApiKey"));
-                        contentValues.put(RapipayDB.COLOMN_PRTXNID, object.getString("txnRefId"));
-                        contentValues.put(RapipayDB.COLOMN_SESSIONREFNO, object.getString("sessionRefNo"));
-                        String whereClause = RapipayDB.COLOMN_MOBILENO + "=?";
-                        String whereArgs[] = {list.get(0).getMobilno()};
-                        dba.update(RapipayDB.TABLE_NAME, contentValues, whereClause, whereArgs);
+                        list = dbRealm.getDetails();
+                        String whereArgs1 = list.get(0).getMobilno();
+                        final RapiPayPozo pinPozo1 = realm.where(RapiPayPozo.class).equalTo("mobilno", whereArgs1).findFirst();
+                        realm.executeTransaction(new Realm.Transaction() {
+                            @Override
+                            public void execute(Realm realm) {
+                                try {
+                                    pinPozo1.setSession(object.getString("sessionId"));
+                                    pinPozo1.setApikey(object.getString("agentApiKey"));
+                                    pinPozo1.setTxnRefId(object.getString("txnRefId"));
+                                    pinPozo1.setSessionRefNo(object.getString("sessionRefNo"));
+                                    pinPozo1.setAgentName(object.getString("agentName"));
+                                    realm.copyToRealmOrUpdate(pinPozo1);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
                     }
                     callBankDetails();
                 } else if (object.getString("serviceType").equalsIgnoreCase("GET_MASTER_DATA")) {
-                    if (new MasterClass().getMasterData(object, db))
+                    if (new MasterClass().getMasterData(object, dbRealm, realm))
                         new AsyncPostMethod(WebConfig.NETWORKTRANSFER_URL, acknowledge().toString(), headerData, PinActivity.this, getString(R.string.responseTimeOut)).execute();
                 } else if (object.getString("serviceType").equalsIgnoreCase("UPDATE_DOWNLAOD_DATA_STATUS")) {
                     new AsyncPostMethod(WebConfig.LOGIN_URL, getWLDetails().toString(), headerData, PinActivity.this, getString(R.string.responseTimeOut)).execute();
@@ -148,22 +173,34 @@ public class PinActivity extends BaseCompactActivity implements View.OnClickList
                         insertImages("leftLogo", object);
                     localStorage.setActivityState(LocalStorage.ROUTESTATE, "PINVERIFIED");
                     customDialog_Common("KYCLAYOUTS", null, null, "Pin Registration", null, "Pin Registration Successful, Do you want to proceed ?", PinActivity.this);
-
                 }
+            }else {
+                pinView.setText("");
+                confirmpinView.setText("");
+                otppinView.setText("");
+                responseMSg(object);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private void insertImages(String imageName, JSONObject object) {
+    public void insertImages(final String imageName, final JSONObject object) {
         try {
-            SQLiteDatabase dba = db.getWritableDatabase();
-            ContentValues values = new ContentValues();
-            String wlimageName = imageName + ".jpg";
-            values.put(RapipayDB.IMAGE_PATH_WL, byteConvert(object.getString(imageName)));
-            values.put(RapipayDB.IMAGE_NAME, wlimageName);
-            dba.insert(RapipayDB.TABLE_IMAGES, null, values);
+            final ImagePozo imagePozo = new ImagePozo();
+            final String wlimageName = imageName + ".jpg";
+            realm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    try {
+                        imagePozo.setImagePath(byteConvert(object.getString(imageName)));
+                        imagePozo.setImageName(wlimageName);
+                        realm.copyToRealm(imagePozo);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -217,14 +254,14 @@ public class PinActivity extends BaseCompactActivity implements View.OnClickList
 
 
     private void callBankDetails() {
-        boolean bank_flag = db.getDetails_Bank();
+        boolean bank_flag = dbRealm.getDetails_Bank();
         if (bank_flag == false) {
             new AsyncPostMethod(WebConfig.CommonReport, getMaster_Validate().toString(), headerData, PinActivity.this, getString(R.string.responseTimeOut)).execute();
         }
     }
 
     public JSONObject getMaster_Validate() {
-        list = db.getDetails();
+        list = dbRealm.getDetails();
         JSONObject jsonObject = new JSONObject();
         if (list.size() != 0) {
             try {
@@ -252,6 +289,7 @@ public class PinActivity extends BaseCompactActivity implements View.OnClickList
 
     @Override
     public void okClicked(String type, Object ob) {
+        deleteTables();
         if (type.equalsIgnoreCase("SESSIONEXPIRRED") || type.equalsIgnoreCase("SESSIONEXPIRE"))
             jumpPage();
         else if (type.equalsIgnoreCase("KYCLAYOUTS")) {

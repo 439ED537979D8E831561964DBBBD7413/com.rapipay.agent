@@ -33,8 +33,8 @@ class SubAgentFrag : BaseFragment(), RequestHandler, CustomInterface, View.OnCli
     }
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         var view = inflater.inflate(R.layout.subagent_layout, container, false)
-        if (BaseCompactActivity.db != null && BaseCompactActivity.db.details_Rapi)
-            list = BaseCompactActivity.db.details
+        if (BaseCompactActivity.dbRealm != null && BaseCompactActivity.dbRealm.details_Rapi)
+            list = BaseCompactActivity.dbRealm.details
         init(view)
         loadUrl()
         return view
@@ -59,7 +59,6 @@ class SubAgentFrag : BaseFragment(), RequestHandler, CustomInterface, View.OnCli
             }
 
             override fun onLongClick(view: View?, position: Int) {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
             }
         }))
     }
@@ -154,7 +153,6 @@ class SubAgentFrag : BaseFragment(), RequestHandler, CustomInterface, View.OnCli
     }
 
     override fun chechStat(`object`: String?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun chechStatus(`object`: JSONObject?) {
@@ -171,7 +169,8 @@ class SubAgentFrag : BaseFragment(), RequestHandler, CustomInterface, View.OnCli
                 }else if (`object`.getString("serviceType").equals("UPDATE_SUB_AGENT_SERVICES", ignoreCase = true)) {
                     customDialog_Common("KYCLAYOUTSS", null, null, "Alert", null, `object`.getString("responseMessage"), this@SubAgentFrag)
                 }
-            }
+            }else
+                responseMSg(`object`)
         } catch (e: Exception) {
             e.printStackTrace()
         }

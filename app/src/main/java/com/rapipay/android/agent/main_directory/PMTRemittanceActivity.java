@@ -50,12 +50,15 @@ import com.rapipay.android.agent.Model.NepalDistrictPozo;
 import com.rapipay.android.agent.Model.PMTBenefPozo;
 import com.rapipay.android.agent.Model.PMTTransactionHistory;
 import com.rapipay.android.agent.Model.PaymentModePozo;
+import com.rapipay.android.agent.Model.StatePozo;
+import com.rapipay.android.agent.Model.TbNepalPaymentModePozo;
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.adapter.NepalCityAdapter;
 import com.rapipay.android.agent.adapter.NepalDistrictAdapter;
 import com.rapipay.android.agent.adapter.PMTBenefAdapter;
 import com.rapipay.android.agent.adapter.PMTTransAdapter;
 import com.rapipay.android.agent.adapter.PaymentAdapter;
+import com.rapipay.android.agent.adapter.PaymentNepalAdapter;
 import com.rapipay.android.agent.interfaces.ClickListener;
 import com.rapipay.android.agent.interfaces.CustomInterface;
 import com.rapipay.android.agent.interfaces.RequestHandler;
@@ -82,6 +85,8 @@ import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import me.grantland.widget.AutofitTextView;
 
@@ -123,11 +128,6 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
         super.onCreate(savedInstanceState);
         setContentView(R.layout.pmt_resistance_layout);
         initialize();
-//        mobileNo = getIntent().getStringExtra("MOBILENO");
-//        if (!mobileNo.isEmpty()) {
-//            input_mobile.setText(mobileNo);
-//            input_mobile.setEnabled(false);
-//        }
     }
 
     private void initialize() {
@@ -625,7 +625,7 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
                     if (bene_update)
                         new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, getServiceFee(amount, paymode).toString(), headerData, PMTRemittanceActivity.this, getString(R.string.responseTimeOutTrans)).execute();
                     else
-                        customDialog_Common("KYCLAYOUTS", null, null, null, null, object.getString("responseMessage"), PMTRemittanceActivity.this);
+                        customDialog_Common("KYCLAYOUTS", null, null, "Alert", null, object.getString("responseMessage"), PMTRemittanceActivity.this);
                 }
             } else if (object.getString("serviceType").equalsIgnoreCase("GET_BANK_DISTRICT")) {
                 if (object.getString("responseCode").equalsIgnoreCase("200")) {
@@ -645,6 +645,8 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
                 if (object.getString("responseCode").equalsIgnoreCase("200")) {
                     customDialog_Common("KYCLAYOUTS", null, null, "INDO-NEPAL Remittance", "", object.getString("responseMessage"), PMTRemittanceActivity.this);
                 }
+            }else {
+                responseMSg(object);
             }
             hideKeyboard(PMTRemittanceActivity.this);
         } catch (
@@ -737,8 +739,12 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
             case R.id.select_state:
                 if (btnstatus == false) {
                     btnstatus = true;
-                    ArrayList<String> list_state = db.getState_Details();
-                    customSpinner((TextView) findViewById(R.id.select_state), "Select State*", list_state);
+                    ArrayList<String> list_state1 = new ArrayList<>();
+                    ArrayList<StatePozo> list_state = dbRealm.getState_Details();
+                    for (int i = 0; i < list_state.size(); i++) {
+                        list_state1.add(list_state.get(i).getHeaderValue());
+                    }
+                    customSpinner((TextView) findViewById(R.id.select_state), "Select State*", list_state1);
                 }
                 handlercontrol();
                 break;
@@ -916,7 +922,7 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
             }
         });
         dialognew.show();
-        Window window = dialog.getWindow();
+        Window window = dialognew.getWindow();
         window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
     }
 
@@ -950,7 +956,8 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
                     @Override
                     public void afterTextChanged(Editable s) {
                         if (s.length()!=0 && s.length()<10) {
-                            input_text.setText(EnglishNumberToWords.convert(Integer.parseInt(s.toString())));
+                            input_text.setText("");
+                            input_text.setText(EnglishNumberToWords.convert(Integer.parseInt(s.toString()))+" rupee");
                             input_text.setVisibility(View.VISIBLE);
                         }else
                             input_text.setVisibility(View.GONE);
@@ -958,7 +965,7 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
                 });
                 accountno = (TextView) alertLayout.findViewById(R.id.accountnos);
                 confirmAccountNo = (TextView) alertLayout.findViewById(R.id.confirmaccountnos);
-                final ArrayList<PaymentModePozo> list_payment = db.getPaymentModeNepal();
+                final ArrayList<PaymentModePozo> list_payment = dbRealm.getPaymentModeNepal();
                 if (list_payment.size() != 0)
                     bank_selectss.setAdapter(new PaymentAdapter(PMTRemittanceActivity.this, list_payment));
                 bank_selectss.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -983,9 +990,9 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
                 bank_district = (Spinner) alertLayout.findViewById(R.id.bank_districts);
                 bank_city = (Spinner) alertLayout.findViewById(R.id.bank_citys);
                 account_type = (Spinner) alertLayout.findViewById(R.id.account_types);
-                final ArrayList<PaymentModePozo> list_bank = db.getBankNepal();
+                final ArrayList<TbNepalPaymentModePozo > list_bank = dbRealm.getBankNepal();
                 if (list_bank.size() != 0)
-                    bank_name.setAdapter(new PaymentAdapter(PMTRemittanceActivity.this, list_bank));
+                    bank_name.setAdapter(new PaymentNepalAdapter(PMTRemittanceActivity.this, list_bank));
                 final ArrayList<PaymentModePozo> list_account_type = new ArrayList<>();
                 list_account_type.add(new PaymentModePozo("0", "Select Account Type"));
                 list_account_type.add(new PaymentModePozo("1", "SAVING"));
@@ -1159,9 +1166,9 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
                 bank_district = (Spinner) alertLayout.findViewById(R.id.bank_district);
                 bank_city = (Spinner) alertLayout.findViewById(R.id.bank_city);
                 account_type = (Spinner) alertLayout.findViewById(R.id.account_type);
-                final ArrayList<PaymentModePozo> list_payment = db.getBankNepal();
-                if (list_payment.size() != 0)
-                    bank_name.setAdapter(new PaymentAdapter(PMTRemittanceActivity.this, list_payment));
+                final ArrayList<TbNepalPaymentModePozo> list_bank = dbRealm.getBankNepal();
+                if (list_bank.size() != 0)
+                    bank_name.setAdapter(new PaymentNepalAdapter(PMTRemittanceActivity.this, list_bank));
                 final ArrayList<PaymentModePozo> list_account_type = new ArrayList<>();
                 list_account_type.add(new PaymentModePozo("0", "Select Account Type"));
                 list_account_type.add(new PaymentModePozo("1", "SAVING"));
@@ -1172,7 +1179,7 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                         if (position != 0) {
-                            nepalBank = list_payment.get(position).getTypeID();
+                            nepalBank = list_bank.get(position).getTypeID();
                             new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, getNepalDistrict(nepalBank).toString(), headerData, PMTRemittanceActivity.this, getString(R.string.responseTimeOutTrans)).execute();
                             if (nepalCityPozoArrayList != null || nepalCityAdapter != null) {
                                 nepalCityPozoArrayList.clear();
@@ -1403,14 +1410,6 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
                     intent.putExtra("ImageType", "pmtImage");
                     intent.putExtra("REQUESTTYPE", CAMERA_REQUEST);
                     startActivityForResult(intent, CAMERA_REQUEST);
-//                    ContentValues values = new ContentValues();
-//                    values.put(MediaStore.Images.Media.TITLE, "New Picture");
-//                    values.put(MediaStore.Images.Media.DESCRIPTION, "From your Camera");
-//                    imageUri = getContentResolver().insert(
-//                            MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
-//                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//                    intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-//                    startActivityForResult(intent, CAMERA_REQUEST);
                 } else if (items[item].equals("Choose from Gallery")) {
                     Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                     intent.setType("image/*");
@@ -1447,18 +1446,6 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
     }
 
     private void setPic(Bitmap mCurrentPhotoPath) {
-//        int targetW = image.getWidth();
-//        int targetH = image.getHeight();
-//        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-//        bmOptions.inJustDecodeBounds = true;
-//        BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
-//        int photoW = bmOptions.outWidth;
-//        int photoH = bmOptions.outHeight;
-//        int scaleFactor = Math.min(photoW / targetW, photoH / targetH);
-//        bmOptions.inJustDecodeBounds = false;
-//        bmOptions.inSampleSize = scaleFactor;
-//        bmOptions.inPurgeable = true;
-//        Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
         imageBase64 = getBytesFromBitmap(addWaterMark(mCurrentPhotoPath));
         imgType = "jpg";
     }

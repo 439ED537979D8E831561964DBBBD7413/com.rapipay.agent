@@ -350,6 +350,8 @@ public class AEPS_BBPS_RegistrationActivity extends BaseCompactActivity implemen
             intent.putExtra("persons", "pending");
             intent.putExtra("mobileNo", list.get(0).getMobilno());
             intent.putExtra("formData", formData);
+            intent.putExtra("documentType", "");
+            intent.putExtra("documentID", "");
             startActivity(intent);
         }
     }

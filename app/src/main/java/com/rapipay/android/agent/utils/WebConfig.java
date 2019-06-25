@@ -1,7 +1,7 @@
 package com.rapipay.android.agent.utils;
 
 public class WebConfig {
-//    public static String WEBMain = "http://192.168.1.110:8080/";
+//    public static String WEBMain = "http://172.16.9.254:8080/";
     public static String WEBMain = "https://rapipay.com/";
     public static String KYCACT = "http://rpt.rapipay.com/";
     public static String WEB = WEBMain + "RapiPayAPIHub/";

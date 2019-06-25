@@ -48,7 +48,6 @@ import java.util.Locale;
 import me.grantland.widget.AutofitTextView;
 
 public class NetworkTransFragment extends BaseFragment implements RequestHandler, CustomInterface {
-
     private int first = 1, last = 25;
     private boolean isLoading;
     ListView trans_details;
@@ -68,11 +67,9 @@ public class NetworkTransFragment extends BaseFragment implements RequestHandler
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         rv = (View) inflater.inflate(R.layout.network_fragment_layout, container, false);
-        localStorage = LocalStorage.getInstance(getActivity());
         initialize(rv);
-        headerData = (WebConfig.BASIC_USERID + ":" + WebConfig.BASIC_PASSWORD);
-        if (BaseCompactActivity.db != null && BaseCompactActivity.db.getDetails_Rapi()) {
-            list = BaseCompactActivity.db.getDetails();
+        if (BaseCompactActivity.dbRealm != null && BaseCompactActivity.dbRealm.getDetails_Rapi()){
+            list = BaseCompactActivity.dbRealm.getDetails();
             loadApi();
         } else
             dbNull(NetworkTransFragment.this);
@@ -111,8 +108,6 @@ public class NetworkTransFragment extends BaseFragment implements RequestHandler
                     pozoClick = transactionPozoArrayList.get(position);
                     customDialog_Ben(transactionPozoArrayList.get(position), "Network Transfer", "BENLAYOUT", pozoClick.getConsentStatus(), "Credit To Network");
                 }handlercontrol();
-//                if (clickedId.equalsIgnoreCase("0"))
-//                    customDialog_Ben(transactionPozoArrayList.get(position), "Network Transfer", "AMOUNTTRANSFER", "", "Credit To Network");
             }
         });
         trans_details.setOnScrollListener(new AbsListView.OnScrollListener() {
@@ -174,7 +169,8 @@ public class NetworkTransFragment extends BaseFragment implements RequestHandler
                         }
                     }
                 }
-            }
+            }else
+                responseMSg(object);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -334,7 +330,8 @@ public class NetworkTransFragment extends BaseFragment implements RequestHandler
             @Override
             public void afterTextChanged(Editable s) {
                 if (s.length()!=0 && s.length()<10) {
-                    input_text.setText(EnglishNumberToWords.convert(Integer.parseInt(s.toString())));
+                    input_text.setText("");
+                    input_text.setText(EnglishNumberToWords.convert(Integer.parseInt(s.toString()))+" rupee");
                     input_text.setVisibility(View.VISIBLE);
                 }else
                     input_text.setVisibility(View.GONE);

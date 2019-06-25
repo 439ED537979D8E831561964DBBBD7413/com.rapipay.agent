@@ -37,8 +37,6 @@ public class GetAllServicesActivity extends BaseCompactActivity implements Reque
         setContentView(R.layout.getserviceslayout);
         pozo = (NetworkTransferPozo) getIntent().getSerializableExtra("OBJECT");
         initialize();
-//        if (pozo != null)
-//            new AsyncPostMethod(WebConfig.CommonReportS, getNetworkServices(pozo).toString(), headerData, GetAllServicesActivity.this, getString(R.string.responseTimeOut), "GETALLSERVICES").execute();
     }
 
     @Override
@@ -117,6 +115,8 @@ public class GetAllServicesActivity extends BaseCompactActivity implements Reque
                 }else if(object.getString("serviceType").equalsIgnoreCase("UPDATE_AGENT_SERVICE_STATUS")){
                     customDialog_Common("KYCLAYOUTS", null, null, "Alert", "", object.getString("responseMessage"), GetAllServicesActivity.this);
                 }
+            }else {
+                responseMSg(object);
             }
         } catch (Exception e) {
             e.printStackTrace();

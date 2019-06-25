@@ -48,6 +48,11 @@ import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
 import com.rapipay.android.agent.Database.RapipayDB;
 import com.rapipay.android.agent.Model.NewKYCPozo;
+import com.rapipay.android.agent.Model.NewKycAddress;
+import com.rapipay.android.agent.Model.NewKycBusiness;
+import com.rapipay.android.agent.Model.NewKycPersion;
+import com.rapipay.android.agent.Model.NewKycVerification;
+import com.rapipay.android.agent.Model.StatePozo;
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.fragments.AgentKYCFragment;
 import com.rapipay.android.agent.interfaces.RequestHandler;
@@ -58,6 +63,7 @@ import com.rapipay.android.agent.utils.GenerateChecksum;
 import com.rapipay.android.agent.utils.ImageUtils;
 import com.rapipay.android.agent.utils.WebConfig;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
@@ -71,6 +77,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
+import io.realm.Realm;
 import me.grantland.widget.AutofitTextView;
 
 public class KYCFormActivity extends BaseCompactActivity implements RequestHandler, View.OnClickListener, GoogleApiClient.ConnectionCallbacks,
@@ -114,7 +121,6 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
         setContentView(R.layout.kyc_personal_detail);
         setUpGClient();
         initialize();
-//        loadCamera();
     }
 
     private void initialize() {
@@ -141,8 +147,12 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
         select_state.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ArrayList<String> list_state = db.getState_Details();
-                customSpinner(select_state, "Select State", list_state);
+                ArrayList<String> list_state1 = new ArrayList<>();
+                ArrayList<StatePozo> list_state = dbRealm.getState_Details();
+                for (int i = 0; i < list_state.size(); i++) {
+                    list_state1.add(list_state.get(i).getHeaderValue());
+                }
+                customSpinner(select_state, "Select State", list_state1);
             }
         });
         pan_no = (TextView) findViewById(R.id.pan_no);
@@ -216,12 +226,16 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
             getPersonalDetails();
         }
     }
-
+    ArrayList<String> stcondition;
     private void getPersonalDetails() {
+        stcondition = new ArrayList<>();
         try {
             if (getIntent().getStringExtra("localPersonal").equalsIgnoreCase("true") || clicked.equalsIgnoreCase("business")) {
-                String condition = "where " + RapipayDB.MOBILENO + "='" + mobileNo + "'" + " AND " + RapipayDB.DOCUMENTTYPE + "='" + documentType + "'" + " AND " + RapipayDB.DOCUMENTID + "='" + documentID + "'";
-                ArrayList<NewKYCPozo> newKYCList_Personal = db.getKYCDetails_Personal(condition);
+                //  String condition = "where " + RapipayRealmdbRealm.MOBILENO + "='" + mobileNo + "'" + " AND " + RapipayRealmdbRealm.DOCUMENTTYPE + "='" + documentType + "'" + " AND " + RapipayRealmdbRealm.DOCUMENTID + "='" + documentID + "'";
+                stcondition.add(mobileNo);
+                stcondition.add(documentType);
+                stcondition.add(documentID);
+                ArrayList<NewKycPersion> newKYCList_Personal = dbRealm.getKYCDetails_Personal(stcondition);
                 if (newKYCList_Personal.size() != 0) {
                     input_name.setText(newKYCList_Personal.get(0).getUSER_NAME());
                     input_email.setText(newKYCList_Personal.get(0).getEMAILID());
@@ -261,9 +275,13 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
 
     private void getAddressDetails() {
         try {
+            stcondition = new ArrayList<>();
             if (getIntent().getStringExtra("localAddress").equalsIgnoreCase("true") || clicked.equalsIgnoreCase("business")) {
-                String condition = "where " + RapipayDB.MOBILENO + "='" + mobileNo + "'" + " AND " + RapipayDB.DOCUMENTTYPE + "='" + documentType + "'" + " AND " + RapipayDB.DOCUMENTID + "='" + documentID + "'";
-                ArrayList<NewKYCPozo> newKYCList_Address = db.getKYCDetails_Address(condition);
+                // String condition = "where " + RapipayRealmdbRealm.MOBILENO + "='" + mobileNo + "'" + " AND " + RapipayRealmdbRealm.DOCUMENTTYPE + "='" + documentType + "'" + " AND " + RapipayRealmdbRealm.DOCUMENTID + "='" + documentID + "'";
+                stcondition.add(mobileNo);
+                stcondition.add(documentType);
+                stcondition.add(documentID);
+                ArrayList<NewKycAddress> newKYCList_Address = dbRealm.getKYCDetails_Address(stcondition);
                 if (newKYCList_Address.size() != 0) {
                     input_address.setText(newKYCList_Address.get(0).getADDRESS());
                     city_name.setText(newKYCList_Address.get(0).getCITY());
@@ -294,7 +312,7 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
         }
     }
 
-    private void mapAddressData(ArrayList<NewKYCPozo> newKYCPozoArrayList) {
+    private void mapAddressData(ArrayList<NewKycAddress> newKYCPozoArrayList) {
         try {
             if (!kycMapData.has("address"))
                 kycMapData.put("address", newKYCPozoArrayList.get(0).getADDRESS());
@@ -327,9 +345,13 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
 
     private void getVerifyDetails() {
         try {
+            stcondition = new ArrayList<>();
             if (getIntent().getStringExtra("localVerify").equalsIgnoreCase("true")) {
-                String condition = "where " + RapipayDB.MOBILENO + "='" + mobileNo + "'" + " AND " + RapipayDB.DOCUMENTTYPE + "='" + documentType + "'" + " AND " + RapipayDB.DOCUMENTID + "='" + documentID + "'";
-                ArrayList<NewKYCPozo> newKYCList_Verify = db.getKYCDetails_VERIFY(condition);
+                // String condition = "where " + RapipayRealmdbRealm.MOBILENO + "='" + mobileNo + "'" + " AND " + RapipayRealmdbRealm.DOCUMENTTYPE + "='" + documentType + "'" + " AND " + RapipayRealmdbRealm.DOCUMENTID + "='" + documentID + "'";
+                stcondition.add(mobileNo);
+                stcondition.add(documentType);
+                stcondition.add(documentID);
+                ArrayList<NewKycVerification> newKYCList_Verify = dbRealm.getKYCDetails_VERIFY(stcondition);
                 if (newKYCList_Verify.size() != 0) {
                     if (newKYCList_Verify.get(0).getSELF_PHOTO() != null) {
                         byteConvert((ImageView) findViewById(R.id.selfphoto), newKYCList_Verify.get(0).getSELF_PHOTO());
@@ -353,9 +375,13 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
 
     private void getBusinessDetails() {
         try {
+            stcondition = new ArrayList<>();
             if (getIntent().getStringExtra("localBusiness").equalsIgnoreCase("true") || clicked.equalsIgnoreCase("business")) {
-                String condition = "where " + RapipayDB.MOBILENO + "='" + mobileNo + "'" + " AND " + RapipayDB.DOCUMENTTYPE + "='" + documentType + "'" + " AND " + RapipayDB.DOCUMENTID + "='" + documentID + "'";
-                ArrayList<NewKYCPozo> newKYCList_Business = db.getKYCDetails_BUISNESS(condition);
+                //  String condition = "where " + RapipayRealmdbRealm.MOBILENO + "='" + mobileNo + "'" + " AND " + RapipayRealmdbRealm.DOCUMENTTYPE + "='" + documentType + "'" + " AND " + RapipayRealmdbRealm.DOCUMENTID + "='" + documentID + "'";
+                stcondition.add(mobileNo);
+                stcondition.add(documentType);
+                stcondition.add(documentID);
+                ArrayList<NewKycBusiness> newKYCList_Business = dbRealm.getKYCDetails_BUISNESS(stcondition);
                 if (newKYCList_Business.size() != 0) {
                     pan_no.setText(newKYCList_Business.get(0).getPANNUMBER());
                     gsin_no.setText(newKYCList_Business.get(0).getGSTINNUMBER());
@@ -383,7 +409,7 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
         }
     }
 
-    private void mapBusinessData(ArrayList<NewKYCPozo> newKYCPozoArrayList) {
+    private void mapBusinessData(ArrayList<NewKycBusiness> newKYCPozoArrayList) {
         try {
             if (!kycMapData.has("panNo"))
                 kycMapData.put("panNo", newKYCPozoArrayList.get(0).getPANNUMBER());
@@ -399,7 +425,7 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
         AgentKYCFragment.byteBase64 = "";
         CustomerKYCActivity.bitmap_trans = null;
         CustomerKYCActivity.byteBase64 = "";
-        db.deleteRow(mobileNo, "");
+        dbRealm.deleteRow(mobileNo, "",documentID,documentType);
         finish();
     }
 
@@ -410,7 +436,7 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
                 case R.id.delete_all:
                     if (btnstatus == false) {
                         btnstatus = true;
-                        db.deleteRow(mobileNo, "verify");
+                        dbRealm.deleteRow(mobileNo, "",documentID,documentType);
                         clearVerify();
                     }
                     handlercontrol();
@@ -603,7 +629,7 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
         }
     }
 
-    private void mapPersonalData(ArrayList<NewKYCPozo> newKYCPozoArrayList) {
+    private void mapPersonalData(ArrayList<NewKycPersion> newKYCPozoArrayList) {
         try {
             if (!kycMapData.has("mobileNo"))
                 kycMapData.put("mobileNo", newKYCPozoArrayList.get(0).getMOBILENO());
@@ -645,22 +671,8 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
     public String getsession_ValidateKyc(String kycType, String tokenId) {
         JSONObject jsonObject = new JSONObject();
         String byteBase64 = "", passportPhoto = "", signPhoto = "", shopPhoto = "", pancardImg = "", kycImage = "";
-//        if (customerType.equalsIgnoreCase("C"))
-//            byteBase64 = CustomerKYCActivity.byteBase64;
-//        else if (customerType.equalsIgnoreCase("A"))
-//            byteBase64 = AgentKYCFragment.byteBase64;
         String form = null;
         try {
-//            if (kycMapImage.has("kycImage"))
-//                kycImage = kycMapImage.get("kycImage").toString();
-//            if (kycMapImage.has("pancardImg"))
-//                pancardImg = kycMapImage.get("pancardImg").toString();
-//            if (kycMapImage.has("passportPhoto"))
-//                passportPhoto = kycMapImage.get("passportPhoto").toString();
-//            if (kycMapImage.has("signPhoto"))
-//                signPhoto = kycMapImage.get("signPhoto").toString();
-//            if (kycMapImage.has("shopPhoto"))
-//                shopPhoto = kycMapImage.get("shopPhoto").toString();
             jsonObject.put("serviceType", "KYC_PROCESS");
             jsonObject.put("reKYC", "");
             jsonObject.put("agentId", list.get(0).getMobilno());
@@ -686,14 +698,6 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
                     "\t<body>\n" +
                     "\t\t<form name=\"validatekyc\" id=\"validatekyc\" method=\"POST\" action=\"" + WebConfig.EKYCFORWARD + "\">\n" +
                     "\t\t\t<input name=\"requestedData\" value=\"" + getDataBase64(jsonObject.toString()) + "\" type=\"hidden\"/>\n" +
-//                    "\t\t\t<input name=\"passportPhoto\" value=\"" + passportPhoto + "\" type=\"hidden\"/>\n" +
-//                    "\t\t\t<input name=\"signPhoto\" value=\"" + signPhoto + "\" type=\"hidden\"/>\n" +
-//                    "\t\t\t<input name=\"uploadFront\" value=\"" + kycMapImage.get("uploadFront").toString() + "\" type=\"hidden\"/>\n" +
-//                    "\t\t\t<input name=\"uploadBack\" value=\"" + kycMapImage.get("uploadBack").toString() + "\" type=\"hidden\"/>\n" +
-//                    "\t\t\t<input name=\"pancardImg\" value=\"" + pancardImg + "\" type=\"hidden\"/>\n" +
-//                    "\t\t\t<input name=\"shopPhoto\" value=\"" + shopPhoto + "\" type=\"hidden\"/>\n" +
-//                    "\t\t\t<input name=\"selfPhoto\" value=\"" + kycMapImage.get("selfPhoto").toString() + "\" type=\"hidden\"/>\n" +
-//                    "\t\t\t<input name=\"kycImage\" value=\"" + kycImage + "\" type=\"hidden\"/>\n" +
                     "\t\t\t<input type=\"submit\"/>\n" +
                     "\t\t</form>\n" +
                     "\t\t<script language=\"JavaScript\" type=\"text/javascript\">\n" +
@@ -770,17 +774,6 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
 
     private Boolean oursValidation() {
         if (persons.equalsIgnoreCase("outside")) {
-//            if (selfphoto.getDrawable() == null) {
-//                TextView self_photo = (TextView) findViewById(R.id.self_photo);
-//                self_photo.setError("Please upload valid live image");
-//                self_photo.requestFocus();
-//                return false;
-//            } else if (signphoto.getDrawable() == null) {
-//                TextView sign_photo = (TextView) findViewById(R.id.sign_photo);
-//                sign_photo.setError("Please upload valid agent sign image");
-//                sign_photo.requestFocus();
-//                return false;
-//            } else
             return true;
         } else if (persons.equalsIgnoreCase("internal")) {
             if (selfphoto.getDrawable() == null) {
@@ -813,12 +806,6 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
             date1_text.requestFocus();
             return false;
         } else if (persons.equalsIgnoreCase("outside")) {
-//            if (passportphotoimage.getDrawable() == null) {
-//                TextView self_photo = (TextView) findViewById(R.id.passportphoto);
-//                self_photo.setError("Please upload valid passport size image");
-//                self_photo.requestFocus();
-//                return false;
-//            } else
             if (!ImageUtils.commonRegex(input_comp.getText().toString(), 150, "0-9 .&")) {
                 input_comp.setError("Please enter valid company name");
                 input_comp.requestFocus();
@@ -834,14 +821,6 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
                 return false;
             } else
                 return true;
-//        } else if (customerType.equalsIgnoreCase("A")) {
-//            if (!printDifference(mainDate(date1_text.getText().toString()))) {
-//                Toast.makeText(KYCFormActivity.this, "Please select valid date of birth", Toast.LENGTH_SHORT).show();
-//                date1_text.setError("Please enter valid date");
-//                date1_text.requestFocus();
-//                return false;
-//            } else
-//                return true;
         } else
             return true;
     }
@@ -892,11 +871,6 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
                 pan_photo.setError("Please upload valid pancard image");
                 pan_photo.requestFocus();
                 return false;
-//            } else if (shopPhoto.getDrawable() == null) {
-//                TextView shop_photo = (TextView) findViewById(R.id.shop_photo);
-//                shop_photo.setError("Please upload valid data");
-//                shop_photo.requestFocus();
-//                return false;
             } else if (gsin_no.getText().toString().length() != 0) {
                 if (!gsin_no.getText().toString().matches("^[0-9]{2}[a-zA-Z]{5}[0-9]{4}[a-zA-Z]{1}[0-9]{1}[a-zA-Z]{1}[a-z0-9A-Z]{1}$")) {
                     gsin_no.setError("Please upload valid data");
@@ -1026,17 +1000,12 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
     }
 
     private void inspect(Bitmap bitmap, String documentType, String documentID, String imageType, TextView textView, ImageView view) {
-//        InputStream is = null;
-//        Bitmap bitmap = null;
         try {
-//            is = getContentResolver().openInputStream(uri);
-//            BitmapFactory.Options options = new BitmapFactory.Options();
-//            options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-//            options.inSampleSize = 2;
-//            options.inScreenDensity = DisplayMetrics.DENSITY_LOW;
-//            bitmap = BitmapFactory.decodeStream(is, null, options);
-            String condition = "where " + RapipayDB.MOBILENO + "='" + mobileNo + "'" + " AND " + RapipayDB.DOCUMENTTYPE + "='" + documentType + "'" + " AND " + RapipayDB.DOCUMENTID + "='" + documentID + "'";
-            ArrayList<NewKYCPozo> newKYCList_Personal = db.getKYCDetails_Personal(condition);
+            stcondition = new ArrayList<>();
+            stcondition.add(mobileNo);
+            stcondition.add(documentType);
+            stcondition.add(documentID);
+            ArrayList<NewKycPersion> newKYCList_Personal = dbRealm.getKYCDetails_Personal(stcondition);
             if (newKYCList_Personal.size() != 0)
                 type = newKYCList_Personal.get(0).getSCANTYPE();
             if (type.equalsIgnoreCase("SCAN")) {
@@ -1284,70 +1253,84 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
                     intent.putExtra("documentID", documentID);
                     startActivity(intent);
                 }
+            }else {
+                responseMSg(object);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private void insertPersonal(JSONObject mapValue, JSONObject mapPhoto, String name, String
-            documentID, String documentType, String customerType) {
+    int id = 0;
+    NewKYCPozo newKYCPozo;
+    NewKycPersion newKycPersion;
+    ArrayList<NewKYCPozo> newKYCPozos;
+    private void insertPersonal(final JSONObject mapValue, final JSONObject mapPhoto, final String name, final String
+            documentID, final String documentType, String customerType) {
         customProgessDialog = new CustomProgessDialog(KYCFormActivity.this);
-        SQLiteDatabase dba = db.getWritableDatabase();
-        try {
-            ContentValues values = new ContentValues();
-            String imageName = "passportPhoto_" + mapValue.getString("mobileNo") + ".jpg";
-            values.put(RapipayDB.MOBILENO, mapValue.getString("mobileNo"));
-            values.put(RapipayDB.USER_NAME, name);
-            values.put(RapipayDB.DOB, mapValue.getString("dob"));
-            values.put(RapipayDB.EMAILID, mapValue.getString("email"));
-            values.put(RapipayDB.COMPANY_NAME, mapValue.getString("companyName"));
-            values.put(RapipayDB.IMAGE_NAME, imageName);
-            values.put(RapipayDB.PERSONAL_CLICKED, "true");
-            values.put(RapipayDB.DOCUMENTTYPE, documentType);
-            values.put(RapipayDB.DOCUMENTID, documentID);
-            values.put(RapipayDB.SCANTYPE, type);
-            if (mapPhoto.has("passportPhoto"))
-                values.put(RapipayDB.PASSPORT_PHOTO, byteConvert(mapPhoto.getString("passportPhoto")));
-            if (type.equalsIgnoreCase("SCAN")) {
-                String scanImageName = "scanPhoto_" + mobileNo + ".jpg";
-                String pathScan = saveToInternalStorage(base64Convert(mapPhoto.getString("kycImage")), scanImageName);
-                values.put(RapipayDB.SCANIMAGE, scanImageName);
-                values.put(RapipayDB.SCANIMAGEPATH, pathScan);
+        newKycPersion = new NewKycPersion();
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                try {
+                    String imageName = "passportPhoto_" + mapValue.getString("mobileNo") + ".jpg";
+                    newKycPersion.setMOBILENO(mapValue.getString("mobileNo"));
+                    newKycPersion.setUSER_NAME(name);
+                    newKycPersion.setDOB(mapValue.getString("dob"));
+                    newKycPersion.setEMAILID(mapValue.getString("email"));
+                    newKycPersion.setCOMPANY_NAME(mapValue.getString("companyName"));
+                    newKycPersion.setIMAGE_NAME(imageName);
+                    newKycPersion.setPERSONAL_CLICKED("true");
+                    newKycPersion.setDOCUMENTTYPE(documentType);
+                    newKycPersion.setDOCUMENTID(documentID);
+                    newKycPersion.setSCANTYPE(type);
+                    if (mapPhoto.has("passportPhoto"))
+                        newKycPersion.setPASSPORT_PHOTO(byteConvert(mapPhoto.getString("passportPhoto")));
+                    if (type.equalsIgnoreCase("SCAN")) {
+                        String scanImageName = "scanPhoto_" + mobileNo + ".jpg";
+                        String pathScan = saveToInternalStorage(base64Convert(mapPhoto.getString("kycImage")), scanImageName);
+                        newKycPersion.setSCANIMAGENAME(scanImageName);
+                        newKycPersion.setSCANIMAGEPATH(pathScan);
+                    }
+                    realm.copyToRealm(newKycPersion);
+                    customProgessDialog.hide_progress();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
-            dba.insert(RapipayDB.TABLE_KYC_PERSONAL, null, values);
-            customProgessDialog.hide_progress();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        });
     }
-
-    private void insertAddress(JSONObject mapValue, JSONObject mapPhoto, String
-            documentID, String documentType, String customerType) {
+    NewKycAddress newKycAddress;
+    private void insertAddress(final JSONObject mapValue, final JSONObject mapPhoto, final String
+            documentID, final String documentType, String customerType) {
         customProgessDialog = new CustomProgessDialog(KYCFormActivity.this);
-        SQLiteDatabase dba = db.getWritableDatabase();
-        try {
-            String frontimageName = "frontPhoto_" + mobileNo + ".jpg";
-            String backimageName = "backPhoto_" + mobileNo + ".jpg";
-            String pathBack = saveToInternalStorage(base64Convert(mapPhoto.getString("uploadBack")), backimageName);
-            ContentValues values = new ContentValues();
-            values.put(RapipayDB.MOBILENO, mobileNo);
-            values.put(RapipayDB.ADDRESS, mapValue.getString("address"));
-            values.put(RapipayDB.CITY, mapValue.getString("city"));
-            values.put(RapipayDB.STATE, mapValue.getString("state"));
-            values.put(RapipayDB.PINCODE, mapValue.getString("pinCode"));
-            values.put(RapipayDB.DOCUMENTFRONT_IMAGENAME, frontimageName);
-            values.put(RapipayDB.DOCUMENTBACK_IMAGENAME, backimageName);
-            values.put(RapipayDB.ADDRESS_CLICKED, "true");
-            values.put(RapipayDB.DOCUMENTTYPE, documentType);
-            values.put(RapipayDB.DOCUMENTID, documentID);
-            values.put(RapipayDB.DOCUMENTFRONT_PHOTO, byteConvert(mapPhoto.getString("uploadFront")));
-            values.put(RapipayDB.DOCUMENTBACK_PHOTO, pathBack);
-            dba.insert(RapipayDB.TABLE_KYC_ADDRESS, null, values);
-            customProgessDialog.hide_progress();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                try {
+                    String frontimageName = "frontPhoto_" + mobileNo + ".jpg";
+                    String backimageName = "backPhoto_" + mobileNo + ".jpg";
+                    String pathBack = saveToInternalStorage(base64Convert(mapPhoto.getString("uploadBack")), backimageName);
+                    newKycAddress = new NewKycAddress();
+                    newKycAddress.setMOBILENO(mobileNo);
+                    newKycAddress.setADDRESS(mapValue.getString("address"));
+                    newKycAddress.setCITY(mapValue.getString("city"));
+                    newKycAddress.setSTATE(mapValue.getString("state"));
+                    newKycAddress.setPINCODE(mapValue.getString("pinCode"));
+                    newKycAddress.setDOCUMENTFRONT_IMAGENAME(frontimageName);
+                    newKycAddress.setDOCUMENTBACK_IMAGENAME(backimageName);
+                    newKycAddress.setADDRESS_CLICKED("true");
+                    newKycAddress.setDOCUMENTTYPE(documentType);
+                    newKycAddress.setDOCUMENTID(documentID);
+                    newKycAddress.setDOCUMENTFRONT_PHOTO(byteConvert(mapPhoto.getString("uploadFront")));
+                    newKycAddress.setDOCUMENTBACK_PHOTO(pathBack);
+                    realm.copyToRealm(newKycAddress);
+                    customProgessDialog.hide_progress();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     private Bitmap getBitmap(ImageView imageView) {
@@ -1355,57 +1338,66 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
         return drawable.getBitmap();
     }
 
-    private void insertBuisness(JSONObject mapValue, JSONObject mapPhoto, String
-            documentID, String documentType, String customerType) {
+    NewKycBusiness newKycBusiness;
+    private void insertBuisness(final JSONObject mapValue, final JSONObject mapPhoto, final String
+            documentID, final String documentType, String customerType) {
         customProgessDialog = new CustomProgessDialog(KYCFormActivity.this);
-        SQLiteDatabase dba = db.getWritableDatabase();
-        try {
-            String panimageName = "panPhoto_" + mobileNo + ".jpg";
-            String shopimageName = "shopPhoto_" + mobileNo + ".jpg";
-            ContentValues values = new ContentValues();
-            values.put(RapipayDB.MOBILENO, mobileNo);
-            values.put(RapipayDB.PANNUMBER, mapValue.getString("panNo"));
-            values.put(RapipayDB.GSTINNUMBER, mapValue.getString("gstIN"));
-            values.put(RapipayDB.PAN_PHOTO_IMAGENAME, panimageName);
-            values.put(RapipayDB.SHOP_PHOTO_IMAGENAME, shopimageName);
-            values.put(RapipayDB.BUISNESS_CLICKED, "true");
-            values.put(RapipayDB.DOCUMENTTYPE, documentType);
-            values.put(RapipayDB.DOCUMENTID, documentID);
-            if (mapPhoto.has("pancardImg"))
-                values.put(RapipayDB.PAN_PHOTO, byteConvert(mapPhoto.getString("pancardImg")));
-            if (mapPhoto.has("shopPhoto"))
-                values.put(RapipayDB.SHOP_PHOTO, saveToInternalStorage(base64Convert(mapPhoto.getString("shopPhoto")), shopimageName));
-            dba.insert(RapipayDB.TABLE_KYC_BUISNESS, null, values);
-            customProgessDialog.hide_progress();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                newKycBusiness = new NewKycBusiness();
+                try {
+                    String panimageName = "panPhoto_" + mobileNo + ".jpg";
+                    String shopimageName = "shopPhoto_" + mobileNo + ".jpg";
+                    newKycBusiness.setMOBILENO(mobileNo);
+                    newKycBusiness.setPANNUMBER(mapValue.getString("panNo"));
+                    newKycBusiness.setGSTINNUMBER(mapValue.getString("gstIN"));
+                    newKycBusiness.setPAN_PHOTO_IMAGENAME(panimageName);
+                    newKycBusiness.setSHOP_PHOTO_IMAGENAME(shopimageName);
+                    newKycBusiness.setBUISNESS_CLICKED("true");
+                    newKycBusiness.setDOCUMENTTYPE(documentType);
+                    newKycBusiness.setDOCUMENTID(documentID);
+                    if (mapPhoto.has("pancardImg"))
+                        newKycBusiness.setPAN_PHOTO(byteConvert(mapPhoto.getString("pancardImg")));
+                    if (mapPhoto.has("shopPhoto"))
+                        newKycBusiness.setSHOP_PHOTO(saveToInternalStorage(base64Convert(mapPhoto.getString("shopPhoto")), shopimageName));
+                    realm.copyToRealm(newKycBusiness);
+                    customProgessDialog.hide_progress();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
-    private void insertVerify(JSONObject mapValue, JSONObject mapPhoto, String
-            documentID, String documentType, String customerType) {
+    NewKycVerification newKycVerification;
+    private void insertVerify(final JSONObject mapValue, final JSONObject mapPhoto, final String
+            documentID, final String documentType, String customerType) {
         customProgessDialog = new CustomProgessDialog(KYCFormActivity.this);
-        SQLiteDatabase dba = db.getWritableDatabase();
-        String signImage = "";
-        try {
-            String selfimageName = "selfPhoto_" + mobileNo + ".jpg";
-            String signimageName = "signPhoto_" + mobileNo + ".jpg";
-            ContentValues values = new ContentValues();
-            values.put(RapipayDB.MOBILENO, mobileNo);
-            values.put(RapipayDB.SELF_PHOTO_IMAGENAME, selfimageName);
-            values.put(RapipayDB.SIGN_PHOTO_IMAGENAME, signimageName);
-            values.put(RapipayDB.VERIFY_CLICKED, "true");
-            values.put(RapipayDB.DOCUMENTTYPE, documentType);
-            values.put(RapipayDB.DOCUMENTID, documentID);
-            if (mapPhoto.has("selfPhoto"))
-                values.put(RapipayDB.SELF_PHOTO, byteConvert(mapPhoto.getString("selfPhoto")));
-            if (mapPhoto.has("signPhoto"))
-                values.put(RapipayDB.SIGN_PHOTO, saveToInternalStorage(base64Convert(mapPhoto.getString("signPhoto")), signimageName));
-            dba.insert(RapipayDB.TABLE_KYC_VERIFICATION, null, values);
-            customProgessDialog.hide_progress();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        newKycVerification = new NewKycVerification();
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                try {
+                    String selfimageName = "selfPhoto_" + mobileNo + ".jpg";
+                    String signimageName = "signPhoto_" + mobileNo + ".jpg";
+                    newKycVerification.setMOBILENO(mobileNo);
+                    newKycVerification.setSELF_PHOTO_IMAGENAME(selfimageName);
+                    newKycVerification.setSIGN_PHOTO_IMAGENAME(signimageName);
+                    newKycVerification.setVERIFY_CLICKED("true");
+                    newKycVerification.setDOCUMENTTYPE(documentType);
+                    newKycVerification.setDOCUMENTID(documentID);
+                    if (mapPhoto.has("selfPhoto"))
+                        newKycVerification.setSELF_PHOTO(byteConvert(mapPhoto.getString("selfPhoto")));
+                    if (mapPhoto.has("signPhoto"))
+                        newKycVerification.setSIGN_PHOTO(saveToInternalStorage(base64Convert(mapPhoto.getString("signPhoto")), signimageName));
+                    realm.copyToRealm(newKycVerification);
+                    customProgessDialog.hide_progress();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     @Override

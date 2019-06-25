@@ -71,7 +71,6 @@ public class MainActivity extends BaseCompactActivity
 
     public static ImageView ivHeaderPhoto;
     NavigationView navigationView;
-    private static String filePath;
     DrawerLayout drawer;
     String data, term = null;
     TextView tv, bankde, bal;
@@ -81,7 +80,6 @@ public class MainActivity extends BaseCompactActivity
     public static String bankdetails = null;
     public static String Parent_Mobile = null,FN_TIME_OUT=null;
     public static String regBankDetails = null;
-    public static ArrayList<HeaderePozo> pozoArrayList;
     public static boolean relailerDetails = false;
     public static ArrayList<DeviceDetailsPozo> deviceDetailsPozoArrayList;
     boolean isUrl = false;
@@ -98,9 +96,9 @@ public class MainActivity extends BaseCompactActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initialization();
-        if (db != null && db.getDetails_Rapi()) {
+        if (dbRealm != null && dbRealm.getDetails_Rapi()) {
             String condition = "where " + RapipayDB.IMAGE_NAME + "='invoiceLogo.jpg'";
-            ArrayList<ImagePozo> imagePozoArrayList = db.getImageDetails(condition);
+            ArrayList<ImagePozo> imagePozoArrayList = dbRealm.getImageDetails(condition);
             if (imagePozoArrayList.size() != 0) {
                 byteConvert(back_click, imagePozoArrayList.get(0).getImagePath());
             } else {
@@ -372,8 +370,6 @@ public class MainActivity extends BaseCompactActivity
                 if (headerList.get(groupPosition).isGroup) {
                     if (!headerList.get(groupPosition).hasChildren) {
                         openfragment(groupPosition);
-//                        WebView webView = findViewById(R.id.webView);
-//                        webView.loadUrl(headerList.get(groupPosition).url);
                         closeDrawer();
                     }
                 }
@@ -391,8 +387,6 @@ public class MainActivity extends BaseCompactActivity
                         int index = parent.getFlatListPosition(ExpandableListView.getPackedPositionForChild(groupPosition, childPosition));
                         parent.setItemChecked(index, true);
                         openChildfragment(groupPosition, childPosition);
-//                        WebView webView = findViewById(R.id.webView);
-//                        webView.loadUrl(model.url);
                         closeDrawer();
                 }
 
@@ -437,7 +431,6 @@ public class MainActivity extends BaseCompactActivity
                 Cursor cursor = cursorLoader.loadInBackground();
                 int column_index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
                 cursor.moveToFirst();
-                filePath = cursor.getString(column_index);
                 ivHeaderPhoto.setImageBitmap(thumbnail);
                 String imageName = "image" + ".jpg";
                 String path = saveToInternalStorage(thumbnail, imageName);
@@ -642,7 +635,7 @@ public class MainActivity extends BaseCompactActivity
         try {
             if (object.getString("responseCode").equalsIgnoreCase("200")) {
                 if (object.getString("serviceType").equalsIgnoreCase("GET_MASTER_DATA")) {
-                    if (new MasterClass().getMasterData(object, db))
+                    if (new MasterClass().getMasterData(object, dbRealm,realm))
                         if (term.equalsIgnoreCase("N"))
                             new AsyncPostMethod(WebConfig.NETWORKTRANSFER_URL, acknowledge(data, term).toString(), headerData, MainActivity.this, getString(R.string.responseTimeOut), "DOWMLOADDATA").execute();
                 } else if (object.getString("serviceType").equalsIgnoreCase("GET_NODE_HEADER_DATA")) {
@@ -662,6 +655,8 @@ public class MainActivity extends BaseCompactActivity
                         deviceDetails(object.getJSONArray("deviceList"));
                     }
                 }
+            }else {
+                responseMSg(object);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -746,14 +741,14 @@ public class MainActivity extends BaseCompactActivity
     }
 
     private void callMasterDetails() {
-        ArrayList<BankDetailsPozo> list = db.geBanktDetails("");
+        ArrayList<BankDetailsPozo> list = dbRealm.geBanktDetails("");
         if (list.size() == 0) {
             new AsyncPostMethod(WebConfig.CommonReport, getMaster_Validate().toString(), headerData, MainActivity.this, getString(R.string.responseTimeOut), "GETMASTERDATA").execute();
         }
     }
 
     public JSONObject getMaster_Validate() {
-        ArrayList<RapiPayPozo> list = db.getDetails();
+        ArrayList<RapiPayPozo> list = dbRealm.getDetails();
         JSONObject jsonObject = new JSONObject();
         if (list.size() != 0) {
             try {
@@ -775,7 +770,7 @@ public class MainActivity extends BaseCompactActivity
     }
 
     public JSONObject acknowledge(String data, String term) {
-        ArrayList<RapiPayPozo> list = db.getDetails();
+        ArrayList<RapiPayPozo> list = dbRealm.getDetails();
         JSONObject jsonObject = new JSONObject();
         if (list.size() != 0) {
             try {
@@ -841,6 +836,8 @@ public class MainActivity extends BaseCompactActivity
             intent.putExtra("persons", "pending");
             intent.putExtra("mobileNo", list.get(0).getMobilno());
             intent.putExtra("formData", formData);
+            intent.putExtra("documentType", "");
+            intent.putExtra("documentID", "");
             startActivityForResult(intent, 2);
         } else
             finish();

@@ -43,8 +43,8 @@ public class CDMFragment extends BaseFragment implements RequestHandler {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View rv = (View) inflater.inflate(R.layout.cdm_axix_alyout, container, false);
         localStorage = LocalStorage.getInstance(getActivity());
-        if (BaseCompactActivity.db != null && BaseCompactActivity.db.getDetails_Rapi())
-            list = BaseCompactActivity.db.getDetails();
+        if (BaseCompactActivity.dbRealm != null && BaseCompactActivity.dbRealm.getDetails_Rapi())
+            list = BaseCompactActivity.dbRealm.getDetails();
         initialize(rv);
         url();
         return rv;
@@ -127,7 +127,8 @@ public class CDMFragment extends BaseFragment implements RequestHandler {
                     }
 
                 }
-            }
+            }else
+                responseMSg(object);
         } catch (Exception e) {
             e.printStackTrace();
         }

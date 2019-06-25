@@ -23,7 +23,24 @@ import android.widget.TextView;
 
 import com.rapipay.android.agent.BuildConfig;
 import com.rapipay.android.agent.Database.RapipayDB;
+import com.rapipay.android.agent.Database.RapipayRealmDB;
+import com.rapipay.android.agent.Model.BankDetailsPozo;
+import com.rapipay.android.agent.Model.CreaditPaymentModePozo;
 import com.rapipay.android.agent.Model.HeaderePozo;
+import com.rapipay.android.agent.Model.ImagePozo;
+import com.rapipay.android.agent.Model.MasterPozo;
+import com.rapipay.android.agent.Model.NewKYCPozo;
+import com.rapipay.android.agent.Model.NewKycAddress;
+import com.rapipay.android.agent.Model.NewKycBusiness;
+import com.rapipay.android.agent.Model.NewKycPersion;
+import com.rapipay.android.agent.Model.NewKycVerification;
+import com.rapipay.android.agent.Model.PaymentModePozo;
+import com.rapipay.android.agent.Model.RapiPayPozo;
+import com.rapipay.android.agent.Model.StatePozo;
+import com.rapipay.android.agent.Model.TbNepalPaymentModePozo;
+import com.rapipay.android.agent.Model.TbOperatorPozo;
+import com.rapipay.android.agent.Model.TbRechargePozo;
+import com.rapipay.android.agent.Model.TbTransitionPojo;
 import com.rapipay.android.agent.Model.VersionPozo;
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.adapter.FooterAdapter;
@@ -41,6 +58,7 @@ import com.rapipay.android.agent.utils.WebConfig;
 import com.viewpagerindicator.CirclePageIndicator;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
@@ -48,6 +66,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import io.reactivex.Observable;
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
+import io.realm.Realm;
+import io.realm.RealmResults;
 
 public class PinVerification extends BaseCompactActivity implements RequestHandler, View.OnClickListener, CustomInterface, VersionListener {
     private ViewPager mPager;
@@ -67,12 +93,600 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
         super.onCreate(savedInstanceState);
         setContentView(R.layout.pinverification_layout);
         localStorage.setActivityState(LocalStorage.LOGOUT, "0");
-        initialize();
         if (db != null && db.getDetails_Rapi()) {
+            listOld = db.getDetails();
+            copyData(listOld);
+            getBankCopy();
+            getPaymentCopy();
+            getStateCopy();
+            getOperatorCopy();
+            getTransferCopy();
+            getPayerpAYEECopy();
+            getPMTPaymentCopy();
+            getPMTBankCopy();
+            getKYCPersonalCopy();
+            getKYCAddressCopy();
+            getKYCBuisnessCopy();
+            getKYCVerificationCopy();
+            getImageCopy();
+            if (dbRealm != null && dbRealm.getDetails_Rapi())
+                list = dbRealm.getDetails();
+        }
+        initialize();
+        if (dbRealm != null && dbRealm.getDetails_Rapi()) {
+            deleteTables();
             loadApi();
 //            loadMaster();
         } else
             dbNull(PinVerification.this);
+    }
+
+
+
+    private void copyData(final ArrayList<RapiPayPozo> list) {
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                try {
+                    RapiPayPozo rapiPayPozo = new RapiPayPozo();
+                    rapiPayPozo.setSessionRefNo(list.get(0).getSessionRefNo());
+                    rapiPayPozo.setApikey(list.get(0).getApikey());
+                    rapiPayPozo.setImei(list.get(0).getImei());
+                    rapiPayPozo.setMobilno(list.get(0).getMobilno());
+                    rapiPayPozo.setTxnRefId(list.get(0).getTxnRefId());
+                    rapiPayPozo.setSession(list.get(0).getSession());
+                    rapiPayPozo.setAgentName(list.get(0).getAgentName());
+                    realm.copyToRealm(rapiPayPozo);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    private void getBankCopy() {
+        Observable.fromArray(db.geBanktDetails(""))
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<ArrayList<BankDetailsPozo>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(final ArrayList<BankDetailsPozo> bankDetailsPozos) {
+                        realm.executeTransaction(new Realm.Transaction() {
+                            @Override
+                            public void execute(Realm realm) {
+                                try {
+                                    for (int i = 0; i < bankDetailsPozos.size(); i++) {
+                                        BankDetailsPozo bankDetailsPozo = bankDetailsPozos.get(i);
+                                        final int finalI = i;
+                                        bankDetailsPozo.setId(String.valueOf(finalI));
+                                        realm.copyToRealm(bankDetailsPozo);
+                                    }
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+    }
+
+    private void getImageCopy() {
+        Observable.fromArray(db.getImageDetails(""))
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<ArrayList<ImagePozo>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(final ArrayList<ImagePozo> bankDetailsPozos) {
+                        realm.executeTransaction(new Realm.Transaction() {
+                            @Override
+                            public void execute(Realm realm) {
+                                try {
+                                    for (int i = 0; i < bankDetailsPozos.size(); i++) {
+                                        realm.copyToRealm(bankDetailsPozos.get(i));
+                                    }
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+    }
+
+    private void getPaymentCopy() {
+        Observable.fromArray(db.getPaymenttDetails())
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<ArrayList<CreaditPaymentModePozo>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(final ArrayList<CreaditPaymentModePozo> bankDetailsPozos) {
+                        realm.executeTransaction(new Realm.Transaction() {
+                            @Override
+                            public void execute(Realm realm) {
+                                try {
+                                    for (int i = 0; i < bankDetailsPozos.size(); i++) {
+                                        realm.copyToRealm(bankDetailsPozos.get(i));
+                                    }
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+    }
+
+    private void getStateCopy() {
+        Observable.fromArray(db.getState_Details())
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<ArrayList<StatePozo>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(final ArrayList<StatePozo> bankDetailsPozos) {
+                        realm.executeTransaction(new Realm.Transaction() {
+                            @Override
+                            public void execute(Realm realm) {
+                                try {
+                                    for (int i = 0; i < bankDetailsPozos.size(); i++) {
+                                        realm.copyToRealm(bankDetailsPozos.get(i));
+                                    }
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+    }
+
+    private void getOperatorCopy() {
+        Observable.fromArray(db.getOperatorDetail(""))
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<ArrayList<TbRechargePozo>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(final ArrayList<TbRechargePozo> bankDetailsPozos) {
+                        realm.executeTransaction(new Realm.Transaction() {
+                            @Override
+                            public void execute(Realm realm) {
+                                try {
+                                    for (int i = 0; i < bankDetailsPozos.size(); i++) {
+                                        realm.copyToRealm(bankDetailsPozos.get(i));
+                                    }
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+    }
+
+    private void getTransferCopy() {
+        Observable.fromArray(db.getTransferDetails(""))
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<ArrayList<TbTransitionPojo>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(final ArrayList<TbTransitionPojo> bankDetailsPozos) {
+                        realm.executeTransaction(new Realm.Transaction() {
+                            @Override
+                            public void execute(Realm realm) {
+                                try {
+                                    for (int i = 0; i < bankDetailsPozos.size(); i++) {
+                                        realm.copyToRealm(bankDetailsPozos.get(i));
+                                    }
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+    }
+
+    private void getPayerpAYEECopy() {
+        Observable.fromArray(db.getPayee_Details())
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<ArrayList<TbOperatorPozo>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(final ArrayList<TbOperatorPozo> bankDetailsPozos) {
+                        realm.executeTransaction(new Realm.Transaction() {
+                            @Override
+                            public void execute(Realm realm) {
+                                try {
+                                    for (int i = 0; i < bankDetailsPozos.size(); i++) {
+                                        realm.copyToRealm(bankDetailsPozos.get(i));
+                                    }
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+    }
+
+    private void getPMTPaymentCopy() {
+        Observable.fromArray(db.getPaymentModeNepal())
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<ArrayList<PaymentModePozo>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(final ArrayList<PaymentModePozo> bankDetailsPozos) {
+                        realm.executeTransaction(new Realm.Transaction() {
+                            @Override
+                            public void execute(Realm realm) {
+                                try {
+                                    for (int i = 0; i < bankDetailsPozos.size(); i++) {
+                                        realm.copyToRealm(bankDetailsPozos.get(i));
+                                    }
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+    }
+
+    private void getPMTBankCopy() {
+        Observable.fromArray(db.getBankNepal())
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<ArrayList<TbNepalPaymentModePozo>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                    }
+
+                    @Override
+                    public void onNext(final ArrayList<TbNepalPaymentModePozo> bankDetailsPozos) {
+                        realm.executeTransaction(new Realm.Transaction() {
+                            @Override
+                            public void execute(Realm realm) {
+                                try {
+                                    for (int i = 0; i < bankDetailsPozos.size(); i++) {
+                                        bankDetailsPozos.get(i).setId(String.valueOf(i));
+                                        realm.copyToRealm(bankDetailsPozos.get(i));
+                                    }
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                    }
+
+                    @Override
+                    public void onComplete() {
+                    }
+                });
+    }
+
+    private void getKYCPersonalCopy() {
+        Observable.fromArray(db.getKYCDetails_Personal(""))
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<ArrayList<NewKYCPozo>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(final ArrayList<NewKYCPozo> bankDetailsPozos) {
+                        realm.executeTransaction(new Realm.Transaction() {
+                            @Override
+                            public void execute(Realm realm) {
+                                try {
+                                    for (int i = 0; i < bankDetailsPozos.size(); i++) {
+                                        NewKycPersion newKycPersion = new NewKycPersion();
+                                        newKycPersion.setMOBILENO(bankDetailsPozos.get(i).getMOBILENO());
+                                        newKycPersion.setUSER_NAME(bankDetailsPozos.get(i).getUSER_NAME());
+                                        newKycPersion.setDOB(bankDetailsPozos.get(i).getDOB());
+                                        newKycPersion.setId(String.valueOf(i));
+                                        newKycPersion.setEMAILID(bankDetailsPozos.get(i).getEMAILID());
+                                        newKycPersion.setCOMPANY_NAME(bankDetailsPozos.get(i).getCOMPANY_NAME());
+                                        newKycPersion.setPASSPORT_PHOTO(bankDetailsPozos.get(i).getPASSPORT_PHOTO());
+                                        newKycPersion.setSCANIMAGENAME(bankDetailsPozos.get(i).getSCANIMAGENAME());
+                                        newKycPersion.setSCANIMAGEPATH(bankDetailsPozos.get(i).getSCANIMAGEPATH());
+                                        newKycPersion.setPERSONAL_CLICKED(bankDetailsPozos.get(i).getPERSONAL_CLICKED());
+                                        newKycPersion.setDOCUMENTTYPE(bankDetailsPozos.get(i).getDOCUMENTTYPE());
+                                        newKycPersion.setDOCUMENTID(bankDetailsPozos.get(i).getDOCUMENTID());
+                                        newKycPersion.setIMAGE_NAME(bankDetailsPozos.get(i).getIMAGE_NAME());
+                                        newKycPersion.setSCANTYPE(bankDetailsPozos.get(i).getSCANTYPE());
+                                        realm.copyToRealm(newKycPersion);
+                                    }
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+    }
+
+    private void getKYCAddressCopy() {
+        Observable.fromArray(db.getKYCDetails_Address(""))
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<ArrayList<NewKYCPozo>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(final ArrayList<NewKYCPozo> bankDetailsPozos) {
+                        realm.executeTransaction(new Realm.Transaction() {
+                            @Override
+                            public void execute(Realm realm) {
+                                try {
+                                    for (int i = 0; i < bankDetailsPozos.size(); i++) {
+                                        NewKycAddress newKycAddress = new NewKycAddress();
+                                        newKycAddress.setMOBILENO(bankDetailsPozos.get(i).getMOBILENO());
+                                        newKycAddress.setADDRESS(bankDetailsPozos.get(i).getADDRESS());
+                                        newKycAddress.setCITY(bankDetailsPozos.get(i).getCITY());
+                                        newKycAddress.setSTATE(bankDetailsPozos.get(i).getSTATE());
+                                        newKycAddress.setId(String.valueOf(i));
+                                        newKycAddress.setPINCODE(bankDetailsPozos.get(i).getPINCODE());
+                                        newKycAddress.setDOCUMENTFRONT_IMAGENAME(bankDetailsPozos.get(i).getDOCUMENTFRONT_IMAGENAME());
+                                        newKycAddress.setDOCUMENTBACK_IMAGENAME(bankDetailsPozos.get(i).getDOCUMENTBACK_IMAGENAME());
+                                        newKycAddress.setADDRESS_CLICKED(bankDetailsPozos.get(i).getADDRESS_CLICKED());
+                                        newKycAddress.setDOCUMENTFRONT_PHOTO(bankDetailsPozos.get(i).getDOCUMENTFRONT_PHOTO());
+                                        newKycAddress.setDOCUMENTBACK_PHOTO(bankDetailsPozos.get(i).getDOCUMENTBACK_PHOTO());
+                                        newKycAddress.setDOCUMENTTYPE(bankDetailsPozos.get(i).getDOCUMENTTYPE());
+                                        newKycAddress.setDOCUMENTID(bankDetailsPozos.get(i).getDOCUMENTID());
+                                        realm.copyToRealm(newKycAddress);
+                                    }
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+    }
+
+    private void getKYCBuisnessCopy() {
+        Observable.fromArray(db.getKYCDetails_BUISNESS(""))
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<ArrayList<NewKYCPozo>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(final ArrayList<NewKYCPozo> bankDetailsPozos) {
+                        realm.executeTransaction(new Realm.Transaction() {
+                            @Override
+                            public void execute(Realm realm) {
+                                try {
+                                    for (int i = 0; i < bankDetailsPozos.size(); i++) {
+                                        NewKycBusiness newKycBusiness = new NewKycBusiness();
+                                        newKycBusiness.setMOBILENO(bankDetailsPozos.get(i).getMOBILENO());
+                                        newKycBusiness.setPANNUMBER(bankDetailsPozos.get(i).getPANNUMBER());
+                                        newKycBusiness.setGSTINNUMBER(bankDetailsPozos.get(i).getGSTINNUMBER());
+                                        newKycBusiness.setId(String.valueOf(i));
+                                        newKycBusiness.setPAN_PHOTO_IMAGENAME(bankDetailsPozos.get(i).getPAN_PHOTO_IMAGENAME());
+                                        newKycBusiness.setSHOP_PHOTO_IMAGENAME(bankDetailsPozos.get(i).getSHOP_PHOTO_IMAGENAME());
+                                        newKycBusiness.setBUISNESS_CLICKED(bankDetailsPozos.get(i).getBUISNESS_CLICKED());
+                                        newKycBusiness.setPAN_PHOTO(bankDetailsPozos.get(i).getPAN_PHOTO());
+                                        newKycBusiness.setSHOP_PHOTO(bankDetailsPozos.get(i).getSHOP_PHOTO());
+                                        newKycBusiness.setDOCUMENTTYPE(bankDetailsPozos.get(i).getDOCUMENTTYPE());
+                                        newKycBusiness.setDOCUMENTID(bankDetailsPozos.get(i).getDOCUMENTID());
+                                        realm.copyToRealm(newKycBusiness);
+                                    }
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+    }
+
+    private void getKYCVerificationCopy() {
+        Observable.fromArray(db.getKYCDetails_VERIFY(""))
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<ArrayList<NewKYCPozo>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(final ArrayList<NewKYCPozo> bankDetailsPozos) {
+                        realm.executeTransaction(new Realm.Transaction() {
+                            @Override
+                            public void execute(Realm realm) {
+                                try {
+                                    for (int i = 0; i < bankDetailsPozos.size(); i++) {
+                                        NewKycVerification newKycVerification = new NewKycVerification();
+                                        newKycVerification.setMOBILENO(bankDetailsPozos.get(i).getMOBILENO());
+                                        newKycVerification.setSELF_PHOTO_IMAGENAME(bankDetailsPozos.get(i).getSELF_PHOTO_IMAGENAME());
+                                        newKycVerification.setSIGN_PHOTO_IMAGENAME(bankDetailsPozos.get(i).getSIGN_PHOTO_IMAGENAME());
+                                        newKycVerification.setVERIFY_CLICKED(bankDetailsPozos.get(i).getVERIFY_CLICKED());
+                                        newKycVerification.setSELF_PHOTO(bankDetailsPozos.get(i).getSELF_PHOTO());
+                                        newKycVerification.setSIGN_PHOTO(bankDetailsPozos.get(i).getSIGN_PHOTO());
+                                        newKycVerification.setDOCUMENTTYPE(bankDetailsPozos.get(i).getDOCUMENTTYPE());
+                                        newKycVerification.setDOCUMENTID(bankDetailsPozos.get(i).getDOCUMENTID());
+                                        realm.copyToRealm(newKycVerification);
+                                    }
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
     }
 
     private void loadApi() {
@@ -192,30 +806,38 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
     }
 
     @Override
-    public void chechStatus(JSONObject object) {
+    public void chechStatus(final JSONObject object) {
         try {
             if (object.getString("responseCode").equalsIgnoreCase("200")) {
                 if (object.getString("serviceType").equalsIgnoreCase("PinVerify")) {
-                    SQLiteDatabase dba = db.getWritableDatabase();
-                    ContentValues contentValues = new ContentValues();
-                    contentValues.put(RapipayDB.COLOMN_PINSESSION, object.getString("session"));
-                    contentValues.put(RapipayDB.COLOMN_AFTERSESSIONREFNO, object.getString("sessionRefNo"));
-                    String whereClause = "apikey=?";
-                    String whereArgs[] = {list.get(0).getApikey()};
-                    dba.update(RapipayDB.TABLE_NAME, contentValues, whereClause, whereArgs);
-//                    localStorage.setActivityState(LocalStorage.ROUTESTATE, "UPDATE");
-                    localStorage.setActivityState(LocalStorage.LOGOUT, "LOGOUT");
-                    Intent intent = new Intent(this, MainActivity.class);
-                    startActivity(intent);
-                    finish();
+                    String whereArgs1 = list.get(0).getApikey();
+                    final RapiPayPozo pinVeriPojo1 = realm.where(RapiPayPozo.class).equalTo("apikey", whereArgs1).findFirst();
+                    realm.executeTransaction(new Realm.Transaction() {
+                        @Override
+                        public void execute(Realm realm) {
+                            try {
+                                pinVeriPojo1.setSession(object.getString("session"));
+                                pinVeriPojo1.setSessionRefNo(object.getString("sessionRefNo"));
+                                pinVeriPojo1.setAftersessionRefNo(object.getString("sessionRefNo"));
+                                pinVeriPojo1.setPinsession(object.getString("session"));
+                                realm.copyToRealmOrUpdate(pinVeriPojo1);
+                                localStorage.setActivityState(LocalStorage.LOGOUT, "LOGOUT");
+                                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                                startActivity(intent);
+                                finish();
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
                 } else if (object.getString("serviceType").equalsIgnoreCase("GET_FOOTER_DATA")) {
                     if (object.getString("imageDownloadFlag").equalsIgnoreCase("Y")) {
                         if (object.has("footerImgList")) {
                             JSONArray array = object.getJSONArray("footerImgList");
-                            insertFooterDetails(array, db, object.getString("timeStamp"));
+                            insertFooterDetails(array, dbRealm, object.getString("timeStamp"));
                         }
                     } else
-                        init(db.getFooterDetail(""));
+                        init(dbRealm.getFooterDetail(""));
                 } else if (object.getString("serviceType").equalsIgnoreCase("APP_LIVE_STATUS")) {
                     if (object.has("headerList")) {
                         JSONArray array = object.getJSONArray("headerList");
@@ -227,6 +849,9 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
                         masterDetails(array);
                     }
                 }
+            } else {
+                confirmpinView.setText("");
+                responseMSg(object);
             }
             flaf = false;
         } catch (Exception e) {
@@ -236,24 +861,32 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
 
     protected void masterDetails(JSONArray array) {
         try {
-            SQLiteDatabase dba = db.getWritableDatabase();
-            dba.execSQL("delete from " + RapipayDB.TABLE_MASTER);
             for (int i = 0; i < array.length(); i++) {
-                JSONObject object = array.getJSONObject(i);
-                ContentValues values = new ContentValues();
-                values.put(RapipayDB.COLOMN_FRONTID, object.getString("frontId"));
-                values.put(RapipayDB.COLOMN_SERVICETYPENAME, object.getString("serviceTypeName"));
-                values.put(RapipayDB.COLOMN_DISPLAYNAME, object.getString("displayName"));
-                values.put(RapipayDB.COLOMN_DISPLAYTYPE, object.getString("displayType"));
-                values.put(RapipayDB.COLOMN_ICON, byteConvert(object.getString("icon")));
-                values.put(RapipayDB.COLOMN_ORDER, object.getString("order"));
-                values.put(RapipayDB.IMAGE_TIME_STAMP, object.getString("timeStamp"));
-                dba.insert(RapipayDB.TABLE_MASTER, null, values);
+                final JSONObject object = array.getJSONObject(i);
+                realm.executeTransaction(new Realm.Transaction() {
+                    @Override
+                    public void execute(Realm realm) {
+                        try {
+                            MasterPozo masterPozo = new MasterPozo();
+                            masterPozo.setFrontId(object.getString("frontId"));
+                            masterPozo.setServiceTypeName(object.getString("serviceTypeName"));
+                            masterPozo.setDisplayName(object.getString("displayName"));
+                            masterPozo.setDisplayType(object.getString("displayType"));
+                            masterPozo.setIcon(byteConvert(object.getString("icon")));
+                            masterPozo.setOrder(object.getString("order"));
+                            masterPozo.setTimeStamp(object.getString("timeStamp"));
+                            realm.copyToRealm(masterPozo);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
 
     @Override
     public void onClick(View v) {
@@ -305,8 +938,8 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
                 jsonObject.put("typeMobileWeb", "mobile");
                 jsonObject.put("transactionID", ImageUtils.miliSeconds());
                 jsonObject.put("nodeAgentId", list.get(0).getMobilno());
-                if (db.getFooterDetail("banner").size() != 0)
-                    jsonObject.put("timeStamp", db.getFooterDetail("banner").get(0).getTimeStamp());
+                if (dbRealm.getFooterDetail("banner").size() != 0)
+                    jsonObject.put("timeStamp", dbRealm.getFooterDetail("banner").get(0).getTimeStamp());
                 else
                     jsonObject.put("timeStamp", "");
                 jsonObject.put("sessionRefNo", list.get(0).getSessionRefNo());
@@ -330,8 +963,8 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
                 jsonObject.put("requestType", "BC_CHANNEL");
                 jsonObject.put("transactionID", ImageUtils.miliSeconds());
                 jsonObject.put("typeMobileWeb", "mobile");
-                if (db.getMasterDetail("").size() != 0)
-                    jsonObject.put("timeStamp", db.getMasterDetail("").get(0).getTimeStamp());
+                if (dbRealm.getMasterDetail("").size() != 0)
+                    jsonObject.put("timeStamp", dbRealm.getMasterDetail("").get(0).getTimeStamp());
                 else
                     jsonObject.put("timeStamp", format.format(date));
                 jsonObject.put("sessionRefNo", list.get(0).getSessionRefNo());
@@ -344,12 +977,17 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
         return jsonObject;
     }
 
-    private void insertFooterDetails(JSONArray array, RapipayDB db, String timeStamp) {
+    private void insertFooterDetails(JSONArray array, RapipayRealmDB db, final String timeStamp) {
         bannerlist = new ArrayList<HeaderePozo>();
         imagelist = new ArrayList<HeaderePozo>();
-        SQLiteDatabase dba = db.getWritableDatabase();
-        if (db.getDetailsFooter())
-            dba.execSQL("delete from " + RapipayDB.TABLE_FOOTER);
+        if (dbRealm.getDetailsFooter())
+            realm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    RealmResults<HeaderePozo> headerePozoRealmResults = realm.where(HeaderePozo.class).findAll();
+                    headerePozoRealmResults.deleteAllFromRealm();
+                }
+            });
         try {
             for (int i = 0; i < array.length(); i++) {
                 JSONObject object = array.getJSONObject(i);
@@ -361,67 +999,27 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
             e.printStackTrace();
         }
         if (bannerlist.size() != 0) {
-            for (int i = 0; i < bannerlist.size(); i++) {
-                ContentValues values = new ContentValues();
-                String wlimageName = "banner" + i + ".jpg";
-                values.put(RapipayDB.COLOMN_OPERATORID, bannerlist.get(i).getHeaderID());
-                values.put(RapipayDB.COLOMN_OPERATORDATA, bannerlist.get(i).getHeaderData());
-                values.put(RapipayDB.IMAGE_TIME_STAMP, timeStamp);
-                values.put(RapipayDB.COLOMN_OPERATORVALUE, wlimageName);
-                values.put(RapipayDB.COLOMN_PATH, byteConvert(bannerlist.get(i).getHeaderData()));
-                values.put(RapipayDB.COLOMN_OPERATORVALUE, wlimageName);
-                dba.insert(RapipayDB.TABLE_FOOTER, null, values);
-//                String insertSQL = "INSERT INTO " + RapipayDB.TABLE_FOOTER + "\n" +
-//                        "(" + RapipayDB.COLOMN_OPERATORID + "," + RapipayDB.COLOMN_OPERATORVALUE + "," + RapipayDB.COLOMN_OPERATORDATA + "," + RapipayDB.COLOMN_PATH + "," + RapipayDB.IMAGE_TIME_STAMP + ")\n" +
-//                        "VALUES \n" +
-//                        "( ?, ?, ?,?,?);";
-//
-//                String imageName = "banner" + i + ".jpg";
-//                String path = saveToInternalStorage(base64Convert(bannerlist.get(i).getHeaderData()), imageName);
-//                dba.execSQL(insertSQL, new String[]{bannerlist.get(i).getHeaderID(), imageName, bannerlist.get(i).getHeaderData(), path, timeStamp});
+            if (bannerlist.size() != 0) {
+                realm.executeTransaction(new Realm.Transaction() {
+                    @Override
+                    public void execute(Realm realm) {
+                        for (int i = 0; i < bannerlist.size(); i++) {
+                            HeaderePozo headerePozo = new HeaderePozo();
+                            String wlimageName = "banner" + i + ".jpg";
+                            headerePozo.setHeaderID(bannerlist.get(i).getHeaderID());
+                            headerePozo.setHeaderData(bannerlist.get(i).getHeaderData());
+                            headerePozo.setTimeStamp(timeStamp);
+                            headerePozo.setHeaderValue(wlimageName);
+                            headerePozo.setPath(bannerlist.get(i).getHeaderData());
+                            headerePozo.setHeaderValue(wlimageName);
+                            realm.copyToRealm(headerePozo);
+                        }
+                    }
+                });
             }
         }
-//        if (imagelist.size() != 0) {
-//            for (int i = 0; i < imagelist.size(); i++) {
-//                String insertSQL = "INSERT INTO " + RapipayDB.TABLE_FOOTER + "\n" +
-//                        "(" + RapipayDB.COLOMN_OPERATORID + "," + RapipayDB.COLOMN_OPERATORVALUE + "," + RapipayDB.COLOMN_OPERATORDATA + "," + RapipayDB.COLOMN_PATH + "," + RapipayDB.IMAGE_TIME_STAMP + ")\n" +
-//                        "VALUES \n" +
-//                        "( ?, ?, ?,?,?);";
-//
-//                String imageName = imagelist.get(i).getHeaderValue() + ".jpg";
-//                new ChangeTask(imagelist.get(i).getHeaderData(), PinVerification.this).execute();
-//                String path = saveToInternalStorage(base64Convert(imagelist.get(i).getHeaderData()), imageName);
-//                dba.execSQL(insertSQL, new String[]{imagelist.get(i).getHeaderID(), imageName, imagelist.get(i).getHeaderData(), path, timeStamp});
-//            }
-//        }
-        init(db.getFooterDetail(""));
+        init(dbRealm.getFooterDetail(""));
     }
-
-    private void initializeTransAdapter(ArrayList<HeaderePozo> list) {
-        LinearLayoutManager layoutManager = new LinearLayoutManager(PinVerification.this, LinearLayoutManager.HORIZONTAL, false);
-        recycler_view.setLayoutManager(layoutManager);
-        recycler_view.setAdapter(new FooterAdapter(PinVerification.this, recycler_view, list));
-    }
-
-//    @Override
-//    public void checkVersion(ArrayList<VersionPozo> list) {
-//        for (int i = 0; i < list.size(); i++) {
-//            if (list.get(i).getName() != null)
-//                if (list.get(i).getName().equalsIgnoreCase("APP_UPDATE_ST")) {
-//                    try {
-//                        PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-//                        String version = pInfo.versionName;
-//                        if (("F").equalsIgnoreCase(list.get(i + 1).getValue())) {
-//                            customDialog_Common("KYCLAYOUTSS", null, null, "Update Available", null, "You are running on lower version please update for new versions!.", PinVerification.this);
-//                        } else {
-//                            new AsyncPostMethod(WebConfig.LOGIN_URL, getJson_Validate(confirmpinView.getText().toString()).toString(), "", PinVerification.this,getString(R.string.responseTimeOut)).execute();
-//                        }
-//                    } catch (PackageManager.NameNotFoundException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//        }
-//    }
 
     @Override
     public void checkVersion(ArrayList<VersionPozo> list) {
@@ -430,41 +1028,19 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
             if (list.get(i).getName() != null)
                 if (list.get(i).getName().equalsIgnoreCase("PROD")) {
                     stringArrayList.add(list.get(i + 1).getValue());
-//                    try {
-//                        PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-//                        String version = pInfo.versionName;
-//                        if (!version.equalsIgnoreCase(list.get(i + 1).getValue())) {
-//                            customDialog_Common("KYCLAYOUTSS", null, null, "Update Available", null, "You are running on lower version please update for new versions!.", LoginScreenActivity.this);
-//                        } else {
-//                            new AsyncPostMethod(WebConfig.LOGIN_URL, getJson_Validate().toString(), "", LoginScreenActivity.this, getString(R.string.responseTimeOut)).execute();
-//                        }
-//                    } catch (PackageManager.NameNotFoundException e) {
-//                        e.printStackTrace();
-//                    }
                 } else if (list.get(i).getName().equalsIgnoreCase("APP_UPDATE_ST")) {
                     stringArrayList.add(list.get(i + 1).getValue());
-//                    try {
-//                        PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-//                        String version = pInfo.versionName;
-//                        if (("F").equalsIgnoreCase(list.get(i + 1).getValue())) {
-//                            customDialog_Common("KYCLAYOUTSS", null, null, "Update Available", null, "You are running on lower version please update for new versions!.", LoginScreenActivity.this);
-//                        } else {
-//                            new AsyncPostMethod(WebConfig.LOGIN_URL, getJson_Validate().toString(), "", LoginScreenActivity.this, getString(R.string.responseTimeOut)).execute();
-//                        }
-//                    } catch (PackageManager.NameNotFoundException e) {
-//                        e.printStackTrace();
-//                    }
                 }
         }
         if (stringArrayList.size() != 0) {
             try {
                 PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
                 String version = pInfo.versionName;
-                if (Double.valueOf(version)>=Double.valueOf(stringArrayList.get(0)) && (stringArrayList.get(1).equalsIgnoreCase("F") || stringArrayList.get(1).equalsIgnoreCase("N"))) {
+                if (Double.valueOf(version) >= Double.valueOf(stringArrayList.get(0)) && (stringArrayList.get(1).equalsIgnoreCase("F") || stringArrayList.get(1).equalsIgnoreCase("N"))) {
                     new AsyncPostMethod(WebConfig.LOGIN_URL, getJson_Validate(confirmpinView.getText().toString()).toString(), "", PinVerification.this, getString(R.string.responseTimeOut)).execute();
-                } else if (Double.valueOf(version)<Double.valueOf(stringArrayList.get(0)) && stringArrayList.get(1).equalsIgnoreCase("F")) {
+                } else if (Double.valueOf(version) < Double.valueOf(stringArrayList.get(0)) && stringArrayList.get(1).equalsIgnoreCase("F")) {
                     customDialog_Common("KYCLAYOUTSS", null, null, "Update Available", null, "You are running on lower version please update for new versions!.", PinVerification.this);
-                } else if (Double.valueOf(stringArrayList.get(0))!=Double.valueOf(version) && stringArrayList.get(1).equalsIgnoreCase("N")) {
+                } else if (Double.valueOf(stringArrayList.get(0)) != Double.valueOf(version) && stringArrayList.get(1).equalsIgnoreCase("N")) {
                     new AsyncPostMethod(WebConfig.LOGIN_URL, getJson_Validate(confirmpinView.getText().toString()).toString(), "", PinVerification.this, getString(R.string.responseTimeOut)).execute();
                 } else {
                     customDialog_Common("KYCLAYOUTSS", null, null, "Update Available", null, "You are running on lower version please update for new versions!.", PinVerification.this);

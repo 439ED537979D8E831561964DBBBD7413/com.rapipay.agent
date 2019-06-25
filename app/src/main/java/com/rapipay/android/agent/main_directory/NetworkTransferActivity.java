@@ -47,7 +47,7 @@ public class NetworkTransferActivity extends BaseCompactActivity implements Requ
         setContentView(R.layout.network_transfer_layout);
         initialize();
         clickedId = getIntent().getStringExtra("CLICKED");
-        if (db != null && db.getDetails_Rapi())
+        if (dbRealm != null && dbRealm.getDetails_Rapi())
             loadApi();
         else
             dbNull(NetworkTransferActivity.this);
@@ -114,6 +114,8 @@ public class NetworkTransferActivity extends BaseCompactActivity implements Requ
                 } else if (object.getString("serviceType").equalsIgnoreCase("C2C_NETWORK_CREDIT")) {
                     customDialog_Common("KYCLAYOUT", null, null, "Network Detail", null, object.getString("responseMessage"), NetworkTransferActivity.this);
                 }
+            }else {
+                responseMSg(object);
             }
         } catch (Exception e) {
             e.printStackTrace();

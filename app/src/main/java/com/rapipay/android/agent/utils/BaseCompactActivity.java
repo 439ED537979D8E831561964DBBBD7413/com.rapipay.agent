@@ -61,11 +61,26 @@ import android.widget.Toast;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.rapipay.android.agent.Database.RapipayDB;
+import com.rapipay.android.agent.Database.RapipayRealmDB;
+import com.rapipay.android.agent.Model.BankDetailsPozo;
 import com.rapipay.android.agent.Model.BeneficiaryDetailsPozo;
+import com.rapipay.android.agent.Model.CreaditPaymentModePozo;
 import com.rapipay.android.agent.Model.HeaderePozo;
 import com.rapipay.android.agent.Model.ImagePozo;
+import com.rapipay.android.agent.Model.MasterPozo;
+import com.rapipay.android.agent.Model.NewKYCPozo;
+import com.rapipay.android.agent.Model.NewKycAddress;
+import com.rapipay.android.agent.Model.NewKycBusiness;
+import com.rapipay.android.agent.Model.NewKycPersion;
+import com.rapipay.android.agent.Model.NewKycVerification;
 import com.rapipay.android.agent.Model.PMTBenefPozo;
+import com.rapipay.android.agent.Model.PaymentModePozo;
 import com.rapipay.android.agent.Model.RapiPayPozo;
+import com.rapipay.android.agent.Model.StatePozo;
+import com.rapipay.android.agent.Model.TbNepalPaymentModePozo;
+import com.rapipay.android.agent.Model.TbOperatorPozo;
+import com.rapipay.android.agent.Model.TbRechargePozo;
+import com.rapipay.android.agent.Model.TbTransitionPojo;
 import com.rapipay.android.agent.Model.VersionPozo;
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.adapter.BottomAdapter;
@@ -98,6 +113,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+import io.realm.Realm;
+import io.realm.RealmResults;
 import me.grantland.widget.AutofitTextView;
 
 public class BaseCompactActivity extends AppCompatActivity {
@@ -116,7 +133,7 @@ public class BaseCompactActivity extends AppCompatActivity {
     public static RapipayDB db;
     protected BluetoothAdapter btAdapter;
     protected static int REQUEST_BLUETOOTH = 101;
-    protected ArrayList<RapiPayPozo> list;
+    protected ArrayList<RapiPayPozo> list, listOld;
     final protected static int PERMISSIONS_REQUEST_READ_PHONE_STATE = 0;
     final protected static int PERMISSIONS_REQUEST_CAMERA_STATE = 1;
     protected LocalStorage localStorage;
@@ -126,6 +143,7 @@ public class BaseCompactActivity extends AppCompatActivity {
     String months = null, dayss = null;
     protected ImageView toimage, fromimage;
     ArrayList<String> left, right, medium, spinner_list;
+    public static ArrayList<HeaderePozo> pozoArrayList = new ArrayList<>();
     ArrayList<HeaderePozo> bottom;
     LinearLayout main_layout;
     protected String mCameraPhotoPath = null;
@@ -137,16 +155,21 @@ public class BaseCompactActivity extends AppCompatActivity {
     protected PowerManager.WakeLock mWakeLock;
     public static String ENABLE_TPIN = null;
     public static String IS_CRIMAGE_REQUIRED = null;
+    public static Realm realm;
+    public static RapipayRealmDB dbRealm;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        dbRealm = new RapipayRealmDB();
         db = new RapipayDB(this);
+        Realm.init(this);
+        realm = Realm.getDefaultInstance();
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         localStorage = LocalStorage.getInstance(this);
         hideKeyboard(this);
-        if (db != null && db.getDetails_Rapi())
-            list = db.getDetails();
+        if (dbRealm != null && dbRealm.getDetails_Rapi())
+            list = dbRealm.getDetails();
     }
 
     protected boolean btnstatus = false;
@@ -161,14 +184,7 @@ public class BaseCompactActivity extends AppCompatActivity {
     }
 
     public boolean printDifference(Date startDate, Date endDate) {
-        //milliseconds
         try {
-//            Calendar c = Calendar.getInstance();
-//            System.out.println("Current time => " + c.getTime());
-//
-//            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-//            Date endDate = mainDate(df.format(c.getTime()));
-
             long different = endDate.getTime() - startDate.getTime();
 
             System.out.println("startDate : " + startDate);
@@ -189,7 +205,7 @@ public class BaseCompactActivity extends AppCompatActivity {
             different = different % minutesInMilli;
 
             long elapsedSeconds = different / secondsInMilli;
-            if (elapsedDays >= 0)
+            if (elapsedDays >= 0 && elapsedDays <= 31)
                 return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -290,13 +306,6 @@ public class BaseCompactActivity extends AppCompatActivity {
         }
         return jsonObject;
     }
-
-    //    public void turnOnScreen(){
-//        // turn on screen
-//        Log.v("ProximityActivity", "ON!");
-//        mWakeLock = mPowerManager.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "tag");
-//        mWakeLock.acquire();
-//    }
     public void hideKeyboard(Activity activity) {
         InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
         View view = activity.getCurrentFocus();
@@ -321,33 +330,54 @@ public class BaseCompactActivity extends AppCompatActivity {
         }
         return null;
     }
-
-    protected void deleteTables(String type) {
+    protected void deleteTables(final String type) {
         localStorage.setActivityState(LocalStorage.ROUTESTATE, "0");
         localStorage.setActivityState(LocalStorage.EMI, "0");
         localStorage.setActivityState(LocalStorage.LOGOUT, "0");
         localStorage.setActivityState(LocalStorage.IMAGEPATH, "0");
-        SQLiteDatabase dba = db.getWritableDatabase();
-        dba.execSQL("delete from " + RapipayDB.TABLE_BANK);
-        dba.execSQL("delete from " + RapipayDB.TABLE_PAYMENT);
-        dba.execSQL("delete from " + RapipayDB.TABLE_STATE);
-        dba.execSQL("delete from " + RapipayDB.TABLE_OPERATOR);
-        dba.execSQL("delete from " + RapipayDB.TABLE_FOOTER);
-        dba.execSQL("delete from " + RapipayDB.TABLE_TRANSFERLIST);
-        dba.execSQL("delete from " + RapipayDB.TABLE_PAYERPAYEE);
-        dba.execSQL("delete from " + RapipayDB.TABLE_NEPAL_BANK);
-        dba.execSQL("delete from " + RapipayDB.TABLE_NEPAL_PAYMENTMOODE);
-        if (!type.equalsIgnoreCase("")) {
-            dba.execSQL("delete from " + RapipayDB.TABLE_NAME);
-            dba.execSQL("delete from " + RapipayDB.TABLE_MASTER);
-            dba.execSQL("delete from " + RapipayDB.TABLE_KYC_PERSONAL);
-            dba.execSQL("delete from " + RapipayDB.TABLE_KYC_ADDRESS);
-            dba.execSQL("delete from " + RapipayDB.TABLE_KYC_BUISNESS);
-            dba.execSQL("delete from " + RapipayDB.TABLE_KYC_VERIFICATION);
-            dba.execSQL("delete from " + RapipayDB.TABLE_IMAGES);
-        }
+        final RealmResults<RapiPayPozo> rapiPayPozoRealmResults = realm.where(RapiPayPozo.class).findAll();
+        final RealmResults<MasterPozo> masterPozoRealmResults = realm.where(MasterPozo.class).findAll();
+        final RealmResults<ImagePozo> imagePozoRealmResults = realm.where(ImagePozo.class).findAll();
+        final RealmResults<PaymentModePozo> paymentModePozoRealmResults = realm.where(PaymentModePozo.class).findAll();
+        final RealmResults<StatePozo> statePozoRealmResults = realm.where(StatePozo.class).findAll();
+        final RealmResults<TbOperatorPozo> tbOperatorPozoRealmResults = realm.where(TbOperatorPozo.class).findAll();
+        final RealmResults<NewKYCPozo> newKYCPozoRealmResults = realm.where(NewKYCPozo.class).findAll();
+        final RealmResults<BankDetailsPozo> bankDetailsPozoRealmResults = realm.where(BankDetailsPozo.class).findAll();
+        final RealmResults<HeaderePozo> headerePozoRealmResults = realm.where(HeaderePozo.class).findAll();
+        final RealmResults<CreaditPaymentModePozo> creaditPaymentModePozos = realm.where(CreaditPaymentModePozo.class).findAll();
+        final RealmResults<NewKycAddress> newKycAddresses = realm.where(NewKycAddress.class).findAll();
+        final RealmResults<NewKycBusiness> newKycBusinesses = realm.where(NewKycBusiness.class).findAll();
+        final RealmResults<NewKycPersion> newKycPersions = realm.where(NewKycPersion.class).findAll();
+        final RealmResults<NewKycVerification> newKycVerifications = realm.where(NewKycVerification.class).findAll();
+        final RealmResults<TbRechargePozo> tbRechargePozos = realm.where(TbRechargePozo.class).findAll();
+        final RealmResults<TbNepalPaymentModePozo> tbNepalPaymentModePozos = realm.where(TbNepalPaymentModePozo.class).findAll();
+        final RealmResults<TbTransitionPojo> tbTransitionPojos = realm.where(TbTransitionPojo.class).findAll();
+        //    SQLiteDatabase dba = db.getWritableDatabase();
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                paymentModePozoRealmResults.deleteAllFromRealm();
+                statePozoRealmResults.deleteAllFromRealm();
+                tbOperatorPozoRealmResults.deleteAllFromRealm();
+                bankDetailsPozoRealmResults.deleteAllFromRealm();
+                headerePozoRealmResults.deleteAllFromRealm();
+                creaditPaymentModePozos.deleteAllFromRealm();
+                newKycAddresses.deleteAllFromRealm();
+                newKycBusinesses.deleteAllFromRealm();
+                newKycPersions.deleteAllFromRealm();
+                newKycVerifications.deleteAllFromRealm();
+                tbRechargePozos.deleteAllFromRealm();
+                tbNepalPaymentModePozos.deleteAllFromRealm();
+                tbTransitionPojos.deleteAllFromRealm();
+                if (!type.equalsIgnoreCase("")) {
+                    rapiPayPozoRealmResults.deleteAllFromRealm();
+                    masterPozoRealmResults.deleteAllFromRealm();
+                    imagePozoRealmResults.deleteAllFromRealm();
+                    newKYCPozoRealmResults.deleteAllFromRealm();
+                }
+            }
+        });
     }
-
     protected void jumpPage() {
         Intent intent = new Intent(BaseCompactActivity.this, LoginScreenActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -367,7 +397,6 @@ public class BaseCompactActivity extends AppCompatActivity {
     }
 
     protected Dialog dialog, dialognew;
-    //    protected AlertDialog alertDialog, newdialog;
     CustomInterface anInterface;
 
     protected void customDialog_Common(final String type, final JSONObject object, final Object ob, String msg, final String input, String output, final CustomInterface anInterface) {
@@ -615,8 +644,8 @@ public class BaseCompactActivity extends AppCompatActivity {
         btn_sendname.setText(input);
         if (msg.equalsIgnoreCase("Confirm Money Transfer?")) {
             String condition = "where " + RapipayDB.COLOMN_IFSC + "='" + pozo.getIfsc() + "'";
-            if (db.geBank(condition).size() != 0)
-                btn_bank.setText(db.geBank(condition).get(0));
+            if (dbRealm.geBank(condition).size() != 0)
+                btn_bank.setText(dbRealm.geBank(condition).get(0));
             else
                 btn_bank.setVisibility(View.GONE);
         } else
@@ -628,8 +657,6 @@ public class BaseCompactActivity extends AppCompatActivity {
         newtpin = (EditText) alertLayout.findViewById(R.id.newtpin);
         if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y"))
             newtpin.setVisibility(View.VISIBLE);
-//        if (type.equalsIgnoreCase("WALLET") && BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y"))
-//            alertLayout.findViewById(R.id.myRadioGroup).setVisibility(View.VISIBLE);
         dialog.setContentView(alertLayout);
     }
 
@@ -655,7 +682,7 @@ public class BaseCompactActivity extends AppCompatActivity {
         btn_sendname.setText(input);
         if (ifsc_code != null) {
             String condition = "where " + RapipayDB.COLOMN_IFSC + "='" + ifsc_code + "'";
-            btn_bank.setText(db.geBank(condition).get(0));
+            btn_bank.setText(dbRealm.geBank(condition).get(0));
         }
         if (name != null)
             btn_name.setText(name);
@@ -777,8 +804,12 @@ public class BaseCompactActivity extends AppCompatActivity {
         bank_select.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ArrayList<String> list_state = db.getState_Details();
-                customSpinner(bank_select, "Select State*", list_state);
+                ArrayList<String> list_state1 = new ArrayList<>();
+                ArrayList<StatePozo> list_state = dbRealm.getState_Details();
+                for (int i = 0; i < list_state.size(); i++) {
+                    list_state1.add(list_state.get(i).getHeaderValue());
+                }
+                customSpinner(bank_select, "Select State*", list_state1);
             }
         });
         dialog.setContentView(alertLayout);
@@ -826,10 +857,6 @@ public class BaseCompactActivity extends AppCompatActivity {
                 @Override
                 public void onDateSet(DatePicker arg0,
                                       int arg1, int arg2, int arg3) {
-                    // TODO Auto-generated method stub
-                    // arg1 = year
-                    // arg2 = month
-                    // arg3 = day
                     showDate(arg1, arg2 + 1, arg3);
                 }
             };
@@ -1218,7 +1245,7 @@ public class BaseCompactActivity extends AppCompatActivity {
         alertLayout.setKeepScreenOn(true);
         ImageView receipt_logo = (ImageView) alertLayout.findViewById(R.id.receipt_logo);
         String condition = "where " + RapipayDB.IMAGE_NAME + "='invoiceLogo.jpg'";
-        ArrayList<ImagePozo> imagePozoArrayList = db.getImageDetails(condition);
+        ArrayList<ImagePozo> imagePozoArrayList = dbRealm.getImageDetails(condition);
         if (imagePozoArrayList.size() != 0) {
             byteConvert(receipt_logo, imagePozoArrayList.get(0).getImagePath());
         }
@@ -1370,7 +1397,7 @@ public class BaseCompactActivity extends AppCompatActivity {
         alertLayout.setKeepScreenOn(true);
         ImageView receipt_logo = (ImageView) alertLayout.findViewById(R.id.receipt_logo);
         String condition = "where " + RapipayDB.IMAGE_NAME + "='invoiceLogo.jpg'";
-        ArrayList<ImagePozo> imagePozoArrayList = db.getImageDetails(condition);
+        ArrayList<ImagePozo> imagePozoArrayList = dbRealm.getImageDetails(condition);
         if (imagePozoArrayList.size() != 0) {
             byteConvert(receipt_logo, imagePozoArrayList.get(0).getImagePath());
         }
@@ -1531,7 +1558,7 @@ public class BaseCompactActivity extends AppCompatActivity {
         alertLayout.setKeepScreenOn(true);
         ImageView receipt_logo = (ImageView) alertLayout.findViewById(R.id.receipt_logo);
         String condition = "where " + RapipayDB.IMAGE_NAME + "='invoiceLogo.jpg'";
-        ArrayList<ImagePozo> imagePozoArrayList = db.getImageDetails(condition);
+        ArrayList<ImagePozo> imagePozoArrayList = dbRealm.getImageDetails(condition);
         if (imagePozoArrayList.size() != 0) {
             byteConvert(receipt_logo, imagePozoArrayList.get(0).getImagePath());
         }
@@ -1574,8 +1601,6 @@ public class BaseCompactActivity extends AppCompatActivity {
                 listRight.addView(inflate);
             }
         }
-//        if (medium.size() == 1)
-//            mediums.setText(medium.get(0));
         if (bottom.size() != 0) {
             for (int i = 0; i < bottom.size(); i++) {
                 View inflate = inflater.inflate(R.layout.bottom_layout_pmt, null);
@@ -1689,8 +1714,6 @@ public class BaseCompactActivity extends AppCompatActivity {
                     objTimer.cancel();
                     count = 30 * 60 * 7500;
                     objTimer.start();
-//                    customDialogLog("LOGOUT", "Session Expired", "Your Session got expired");
-//                    Toast.makeText(BaseCompactActivity.this, "Your Session got expired", Toast.LENGTH_SHORT).show();
                 } else if (localStorage.getActivityState(LocalStorage.LOGOUT).equalsIgnoreCase("LOGOUT")) {
                     customDialogLog("LOGOUT", "Session Expired", "Your Session got expired");
                     Toast.makeText(BaseCompactActivity.this, "Your Session got expired", Toast.LENGTH_SHORT).show();
@@ -1942,7 +1965,6 @@ public class BaseCompactActivity extends AppCompatActivity {
     }
 
     public boolean printDifference(Date startDate) {
-        //milliseconds
         try {
             Calendar c = Calendar.getInstance();
             System.out.println("Current time => " + c.getTime());
@@ -1987,7 +2009,6 @@ public class BaseCompactActivity extends AppCompatActivity {
         }
         return null;
     }
-
     protected JSONObject getCashOutDetails(String mobile, String txnAmmount, String serviceType, String requestChannel, String reqFor, String requestType, String blueToothAddress) {
         JSONObject jsonObject = new JSONObject();
         try {
@@ -2029,17 +2050,6 @@ public class BaseCompactActivity extends AppCompatActivity {
                     intent.putExtra("ImageType", imageType);
                     intent.putExtra("REQUESTTYPE", id1);
                     startActivityForResult(intent, id1);
-//                    String filename = System.currentTimeMillis() + ".jpg";
-//
-//                    ContentValues values = new ContentValues();
-//                    values.put(MediaStore.Images.Media.TITLE, filename);
-//                    values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
-//                    imageUri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
-//
-//                    Intent intent = new Intent();
-//                    intent.setAction(MediaStore.ACTION_IMAGE_CAPTURE);
-//                    intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-//                    startActivityForResult(intent, id1);
                 } else if (items[item].equals("Choose from Gallery")) {
                     Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                     intent.setType("image/*");
@@ -2051,5 +2061,64 @@ public class BaseCompactActivity extends AppCompatActivity {
         });
         builder.show();
     }
+    protected void responseMSg(JSONObject object) {
+        try {
+            if (object.has("responseMessage"))
+                customDialog_Common(object.getString("responseMessage"));
+            else if (object.has("responseMsg"))
+                customDialog_Common(object.getString("responseMsg"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
+    protected void customDialog_Common(String msg) {
+        try {
+            final Dialog dialog = new Dialog(BaseCompactActivity.this);
+            LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View alertLayout = inflater.inflate(R.layout.custom_layout_common, null);
+            TextView text = (TextView) alertLayout.findViewById(R.id.dialog_title);
+            text.setText(getResources().getString(R.string.Alert));
+            TextView dialog_msg = (TextView) alertLayout.findViewById(R.id.dialog_msg);
+            dialog_msg.setText(msg);
+            dialog_msg.setVisibility(View.VISIBLE);
+            alertLayout.findViewById(R.id.btn_cancel).setVisibility(View.GONE);
+            AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
+            dialog.setCancelable(false);
+            btn_ok.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    try {
+                        dialog.dismiss();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            dialog.setContentView(alertLayout);
+            dialog.show();
+            Window window = dialog.getWindow();
+            window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    protected void deleteTables() {
+        SQLiteDatabase dba = BaseCompactActivity.db.getWritableDatabase();
+        dba.execSQL("delete from " + RapipayDB.TABLE_NAME);
+        dba.execSQL("delete from " + RapipayDB.TABLE_BANK);
+        dba.execSQL("delete from " + RapipayDB.TABLE_STATE);
+        dba.execSQL("delete from " + RapipayDB.TABLE_PAYMENT);
+        dba.execSQL("delete from " + RapipayDB.TABLE_OPERATOR);
+        dba.execSQL("delete from " + RapipayDB.TABLE_TRANSFERLIST);
+        dba.execSQL("delete from " + RapipayDB.TABLE_PAYERPAYEE);
+        dba.execSQL("delete from " + RapipayDB.TABLE_NEPAL_PAYMENTMOODE);
+        dba.execSQL("delete from " + RapipayDB.TABLE_NEPAL_BANK);
+        dba.execSQL("delete from " + RapipayDB.TABLE_KYC_PERSONAL);
+        dba.execSQL("delete from " + RapipayDB.TABLE_KYC_ADDRESS);
+        dba.execSQL("delete from " + RapipayDB.TABLE_KYC_BUISNESS);
+        dba.execSQL("delete from " + RapipayDB.TABLE_KYC_VERIFICATION);
+        dba.execSQL("delete from " + RapipayDB.TABLE_IMAGES);
+    }
 }

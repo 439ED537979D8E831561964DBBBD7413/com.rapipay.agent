@@ -2,8 +2,12 @@ package com.rapipay.android.agent.Model;
 
 import java.io.Serializable;
 
-public class NewKYCPozo implements Serializable {
+import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
 
+public class NewKYCPozo extends RealmObject implements Serializable {
+    @PrimaryKey
+    public String id;
     public String MOBILENO;
     public String USER_NAME;
     public String DOB;
@@ -39,6 +43,13 @@ public class NewKYCPozo implements Serializable {
     public String SCANIMAGEPATH;
     public String SCANTYPE;
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
     public String getSCANTYPE() {
         return SCANTYPE;
     }

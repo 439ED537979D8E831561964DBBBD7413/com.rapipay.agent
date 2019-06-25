@@ -20,6 +20,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.rapipay.android.agent.Database.RapipayDB;
+import com.rapipay.android.agent.Model.BankDetailsPozo;
 import com.rapipay.android.agent.Model.PMTBenefPozo;
 import com.rapipay.android.agent.Model.SettlementPozo;
 import com.rapipay.android.agent.R;
@@ -61,8 +62,8 @@ public class SettlementBankFragment extends BaseFragment implements WalletReques
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         rv = (View) inflater.inflate(R.layout.settlement_layout, container, false);
-        if (BaseCompactActivity.db != null && BaseCompactActivity.db.getDetails_Rapi())
-            list = BaseCompactActivity.db.getDetails();
+        if (BaseCompactActivity.dbRealm != null && BaseCompactActivity.dbRealm.getDetails_Rapi())
+            list = BaseCompactActivity.dbRealm.getDetails();
         pageType = getArguments().getString("message");
         initialize(rv);
         loadUrl();
@@ -84,10 +85,14 @@ public class SettlementBankFragment extends BaseFragment implements WalletReques
         btn_addBank.setOnClickListener(this);
         image = (AutofitTextView) rv.findViewById(R.id.images);
         image.setOnClickListener(this);
+        final ArrayList<String> list_bank = new ArrayList<>();
         bank_select.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ArrayList<String> list_bank = BaseCompactActivity.db.geBankDetails("");
+                ArrayList<BankDetailsPozo> stlist = BaseCompactActivity.dbRealm.geBankDetails("");
+                for(int i=0; i< stlist.size(); i++){
+                    list_bank.add(stlist.get(i).getBankName());
+                }
                 customSpinner(bank_select, "Select Bank", list_bank, "");
             }
         });
@@ -108,7 +113,7 @@ public class SettlementBankFragment extends BaseFragment implements WalletReques
         try {
             transactionID = ImageUtils.miliSeconds();
             String condition = "where " + RapipayDB.COLOMN__BANK_NAME + "='" + bank_select.getText().toString() + "'";
-            ifsc_code = BaseCompactActivity.db.geBankIFSC(condition).get(0);
+            ifsc_code = BaseCompactActivity.dbRealm.geBankIFSC(condition).get(0);
             jsonObject.put("serviceType", "Verify_Account");
             jsonObject.put("requestType", "BC_CHANNEL");
             jsonObject.put("typeMobileWeb", "mobile");
@@ -178,7 +183,6 @@ public class SettlementBankFragment extends BaseFragment implements WalletReques
             if (object.has("apiCommonResposne")) {
                 JSONObject object1 = object.getJSONObject("apiCommonResposne");
                 String balance = object1.getString("runningBalance");
-//                heading.setText("BC Fund Transfer (Balance : Rs." + format(balance) + ")");
             }
             if (object.getString("responseCode").equalsIgnoreCase("200")) {
                 if (object.getString("serviceType").equalsIgnoreCase("GET_SERVICE_FEE")) {
@@ -198,13 +202,17 @@ public class SettlementBankFragment extends BaseFragment implements WalletReques
                 } else if (object.getString("serviceType").equalsIgnoreCase("GET_AGENT_BANK_DETAILS")) {
                     if (hitFrom.equalsIgnoreCase("GETBANKLIST")) {
                         if (object.has("objAgentBankDetailsList"))
+                            if (object.isNull("objAgentBankDetailsList") && object.getJSONArray("objAgentBankDetailsList").length() == 0)
+                                customDialog_Common("No Record Found");
+                            else
                             insertLastTransDetails(object.getJSONArray("objAgentBankDetailsList"));
                     }
                 } else if (object.getString("serviceType").equalsIgnoreCase("DEACTIVATE_AGENT_BANK_DETAILS")) {
                     accountAdded = false;
                     customDialog_Common("KYCLAYOUTS", null, null, "Account Deactivation", "", object.getString("responseMessage"), SettlementBankFragment.this);
                 }
-            }
+            }else
+                responseMSg(object);
         } catch (Exception e) {
             e.printStackTrace();
         }

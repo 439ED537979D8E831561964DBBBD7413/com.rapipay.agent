@@ -31,11 +31,12 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.rapipay.android.agent.Database.RapipayDB;
+import com.rapipay.android.agent.Model.BankDetailsPozo;
+import com.rapipay.android.agent.Model.CreaditPaymentModePozo;
 import com.rapipay.android.agent.Model.PaymentModePozo;
 import com.rapipay.android.agent.Model.RapiPayPozo;
 import com.rapipay.android.agent.R;
-import com.rapipay.android.agent.adapter.PaymentAdapter;
+import com.rapipay.android.agent.adapter.CreaditPaymentAdapter;
 import com.rapipay.android.agent.interfaces.CustomInterface;
 import com.rapipay.android.agent.interfaces.RequestHandler;
 import com.rapipay.android.agent.utils.AsyncPostMethod;
@@ -51,6 +52,8 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashSet;
+import java.util.Set;
 
 import me.grantland.widget.AutofitTextView;
 
@@ -58,7 +61,6 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
     final private static int PERMISSIONS_REQUEST_READ_PHONE_STATE = 0;
     Spinner select_mode;
     TextView bank_select;
-    ArrayList<PaymentModePozo> list_payment;
     TextView input_account, input_remark, input_transid, input_amount, input_code;
     AutofitTextView date1_text, image;
     private static final int CAMERA_REQUEST = 1888;
@@ -70,14 +72,15 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
     AppCompatButton btn_fund;
     private int selectedDate, selectedMonth, selectedYear;
     String months = null, dayss = null;
+    ArrayList<CreaditPaymentModePozo> cr_list_payment;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         rv = (View) inflater.inflate(R.layout.credit_request_layout, container, false);
         initialize(rv);
-        if (BaseCompactActivity.db != null && BaseCompactActivity.db.getDetails_Rapi())
-            list = BaseCompactActivity.db.getDetails();
+        if (BaseCompactActivity.dbRealm != null && BaseCompactActivity.dbRealm.getDetails_Rapi())
+            list = BaseCompactActivity.dbRealm.getDetails();
         else
             dbNull(CreditRequestFragment.this);
         return rv;
@@ -101,19 +104,27 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
         bank_select.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String condition = "where " + RapipayDB.COLOMN_CREDITBANK + "='Y'";
-                ArrayList<String> list_bank = BaseCompactActivity.db.geBankDetails(condition);
-                customSpinner(bank_select, "Select Bank", list_bank, "");
+                ArrayList<String> list_bank= new ArrayList<>();
+                String condition = "Y";
+                ArrayList<BankDetailsPozo> stlist = BaseCompactActivity.dbRealm.geBankDetails(condition);
+                for(int i=0; i< stlist.size(); i++){
+                    list_bank.add(stlist.get(i).getBankName());
+                }
+                customSpinner(bank_select, "Select Bank", list_bank, null);
             }
         });
-        list_payment = BaseCompactActivity.db.getPaymenttDetails();
-        if (list_payment.size() != 0)
-            select_mode.setAdapter(new PaymentAdapter(getActivity(), list_payment));
+        cr_list_payment = BaseCompactActivity.dbRealm.getPaymenttDetails();
+//        Set<CreaditPaymentModePozo> s= new HashSet<CreaditPaymentModePozo>();
+//        s.addAll(cr_list_payment);
+//        cr_list_payment.clear();
+//        cr_list_payment.addAll(s);
+        if (cr_list_payment.size() != 0)
+            select_mode.setAdapter(new CreaditPaymentAdapter(getActivity(), cr_list_payment));
         select_mode.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (position != 0)
-                    paymode = list_payment.get(position).getPaymentMode();
+                    paymode = cr_list_payment.get(position).getPaymentMode();
                 else
                     paymode = "";
             }
@@ -143,7 +154,8 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
             @Override
             public void afterTextChanged(Editable s) {
                 if (s.length()!=0 && s.length()<10) {
-                    input_text.setText(EnglishNumberToWords.convert(Integer.parseInt(s.toString())));
+                    input_text.setText("");
+                    input_text.setText(EnglishNumberToWords.convert(Integer.parseInt(s.toString()))+" rupee");
                     input_text.setVisibility(View.VISIBLE);
                 }else
                     input_text.setVisibility(View.GONE);
@@ -158,7 +170,8 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
                 if (object.getString("serviceType").equalsIgnoreCase("CREDIT_FUND_REQUEST")) {
                     customDialog_Ben(object.getString("responseMessage"), "CREDIT FUND REQUEST");
                 }
-            }
+            }else
+                responseMSg(object);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -177,7 +190,6 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
 
     }
 
-//    Dialog alertDialog;
 
     private void customDialog_Ben(String msg, String title) {
         final Dialog dialog = new Dialog(getActivity());
@@ -196,12 +208,8 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
         btn_ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (btnstatus == false) {
-                    btnstatus = true;
                     clear();
                     dialog.dismiss();
-                }
-                handlercontrol();
             }
         });
         btn_cancel.setOnClickListener(new View.OnClickListener() {
@@ -229,7 +237,7 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
         paymode = "";
         image.setError(null);
         date1_text.setError(null);
-        select_mode.setAdapter(new PaymentAdapter(getActivity(), list_payment));
+        select_mode.setAdapter(new CreaditPaymentAdapter(getActivity(), cr_list_payment));
     }
 
     public void loadIMEI() {
@@ -318,10 +326,6 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
                         bank_select.setError("Please enter valid data");
                     else if (paymode.isEmpty())
                         Toast.makeText(getActivity(), "Please select payment mode.", Toast.LENGTH_SHORT).show();
-//                else if (BaseCompactActivity.IS_CRIMAGE_REQUIRED == null && image.getText().toString().isEmpty()) {
-//                    image.setError("Please Select Image");
-//                    image.requestFocus();
-//                }
                     else if (BaseCompactActivity.IS_CRIMAGE_REQUIRED != null && BaseCompactActivity.IS_CRIMAGE_REQUIRED.equalsIgnoreCase("Y") && image.getText().toString().isEmpty()) {
                         image.setError("Please Select Image");
                         image.requestFocus();
@@ -355,6 +359,7 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
             selectedDate = calendar.get(Calendar.DAY_OF_MONTH);
             selectedMonth = calendar.get(Calendar.MONTH);
             selectedYear = calendar.get(Calendar.YEAR);
+            datePicker.setMaxDate(System.currentTimeMillis());
             datePicker.init(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH), new DatePicker.OnDateChangedListener() {
 
                 @Override

@@ -26,6 +26,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.rapipay.android.agent.Model.RapiPayPozo;
+import com.rapipay.android.agent.Model.StatePozo;
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.adapter.CustomSpinnerAdapter;
 import com.rapipay.android.agent.interfaces.CustomInterface;
@@ -66,8 +67,8 @@ public class RegisterUserFragment extends BaseFragment implements RequestHandler
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View rv = (View) inflater.inflate(R.layout.register_kyc_frag, container, false);
-        if (BaseCompactActivity.db != null && BaseCompactActivity.db.getDetails_Rapi())
-            list = BaseCompactActivity.db.getDetails();
+        if (BaseCompactActivity.dbRealm != null && BaseCompactActivity.dbRealm.getDetails_Rapi())
+            list = BaseCompactActivity.dbRealm.getDetails();
         TYPE = getActivity().getIntent().getStringExtra("type");
         mobileNo = getActivity().getIntent().getStringExtra("mobileNo");
         loadIMEI();
@@ -87,8 +88,12 @@ public class RegisterUserFragment extends BaseFragment implements RequestHandler
         select_state.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ArrayList<String> list_state = BaseCompactActivity.db.getState_Details();
-                customSpinner(select_state, "Select State", list_state);
+                ArrayList<String> list_state1 = new ArrayList<>();
+                ArrayList<StatePozo> list_state = BaseCompactActivity.dbRealm.getState_Details();
+                for(int i=0;i<list_state.size();i++){
+                    list_state1.add(list_state.get(i).getHeaderValue());
+                }
+                customSpinner(select_state, "Select State", list_state1);
             }
         });
         if (!mobileNo.isEmpty())
@@ -256,7 +261,8 @@ public class RegisterUserFragment extends BaseFragment implements RequestHandler
                     startActivity(intent);
                     clear();
                 }
-            }
+            }else
+                responseMSg(object);
         } catch (Exception e) {
             e.printStackTrace();
         }

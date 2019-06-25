@@ -35,8 +35,8 @@ public class SpashScreenActivity extends BaseCompactActivity implements CustomIn
     private void initialization(){
         imageView = (ImageView)findViewById(R.id.imageView);
         String condition = "where " + RapipayDB.IMAGE_NAME + "='loginLogo.jpg'";
-        if(db!=null) {
-            ArrayList<ImagePozo> imagePozoArrayList = db.getImageDetails(condition);
+        if(dbRealm!=null) {
+            ArrayList<ImagePozo> imagePozoArrayList = dbRealm.getImageDetails(condition);
             if (imagePozoArrayList.size() != 0) {
                 byteConvert(imageView, imagePozoArrayList.get(0).getImagePath());
             } else {

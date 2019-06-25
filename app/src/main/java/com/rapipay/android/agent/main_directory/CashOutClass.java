@@ -395,7 +395,8 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
             @Override
             public void afterTextChanged(Editable s) {
                 if (s.length()!=0 && s.length()<10) {
-                    input_text.setText(EnglishNumberToWords.convert(Integer.parseInt(s.toString())));
+                    input_text.setText("");
+                    input_text.setText(EnglishNumberToWords.convert(Integer.parseInt(s.toString()))+" rupee");
                     input_text.setVisibility(View.VISIBLE);
                 }else
                     input_text.setVisibility(View.GONE);
@@ -570,6 +571,8 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                         generateReceipt(array);
 
                 }
+            }else {
+                responseMSg(object);
             }
         } catch (Exception e) {
             e.printStackTrace();

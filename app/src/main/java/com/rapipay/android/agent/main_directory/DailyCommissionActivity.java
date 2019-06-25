@@ -113,6 +113,8 @@ public class DailyCommissionActivity extends BaseCompactActivity implements Requ
                         }
                     }
                 }
+            }else {
+                responseMSg(object);
             }
         } catch (Exception e) {
             e.printStackTrace();

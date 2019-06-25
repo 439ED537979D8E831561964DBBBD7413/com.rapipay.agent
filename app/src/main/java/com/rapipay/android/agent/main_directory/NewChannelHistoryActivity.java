@@ -82,18 +82,11 @@ public class NewChannelHistoryActivity extends BaseCompactActivity implements Vi
 
             @Override
             public void afterTextChanged(Editable s) {
-                if (s.toString().length() != 0)
+                if (s.toString().length() != -1)
                     adapter.filter(s.toString());
 
             }
         });
-//        trans_details.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                NewTransactionPozo pozo = transactionPozoArrayList.get(position);
-//                new AsyncPostMethod(WebConfig.WALLETRECEIPTURL, receipt_request(pozo).toString(), headerData, NewChannelHistoryActivity.this, getString(R.string.responseTimeOut), "RECEIPTREQUEST").execute();
-//            }
-//        });
         findViewById(R.id.todate).setOnClickListener(toDateClicked);
         findViewById(R.id.date1).setOnClickListener(toDateClicked);
         findViewById(R.id.fromdate).setOnClickListener(fromDateClicked);
@@ -122,26 +115,6 @@ public class NewChannelHistoryActivity extends BaseCompactActivity implements Vi
             }
         });
     }
-//
-//    public JSONObject receipt_request(NewTransactionPozo pozo) {
-//        JSONObject jsonObject = new JSONObject();
-//        try {
-//            jsonObject.put("serviceType", "Get_Txn_Recipt");
-//            jsonObject.put("requestType", "DMT_CHANNEL");
-//            jsonObject.put("typeMobileWeb", "mobile");
-//            jsonObject.put("txnRef", ImageUtils.miliSeconds());
-//            jsonObject.put("nodeAgentId", list.get(0).getMobilno());
-//            jsonObject.put("agentId", list.get(0).getMobilno());
-//            jsonObject.put("orgTxnRef", pozo.getOrgTxnid());
-//            jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
-//            jsonObject.put("routeType", pozo.getTransferType());
-//            jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        return jsonObject;
-//    }
 
     @Override
     public void onClick(View v) {
@@ -159,10 +132,13 @@ public class NewChannelHistoryActivity extends BaseCompactActivity implements Vi
                     } else if (date1_text.getText().toString().isEmpty()) {
                         date1_text.setError("Please enter mandatory field");
                         Toast.makeText(this, "Please enter mandatory field", Toast.LENGTH_SHORT).show();
-                    } else if (printDifference(mainDate(date2_text.getText().toString()), mainDate(date1_text.getText().toString())))
+                    } else if (printDifference(mainDate(date2_text.getText().toString()), mainDate(date1_text.getText().toString()))) {
+                        trans_details.setVisibility(View.VISIBLE);
                         new AsyncPostMethod(WebConfig.CommonReport, channel_request().toString(), headerData, NewChannelHistoryActivity.this, getString(R.string.responseTimeOut), "TRANSACTIONHISTORY").execute();
-                    else
-                        Toast.makeText(NewChannelHistoryActivity.this, "Please select correct date", Toast.LENGTH_SHORT).show();
+                    } else {
+                        customDialog_Common("Statement can only view from one month");
+                        trans_details.setVisibility(View.GONE);
+                    }
                 }
                 handlercontrol();
                 break;
@@ -207,6 +183,8 @@ public class NewChannelHistoryActivity extends BaseCompactActivity implements Vi
                             customDialog_Common("KYCLAYOUTS", null, null, "Transaction Receipt", "", "Cannot generate receipt now please try later!", NewChannelHistoryActivity.this);
                         }
                 }
+            } else {
+                responseMSg(object);
             }
         } catch (Exception e) {
             e.printStackTrace();

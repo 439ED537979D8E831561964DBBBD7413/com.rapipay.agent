@@ -45,14 +45,27 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.rapipay.android.agent.Database.RapipayDB;
+import com.rapipay.android.agent.Model.BankDetailsPozo;
 import com.rapipay.android.agent.Model.BeneficiaryDetailsPozo;
+import com.rapipay.android.agent.Model.CreaditPaymentModePozo;
 import com.rapipay.android.agent.Model.HeaderePozo;
 import com.rapipay.android.agent.Model.ImagePozo;
+import com.rapipay.android.agent.Model.MasterPozo;
+import com.rapipay.android.agent.Model.NewKYCPozo;
+import com.rapipay.android.agent.Model.NewKycAddress;
+import com.rapipay.android.agent.Model.NewKycBusiness;
+import com.rapipay.android.agent.Model.NewKycPersion;
+import com.rapipay.android.agent.Model.NewKycVerification;
 import com.rapipay.android.agent.Model.PMTBenefPozo;
+import com.rapipay.android.agent.Model.PaymentModePozo;
 import com.rapipay.android.agent.Model.PermissionPozo;
 import com.rapipay.android.agent.Model.RapiPayPozo;
+import com.rapipay.android.agent.Model.StatePozo;
 import com.rapipay.android.agent.Model.SubAgentList;
+import com.rapipay.android.agent.Model.TbNepalPaymentModePozo;
+import com.rapipay.android.agent.Model.TbOperatorPozo;
+import com.rapipay.android.agent.Model.TbRechargePozo;
+import com.rapipay.android.agent.Model.TbTransitionPojo;
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.adapter.CustomSpinnerAdapter;
 import com.rapipay.android.agent.adapter.PermissionCheckAdapter;
@@ -63,7 +76,6 @@ import com.rapipay.android.agent.view.EnglishNumberToWords;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.jsoup.Connection;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -77,12 +89,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
+import io.realm.Realm;
+import io.realm.RealmResults;
 import me.grantland.widget.AutofitTextView;
 
 public class BaseFragment extends Fragment {
     protected LocalStorage localStorage;
     protected Dialog dialog, dialognew, dialognew1;
-    //    protected AlertDialog alertDialog, newdialog;
     CustomInterface anInterface;
     protected boolean scan = false;
     protected String TYPE, customerType;
@@ -194,16 +207,6 @@ public class BaseFragment extends Fragment {
                 });
             }
         } else if (requestCode == PERMISSIONS_REQUEST_CAMERA_STATE) {
-//            if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//                doCameraPermissionGrantedStuffs();
-//            } else {
-//                alertPerm(getString(R.string.permissions_not_granted_read_phone_state), new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        loadCamera();
-//                    }
-//                });
-//            }
         }
     }
 
@@ -225,28 +228,53 @@ public class BaseFragment extends Fragment {
         }
     }
 
-    protected void deleteTables(String type) {
+    protected void deleteTables(final String type) {
         localStorage.setActivityState(LocalStorage.ROUTESTATE, "0");
         localStorage.setActivityState(LocalStorage.EMI, "0");
         localStorage.setActivityState(LocalStorage.LOGOUT, "0");
         localStorage.setActivityState(LocalStorage.IMAGEPATH, "0");
-        SQLiteDatabase dba = BaseCompactActivity.db.getWritableDatabase();
-        dba.execSQL("delete from " + RapipayDB.TABLE_BANK);
-        dba.execSQL("delete from " + RapipayDB.TABLE_PAYMENT);
-        dba.execSQL("delete from " + RapipayDB.TABLE_STATE);
-        dba.execSQL("delete from " + RapipayDB.TABLE_OPERATOR);
-        dba.execSQL("delete from " + RapipayDB.TABLE_FOOTER);
-        dba.execSQL("delete from " + RapipayDB.TABLE_TRANSFERLIST);
-        dba.execSQL("delete from " + RapipayDB.TABLE_PAYERPAYEE);
-        if (!type.equalsIgnoreCase("")) {
-            dba.execSQL("delete from " + RapipayDB.TABLE_NAME);
-            dba.execSQL("delete from " + RapipayDB.TABLE_MASTER);
-            dba.execSQL("delete from " + RapipayDB.TABLE_KYC_PERSONAL);
-            dba.execSQL("delete from " + RapipayDB.TABLE_KYC_ADDRESS);
-            dba.execSQL("delete from " + RapipayDB.TABLE_KYC_BUISNESS);
-            dba.execSQL("delete from " + RapipayDB.TABLE_KYC_VERIFICATION);
-            dba.execSQL("delete from " + RapipayDB.TABLE_IMAGES);
-        }
+        final RealmResults<RapiPayPozo> rapiPayPozoRealmResults = BaseCompactActivity.realm.where(RapiPayPozo.class).findAll();
+        final RealmResults<MasterPozo> masterPozoRealmResults = BaseCompactActivity.realm.where(MasterPozo.class).findAll();
+        final RealmResults<ImagePozo> imagePozoRealmResults = BaseCompactActivity.realm.where(ImagePozo.class).findAll();
+        final RealmResults<PaymentModePozo> paymentModePozoRealmResults = BaseCompactActivity.realm.where(PaymentModePozo.class).findAll();
+        final RealmResults<StatePozo> statePozoRealmResults = BaseCompactActivity.realm.where(StatePozo.class).findAll();
+        final RealmResults<TbOperatorPozo> tbOperatorPozoRealmResults = BaseCompactActivity.realm.where(TbOperatorPozo.class).findAll();
+        final RealmResults<NewKYCPozo> newKYCPozoRealmResults = BaseCompactActivity.realm.where(NewKYCPozo.class).findAll();
+        final RealmResults<BankDetailsPozo> bankDetailsPozoRealmResults = BaseCompactActivity.realm.where(BankDetailsPozo.class).findAll();
+        final RealmResults<HeaderePozo> headerePozoRealmResults = BaseCompactActivity.realm.where(HeaderePozo.class).findAll();
+        final RealmResults<CreaditPaymentModePozo> creaditPaymentModePozos = BaseCompactActivity.realm.where(CreaditPaymentModePozo.class).findAll();
+        final RealmResults<NewKycAddress> newKycAddresses = BaseCompactActivity.realm.where(NewKycAddress.class).findAll();
+        final RealmResults<NewKycBusiness> newKycBusinesses = BaseCompactActivity.realm.where(NewKycBusiness.class).findAll();
+        final RealmResults<NewKycPersion> newKycPersions = BaseCompactActivity.realm.where(NewKycPersion.class).findAll();
+        final RealmResults<NewKycVerification> newKycVerifications = BaseCompactActivity.realm.where(NewKycVerification.class).findAll();
+        final RealmResults<TbRechargePozo> tbRechargePozos = BaseCompactActivity.realm.where(TbRechargePozo.class).findAll();
+        final RealmResults<TbNepalPaymentModePozo> tbNepalPaymentModePozos = BaseCompactActivity.realm.where(TbNepalPaymentModePozo.class).findAll();
+        final RealmResults<TbTransitionPojo> tbTransitionPojos = BaseCompactActivity.realm.where(TbTransitionPojo.class).findAll();
+        //    SQLiteDatabase dba = db.getWritableDatabase();
+        BaseCompactActivity.realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                paymentModePozoRealmResults.deleteAllFromRealm();
+                statePozoRealmResults.deleteAllFromRealm();
+                tbOperatorPozoRealmResults.deleteAllFromRealm();
+                bankDetailsPozoRealmResults.deleteAllFromRealm();
+                headerePozoRealmResults.deleteAllFromRealm();
+                creaditPaymentModePozos.deleteAllFromRealm();
+                newKycAddresses.deleteAllFromRealm();
+                newKycBusinesses.deleteAllFromRealm();
+                newKycPersions.deleteAllFromRealm();
+                newKycVerifications.deleteAllFromRealm();
+                tbRechargePozos.deleteAllFromRealm();
+                tbNepalPaymentModePozos.deleteAllFromRealm();
+                tbTransitionPojos.deleteAllFromRealm();
+                if (!type.equalsIgnoreCase("")) {
+                    rapiPayPozoRealmResults.deleteAllFromRealm();
+                    masterPozoRealmResults.deleteAllFromRealm();
+                    imagePozoRealmResults.deleteAllFromRealm();
+                    newKYCPozoRealmResults.deleteAllFromRealm();
+                }
+            }
+        });
     }
 
     protected void jumpPage() {
@@ -356,8 +384,12 @@ public class BaseFragment extends Fragment {
                 bank_select.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        ArrayList<String> list_state = BaseCompactActivity.db.getState_Details();
-                        customSpinner(bank_select, "Select State*", list_state, "");
+                        ArrayList<String> list_state1 = new ArrayList<>();
+                        ArrayList<StatePozo> list_state = BaseCompactActivity.dbRealm.getState_Details();
+                        for (int i = 0; i < list_state.size(); i++) {
+                            list_state1.add(list_state.get(i).getHeaderValue());
+                        }
+                        customSpinner(bank_select, "Select State*", list_state1, "");
                     }
                 });
                 dialog.setContentView(alertLayout);
@@ -546,40 +578,13 @@ public class BaseFragment extends Fragment {
             @Override
             public void afterTextChanged(Editable s) {
                 if (s.length()!=0 && s.length()<10) {
-                    input_text.setText(EnglishNumberToWords.convert(Integer.parseInt(s.toString())));
+                    input_text.setText("");
+                    input_text.setText(EnglishNumberToWords.convert(Integer.parseInt(s.toString()))+" rupee");
                     input_text.setVisibility(View.VISIBLE);
                 }else
                     input_text.setVisibility(View.GONE);
             }
         });
-//        list_view_with_checkbox.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> adapterView, View view, int itemIndex, long l) {
-//                // Get user selected item.
-//                Object itemObject = adapterView.getAdapter().getItem(itemIndex);
-//
-//                // Translate the selected item to DTO object.
-//                PermissionPozo itemDto = (PermissionPozo) itemObject;
-//
-//                // Get the checkbox.
-//                CheckBox itemCheckbox = (CheckBox) view.findViewById(R.id.list_view_item_checkbox);
-//
-//                // Reverse the checkbox and clicked item check state.
-//                if (itemCheckbox.isChecked()) {
-//                    medium.get(itemIndex).setChecked(false);
-//                    itemCheckbox.setChecked(false);
-//                    itemDto.setChecked(false);
-//                } else {
-//                    medium.get(itemIndex).setChecked(true);
-//                    itemCheckbox.setChecked(true);
-//                    itemDto.setChecked(true);
-//
-//                }
-//
-//                //Toast.makeText(getApplicationContext(), "select item text : " + itemDto.getItemText(), Toast.LENGTH_SHORT).show();
-//            }
-//        });
-
         try {
             JSONArray array = object.getJSONArray("serviceList");
             for (int i = 0; i < array.length(); i++) {
@@ -663,7 +668,6 @@ public class BaseFragment extends Fragment {
             listView.setVisibility(View.VISIBLE);
             PermissionCheckAdapter listViewDataAdapter = new PermissionCheckAdapter(getActivity(), medium);
             listViewDataAdapter.notifyDataSetChanged();
-            // Set data adapter to list view.
             listView.setAdapter(listViewDataAdapter);
         }
 
@@ -754,8 +758,9 @@ public class BaseFragment extends Fragment {
                 viewText.setText(list_spinner.get(position));
                 viewText.setError(null);
                 if (con_ifsc != null) {
-                    String condition = "where " + RapipayDB.COLOMN__BANK_NAME + "='" + viewText.getText().toString() + "'";
-                    String ifsccode = BaseCompactActivity.db.geBankIFSC(condition).get(0);
+                   // String condition = "where " + RapipayDB.COLOMN__BANK_NAME + "='" + viewText.getText().toString() + "'";
+                    String condition = viewText.getText().toString();
+                    String ifsccode = BaseCompactActivity.dbRealm.geBankIFSC(condition).get(0);
                     if (ifsccode.equalsIgnoreCase("NA") & typeCheck.equalsIgnoreCase("BC")) {
                         con_ifsc.setVisibility(View.VISIBLE);
                         isNEFT = true;
@@ -765,7 +770,7 @@ public class BaseFragment extends Fragment {
                         isNEFT = false;
                     } else if (!ifsccode.equalsIgnoreCase("NA")) {
                         con_ifsc.setVisibility(View.VISIBLE);
-                        con_ifsc.setText(BaseCompactActivity.db.geBankIFSC(condition).get(0));
+                        con_ifsc.setText(BaseCompactActivity.dbRealm.geBankIFSC(condition).get(0));
                     }
                 }
                 dialognew.dismiss();
@@ -862,14 +867,7 @@ public class BaseFragment extends Fragment {
     }
 
     public boolean printDifference(Date startDate, Date endDate) {
-        //milliseconds
         try {
-//            Calendar c = Calendar.getInstance();
-//            System.out.println("Current time => " + c.getTime());
-//
-//            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-//            Date endDate = mainDate(df.format(c.getTime()));
-
             long different = endDate.getTime() - startDate.getTime();
 
             System.out.println("startDate : " + startDate);
@@ -931,9 +929,10 @@ public class BaseFragment extends Fragment {
             btn_account.setText("NA");
         btn_sendname.setText(input);
         if (msg.equalsIgnoreCase("Confirm Money Transfer?")) {
-            String condition = "where " + RapipayDB.COLOMN_IFSC + "='" + pozo.getIfsc() + "'";
-            if (BaseCompactActivity.db.geBank(condition).size() != 0)
-                btn_bank.setText(BaseCompactActivity.db.geBank(condition).get(0));
+            //String condition = "where " + RapipayDB.COLOMN_IFSC + "='" + pozo.getIfsc() + "'";
+            String condition = pozo.getIfsc();
+            if (BaseCompactActivity.dbRealm.geBank(condition).size() != 0)
+                btn_bank.setText(BaseCompactActivity.dbRealm.geBank(condition).get(0));
             else
                 btn_bank.setVisibility(View.GONE);
         } else
@@ -969,8 +968,9 @@ public class BaseFragment extends Fragment {
             btn_account.setText(accountNo);
         btn_sendname.setText(input);
         if (ifsc_code != null) {
-            String condition = "where " + RapipayDB.COLOMN_IFSC + "='" + ifsc_code + "'";
-            btn_bank.setText(BaseCompactActivity.db.geBank(condition).get(0));
+           // String condition = "where " + RapipayDB.COLOMN_IFSC + "='" + ifsc_code + "'";
+            String condition = ifsc_code;
+            btn_bank.setText(BaseCompactActivity.dbRealm.geBank(condition).get(0));
         }
         if (name != null)
             btn_name.setText(name);
@@ -1018,7 +1018,8 @@ public class BaseFragment extends Fragment {
             @Override
             public void afterTextChanged(Editable s) {
                 if (s.length()!=0 && s.length()<10) {
-                    input_text.setText(EnglishNumberToWords.convert(Integer.parseInt(s.toString())));
+                    input_text.setText("");
+                    input_text.setText(EnglishNumberToWords.convert(Integer.parseInt(s.toString()))+" rupee");
                     input_text.setVisibility(View.VISIBLE);
                 }else
                     input_text.setVisibility(View.GONE);
@@ -1100,8 +1101,9 @@ public class BaseFragment extends Fragment {
         View alertLayout = inflater.inflate(R.layout.receipt_layout_new, null);
         alertLayout.setKeepScreenOn(true);
         ImageView receipt_logo = (ImageView) alertLayout.findViewById(R.id.receipt_logo);
-        String condition = "where " + RapipayDB.IMAGE_NAME + "='invoiceLogo.jpg'";
-        ArrayList<ImagePozo> imagePozoArrayList = BaseCompactActivity.db.getImageDetails(condition);
+       // String condition = "where " + RapipayDB.IMAGE_NAME + "='invoiceLogo.jpg'";
+        String condition = "invoiceLogo.jpg";
+        ArrayList<ImagePozo> imagePozoArrayList = BaseCompactActivity.dbRealm.getImageDetails(condition);
         if (imagePozoArrayList.size() != 0) {
             byteConvert(receipt_logo, imagePozoArrayList.get(0).getImagePath());
         }
@@ -1275,8 +1277,9 @@ public class BaseFragment extends Fragment {
         View alertLayout = inflater.inflate(R.layout.pmt_receipt_layout, null);
         alertLayout.setKeepScreenOn(true);
         ImageView receipt_logo = (ImageView) alertLayout.findViewById(R.id.receipt_logo);
-        String condition = "where " + RapipayDB.IMAGE_NAME + "='invoiceLogo.jpg'";
-        ArrayList<ImagePozo> imagePozoArrayList = BaseCompactActivity.db.getImageDetails(condition);
+      //  String condition = "where " + RapipayDB.IMAGE_NAME + "='invoiceLogo.jpg'";
+        String condition = "invoiceLogo.jpg";
+        ArrayList<ImagePozo> imagePozoArrayList = BaseCompactActivity.dbRealm.getImageDetails(condition);
         if (imagePozoArrayList.size() != 0) {
             byteConvert(receipt_logo, imagePozoArrayList.get(0).getImagePath());
         }
@@ -1319,8 +1322,6 @@ public class BaseFragment extends Fragment {
                 listRight.addView(inflate);
             }
         }
-//        if (medium.size() == 1)
-//            mediums.setText(medium.get(0));
         if (bottom.size() != 0) {
             for (int i = 0; i < bottom.size(); i++) {
                 View inflate = inflater.inflate(R.layout.bottom_layout_pmt, null);
@@ -1398,31 +1399,14 @@ public class BaseFragment extends Fragment {
         Window window = dialog.getWindow();
         window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
     }
-
-    protected boolean date_Different(String fromdate, String toDate, int datedifferent) {
-        String fromDate = fromdate;
-        String ToDate = toDate;
-        String dateBeforeString;
-        String dateAfterString;
-        if (fromDate.contains("/") == true) {
-            dateBeforeString = fromDate.replace("/", "-");
-            dateAfterString = ToDate.replace("/", "-");
-        } else {
-            dateBeforeString = fromDate;
-            dateAfterString = ToDate;
+    protected void responseMSg(JSONObject object) {
+        try {
+            if (object.has("responseMessage"))
+                customDialog_Common(object.getString("responseMessage"));
+            else if (object.has("responseMsg"))
+                customDialog_Common(object.getString("responseMsg"));
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        LocalDate dateBefore = null;
-        LocalDate dateAfter = null;
-        long noOfDaysBetween = 0;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            dateBefore = LocalDate.parse(dateBeforeString);
-            dateAfter = LocalDate.parse(dateAfterString);
-            noOfDaysBetween = ChronoUnit.DAYS.between(dateBefore, dateAfter);
-        }
-//calculating number of days in between
-        if (datedifferent <= noOfDaysBetween)
-            return true;
-        else
-            return false;
     }
 }

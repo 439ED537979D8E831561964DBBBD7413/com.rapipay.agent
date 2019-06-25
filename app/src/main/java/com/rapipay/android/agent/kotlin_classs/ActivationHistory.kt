@@ -44,8 +44,8 @@ class ActivationHistory : BaseFragment(), RequestHandler, View.OnClickListener {
     var calendersss: LinearLayout? = null
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         var view = inflater.inflate(R.layout.enable_service_layout, container, false);
-        if (BaseCompactActivity.db != null && BaseCompactActivity.db.details_Rapi)
-            list = BaseCompactActivity.db.details
+        if (BaseCompactActivity.dbRealm != null && BaseCompactActivity.dbRealm.details_Rapi)
+            list = BaseCompactActivity.dbRealm.details
         init(view)
         loadUrl()
         return view;
@@ -270,6 +270,7 @@ class ActivationHistory : BaseFragment(), RequestHandler, View.OnClickListener {
                 } else {
                     calendersss?.visibility = View.GONE
                     belowlay?.visibility = View.VISIBLE
+                    responseMSg(`object`)
                 }
             } catch (e: Exception) {
                 e.printStackTrace()

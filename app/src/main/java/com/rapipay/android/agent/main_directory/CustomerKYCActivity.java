@@ -21,6 +21,10 @@ import android.widget.Toast;
 
 import com.rapipay.android.agent.Database.RapipayDB;
 import com.rapipay.android.agent.Model.NewKYCPozo;
+import com.rapipay.android.agent.Model.NewKycAddress;
+import com.rapipay.android.agent.Model.NewKycBusiness;
+import com.rapipay.android.agent.Model.NewKycPersion;
+import com.rapipay.android.agent.Model.NewKycVerification;
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.interfaces.RequestHandler;
 import com.rapipay.android.agent.utils.AsyncPostMethod;
@@ -47,8 +51,12 @@ public class CustomerKYCActivity extends BaseCompactActivity implements RequestH
     String[] items = new String[]{"Select Document Type", "Aadhar Card", "Voter Id Card", "Driving License", "Passport"};
     String spinner_value = "", TYPE, mobileNo, customerType;
     String type = "MANUAL";
-    private ArrayList<NewKYCPozo> newKYCList_Personal = null, newKYCList_Address = null, newKYCList_Buisness = null, newKYCList_Verify = null;
+    private ArrayList<NewKycPersion> newKYCList_Personal = null;
     private boolean scan = false;
+    ArrayList<String> stcondition;
+    private ArrayList<NewKycAddress> newKYCList_Address = null;
+    private ArrayList<NewKycBusiness> newKYCList_Buisness = null;
+    private ArrayList<NewKycVerification> newKYCList_Verify = null;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -363,8 +371,12 @@ public class CustomerKYCActivity extends BaseCompactActivity implements RequestH
             if (object.getString("responseCode").equalsIgnoreCase("200")) {
                 if (object.getString("serviceType").equalsIgnoreCase("VALIDATE_KYC_DETAILS")) {
                     if (object.getString("responseMessage").equalsIgnoreCase("success")) {
-                        String condition = "where " + RapipayDB.MOBILENO + "='" + mobileNo + "'" + " AND " + RapipayDB.DOCUMENTTYPE + "='" + spinner_value + "'" + " AND " + RapipayDB.DOCUMENTID + "='" + documentid.getText().toString() + "'";
-                        newKYCList_Personal = db.getKYCDetails_Personal(condition);
+                        //String condition = "where " + RapipayRealmdbRealm.MOBILENO + "='" + mobileNo + "'" + " AND " + RapipayRealmdbRealm.DOCUMENTTYPE + "='" + spinner_value + "'" + " AND " + RapipayRealmdbRealm.DOCUMENTID + "='" + documentid.getText().toString() + "'";
+                        stcondition = new ArrayList<>();
+                        stcondition.add(mobileNo);
+                        stcondition.add(spinner_value);
+                        stcondition.add(documentid.getText().toString());
+                        newKYCList_Personal = dbRealm.getKYCDetails_Personal(stcondition);
                         if (newKYCList_Personal != null && newKYCList_Personal.size() != 0) {
                             findViewById(R.id.prsnl_btn).setBackgroundColor(getResources().getColor(R.color.green));
                             documentid.setText(newKYCList_Personal.get(0).getDOCUMENTID());
@@ -378,15 +390,15 @@ public class CustomerKYCActivity extends BaseCompactActivity implements RequestH
                             sub_btn.setVisibility(View.GONE);
                             scan_data.setVisibility(View.GONE);
                             kyc_layout_bottom.setVisibility(View.VISIBLE);
-                            newKYCList_Address = db.getKYCDetails_Address(condition);
+                            newKYCList_Address = dbRealm.getKYCDetails_Address(stcondition);
                             if (newKYCList_Address.size() != 0) {
                                 findViewById(R.id.adrs_btn).setBackgroundColor(getResources().getColor(R.color.green));
                                 findViewById(R.id.address_layout).setVisibility(View.VISIBLE);
-                                newKYCList_Buisness = db.getKYCDetails_BUISNESS(condition);
+                                newKYCList_Buisness = dbRealm.getKYCDetails_BUISNESS(stcondition);
                                 if (newKYCList_Buisness.size() != 0) {
                                     findViewById(R.id.business_btn).setBackgroundColor(getResources().getColor(R.color.green));
                                     findViewById(R.id.buisness_layout).setVisibility(View.VISIBLE);
-                                    newKYCList_Verify = db.getKYCDetails_VERIFY(condition);
+                                    newKYCList_Verify = dbRealm.getKYCDetails_VERIFY(stcondition);
                                     if (newKYCList_Verify.size() != 0) {
                                         findViewById(R.id.verification_btn).setBackgroundColor(getResources().getColor(R.color.green));
                                         findViewById(R.id.verification_button).setVisibility(View.VISIBLE);
@@ -416,15 +428,20 @@ public class CustomerKYCActivity extends BaseCompactActivity implements RequestH
                         hideKeyboard(CustomerKYCActivity.this);
                     }
                 }
+            }else {
+                responseMSg(object);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
     private void resumeCall() {
-        String condition = "where " + RapipayDB.MOBILENO + "='" + mobileNo + "'" + " AND " + RapipayDB.DOCUMENTTYPE + "='" + spinner_value + "'" + " AND " + RapipayDB.DOCUMENTID + "='" + documentid.getText().toString() + "'";
-        newKYCList_Personal = db.getKYCDetails_Personal(condition);
+        //String condition = "where " + RapipayRealmdbRealm.MOBILENO + "='" + mobileNo + "'" + " AND " + RapipayRealmdbRealm.DOCUMENTTYPE + "='" + spinner_value + "'" + " AND " + RapipayRealmdbRealm.DOCUMENTID + "='" + documentid.getText().toString() + "'";
+        stcondition = new ArrayList<>();
+        stcondition.add(mobileNo);
+        stcondition.add(spinner_value);
+        stcondition.add(documentid.getText().toString());
+        newKYCList_Personal = dbRealm.getKYCDetails_Personal(stcondition);
         if (newKYCList_Personal != null && newKYCList_Personal.size() != 0) {
             findViewById(R.id.prsnl_btn).setBackgroundColor(getResources().getColor(R.color.green));
             documentid.setText(newKYCList_Personal.get(0).getDOCUMENTID());
@@ -438,15 +455,15 @@ public class CustomerKYCActivity extends BaseCompactActivity implements RequestH
             sub_btn.setVisibility(View.GONE);
             kyc_layout_bottom.setVisibility(View.VISIBLE);
             scan_data.setVisibility(View.GONE);
-            newKYCList_Address = db.getKYCDetails_Address(condition);
+            newKYCList_Address = dbRealm.getKYCDetails_Address(stcondition);
             if (newKYCList_Address.size() != 0) {
                 findViewById(R.id.adrs_btn).setBackgroundColor(getResources().getColor(R.color.green));
                 findViewById(R.id.address_layout).setVisibility(View.VISIBLE);
-                newKYCList_Buisness = db.getKYCDetails_BUISNESS(condition);
+                newKYCList_Buisness = dbRealm.getKYCDetails_BUISNESS(stcondition);
                 if (newKYCList_Buisness.size() != 0) {
                     findViewById(R.id.business_btn).setBackgroundColor(getResources().getColor(R.color.green));
                     findViewById(R.id.buisness_layout).setVisibility(View.VISIBLE);
-                    newKYCList_Verify = db.getKYCDetails_VERIFY(condition);
+                    newKYCList_Verify = dbRealm.getKYCDetails_VERIFY(stcondition);
                     if (newKYCList_Verify.size() != 0) {
                         findViewById(R.id.verification_btn).setBackgroundColor(getResources().getColor(R.color.green));
                         findViewById(R.id.verification_button).setVisibility(View.VISIBLE);
@@ -457,19 +474,22 @@ public class CustomerKYCActivity extends BaseCompactActivity implements RequestH
             } else
                 findViewById(R.id.address_layout).setVisibility(View.VISIBLE);
         } else {
-            scan_data.setVisibility(View.GONE);
-            sub_btn.setVisibility(View.VISIBLE);
-            kyc_layout_bottom.setVisibility(View.GONE);
-            findViewById(R.id.adrs_btn).setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
-            findViewById(R.id.business_btn).setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
-            findViewById(R.id.verification_btn).setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
-            findViewById(R.id.prsnl_btn).setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
-            findViewById(R.id.address_layout).setVisibility(View.GONE);
-            findViewById(R.id.buisness_layout).setVisibility(View.GONE);
-            findViewById(R.id.verification_button).setVisibility(View.GONE);
+            customkycvisible();
         }
     }
 
+    public void customkycvisible() {
+        scan_data.setVisibility(View.GONE);
+        sub_btn.setVisibility(View.VISIBLE);
+        kyc_layout_bottom.setVisibility(View.GONE);
+        findViewById(R.id.adrs_btn).setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
+        findViewById(R.id.business_btn).setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
+        findViewById(R.id.verification_btn).setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
+        findViewById(R.id.prsnl_btn).setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
+        findViewById(R.id.address_layout).setVisibility(View.GONE);
+        findViewById(R.id.buisness_layout).setVisibility(View.GONE);
+        findViewById(R.id.verification_button).setVisibility(View.GONE);
+    }
     @Override
     public void chechStat(String object) {
 

@@ -145,46 +145,12 @@ public class DashBoardFragments extends BaseFragment {
         LinearLayoutManager layoutManager8 = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
         recycler_view8.setLayoutManager(layoutManager8);
         recycler_view8.setAdapter(new SimpleStringRecyclerViewAdapter(getActivity(), recycler_view8, ImageUtils.getEigthImageUrl(), "eigth"));
-        //recycler listener
-//        recycler_view3.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), recycler_view3, new ClickListener() {
-//            @Override
-//            public void onClick(View view, int position) {
-//                if (position == 0) {
-//                    Intent intent = new Intent(getActivity(), MPOSRegistration.class);
-//                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//                    startActivity(intent);
-//                } else if (position == 1) {
-//                    Intent intent = new Intent(getActivity(), AEPS_BBPS_RegistrationActivity.class);
-//                    intent.putExtra("typeput", "AEPS");
-//                    intent.putExtra("persons", "pending");
-//                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//                    startActivity(intent);
-//                } else if (position == 2) {
-//                    Intent intent = new Intent(getActivity(), AEPS_BBPS_RegistrationActivity.class);
-//                    intent.putExtra("typeput", "BBPS");
-//                    intent.putExtra("persons", "pending");
-//                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//                    startActivity(intent);
-//                } else if (position == 3) {
-//                    Intent intent = new Intent(getActivity(), AEPS_BBPS_RegistrationActivity.class);
-//                    intent.putExtra("typeput", "MATM");
-//                    intent.putExtra("persons", "pending");
-//                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//                    startActivity(intent);
-//                }
-//            }
-//
-//            @Override
-//            public void onLongClick(View view, int position) {
-//
-//            }
-//        }));
+
         recycler_view6.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), recycler_view6, new ClickListener() {
             @Override
             public void onClick(View view, int position) {
                 Intent intent = null;
                 if (position == 0) {
-//                    customDialog_Ben("MPOS-SALE", "MposCashoutTransfer");
                     intent = new Intent(getActivity(), CashOutClass.class);
                     intent.putExtra("typeput", "CASHOUT");
                     intent.putExtra("serviceType", "MPOS_CASHOUT");
@@ -192,7 +158,6 @@ public class DashBoardFragments extends BaseFragment {
                     intent.putExtra("requestType", "MPOS-CASHOUT");
                     intent.putExtra("reqFor", "MPOS");
                 } else if (position == 1) {
-//                    customDialog_Ben("MPOS-SALE", "MposSaleTransfer");
                     intent = new Intent(getActivity(), CashOutClass.class);
                     intent.putExtra("typeput", "SALE");
                     intent.putExtra("serviceType", "MPOS_SALE");
@@ -200,7 +165,6 @@ public class DashBoardFragments extends BaseFragment {
                     intent.putExtra("requestType", "MPOS-SALE");
                     intent.putExtra("reqFor", "MPOS");
                 } else if (position == 2) {
-//                    customDialog_Ben("MPOS-SALE", "MposEmiTransfer");
                     intent = new Intent(getActivity(), CashOutClass.class);
                     intent.putExtra("typeput", "EMI");
                     intent.putExtra("serviceType", "MPOS_EMI");
@@ -276,12 +240,6 @@ public class DashBoardFragments extends BaseFragment {
                     intent.putExtra("requestType", "AEPS-BE");
                     intent.putExtra("reqFor", "AEPS");
                 } else if (position == 2) {
-//                    intent = new Intent(getActivity(), Fino_AEPS_BBPS_Activity.class);
-//                    intent.putExtra("typeput", "EMI");
-//                    intent.putExtra("serviceType", "MPOS_EMI");
-//                    intent.putExtra("requestChannel", "MPOS_CHANNEL");
-//                    intent.putExtra("requestType", "MPOS_EMI");
-//                    intent.putExtra("reqFor", "MPOS");
                 }
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
@@ -301,22 +259,6 @@ public class DashBoardFragments extends BaseFragment {
                 } else if (position == 1) {
                     intent = new Intent(getActivity(), NetworkTab.class);
                     intent.putExtra("CLICKED", "0");
-//                } else if (position == 0) {
-////                    if (MainActivity.pozoArrayList.size() != 0) {
-////                        for (int i = 0; i < MainActivity.pozoArrayList.size(); i++) {
-////                            if (MainActivity.pozoArrayList.get(i).getHeaderID().equalsIgnoreCase("10"))
-//                    if (MainActivity.relailerDetails) {
-//                        Toast.makeText(getActivity(), "Not Authorized to create New User!.", Toast.LENGTH_SHORT).show();
-//                    } else {
-//                        Intent intent = new Intent(getActivity(), RegisterKYCTab.class);
-//                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//                        intent.putExtra("type", "outside");
-//                        intent.putExtra("customerType", "A");
-//                        intent.putExtra("mobileNo", "");
-//                        startActivity(intent);
-//                    }
-////                        }
-////                    }
                 } else if (position == 2) {
                     intent = new Intent(getActivity(), PassbookActivity.class);
                     intent.putExtra("TYPE", "");
@@ -353,7 +295,6 @@ public class DashBoardFragments extends BaseFragment {
             @Override
             public void onClick(View view, int position) {
                 if (position == 1) {
-//                    customDialog_Ben("BC FUND TRANSFER", "FundTransfer");
                     Intent intent = new Intent(getActivity(), BCTab.class);
                     intent.putExtra("reqFor", "BCS");
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -363,9 +304,7 @@ public class DashBoardFragments extends BaseFragment {
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                 } else if (position == 0) {
-//                    customDialog_Ben("RAPIPAY WALLET FUND TRANSFER", "WALLETTransfer");
                     Intent intent = new Intent(getActivity(), WalletDetailsActivity.class);
-//                    intent.putExtra("mobileNo", input_number.getText().toString());
                     intent.putExtra("type", "");
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
@@ -375,9 +314,7 @@ public class DashBoardFragments extends BaseFragment {
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                 } else if (position == 4) {
-//                    customDialog_Ben("INDO-NEPAL Remittance", "PMTTransfer");
                     Intent intent = new Intent(getActivity(), PMTRemittanceActivity.class);
-//                    intent.putExtra("MOBILENO", input_number.getText().toString());
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                 }

@@ -107,6 +107,8 @@ public class BankDetails extends BaseCompactActivity implements RequestHandler, 
                     parseBankDetails(new JSONObject(text));
 
                 }
+            }else {
+                responseMSg(object);
             }
         } catch (Exception e) {
             e.printStackTrace();

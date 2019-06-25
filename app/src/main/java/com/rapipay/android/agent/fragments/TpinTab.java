@@ -27,13 +27,6 @@ public class TpinTab extends BaseFragment {
         return rv;
     }
 
-//    @Override
-//    protected void onCreate(@Nullable Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        setContentView(R.layout.credit_tablayout);
-//        initialize();
-//    }
-
     private void initialize(View view){
         tabLayout = (TabLayout) view.findViewById(R.id.bottomNavigation);
         bindWidgetsWithAnEvent();

@@ -324,9 +324,7 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
     }
 
     public class PQChromeClient extends WebChromeClient {
-        // For Android 5.0+
         public boolean onShowFileChooser(WebView view, ValueCallback<Uri[]> filePath, FileChooserParams fileChooserParams) {
-            // Double check that we don't have any existing callbacks
             if (mUploadMessage != null) {
                 mUploadMessage.onReceiveValue(null);
             }
@@ -338,13 +336,10 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
     }
 
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        // Check if the key event was the Back button and if there's history
         if ((keyCode == KeyEvent.KEYCODE_BACK) && web.canGoBack()) {
             web.goBack();
             return true;
         }
-        // If it wasn't the Back key or there's no web page history, bubble up to the default
-        // system behavior (probably exit the activity)
         return super.onKeyDown(keyCode, event);
     }
 
@@ -384,10 +379,8 @@ public class WebViewClientActivity extends BaseCompactActivity implements Reques
                 count = images.getItemCount();
             }
             Uri[] results = new Uri[count];
-            // Check that the response is a good one
             if (resultCode == Activity.RESULT_OK) {
                 if (size != 0) {
-                    // If there is not data, then we may have taken a photo
                     if (mCameraPhotoPath != null) {
                         results = new Uri[]{Uri.parse(mCameraPhotoPath)};
                     }

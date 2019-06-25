@@ -1,5 +1,6 @@
 package com.rapipay.android.agent.fragments;
 
+import android.app.Dialog;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
@@ -9,6 +10,7 @@ import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -33,8 +35,8 @@ public class GenerateTPINFragment extends BaseFragment implements View.OnClickLi
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         rv = (View) inflater.inflate(R.layout.tpin_layout, container, false);
-        if (BaseCompactActivity.db != null && BaseCompactActivity.db.getDetails_Rapi())
-            list = BaseCompactActivity.db.getDetails();
+        if (BaseCompactActivity.dbRealm != null && BaseCompactActivity.dbRealm.getDetails_Rapi())
+            list = BaseCompactActivity.dbRealm.getDetails();
         initialize(rv);
         return rv;
     }
@@ -128,18 +130,19 @@ public class GenerateTPINFragment extends BaseFragment implements View.OnClickLi
                 if (object.getString("serviceType").equalsIgnoreCase("Insert_Txn_Pin")) {
                     customDialog_Ben("OTPLAYOUT", object.getString("otpRefId"), "Enter OTP");
                 } else if (object.getString("serviceType").equalsIgnoreCase("VERIFY_TXN_PIN_OTP")) {
+                    dialog.dismiss();
                     customDialog_Ben("", object.getString("responseMessage"), "Alert");
                 }
-            }
+            }else
+                responseMSg(object);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    AlertDialog alertDialog;
 
     private void customDialog_Ben(final String type, final String msg, String title) {
-        AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
+        dialog = new Dialog(getActivity());
         LayoutInflater inflater = getLayoutInflater();
         View alertLayout = inflater.inflate(R.layout.custom_layout_common, null);
         AppCompatButton btn_cancel = (AppCompatButton) alertLayout.findViewById(R.id.btn_cancel);
@@ -159,7 +162,7 @@ public class GenerateTPINFragment extends BaseFragment implements View.OnClickLi
             dialog_msg.setText(msg);
             dialog_msg.setVisibility(View.VISIBLE);
         }
-        dialog.setView(alertLayout);
+        dialog.setContentView(alertLayout);
         dialog.setCancelable(false);
         btn_ok.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -173,8 +176,9 @@ public class GenerateTPINFragment extends BaseFragment implements View.OnClickLi
                         confirmpin.setText("");
                         enterpin.setHint("Enter New TPIN");
                         confirmpin.setHint("Confirm New TPIN");
+                        dialog.dismiss();
                     }
-                    alertDialog.dismiss();
+
                 }
                 handlercontrol();
             }
@@ -182,9 +186,11 @@ public class GenerateTPINFragment extends BaseFragment implements View.OnClickLi
         btn_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                alertDialog.dismiss();
+                dialog.dismiss();
             }
         });
-        alertDialog = dialog.show();
+        dialog.show();
+        Window window = dialog.getWindow();
+        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
     }
 }

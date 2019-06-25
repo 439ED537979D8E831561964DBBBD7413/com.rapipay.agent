@@ -187,19 +187,18 @@ public class FOSLoginActivity extends BaseCompactActivity implements View.OnClic
                 intent.putExtra("AgentID", input_subuser.getText().toString());
                 intent.putExtra("sessionRefNo", object.getString("sessionRefNo"));
                 intent.putExtra("sessionKey", object.getString("sessionKey"));
-//                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
                 input_subuser.setText("");
                 input_user.setText("");
                 input_password.setText("");
-//                clear()
-//                finish();
             } else if (object.getString("responseCode").equalsIgnoreCase("75115")) {
                 customDialog_Common("KYCLAYOUTS", null, null, "RapiPay Login Failed", null, object.getString("responseMessage"), FOSLoginActivity.this);
             } else if (object.getString("responseCode").equalsIgnoreCase("75115")) {
                 customDialog_Common("KYCLAYOUTS", null, null, "RapiPay Login Failed", null, object.getString("responseMessage"), FOSLoginActivity.this);
             } else if (object.getString("responseCode").equalsIgnoreCase("75077")) {
                 customDialog_Common("KYCLAYOUTS", null, null, "RapiPay Login Failed", null, object.getString("responseMessage"), FOSLoginActivity.this);
+            }else {
+                responseMSg(object);
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.rapipay.android.agent.Database.RapipayDB;
+import com.rapipay.android.agent.Model.TbRechargePozo;
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.interfaces.CustomInterface;
 import com.rapipay.android.agent.interfaces.RequestHandler;
@@ -76,8 +77,12 @@ public class ReChargeActivity extends BaseCompactActivity implements View.OnClic
             @Override
             public void onClick(View v) {
                 if (operator_clicked.equalsIgnoreCase("PRE") || operator_clicked.equalsIgnoreCase("POST") || operator_clicked.equalsIgnoreCase("DTH")) {
-                    String condition = "where " + RapipayDB.COLOMN_OPERATORVALUE + "='" + operator_clicked + "'";
-                    ArrayList<String> list_operator = db.getOperatorDetail(condition);
+                    String condition = operator_clicked;
+                    ArrayList<String> list_operator = new ArrayList<>();
+                    ArrayList<TbRechargePozo> list_operator1 = dbRealm.getOperatorDetail(condition);
+                    for(int i=0; i<list_operator1.size(); i++){
+                        list_operator.add(list_operator1.get(i).getOperatorsData());
+                    }
                     customSpinner(select_operator, "Select Operator", list_operator);
                 } else
                     Toast.makeText(ReChargeActivity.this, "Please select recharge mode", Toast.LENGTH_SHORT).show();
@@ -112,7 +117,8 @@ public class ReChargeActivity extends BaseCompactActivity implements View.OnClic
             @Override
             public void afterTextChanged(Editable s) {
                 if (s.length()!=0 && s.length()<10) {
-                    input_text.setText(EnglishNumberToWords.convert(Integer.parseInt(s.toString())));
+                    input_text.setText("");
+                    input_text.setText(EnglishNumberToWords.convert(Integer.parseInt(s.toString()))+" rupee");
                     input_text.setVisibility(View.VISIBLE);
                 }else
                     input_text.setVisibility(View.GONE);
@@ -241,6 +247,8 @@ public class ReChargeActivity extends BaseCompactActivity implements View.OnClic
                         }
                 }
                 clear();
+            }else {
+                responseMSg(object);
             }
         } catch (Exception e) {
             e.printStackTrace();

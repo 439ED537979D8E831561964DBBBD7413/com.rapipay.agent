@@ -1,9 +1,13 @@
 package com.rapipay.android.agent.Model;
 
-public class RapiPayPozo {
+import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
+
+public class RapiPayPozo  extends RealmObject {
     private String session;
     private String apikey;
     private String imei;
+    @PrimaryKey
     private String mobilno;
     private String txnRefId;
     private String pinsession;

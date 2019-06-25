@@ -207,10 +207,8 @@ public class PendingRefundActivity extends BaseCompactActivity implements Wallet
                     else if (hitfrom.equalsIgnoreCase("WALLET_REFUND") && object.has("otpRefId"))
                         customDialog_Ben("Initiate Refund", object.getString("otpRefId"), "", hitfrom);
                     else if (hitfrom.equalsIgnoreCase("PROCESS_OTP")) {
-//                        localStorage.setActivityState(LocalStorage.ROUTESTATE, "UPDATE");
                         customDialog_Common("REFUNDTXN", object, null, "REFUND TXN", null, object.getString("responseMessage"), PendingRefundActivity.this);
                     } else if (hitfrom.equalsIgnoreCase("Verify_Mobile")) {
-//                        localStorage.setActivityState(LocalStorage.ROUTESTATE, "UPDATE");
                         customDialog_Common("KYCLAYOUTSS", object, null, getResources().getString(R.string.Alert), null, object.getString("responseMessage"), PendingRefundActivity.this);
                     } else
                         change_View(object, hitfrom);
@@ -229,7 +227,11 @@ public class PendingRefundActivity extends BaseCompactActivity implements Wallet
                     customDialog_Common("KYCLAYOUTSS", object, null, "Transaction Pending", null, object.getString("responseMessage"), PendingRefundActivity.this);
                 } else if (object.getString("responsecode").equalsIgnoreCase("200")) {
                     customDialog_Common("KYCLAYOUTSS", object, null, "Transaction Status", null, object.getString("responseMessage"), PendingRefundActivity.this);
+                }else {
+                    responseMSg(object);
                 }
+            }else {
+                responseMSg(object);
             }
         } catch (Exception e) {
             e.printStackTrace();

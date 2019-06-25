@@ -21,8 +21,8 @@ class ServiceEnable : BaseFragment(), View.OnClickListener, RequestHandler {
     protected var headerData = WebConfig.BASIC_USERID + ":" + WebConfig.BASIC_PASSWORD
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         var rv = inflater.inflate(R.layout.enable_service_layout, container, false) as View
-        if (BaseCompactActivity.db != null && BaseCompactActivity.db.details_Rapi)
-            list = BaseCompactActivity.db.details
+        if (BaseCompactActivity.dbRealm != null && BaseCompactActivity.dbRealm.details_Rapi)
+            list = BaseCompactActivity.dbRealm.details
         initialize(rv)
         return rv
     }
@@ -90,7 +90,8 @@ class ServiceEnable : BaseFragment(), View.OnClickListener, RequestHandler {
                 if (`object`.getString("serviceType").equals("Txn_PIN_ENABLE", ignoreCase = true)) {
                     customDialog_Ben("Alert", `object`.getString("responseMessage"))
                 }
-            }
+            }else
+                responseMSg(`object`)
         } catch (e: Exception) {
             e.printStackTrace()
         }

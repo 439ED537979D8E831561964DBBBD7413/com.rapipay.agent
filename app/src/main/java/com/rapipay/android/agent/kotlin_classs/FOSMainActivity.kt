@@ -85,7 +85,6 @@ class FOSMainActivity :BaseCompactActivity(),NavigationView.OnNavigationItemSele
             drawer!!.closeDrawer(GravityCompat.START)
         }
         finish()
-//        customDialog_Common("KYCLAYOUT", null, null, "Rapipay", null, "Are you sure you want to exit ?", this@FOSMainActivity)
     }
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         var fragment : Fragment?=null
@@ -128,7 +127,6 @@ class FOSMainActivity :BaseCompactActivity(),NavigationView.OnNavigationItemSele
         val intent = Intent(this, LoginScreenActivity::class.java)
         startActivity(intent)
         finish()
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun cancelClicked(type: String?, ob: Any?) {

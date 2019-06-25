@@ -81,8 +81,9 @@ public class RechargeHistory extends BaseCompactActivity implements View.OnClick
         fromimage = (ImageView) findViewById(R.id.fromimage);
         fromimage.setOnClickListener(fromDateClicked);
         fromimage.setColorFilter(getResources().getColor(R.color.colorPrimaryDark));
-        String condition = "Select distinct(" + RapipayDB.COLOMN_OPERATORVALUE + ") " + "FROM " + RapipayDB.TABLE_OPERATOR + " Group by " + RapipayDB.COLOMN_OPERATORVALUE;
-        list_state = BaseCompactActivity.db.getOperatorProvider(condition);
+        //  String condition = "Select distinct(" + RapipayDB.COLOMN_OPERATORVALUE + ") " + "FROM " + RapipayDB.TABLE_OPERATOR + " Group by " + RapipayDB.COLOMN_OPERATORVALUE;
+        String condition = "operatorsValue";
+        list_state = BaseCompactActivity.dbRealm.getOperatorProvider(condition);
         if (list_state.size() != 0) {
             ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(RechargeHistory.this,
                     android.R.layout.simple_spinner_item, list_state);
@@ -159,10 +160,13 @@ public class RechargeHistory extends BaseCompactActivity implements View.OnClick
                     } else if (date1_text.getText().toString().isEmpty()) {
                         date1_text.setError("Please enter mandatory field");
                         date1_text.requestFocus();
-                    } else if (printDifference(mainDate(date2_text.getText().toString()), mainDate(date1_text.getText().toString())))
+                    } else if (printDifference(mainDate(date2_text.getText().toString()), mainDate(date1_text.getText().toString()))){
+                        trans_details.setVisibility(View.VISIBLE);
                         new AsyncPostMethod(WebConfig.RECHARGE_URL, channel_request(0, 5).toString(), headerData, RechargeHistory.this, getString(R.string.responseTimeOut)).execute();
-                    else
-                        Toast.makeText(RechargeHistory.this, "Please select correct date", Toast.LENGTH_SHORT).show();
+                    } else {
+                        customDialog_Common("Statement can only view from one month");
+                        trans_details.setVisibility(View.GONE);
+                    }
                 }
                 handlercontrol();
                 break;
@@ -191,13 +195,19 @@ public class RechargeHistory extends BaseCompactActivity implements View.OnClick
         return jsonObject;
     }
 
+
     @Override
     public void chechStatus(JSONObject object) {
         try {
             if (object.getString("responseCode").equalsIgnoreCase("200")) {
                 if (object.getString("serviceType").equalsIgnoreCase("RECHARGE_HISTORY")) {
                     if (object.has("rechargeHistoryList")) {
-                        insertLastTransDetails(object.getJSONArray("rechargeHistoryList"));
+                        if (object.isNull("rechargeHistoryList") && object.getJSONArray("rechargeHistoryList").length() == 0)
+                            customDialog_Common("No Record Found");
+                        else {
+                            trans_details.setVisibility(View.VISIBLE);
+                            insertLastTransDetails(object.getJSONArray("rechargeHistoryList"));
+                        }
                     }
                 } else if (object.getString("serviceType").equalsIgnoreCase("Get_Txn_Recipt")) {
                     if (object.has("getTxnReceiptDataList"))
@@ -209,6 +219,9 @@ public class RechargeHistory extends BaseCompactActivity implements View.OnClick
                             customDialog_Common("KYCLAYOUTS", null, null, "Transaction Receipt", "", "Cannot generate receipt now please try later!", RechargeHistory.this);
                         }
                 }
+            } else {
+                responseMSg(object);
+                trans_details.setVisibility(View.GONE);
             }
         } catch (Exception e) {
             e.printStackTrace();

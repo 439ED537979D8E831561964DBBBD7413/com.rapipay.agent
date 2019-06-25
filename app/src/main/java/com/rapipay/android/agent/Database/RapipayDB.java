@@ -8,12 +8,18 @@ import android.database.sqlite.SQLiteOpenHelper;
 import java.util.ArrayList;
 
 import com.rapipay.android.agent.Model.BankDetailsPozo;
+import com.rapipay.android.agent.Model.CreaditPaymentModePozo;
 import com.rapipay.android.agent.Model.HeaderePozo;
 import com.rapipay.android.agent.Model.ImagePozo;
 import com.rapipay.android.agent.Model.MasterPozo;
 import com.rapipay.android.agent.Model.NewKYCPozo;
 import com.rapipay.android.agent.Model.PaymentModePozo;
 import com.rapipay.android.agent.Model.RapiPayPozo;
+import com.rapipay.android.agent.Model.StatePozo;
+import com.rapipay.android.agent.Model.TbNepalPaymentModePozo;
+import com.rapipay.android.agent.Model.TbOperatorPozo;
+import com.rapipay.android.agent.Model.TbRechargePozo;
+import com.rapipay.android.agent.Model.TbTransitionPojo;
 
 public class RapipayDB extends SQLiteOpenHelper {
 
@@ -398,7 +404,7 @@ public class RapipayDB extends SQLiteOpenHelper {
     }
 
 
-    public ArrayList<PaymentModePozo> getPaymenttDetails() {
+    public ArrayList<CreaditPaymentModePozo> getPaymenttDetails() {
         ArrayList<PaymentModePozo> list = new ArrayList<PaymentModePozo>();
         list.add(new PaymentModePozo("", "Select Payment Mode"));
         String selectQuery = "SELECT  * FROM " + TABLE_PAYMENT;
@@ -412,32 +418,45 @@ public class RapipayDB extends SQLiteOpenHelper {
                 list.add(payPozo);
             } while (cursor.moveToNext());
         }
-        return list;
+
+        ArrayList<CreaditPaymentModePozo> list1 = new ArrayList<>();
+        for(int i=0;i<list.size();i++){
+            list1.add(new CreaditPaymentModePozo(list.get(i).getTypeID(),list.get(i).getPaymentMode()));
+        }
+        return list1;
     }
 
-    public ArrayList<String> getTransferDetails(String condition) {
-        ArrayList<String> list = new ArrayList<String>();
-        list.add("Select Transfer Type");
+    public ArrayList<TbTransitionPojo> getTransferDetails(String condition) {
+        ArrayList<TbTransitionPojo> list = new ArrayList<TbTransitionPojo>();
+//        list.add("Select Transfer Type");
         String selectQuery = "SELECT  * FROM " + TABLE_TRANSFERLIST + " " + condition;
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
         if (cursor.moveToFirst()) {
             do {
-                list.add(cursor.getString(1));
+                TbTransitionPojo tbTransitionPojo = new TbTransitionPojo();
+                tbTransitionPojo.setOperatorsId(cursor.getString(0));
+                tbTransitionPojo.setOperatorsValue(cursor.getString(1));
+                tbTransitionPojo.setOperatorsData(cursor.getString(2));
+                list.add(tbTransitionPojo);
             } while (cursor.moveToNext());
         }
         return list;
     }
 
-    public ArrayList<String> getOperatorDetail(String condition) {
-        ArrayList<String> list = new ArrayList<String>();
-        list.add("Select Operator");
+    public ArrayList<TbRechargePozo> getOperatorDetail(String condition) {
+        ArrayList<TbRechargePozo> list = new ArrayList<TbRechargePozo>();
+//        list.add("Select Operator");
         String selectQuery = "SELECT  * FROM " + TABLE_OPERATOR + " " + condition;
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
         if (cursor.moveToFirst()) {
             do {
-                list.add(cursor.getString(2));
+                TbRechargePozo tbRechargePozo = new TbRechargePozo();
+                tbRechargePozo.setOperatorsId(cursor.getString(0));
+                tbRechargePozo.setOperatorsValue(cursor.getString(1));
+                tbRechargePozo.setOperatorsData(cursor.getString(2));
+                list.add(tbRechargePozo);
             } while (cursor.moveToNext());
         }
         return list;
@@ -498,34 +517,42 @@ public class RapipayDB extends SQLiteOpenHelper {
     }
 
 
-    public ArrayList<String> getState_Details() {
-        ArrayList<String> list = new ArrayList<String>();
-        list.add("Select State");
+    public ArrayList<StatePozo> getState_Details() {
+        ArrayList<StatePozo> list = new ArrayList<StatePozo>();
+//        list.add("Select State");
         String selectQuery = "SELECT  * FROM " + TABLE_STATE;
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
         if (cursor.moveToFirst()) {
             do {
-                list.add(cursor.getString(2));
+                StatePozo statePozo = new StatePozo();
+                statePozo.setHeaderId(cursor.getString(0));
+                statePozo.setHeaderValue(cursor.getString(1));
+                statePozo.setHeaderData(cursor.getString(2));
+                list.add(statePozo);
             } while (cursor.moveToNext());
         }
         return list;
     }
 
-    public ArrayList<String> getPayee_Details() {
-        ArrayList<String> list = new ArrayList<String>();
-        list.add("Select Type");
+
+    public ArrayList<TbOperatorPozo> getPayee_Details() {
+        ArrayList<TbOperatorPozo> list = new ArrayList<TbOperatorPozo>();
+//        list.add("Select Type");
         String selectQuery = "SELECT  * FROM " + TABLE_PAYERPAYEE;
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
         if (cursor.moveToFirst()) {
             do {
-                list.add(cursor.getString(2));
+                TbOperatorPozo tbOperatorPozo = new TbOperatorPozo();
+                tbOperatorPozo.setOperatorsId(cursor.getString(0));
+                tbOperatorPozo.setOperatorsValue(cursor.getString(1));
+                tbOperatorPozo.setOperatorsData(cursor.getString(2));
+                list.add(tbOperatorPozo);
             } while (cursor.moveToNext());
         }
         return list;
     }
-
     public ArrayList<PaymentModePozo> getPaymentModeNepal() {
         ArrayList<PaymentModePozo> list = new ArrayList<PaymentModePozo>();
         list.add(new PaymentModePozo("0","Select Payment Type"));
@@ -543,15 +570,15 @@ public class RapipayDB extends SQLiteOpenHelper {
         return list;
     }
 
-    public ArrayList<PaymentModePozo> getBankNepal() {
-        ArrayList<PaymentModePozo> list = new ArrayList<PaymentModePozo>();
-        list.add(new PaymentModePozo("0","Select Bank"));
+    public ArrayList<TbNepalPaymentModePozo> getBankNepal() {
+        ArrayList<TbNepalPaymentModePozo> list = new ArrayList<TbNepalPaymentModePozo>();
+//        list.add(new PaymentModePozo("0","Select Bank"));
         String selectQuery = "SELECT  * FROM " + TABLE_NEPAL_BANK;
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
         if (cursor.moveToFirst()) {
             do {
-                PaymentModePozo payPozo = new PaymentModePozo();
+                TbNepalPaymentModePozo payPozo = new TbNepalPaymentModePozo();
                 payPozo.setTypeID(cursor.getString(0));
                 payPozo.setPaymentMode(cursor.getString(1));
                 list.add(payPozo);

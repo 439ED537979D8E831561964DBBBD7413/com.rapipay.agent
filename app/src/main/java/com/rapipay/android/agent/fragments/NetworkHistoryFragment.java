@@ -17,6 +17,7 @@ import android.widget.Spinner;
 
 import com.rapipay.android.agent.Model.NetworkHistoryPozo;
 import com.rapipay.android.agent.Model.RapiPayPozo;
+import com.rapipay.android.agent.Model.TbOperatorPozo;
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.adapter.NetworkHistoryAdapter;
 import com.rapipay.android.agent.interfaces.CustomInterface;
@@ -51,15 +52,14 @@ public class NetworkHistoryFragment extends BaseFragment implements RequestHandl
     private int selectedDate, selectedMonth, selectedYear;
     String months = null, dayss = null;
     NetworkHistoryAdapter adapter;
-
+    ArrayList<TbOperatorPozo> list_state1;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         rv = (View) inflater.inflate(R.layout.network_history_layout, container, false);
         initialize(rv);
-        headerData = (WebConfig.BASIC_USERID + ":" + WebConfig.BASIC_PASSWORD);
-        if (BaseCompactActivity.db != null && BaseCompactActivity.db.getDetails_Rapi())
-            list = BaseCompactActivity.db.getDetails();
+        if (BaseCompactActivity.dbRealm != null && BaseCompactActivity.dbRealm.getDetails_Rapi())
+            list = BaseCompactActivity.dbRealm.getDetails();
         else
             dbNull(NetworkHistoryFragment.this);
         return rv;
@@ -79,7 +79,11 @@ public class NetworkHistoryFragment extends BaseFragment implements RequestHandl
         view.findViewById(R.id.btn_fund).setOnClickListener(this);
         trans_details = (ListView) view.findViewById(R.id.trans_details);
         select_state = (Spinner) view.findViewById(R.id.select_state);
-        list_state = BaseCompactActivity.db.getPayee_Details();
+        list_state = new ArrayList<>();
+        list_state1 = BaseCompactActivity.dbRealm.getPayee_Details();
+        for (int i=0; i< list_state1.size();i++){
+            list_state.add(list_state1.get(i).getOperatorsValue());
+        }
         if (list_state.size() != 0) {
             ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(getActivity(),
                     android.R.layout.simple_spinner_item, list_state);
@@ -134,9 +138,6 @@ public class NetworkHistoryFragment extends BaseFragment implements RequestHandl
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_fund:
-//                if (payee.isEmpty())
-//                    Toast.makeText(getActivity(), "Please select type", Toast.LENGTH_SHORT).show();
-//                else
                 if (btnstatus == false) {
                     btnstatus = true;
                     if (date2_text.getText().toString().isEmpty()) {
@@ -147,7 +148,8 @@ public class NetworkHistoryFragment extends BaseFragment implements RequestHandl
                         date1_text.requestFocus();
                     } else if (printDifference(mainDate(date2_text.getText().toString()), mainDate(date1_text.getText().toString())))
                         new AsyncPostMethod(WebConfig.CommonReport, channel_request(first, last).toString(), headerData, NetworkHistoryFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
-                }
+                else
+                        customDialog_Common("Statement Can Only View For One Month");}
                 handlercontrol();
                 break;
         }
@@ -285,9 +287,13 @@ public class NetworkHistoryFragment extends BaseFragment implements RequestHandl
         try {
             if (object.getString("responseCode").equalsIgnoreCase("200")) {
                 if (object.has("objC2CCreditRPTList")) {
+                    if (object.isNull("objC2CCreditRPTList") && object.getJSONArray("objC2CCreditRPTList").length() == 0)
+                        customDialog_Common("No Record Found");
+                    else
                     insertLastTransDetails(object.getJSONArray("objC2CCreditRPTList"));
                 }
-            }
+            }else
+                responseMSg(object);
         } catch (Exception e) {
             e.printStackTrace();
         }

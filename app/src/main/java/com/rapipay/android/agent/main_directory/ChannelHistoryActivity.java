@@ -70,7 +70,8 @@ public class ChannelHistoryActivity extends BaseCompactActivity implements View.
                     btnstatus = true;
                     ChannelHistoryPozo pozo = transactionPozoArrayList.get(position);
                     new AsyncPostMethod(WebConfig.WALLETRECEIPTURL, receipt_request(pozo).toString(), headerData, ChannelHistoryActivity.this, getString(R.string.responseTimeOut), "RECEIPTREQUEST").execute();
-                }handlercontrol();
+                }
+                handlercontrol();
             }
         });
         findViewById(R.id.todate).setOnClickListener(toDateClicked);
@@ -138,10 +139,13 @@ public class ChannelHistoryActivity extends BaseCompactActivity implements View.
                     } else if (date1_text.getText().toString().isEmpty()) {
                         date1_text.setError("Please enter mandatory field");
                         Toast.makeText(this, "Please enter mandatory field", Toast.LENGTH_SHORT).show();
-                    } else if (printDifference(mainDate(date2_text.getText().toString()), mainDate(date1_text.getText().toString())))
+                    } else if (printDifference(mainDate(date2_text.getText().toString()), mainDate(date1_text.getText().toString()))) {
+                        trans_details.setVisibility(View.VISIBLE);
                         new AsyncPostMethod(WebConfig.CommonReport, channel_request(first, last).toString(), headerData, ChannelHistoryActivity.this, getString(R.string.responseTimeOut), "TRANSACTIONHISTORY").execute();
-                    else
-                        Toast.makeText(ChannelHistoryActivity.this, "Please select correct date", Toast.LENGTH_SHORT).show();
+                    }else {
+                        customDialog_Common("Statement can only view from one month");
+                        trans_details.setVisibility(View.GONE);
+                    }
                 }
                 handlercontrol();
                 break;
@@ -187,6 +191,9 @@ public class ChannelHistoryActivity extends BaseCompactActivity implements View.
                             customDialog_Common("KYCLAYOUTS", null, null, "Transaction Receipt", "", "Cannot generate receipt now please try later!", ChannelHistoryActivity.this);
                         }
                 }
+            } else {
+                responseMSg(object);
+                trans_details.setVisibility(View.GONE);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -208,6 +215,7 @@ public class ChannelHistoryActivity extends BaseCompactActivity implements View.
 
     private void insertLastTransDetails(JSONArray array) {
         try {
+            transactionPozoArrayList.clear();
             for (int i = 0; i < array.length(); i++) {
                 JSONObject object = array.getJSONObject(i);
                 transactionPozoArrayList.add(new ChannelHistoryPozo(object.getString("senderName") + " ( " + object.getString("mobileNo") + " )", object.getString("accountNo") + " ( " + object.getString("bankName") + " )", object.getString("requestAmt"), object.getString("txnStatus"), object.getString("txnDateTime"), object.getString("serviceProviderTXNID"), object.getString("transferType"), object.getString("userTxnId"), object.getString("serviceType"), object.getString("txnDateTime")));
@@ -221,6 +229,7 @@ public class ChannelHistoryActivity extends BaseCompactActivity implements View.
 
     private void initializeTransAdapter(ArrayList<ChannelHistoryPozo> list) {
         if (first == 1) {
+            trans_details.setVisibility(View.VISIBLE);
             adapter = new ChannelListAdapter(list, ChannelHistoryActivity.this);
             trans_details.setAdapter(adapter);
         } else {

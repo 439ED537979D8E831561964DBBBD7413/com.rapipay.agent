@@ -31,8 +31,8 @@ public class EnableDiablePinFragment extends BaseFragment implements View.OnClic
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         rv = (View) inflater.inflate(R.layout.tpin_layout, container, false);
-        if (BaseCompactActivity.db != null && BaseCompactActivity.db.getDetails_Rapi())
-            list = BaseCompactActivity.db.getDetails();
+        if (BaseCompactActivity.dbRealm != null && BaseCompactActivity.dbRealm.getDetails_Rapi())
+            list = BaseCompactActivity.dbRealm.getDetails();
         initialize(rv);
         return rv;
     }
@@ -114,7 +114,8 @@ public class EnableDiablePinFragment extends BaseFragment implements View.OnClic
                 if (object.getString("serviceType").equalsIgnoreCase("Txn_PIN_ENABLE")) {
                     customDialog_Ben("Alert", object.getString("responseMessage"));
                 }
-            }
+            }else
+                responseMSg(object);
         } catch (Exception e) {
             e.printStackTrace();
         }

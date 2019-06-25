@@ -117,58 +117,59 @@ public class AsyncPostMethod extends AsyncTask<String, String, String> {
                     handler.chechStat(s);
                 } else if (!s.equalsIgnoreCase("false")) {
                     JSONObject object = new JSONObject(s);
-                    if (object.has("responseCode")) {
-                        if (object.getString("responseCode").equalsIgnoreCase("75120") || object.getString("responseCode").equalsIgnoreCase("201") || object.getString("responseCode").equalsIgnoreCase("1032") || object.getString("responseCode").equalsIgnoreCase("86004") || object.getString("responseCode").equalsIgnoreCase("60236") || object.getString("responseCode").equalsIgnoreCase("200") || object.getString("responseCode").equalsIgnoreCase("300") || object.getString("responseCode").equalsIgnoreCase("101") || object.getString("responseCode").equalsIgnoreCase("75077") || object.getString("responseCode").equalsIgnoreCase("75115") || object.getString("responseCode").equalsIgnoreCase("75062") || object.getString("responseCode").equalsIgnoreCase("75061") || object.getString("responseCode").equalsIgnoreCase("75063") || object.getString("responseCode").equalsIgnoreCase("60116") || object.getString("responseCode").equalsIgnoreCase("86001") || object.getString("responseCode").equalsIgnoreCase("86002")) {
+//                    if (object.has("responseCode")) {
+//                        if (object.getString("responseCode").equalsIgnoreCase("75120") || object.getString("responseCode").equalsIgnoreCase("201") || object.getString("responseCode").equalsIgnoreCase("1032") || object.getString("responseCode").equalsIgnoreCase("86004") || object.getString("responseCode").equalsIgnoreCase("60236") || object.getString("responseCode").equalsIgnoreCase("200") || object.getString("responseCode").equalsIgnoreCase("300") || object.getString("responseCode").equalsIgnoreCase("101") || object.getString("responseCode").equalsIgnoreCase("75077") || object.getString("responseCode").equalsIgnoreCase("75115") || object.getString("responseCode").equalsIgnoreCase("75062") || object.getString("responseCode").equalsIgnoreCase("75061") || object.getString("responseCode").equalsIgnoreCase("75063") || object.getString("responseCode").equalsIgnoreCase("60116") || object.getString("responseCode").equalsIgnoreCase("86001") || object.getString("responseCode").equalsIgnoreCase("86002")) {
                             handler.chechStatus(object);
-                            if (object.has("apiCommonResposne")) {
-                                JSONObject object1 = object.getJSONObject("apiCommonResposne");
-                                if (object1 != null) {
-                                    String balance = object1.getString("runningBalance");
-                                    for (int i = 0; i < MainActivity.pozoArrayList.size(); i++) {
-                                        if (MainActivity.pozoArrayList.get(i).getHeaderID().equalsIgnoreCase("1"))
-                                            MainActivity.pozoArrayList.get(i).setHeaderData(balance);
-                                    }
-                                }
-                            }
-                        } else if (object.getString("responseCode").equalsIgnoreCase("60147")) {
-                            Intent intent = new Intent(context, PinVerification.class);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                            context.startActivity(intent);
-                        } else {
-                            if (object.has("serviceType")) {
-                                if (object.getString("serviceType").equalsIgnoreCase("PinVerify"))
-                                    handler.chechStat(object.getString("responseMessage"));
-                                else if (object.getString("serviceType").equalsIgnoreCase("ValidCredentialService"))
-                                    handler.chechStat(object.getString("responseMessage"));
-                                else
-                                    responseMSg(object);
-                            } else
-                                responseMSg(object);
-                        }
-                    } else if (object.has("responsecode")) {
-                        if (object.getString("responsecode").equalsIgnoreCase("201") || object.getString("responsecode").equalsIgnoreCase("200") || object.getString("responsecode").equalsIgnoreCase("101") || object.getString("responsecode").equalsIgnoreCase("300") || object.getString("responsecode").equalsIgnoreCase("75077") || object.getString("responsecode").equalsIgnoreCase("75115") || object.getString("responsecode").equalsIgnoreCase("75062") || object.getString("responsecode").equalsIgnoreCase("75061") || object.getString("responsecode").equalsIgnoreCase("60116") || object.getString("responsecode").equalsIgnoreCase("75063") || object.getString("responsecode").equalsIgnoreCase("86001") || object.getString("responsecode").equalsIgnoreCase("86002")) {
-                            handler.chechStatus(object);
-                            if (object.has("apiCommonResposne")) {
-                                JSONObject object1 = object.getJSONObject("apiCommonResposne");
-                                if (object1 != null) {
-                                    String balance = object1.getString("runningBalance");
-                                    for (int i = 0; i < MainActivity.pozoArrayList.size(); i++) {
-                                        if (MainActivity.pozoArrayList.get(i).getHeaderID().equalsIgnoreCase("1"))
-                                            MainActivity.pozoArrayList.get(i).setHeaderValue(balance);
-                                    }
-                                }
-                            }
-                        } else
-                            responseMSg(object);
-                    } else
-                        responseMSg(object);
-                } else {
-                    customDialog_Common("No Internet Connectivity");
+//                            if (object.has("apiCommonResposne")) {
+//                                JSONObject object1 = object.getJSONObject("apiCommonResposne");
+//                                if (object1 != null) {
+//                                    String balance = object1.getString("runningBalance");
+//                                    for (int i = 0; i < BaseCompactActivity.pozoArrayList.size(); i++) {
+//                                        if (BaseCompactActivity.pozoArrayList.get(i).getHeaderID().equalsIgnoreCase("1"))
+//                                            BaseCompactActivity.pozoArrayList.get(i).setHeaderData(balance);
+//                                    }
+//                                }
+//                            }
+//                        } else if (object.getString("responseCode").equalsIgnoreCase("60147")) {
+//                            Intent intent = new Intent(context, PinVerification.class);
+//                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                            context.startActivity(intent);
+//                        } else {
+//                            if (object.has("serviceType")) {
+//                                if (object.getString("serviceType").equalsIgnoreCase("PinVerify"))
+//                                    handler.chechStat(object.getString("responseMessage"));
+//                                else if (object.getString("serviceType").equalsIgnoreCase("ValidCredentialService"))
+//                                    handler.chechStat(object.getString("responseMessage"));
+//                                else
+//                                    responseMSg(object);
+//                            } else
+//                                responseMSg(object);
+//                        }
+//                    } else if (object.has("responsecode")) {
+//                        if (object.getString("responsecode").equalsIgnoreCase("201") || object.getString("responsecode").equalsIgnoreCase("200") || object.getString("responsecode").equalsIgnoreCase("101") || object.getString("responsecode").equalsIgnoreCase("300") || object.getString("responsecode").equalsIgnoreCase("75077") || object.getString("responsecode").equalsIgnoreCase("75115") || object.getString("responsecode").equalsIgnoreCase("75062") || object.getString("responsecode").equalsIgnoreCase("75061") || object.getString("responsecode").equalsIgnoreCase("60116") || object.getString("responsecode").equalsIgnoreCase("75063") || object.getString("responsecode").equalsIgnoreCase("86001") || object.getString("responsecode").equalsIgnoreCase("86002")) {
+//                            handler.chechStatus(object);
+//                            if (object.has("apiCommonResposne")) {
+//                                JSONObject object1 = object.getJSONObject("apiCommonResposne");
+//                                if (object1 != null) {
+//                                    String balance = object1.getString("runningBalance");
+//                                    for (int i = 0; i < BaseCompactActivity.pozoArrayList.size(); i++) {
+//                                        if (BaseCompactActivity.pozoArrayList.get(i).getHeaderID().equalsIgnoreCase("1"))
+//                                            BaseCompactActivity.pozoArrayList.get(i).setHeaderValue(balance);
+//                                    }
+//                                }
+//                            }
+//                        } else
+//                            responseMSg(object);
+//                    } else
+//                        responseMSg(object);
+//                } else {
+//                    customDialog_Common("No Internet Connectivity");
                 }
-
-            } else {
-                customDialog_Common(responseData);
-            }
+//
+//            } else {
+//                customDialog_Common(responseData);
+            }else
+                customDialog_Common("Transaction Timeout...");
             dialog.hide_progress();
         } catch (Exception e) {
             e.printStackTrace();

@@ -72,8 +72,6 @@ class FOSTransfer : BaseFragment(), RequestHandler {
                 customDialog_Ben(transactionPozoArrayList!!.get(position), "Network Transfer", "BENLAYOUT", pozoClick!!.getConsentStatus(), "Credit To Network")
             }
             handlercontrol()
-            //                if (clickedId.equalsIgnoreCase("0"))
-            //                    customDialog_Ben(transactionPozoArrayList.get(position), "Network Transfer", "AMOUNTTRANSFER", "", "Credit To Network");
         })
     }
 
@@ -82,7 +80,6 @@ class FOSTransfer : BaseFragment(), RequestHandler {
     }
 
     override fun chechStat(`object`: String?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
     var s:String?=null
     override fun chechStatus(`object`: JSONObject?) {
@@ -100,7 +97,8 @@ class FOSTransfer : BaseFragment(), RequestHandler {
                 }else if (`object`.getString("serviceType").equals("C2C_NETWORK_CREDIT",true)) {
                     customDialog_Ben(null, `object`.getString("responseMessage"), "NETWORK_CREDIT", null, "Credit Confirmation")
                 }
-            }
+            }else
+                responseMSg(`object`)
         } catch (e: Exception) {
             e.printStackTrace()
         }

@@ -58,22 +58,14 @@ class BankDetails : BaseFragment(), RequestHandler {
         }
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         var view = inflater.inflate(R.layout.bankdetail_layout, container, false);
-        if (BaseCompactActivity.db != null && BaseCompactActivity.db.details_Rapi)
-            list = BaseCompactActivity.db.details
+        if (BaseCompactActivity.dbRealm != null && BaseCompactActivity.dbRealm.details_Rapi)
+            list = BaseCompactActivity.dbRealm.details
         initialize(view)
         url()
         return view;
     }
-//    public override fun onCreate(savedInstanceState: Bundle?) {
-//        super.onCreate(savedInstanceState)
-//        setContentView(R.layout.bankdetail_layout)
-//        initialize()
-//        url()
-//    }
 
     private fun initialize(view:View) {
-//        heading = view.findViewById<View>(R.id.toolbar_title) as TextView
-//        heading.text = "Bank Details for Deposit"
         recycler_view = view.findViewById<View>(R.id.recycler_view) as RecyclerView
         note1 = view.findViewById<View>(R.id.note1) as TextView
         note2 = view.findViewById<View>(R.id.note2) as TextView
@@ -96,7 +88,8 @@ class BankDetails : BaseFragment(), RequestHandler {
                     parseBankDetails(JSONObject(text))
 
                 }
-            }
+            }else
+                responseMSg(`object`)
         } catch (e: Exception) {
             e.printStackTrace()
         }

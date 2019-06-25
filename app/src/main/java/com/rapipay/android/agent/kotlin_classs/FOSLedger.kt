@@ -39,19 +39,10 @@ class FOSLedger : BaseFragment(), RequestHandler, View.OnClickListener {
     protected var date1_text: AutofitTextView? = null
     protected var toimage: ImageView? = null
     protected var fromimage: ImageView? = null
-//    override fun onCreate(savedInstanceState: Bundle?) {
-//        super.onCreate(savedInstanceState)
-//        setContentView(R.layout.network_transfer_layout)
-//        var intent = intent as Intent
-//
-//        init()
-//        loadUrl()
-//    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         var view = inflater.inflate(R.layout.fos_layout_ledger, container, false) as View
         init(view)
-//        loadUrl()
         return view
     }
 
@@ -74,10 +65,8 @@ class FOSLedger : BaseFragment(), RequestHandler, View.OnClickListener {
         v.findViewById<View>(R.id.date2).setOnClickListener(fromDateClicked)
         toimage = v.findViewById<View>(R.id.toimage) as ImageView
         toimage!!.setOnClickListener(toDateClicked)
-//        toimage!!.setColorFilter(resources.getColor(R.color.colorPrimaryDark))
         fromimage = v.findViewById<View>(R.id.fromimage) as ImageView
         fromimage!!.setOnClickListener(fromDateClicked)
-//        fromimage!!.setColorFilter(resources.getColor(R.color.colorPrimaryDark))
         trans_details!!.setOnScrollListener(object : AbsListView.OnScrollListener {
             override fun onScrollStateChanged(view: AbsListView, scrollState: Int) {
 
@@ -197,7 +186,8 @@ class FOSLedger : BaseFragment(), RequestHandler, View.OnClickListener {
                     if (`object`.has("subAgentTxnList"))
                         insertLastTransDetails(`object`.getJSONArray("subAgentTxnList"))
                 }
-            }
+            }else
+                responseMSg(`object`)
         } catch (e: Exception) {
             e.printStackTrace()
         }

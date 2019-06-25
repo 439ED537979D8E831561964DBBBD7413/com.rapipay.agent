@@ -1,8 +1,12 @@
 package com.rapipay.android.agent.Model;
 
-public class ImagePozo {
+import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
+
+public class ImagePozo extends RealmObject {
     int imageId;
     String imageTagName;
+    @PrimaryKey
     String imageName;
     byte[] imagePath;
     int imageUrl;

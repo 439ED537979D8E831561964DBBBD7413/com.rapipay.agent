@@ -24,7 +24,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.rapipay.android.agent.Database.RapipayDB;
+import com.rapipay.android.agent.Model.BankDetailsPozo;
 import com.rapipay.android.agent.Model.BeneficiaryDetailsPozo;
+import com.rapipay.android.agent.Model.TbTransitionPojo;
 import com.rapipay.android.agent.Model.WalletTransPozo;
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.adapter.WalletBeneficiaryAdapter;
@@ -74,11 +76,6 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
         setContentView(R.layout.wallet_details_layout);
         initialize();
         TYPE = getIntent().getStringExtra("type");
-//        mobileNo = getIntent().getStringExtra("mobileNo");
-//        if (TYPE.equalsIgnoreCase("internal") || !mobileNo.isEmpty()) {
-//            input_mobile.setText(mobileNo);
-//            input_mobile.setEnabled(false);
-//        }
     }
 
     private void initialize() {
@@ -114,12 +111,14 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
         findViewById(R.id.btn_verify).setOnClickListener(this);
         bank_select = (TextView) findViewById(R.id.bank_select);
         newtpin = (EditText) findViewById(R.id.newtpin);
-//        if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y"))
-//            newtpin.setVisibility(View.VISIBLE);
+        final ArrayList<String> list_bank = new ArrayList<>();
         bank_select.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ArrayList<String> list_bank = db.geBankDetails("");
+                ArrayList<BankDetailsPozo> stlist = dbRealm.geBankDetails("");
+                for (int i = 0; i < stlist.size(); i++) {
+                    list_bank.add(stlist.get(i).getBankName());
+                }
                 customSpinner(bank_select, "Select Bank", list_bank);
             }
         });
@@ -146,7 +145,8 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
                     btnstatus = true;
                     benePosition = position;
                     customDialog_Common("BENLAYOUT", null, beneficiaryDetailsPozoslist.get(position), "RapiPay", null, null, "DELETE&FUND");
-                }handlercontrol();
+                }
+                handlercontrol();
             }
 
             @Override
@@ -269,14 +269,6 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-//            case R.id.btn_otpsubmit:
-//                if (input_otp.getText().toString().isEmpty())
-//                    input_otp.setError("Please enter mandatory field");
-//                else if (!otpRefId.isEmpty() && !input_otp.getText().toString().isEmpty()) {
-//                    hideKeyboard(WalletDetailsActivity.this);
-//                    new WalletAsyncMethod(WebConfig.WALLETTRANSFER_URL, processOtp(input_otp.getText().toString(), otpRefId).toString(), headerData, WalletDetailsActivity.this,getString(R.string.responseTimeOutTrans)).execute();
-//                }
-//                break;
             case R.id.back_click:
                 setBack_click(this);
                 finish();
@@ -292,12 +284,6 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
                         } else if (!ImageUtils.commonAccount(input_account.getText().toString(), 5, 30)) {
                             input_account.setError("Please enter valid account number.");
                             input_account.requestFocus();
-//                    } else if (!ImageUtils.commonRegex(input_ben_name.getText().toString(), 150, " ")) {
-//                        input_ben_name.setError("Please enter mandatory field");
-//                        input_ben_name.requestFocus();
-//                    } else if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && (newtpin.getText().toString().isEmpty() || newtpin.getText().toString().length() != 4)) {
-//                        newtpin.setError("Please enter TPIN");
-//                        newtpin.requestFocus();
                         } else
                             new WalletAsyncMethod(WebConfig.BCRemittanceApp, verify_Account().toString(), headerData, WalletDetailsActivity.this, getString(R.string.responseTimeOutTrans), "VERIFYACCOUNT").execute();
                     } else {
@@ -345,7 +331,6 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
         beneficiary_layout.setVisibility(View.GONE);
         last_tran_layout.setVisibility(View.GONE);
         bank_select.setText("Select Bank");
-//        isRegenrate = false;
     }
 
     @Override
@@ -390,8 +375,9 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
         JSONObject jsonObject = new JSONObject();
         try {
             transactionID = ImageUtils.miliSeconds();
-            String condition = "where " + RapipayDB.COLOMN__BANK_NAME + "='" + bank_select.getText().toString() + "'";
-            ifsc_code = db.geBankIFSC(condition).get(0);
+            // String condition = "where " + RapipayDB.COLOMN__BANK_NAME + "='" + bank_select.getText().toString() + "'";
+            String condition = bank_select.getText().toString();
+            ifsc_code = dbRealm.geBankIFSC(condition).get(0);
             jsonObject.put("serviceType", "Verify_Account");
             jsonObject.put("requestType", "BC_CHANNEL");
             jsonObject.put("typeMobileWeb", "mobile");
@@ -425,121 +411,103 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
                 String balance = object1.getString("runningBalance");
                 heading.setText("Wallet Fund Transfer (Balance : Rs." + format(balance) + ")");
             }
-            if (object.getString("serviceType").equalsIgnoreCase("GET_WALLET_STATUS")) {
-                if (object.getString("responseCode").equalsIgnoreCase("75061")) {
-                    customDialog_Common("KYCLAYOUT", object, null, "KYC Registration", null, object.getString("responseMessage") + "\n" + "Proceed for KYC ?", hitFrom);
-                } else if (object.getString("responseCode").equalsIgnoreCase("75063")) {
-                    customDialog_Common("KYCLAYOUT", object, null, "Mobile Number Status", null, object.getString("responseMessage"), hitFrom);
-                } else if (object.getString("responseCode").equalsIgnoreCase("75062")) {
-                    customDialog_Common("KYCLAYOUT", object, null, "Agent Re-registration", null, object.getString("responseMessage"), "REREGISTRATIONWALLET");
-//                    customDialog_Common("OTPLAYOUT", object, null, "Agent Re-registration", null, object.getString("responseMsg"));
-                } else if (object.getString("responseCode").equalsIgnoreCase("200")) {
-                    hideKeyboard(WalletDetailsActivity.this);
-                    if (hitFrom.equalsIgnoreCase("REREGISTRATIONWALLET")) {
-                        if (!object.getString("otpRefId").equalsIgnoreCase("null") && object.getString("otpRefId").length() > 0) {
-                            customDialog_Common("OTPLAYOUTS", object, null, "Agent Re-registration", null, object.getString("responseMessage"), hitFrom);
-//                            otp_layout.setVisibility(View.VISIBLE);
-//                            btn_sender.setVisibility(View.GONE);
-//                            otpRefId = object.getString("otpRefId");
-//                            clear();
-//                            isRegenrate = true;
-                        }
-                    } else if (hitFrom.equalsIgnoreCase("WALLETSTATUS")) {
-                        clear();
-                        sender_layout.setVisibility(View.VISIBLE);
-                        fundlayout.setVisibility(View.VISIBLE);
-                        btn_sender.setVisibility(View.GONE);
-                        input_name.setText(object.getString("customerName"));
-                        input_name.setEnabled(false);
-                        reset.setVisibility(View.VISIBLE);
-                        isVerifyAccount = object.getString("isVerifyAccount");
-                        limit = Integer.valueOf(object.getInt("dailyRemLimit"));
-                        text_ben.setText("Add Beneficiary  Transfer Limit" + "\n" + "Monthly : Rs " + format(object.getString("monthlyRemLimit")));
-                        if (object.has("beneficiaryDetailList")) {
-                            if (Integer.parseInt(object.getString("numberOfBenCount")) > 0) {
-                                beneficiary_layout.setVisibility(View.VISIBLE);
-                                insertBenfDetails(object.getJSONArray("beneficiaryDetailList"));
+            if (object.getString("responseCode").equalsIgnoreCase("200")) {
+                if (object.getString("serviceType").equalsIgnoreCase("GET_WALLET_STATUS")) {
+                    if (object.getString("responseCode").equalsIgnoreCase("75061")) {
+                        customDialog_Common("KYCLAYOUT", object, null, "KYC Registration", null, object.getString("responseMessage") + "\n" + "Proceed for KYC ?", hitFrom);
+                    } else if (object.getString("responseCode").equalsIgnoreCase("75063")) {
+                        customDialog_Common("KYCLAYOUT", object, null, "Mobile Number Status", null, object.getString("responseMessage"), hitFrom);
+                    } else if (object.getString("responseCode").equalsIgnoreCase("75062")) {
+                        customDialog_Common("KYCLAYOUT", object, null, "Agent Re-registration", null, object.getString("responseMessage"), "REREGISTRATIONWALLET");
+                    } else if (object.getString("responseCode").equalsIgnoreCase("200")) {
+                        hideKeyboard(WalletDetailsActivity.this);
+                        if (hitFrom.equalsIgnoreCase("REREGISTRATIONWALLET")) {
+                            if (!object.getString("otpRefId").equalsIgnoreCase("null") && object.getString("otpRefId").length() > 0) {
+                                customDialog_Common("OTPLAYOUTS", object, null, "Agent Re-registration", null, object.getString("responseMessage"), hitFrom);
                             }
-                        }
-                        if (object.has("transactionDetList")) {
-                            if (Integer.parseInt(object.getString("numberOfTxnCount")) > 0) {
-                                last_tran_layout.setVisibility(View.VISIBLE);
-                                insertTransDetails(object.getJSONArray("transactionDetList"));
+                        } else if (hitFrom.equalsIgnoreCase("WALLETSTATUS")) {
+                            clear();
+                            sender_layout.setVisibility(View.VISIBLE);
+                            fundlayout.setVisibility(View.VISIBLE);
+                            btn_sender.setVisibility(View.GONE);
+                            input_name.setText(object.getString("customerName"));
+                            input_name.setEnabled(false);
+                            reset.setVisibility(View.VISIBLE);
+                            isVerifyAccount = object.getString("isVerifyAccount");
+                            limit = Integer.valueOf(object.getInt("dailyRemLimit"));
+                            text_ben.setText("Add Beneficiary  Transfer Limit" + "\n" + "Monthly : Rs " + format(object.getString("monthlyRemLimit")));
+                            if (object.has("beneficiaryDetailList")) {
+                                if (Integer.parseInt(object.getString("numberOfBenCount")) > 0) {
+                                    beneficiary_layout.setVisibility(View.VISIBLE);
+                                    insertBenfDetails(object.getJSONArray("beneficiaryDetailList"));
+                                }
+                            }
+                            if (object.has("transactionDetList")) {
+                                if (Integer.parseInt(object.getString("numberOfTxnCount")) > 0) {
+                                    last_tran_layout.setVisibility(View.VISIBLE);
+                                    insertTransDetails(object.getJSONArray("transactionDetList"));
+                                }
                             }
                         }
                     }
-//                    } else {
-//                        new WalletAsyncMethod(WebConfig.WALLETTRANSFER_URL, getSender_Validate().toString(), headerData, WalletDetailsActivity.this,getString(R.string.responseTimeOutTrans)).execute();
-//                    }
-                }
-            } else if (object.getString("serviceType").equalsIgnoreCase("Verify_Account")) {
-                if (object.getString("responseCode").equalsIgnoreCase("200"))
-                    customDialog_Common("VerifyLayout", object, null, "Verify Account Details", input_name.getText().toString(), null, hitFrom);
-                else if (object.getString("responseCode").equalsIgnoreCase("101")) {
-                    customDialog_Common("KYCLAYOUTLAY", null, null, "Verify Account Details", null, object.getString("responseMessage"), hitFrom);
-                }
-            } else if (object.getString("serviceType").equalsIgnoreCase("ADD_BENEFICIARY")) {
-                if (object.getString("responseCode").equalsIgnoreCase("200") && object.has("otpRefId"))
-                    customDialog_Common("OTPLAYOUT", object, null, "Add Beneficiary OTP", null, null, hitFrom);
-                else
-                    customDialog_Common("KYCLAYOUTL", object, null, "Beneficiary Detail", null, object.getString("output"), hitFrom);
-            } else if (object.getString("serviceType").equalsIgnoreCase("DELETE_BENEFICIARY")) {
-                if (object.getString("responseCode").equalsIgnoreCase("200"))
-                    customDialog_Common("KYCLAYOUTLAY", object, null, "Payee Detail", null, object.getString("responseMessage"), hitFrom);
-            } else if (object.getString("serviceType").equalsIgnoreCase("FUND_TRANSFER")) {
-                if (object.getString("responseCode").equalsIgnoreCase("200"))
-                    customDialog_Common("OTPLAYOUT", object, null, "Fund Transfer " + radio_Clicked, null, null, hitFrom);
-//                else {
-//                    localStorage.setActivityState(LocalStorage.ROUTESTATE, "UPDATE");
-//                    if (object.has("getTxnReceiptDataList")) {
-//                        try {
-//                            JSONArray array = object.getJSONArray("getTxnReceiptDataList");
-//                            customReceiptNew("Fund Transfer Detail", object, WalletDetailsActivity.this);
-//                        } catch (Exception e) {
-//                            e.printStackTrace();
-//                            customDialog_Common("KYCLAYOUTL", object, null, "", "", "Cannot generate receipt now please try later!",hitFrom);
-//                        }
-//                    }
-//                }
-            } else if (object.getString("serviceType").equalsIgnoreCase("GET_SERVICE_FEE_WLT")) {
-                if (object.getString("responseCode").equalsIgnoreCase("200"))
-                    customDialog_Common("Fund Transfer Confirmation", object, beneficiaryDetailsPozoslist.get(benePosition), "Confirm Money Transfer?", input_mobile.getText().toString(), null, hitFrom);
-            } else if (object.getString("serviceType").equalsIgnoreCase("PROCESS_OTP")) {
-                if (object.getString("responseCode").equalsIgnoreCase("200") || object.getString("responseCode").equalsIgnoreCase("101"))
-//                    if (object.has("getTxnReceiptDataList")) {
-//                        if (!object.getString("getTxnReceiptDataList").equalsIgnoreCase("null")) {
-//                            JSONArray array = object.getJSONArray("getTxnReceiptDataList");
-//                            if (array.length() != 0)
-                    if (hitFrom.equalsIgnoreCase("FUNDTRANSFER")) {
-                        customReceiptNew("Fund Transfer Details", object, WalletDetailsActivity.this);
-//                        localStorage.setActivityState(LocalStorage.ROUTESTATE, "UPDATE");
-                    } else {
-                        dialog.dismiss();
-                        customDialog_Common("KYCLAYOUTL", object, null, "Successfully Done", null, object.getString("responseMessage"), hitFrom);
-                    }
-
-            } else if (object.getString("serviceType").equalsIgnoreCase("WLT_RE_REGISTRATION_PROCESS")) {
-                if (object.getString("responseCode").equalsIgnoreCase("200")) {
-                    customDialog_Common("KYCLAYOUTLAY", object, null, "Registration Added Successfully", null, object.getString("responseMessage"), hitFrom);
-                }
-            } else if (object.getString("serviceType").equalsIgnoreCase("REGENRATE_OTP")) {
-                if (object.getString("responseCode").equalsIgnoreCase("200"))
-                    if (!radio_Clicked.isEmpty())
-                        customDialog_Common("OTPLAYOUT", object, null, radio_Clicked + " Sent Again", null, null, hitFrom);
+                } else if (object.getString("serviceType").equalsIgnoreCase("Verify_Account")) {
+                    if (object.getString("responseCode").equalsIgnoreCase("200"))
+                        customDialog_Common("VerifyLayout", object, null, "Verify Account Details", input_name.getText().toString(), null, hitFrom);
+                } else if (object.getString("serviceType").equalsIgnoreCase("ADD_BENEFICIARY")) {
+                    if (object.getString("responseCode").equalsIgnoreCase("200") && object.has("otpRefId"))
+                        customDialog_Common("OTPLAYOUT", object, null, "Add Beneficiary OTP", null, null, hitFrom);
                     else
-                        customDialog_Common("OTPLAYOUT", object, null, "OTP Sent Again", null, null, hitFrom);
-            } else if (object.getString("serviceType").equalsIgnoreCase("Get_Txn_Recipt")) {
-                if (object.has("getTxnReceiptDataList")) {
-                    try {
-                        JSONArray array = object.getJSONArray("getTxnReceiptDataList");
-                        customReceiptNew("Last Transaction Detail", object, WalletDetailsActivity.this);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        customDialog_Common("KYCLAYOUTL", object, null, "", "", "Cannot generate receipt now please try later!", hitFrom);
+                        customDialog_Common("KYCLAYOUTL", object, null, "Beneficiary Detail", null, object.getString("output"), hitFrom);
+                } else if (object.getString("serviceType").equalsIgnoreCase("DELETE_BENEFICIARY")) {
+                    if (object.getString("responseCode").equalsIgnoreCase("200"))
+                        customDialog_Common("KYCLAYOUTLAY", object, null, "Payee Detail", null, object.getString("responseMessage"), hitFrom);
+                } else if (object.getString("serviceType").equalsIgnoreCase("FUND_TRANSFER")) {
+                    if (object.getString("responseCode").equalsIgnoreCase("200")) {
+                        dialog.dismiss();
+                        customDialog_Common("OTPLAYOUT", object, null, "Fund Transfer " + radio_Clicked, null, null, hitFrom);
+                    }
+                } else if (object.getString("serviceType").equalsIgnoreCase("GET_SERVICE_FEE_WLT")) {
+                    if (object.getString("responseCode").equalsIgnoreCase("200"))
+                        customDialog_Common("Fund Transfer Confirmation", object, beneficiaryDetailsPozoslist.get(benePosition), "Confirm Money Transfer?", input_mobile.getText().toString(), null, hitFrom);
+                } else if (object.getString("serviceType").equalsIgnoreCase("PROCESS_OTP")) {
+                    if (object.getString("responseCode").equalsIgnoreCase("200") || object.getString("responseCode").equalsIgnoreCase("101"))
+
+                        if (hitFrom.equalsIgnoreCase("FUNDTRANSFER")) {
+                            dialog.dismiss();
+                            customReceiptNew("Fund Transfer Details", object, WalletDetailsActivity.this);
+                        } else {
+                            dialog.dismiss();
+                            customDialog_Common("KYCLAYOUTL", object, null, "Successfully Done", null, object.getString("responseMessage"), hitFrom);
+                        }
+
+                } else if (object.getString("serviceType").equalsIgnoreCase("WLT_RE_REGISTRATION_PROCESS")) {
+                    if (object.getString("responseCode").equalsIgnoreCase("200")) {
+                        customDialog_Common("KYCLAYOUTLAY", object, null, "Registration Added Successfully", null, object.getString("responseMessage"), hitFrom);
+                    }
+                } else if (object.getString("serviceType").equalsIgnoreCase("REGENRATE_OTP")) {
+                    if (object.getString("responseCode").equalsIgnoreCase("200"))
+                        if (!radio_Clicked.isEmpty())
+                            customDialog_Common("OTPLAYOUT", object, null, radio_Clicked + " Sent Again", null, null, hitFrom);
+                        else
+                            customDialog_Common("OTPLAYOUT", object, null, "OTP Sent Again", null, null, hitFrom);
+                } else if (object.getString("serviceType").equalsIgnoreCase("Get_Txn_Recipt")) {
+                    if (object.has("getTxnReceiptDataList")) {
+                        try {
+                            JSONArray array = object.getJSONArray("getTxnReceiptDataList");
+                            customReceiptNew("Last Transaction Detail", object, WalletDetailsActivity.this);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            customDialog_Common("KYCLAYOUTL", object, null, "", "", "Cannot generate receipt now please try later!", hitFrom);
+                        }
                     }
                 }
+            } else if (object.getString("responseCode").equalsIgnoreCase("101")) {
+                if (object.getString("serviceType").equalsIgnoreCase("Verify_Account"))
+                    customDialog_Common("KYCLAYOUTLAY", null, null, "Verify Account Details", null, object.getString("responseMessage"), hitFrom);
+            } else {
+                responseMSg(object);
             }
-        } catch (Exception e) {
+        } catch (Exception e){
             e.printStackTrace();
         }
     }
@@ -587,11 +555,6 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
             jsonObject.put("senderMobileNo", input_mobile.getText().toString());
             jsonObject.put("otpRefId", object.getString("otpRefId"));
-//            if (!object.getString("serviceType").equalsIgnoreCase("FUND_TRANSFER") && !object.getString("serviceType").equalsIgnoreCase("REGENRATE_OTP")) {
-//                jsonObject.put("beneficiaryId", object.getString("beneficiaryId"));
-//                jsonObject.put("bankBeneficiaryId", object.getString("bankBeneficiaryId"));
-//                jsonObject.put("regRefId", object.getString("txnRef"));
-//            }
             jsonObject.put("otp", otp);
             jsonObject.put("reqFor", "WALLET");
             jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
@@ -626,8 +589,9 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
     public JSONObject processPayee(String verificationTxnId, String verifyAccountFlag, String senderName) {
         JSONObject jsonObject = new JSONObject();
         try {
-            String condition = "where " + RapipayDB.COLOMN__BANK_NAME + "='" + bank_select.getText().toString() + "'";
-            ifsc_code = db.geBankIFSC(condition).get(0);
+            //  String condition = "where " + RapipayDB.COLOMN__BANK_NAME + "='" + bank_select.getText().toString() + "'";
+            String condition = bank_select.getText().toString();
+            ifsc_code = dbRealm.geBankIFSC(condition).get(0);
             jsonObject.put("serviceType", "ADD_BENEFICIARY");
             jsonObject.put("requestType", "DMT_CHANNEL");
             jsonObject.put("typeMobileWeb", "mobile");
@@ -721,7 +685,11 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
         final TextView input_text = (TextView) alertLayout.findViewById(R.id.input_text);
         texts.setText(title);
         spinner = (Spinner) alertLayout.findViewById(R.id.bank_select);
-        final ArrayList<String> transferArrayList = db.getTransferDetails("");
+        final ArrayList<String> transferArrayList = new ArrayList<>();
+        final ArrayList<TbTransitionPojo> list1 = dbRealm.getTransferDetails("");
+        for (int i = 0; i < list1.size(); i++) {
+            transferArrayList.add(list1.get(i).getOperatorsData());
+        }
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(WalletDetailsActivity.this,
                 android.R.layout.simple_spinner_item, transferArrayList);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -742,17 +710,6 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
 
             }
         });
-//            }
-//        spinner.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                ArrayList<String> transferArrayList = db.getTransferDetails("");
-//                ArrayAdapter<String> adapter = new ArrayAdapter<String>(CustomerKYCActivity.this,
-//                        android.R.layout.simple_spinner_item, items);
-//                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//                customSpinner(spinner, "Select Transfer Type", transferArrayList);
-//            }
-//        });
         AppCompatButton btn_cancel = (AppCompatButton) alertLayout.findViewById(R.id.btn_cancel);
         AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
         btn_cancel.setText("Cancel");
@@ -773,10 +730,11 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
 
             @Override
             public void afterTextChanged(Editable s) {
-                if (s.length()!=0 && s.length()<10) {
-                    input_text.setText(EnglishNumberToWords.convert(Integer.parseInt(s.toString())));
+                if (s.length() != 0 && s.length() < 10) {
+                    input_text.setText("");
+                    input_text.setText(EnglishNumberToWords.convert(Integer.parseInt(s.toString())) + " rupee");
                     input_text.setVisibility(View.VISIBLE);
-                }else
+                } else
                     input_text.setVisibility(View.GONE);
             }
         });
@@ -974,18 +932,13 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
                                 customFund_Transfer((BeneficiaryDetailsPozo) ob, "RapiPay", "FUNDTRANSFER");
                                 dialog.dismiss();
                             } else if (type.equalsIgnoreCase("Fund Transfer Confirmation")) {
-//                            if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && radio_Clicked.isEmpty()) {
-//                                Toast.makeText(WalletDetailsActivity.this, "Please select type", Toast.LENGTH_SHORT).show();
-//                            } else
                                 if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && newtpin.getText().toString().length() == 4) {
                                     new WalletAsyncMethod(WebConfig.WALLETTRANSFER_URL, fund_transfer(beneficiaryDetailsPozoslist.get(benePosition), value, ben_amount.getText().toString()).toString(), headerData, WalletDetailsActivity.this, getString(R.string.responseTimeOutTrans), hitFrom).execute();
-                                    dialog.dismiss();
                                 } else if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && (newtpin.getText().toString().isEmpty() || newtpin.getText().toString().length() != 4)) {
                                     newtpin.setError("Please enter TPIN");
                                     newtpin.requestFocus();
                                 } else if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("N")) {
                                     new WalletAsyncMethod(WebConfig.WALLETTRANSFER_URL, fund_transfer(beneficiaryDetailsPozoslist.get(benePosition), value, ben_amount.getText().toString()).toString(), headerData, WalletDetailsActivity.this, getString(R.string.responseTimeOutTrans), hitFrom).execute();
-                                    dialog.dismiss();
                                 }
                             } else if (type.equalsIgnoreCase("KYCLAYOUTLAY")) {
                                 if (object.getString("serviceType").equalsIgnoreCase("WLT_RE_REGISTRATION_PROCESS"))

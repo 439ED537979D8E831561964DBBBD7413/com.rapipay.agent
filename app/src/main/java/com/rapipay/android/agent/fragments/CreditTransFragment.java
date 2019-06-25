@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.rapipay.android.agent.Model.CreditHistoryPozo;
 import com.rapipay.android.agent.Model.RapiPayPozo;
@@ -55,8 +56,8 @@ public class CreditTransFragment extends BaseFragment implements RequestHandler,
         rv = (View) inflater.inflate(R.layout.credit_fragment_alyout, container, false);
         initialize(rv);
         headerData = (WebConfig.BASIC_USERID + ":" + WebConfig.BASIC_PASSWORD);
-        if (BaseCompactActivity.db != null && BaseCompactActivity.db.getDetails_Rapi())
-            list = BaseCompactActivity.db.getDetails();
+        if (BaseCompactActivity.dbRealm != null && BaseCompactActivity.dbRealm.getDetails_Rapi())
+            list = BaseCompactActivity.dbRealm.getDetails();
         else
             dbNull(CreditTransFragment.this);
         return rv;
@@ -163,9 +164,14 @@ public class CreditTransFragment extends BaseFragment implements RequestHandler,
                     } else if (date1_text.getText().toString().isEmpty()) {
                         date1_text.setError("Please enter valid data");
                         date1_text.requestFocus();
-                    } else if (printDifference(mainDate(date2_text.getText().toString()), mainDate(date1_text.getText().toString())))
+                    } else if (printDifference(mainDate(date2_text.getText().toString()), mainDate(date1_text.getText().toString()))) {
                         new AsyncPostMethod(WebConfig.CommonReport, channel_request().toString(), headerData, CreditTransFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
-                }
+                        trans_details.setVisibility(View.VISIBLE);
+                    }else {
+                        trans_details.setVisibility(View.GONE);
+                        customDialog_Common("Statement Can Only View For One Month");
+                    }
+                }handlercontrol();
                 break;
         }
     }
@@ -248,7 +254,8 @@ public class CreditTransFragment extends BaseFragment implements RequestHandler,
                         if (Integer.parseInt(object.getString("creditFundCount")) > 0)
                             insertLastTransDetails(object.getJSONArray("creditFundList"));
                 }
-            }
+            }else
+                responseMSg(object);
         } catch (Exception e) {
             e.printStackTrace();
         }

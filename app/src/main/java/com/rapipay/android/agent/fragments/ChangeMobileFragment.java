@@ -44,8 +44,8 @@ public class ChangeMobileFragment extends BaseFragment implements RequestHandler
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View rv = (View) inflater.inflate(R.layout.change_number_layout, container, false);
         localStorage = LocalStorage.getInstance(getActivity());
-        if (BaseCompactActivity.db != null && BaseCompactActivity.db.getDetails_Rapi())
-            list = BaseCompactActivity.db.getDetails();
+        if (BaseCompactActivity.dbRealm != null && BaseCompactActivity.dbRealm.getDetails_Rapi())
+            list = BaseCompactActivity.dbRealm.getDetails();
         initialize(rv);
         return rv;
     }
@@ -188,26 +188,13 @@ public class ChangeMobileFragment extends BaseFragment implements RequestHandler
                     new_number.setVisibility(View.GONE);
                     old_number.setVisibility(View.GONE);
                     Toast.makeText(getActivity(), object.getString("responseMessage"), Toast.LENGTH_SHORT).show();
-                    deleteTables("forgot");
                     new RouteClass(getActivity(), null, "", localStorage, "0");
                 }
-            }
+            }else
+                responseMSg(object);
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    protected void deleteTables(String type) {
-        SQLiteDatabase dba = BaseCompactActivity.db.getWritableDatabase();
-        dba.execSQL("delete from " + RapipayDB.TABLE_BANK);
-        dba.execSQL("delete from " + RapipayDB.TABLE_PAYMENT);
-        dba.execSQL("delete from " + RapipayDB.TABLE_STATE);
-        dba.execSQL("delete from " + RapipayDB.TABLE_OPERATOR);
-        dba.execSQL("delete from " + RapipayDB.TABLE_FOOTER);
-        dba.execSQL("delete from " + RapipayDB.TABLE_TRANSFERLIST);
-        dba.execSQL("delete from " + RapipayDB.TABLE_PAYERPAYEE);
-        if (!type.equalsIgnoreCase(""))
-            dba.execSQL("delete from " + RapipayDB.TABLE_NAME);
     }
 
     @Override

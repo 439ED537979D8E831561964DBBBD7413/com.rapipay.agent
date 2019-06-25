@@ -39,8 +39,8 @@ class SettlementBak : BaseFragment(), RequestHandler {
     var holdername: TextView? = null
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         var view = inflater.inflate(R.layout.settle_lay, container, false) as View
-        if (BaseCompactActivity.db != null && BaseCompactActivity.db.details_Rapi)
-            list = BaseCompactActivity.db.details
+        if (BaseCompactActivity.dbRealm != null && BaseCompactActivity.dbRealm.details_Rapi)
+            list = BaseCompactActivity.dbRealm.details
         init(view)
         loadUrl()
         return view
@@ -67,7 +67,6 @@ class SettlementBak : BaseFragment(), RequestHandler {
             }
 
             override fun onLongClick(view: View?, position: Int) {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
             }
         }))
     }
@@ -77,7 +76,6 @@ class SettlementBak : BaseFragment(), RequestHandler {
     }
 
     override fun chechStat(`object`: String?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun chechStatus(`object`: JSONObject?) {
@@ -97,7 +95,8 @@ class SettlementBak : BaseFragment(), RequestHandler {
                 }else if (`object`.getString("serviceType").equals("INITIATE_STLMNT_TRANSFER_FUND", true)) {
                     customDialog_Ben(null, `object`.getString("responseMessage"),"KYCLAYOUTS", "Alert")
                 }
-            }
+            }else
+                responseMSg(`object`)
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -165,7 +164,6 @@ class SettlementBak : BaseFragment(), RequestHandler {
         val btn_ok = alertLayout.findViewById<View>(R.id.btn_ok) as AppCompatButton
         val btn_regenerate = alertLayout.findViewById<View>(R.id.btn_regenerate) as AppCompatButton
         if (type.equals("BENLAYOUT", ignoreCase = true)) {
-//            if (amount?.equals("null")||amount!!.equals("N", ignoreCase = true))
             btn_cancel.visibility = View.GONE
             btn_cancel.text = "Reverse transfer"
             btn_regenerate.text = "Cancel"
@@ -205,7 +203,8 @@ class SettlementBak : BaseFragment(), RequestHandler {
 
             override fun afterTextChanged(s: Editable) {
                 if (s.length != 0 && s.length < 10) {
-                    input_text.text = EnglishNumberToWords.convert(Integer.parseInt(s.toString()))
+                    input_text.text=""
+                    input_text.text = EnglishNumberToWords.convert(Integer.parseInt(s.toString()))+" rupee"
                     input_text.visibility = View.VISIBLE
                 } else
                     input_text.visibility = View.GONE

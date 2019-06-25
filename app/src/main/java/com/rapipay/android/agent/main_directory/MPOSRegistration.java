@@ -305,6 +305,8 @@ public class MPOSRegistration extends BaseCompactActivity implements View.OnClic
             intent.putExtra("persons", "pending");
             intent.putExtra("mobileNo", list.get(0).getMobilno());
             intent.putExtra("formData", formData);
+            intent.putExtra("documentType", "");
+            intent.putExtra("documentID", "");
             startActivity(intent);
         }
     }

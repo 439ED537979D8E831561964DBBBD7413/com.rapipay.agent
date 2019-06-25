@@ -43,8 +43,8 @@ class TransactionReports : BaseFragment(), RequestHandler, View.OnClickListener,
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         var view = inflater.inflate(R.layout.txn_report_layout, container, false);
         reqFor = arguments!!.getString("reqFor")
-        if (BaseCompactActivity.db != null && BaseCompactActivity.db.details_Rapi)
-            list = BaseCompactActivity.db.details
+        if (BaseCompactActivity.dbRealm != null && BaseCompactActivity.dbRealm.details_Rapi)
+            list = BaseCompactActivity.dbRealm.details
         init(view)
         return view;
     }
@@ -64,10 +64,8 @@ class TransactionReports : BaseFragment(), RequestHandler, View.OnClickListener,
         v.findViewById<View>(R.id.date2).setOnClickListener(fromDateClicked)
         toimage = v.findViewById<View>(R.id.toimage) as ImageView
         toimage!!.setOnClickListener(toDateClicked)
-//        toimage!!.setColorFilter(resources.getColor(R.color.colorPrimaryDark))
         fromimage = v.findViewById<View>(R.id.fromimage) as ImageView
         fromimage!!.setOnClickListener(fromDateClicked)
-//        fromimage!!.setColorFilter(resources.getColor(R.color.colorPrimaryDark))
         trans_details!!.setOnItemClickListener(AdapterView.OnItemClickListener { parent, view, position, id ->
             if (btnstatus == false) {
                 btnstatus = true
@@ -94,11 +92,9 @@ class TransactionReports : BaseFragment(), RequestHandler, View.OnClickListener,
     }
 
     override fun okClicked(type: String?, ob: Any?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun cancelClicked(type: String?, ob: Any?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     fun receipt_request(pozo: ChannelHistoryPozo): JSONObject {
@@ -245,31 +241,15 @@ class TransactionReports : BaseFragment(), RequestHandler, View.OnClickListener,
                 date1_text!!.setError("Please enter mandatory field")
                 date1_text!!.requestFocus()
             } else if (printDifference(mainDate(date2_text!!.getText().toString()), mainDate(date1_text!!.getText().toString()))) {
-//                val fromDate = date1_text!!.getText().toString()
-//                val ToDate = date2_text!!.getText().toString()
-//
-//                /* val dateBeforeString = fromDate.replace("/", "-")
-//                 val dateAfterString = ToDate.replace("/", "-")
-//                 val dateBefore = LocalDate.parse(dateBeforeString)
-//                 val dateAfter = LocalDate.parse(dateAfterString)
-//                 //calculating number of days in between
-//                 val noOfDaysBetween = ChronoUnit.DAYS.between(ToDate ,fromDate)*/
-////                var checkval: Boolean? = false
-//                var checkval= date_Different(ToDate ,fromDate, 31)
-//                if(!checkval) {
                 loadUrl()
             } else {
+                trans_details!!.setVisibility(View.GONE);
                 customDialog_Common("Statement can only view from one month")
-//                    transactionPozoArrayList = ArrayList<ChannelHistoryPozo>()
-//                    initializeTransAdapter(transactionPozoArrayList!!)
             }
-//            }else
-//                Toast.makeText(activity, "Please select correct date", Toast.LENGTH_SHORT).show()
         }
     }
 
     override fun chechStat(`object`: String?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -301,7 +281,8 @@ class TransactionReports : BaseFragment(), RequestHandler, View.OnClickListener,
                         }
 
                 }
-            }
+            }else
+                responseMSg(`object`)
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -324,6 +305,7 @@ class TransactionReports : BaseFragment(), RequestHandler, View.OnClickListener,
 
     private fun initializeTransAdapter(list: ArrayList<ChannelHistoryPozo>) {
         if (first == 1) {
+            trans_details!!.setVisibility(View.VISIBLE);
             adapters = ChannelListAdapter(list, activity)
             trans_details!!.setAdapter(adapters)
         } else {

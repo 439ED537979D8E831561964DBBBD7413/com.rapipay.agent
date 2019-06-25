@@ -17,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.rapipay.android.agent.Model.StatePozo;
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.interfaces.CustomInterface;
 import com.rapipay.android.agent.interfaces.RequestHandler;
@@ -73,8 +74,12 @@ public class RegisterUserActivity extends BaseCompactActivity implements Request
         select_state.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ArrayList<String> list_state = db.getState_Details();
-                customSpinner(select_state, "Select State", list_state);
+                ArrayList<String> list_state1 = new ArrayList<>();
+                ArrayList<StatePozo> list_state = dbRealm.getState_Details();
+                for(int i=0;i<list_state.size();i++){
+                    list_state1.add(list_state.get(i).getHeaderValue());
+                }
+                customSpinner(select_state, "Select State", list_state1);
             }
         });
         scan_check = 0;
@@ -264,6 +269,8 @@ public class RegisterUserActivity extends BaseCompactActivity implements Request
                         e.printStackTrace();
                     }
                 }
+            }else {
+                responseMSg(object);
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -195,6 +195,10 @@ public class LoginScreenActivity extends BaseCompactActivity implements View.OnC
                 customDialog_Common("KYCLAYOUTS", null, null, "RapiPay Login Failed", null, object.getString("responseMessage"), LoginScreenActivity.this);
             } else if (object.getString("responseCode").equalsIgnoreCase("75077")) {
                 customDialog_Common("KYCLAYOUTS", null, null, "RapiPay Login Failed", null, object.getString("responseMessage"), LoginScreenActivity.this);
+            }else {
+                responseMSg(object);
+                input_user.setText("");
+                input_password.setText("");
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -44,8 +44,8 @@ public class PendingKyc extends BaseFragment implements RequestHandler {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View rv = (View) inflater.inflate(R.layout.pending_kyc_layout, container, false);
-        if (BaseCompactActivity.db != null && BaseCompactActivity.db.getDetails_Rapi())
-            list = BaseCompactActivity.db.getDetails();
+        if (BaseCompactActivity.dbRealm != null && BaseCompactActivity.dbRealm.getDetails_Rapi())
+            list = BaseCompactActivity.dbRealm.getDetails();
         TYPE = getActivity().getIntent().getStringExtra("type");
         customerType = getActivity().getIntent().getStringExtra("customerType");
         initialize(rv);
@@ -85,6 +85,8 @@ public class PendingKyc extends BaseFragment implements RequestHandler {
                             intent.putExtra("persons", "pending");
                             intent.putExtra("mobileNo", pendingKYCPozo.getMobileNo());
                             intent.putExtra("formData", formData);
+                            intent.putExtra("documentType", "");
+                            intent.putExtra("documentID", "");
                             startActivity(intent);
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -169,12 +171,16 @@ public class PendingKyc extends BaseFragment implements RequestHandler {
             if (object.getString("responseCode").equalsIgnoreCase("200")) {
                 try {
                     if (object.has("agentKycPendingList")) {
+                        if (object.isNull("agentKycPendingList") && object.getJSONArray("agentKycPendingList").length() == 0)
+                            customDialog_Common("No Record Found");
+                        else
                         insertLastTransDetails(object.getJSONArray("agentKycPendingList"));
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-            }
+            }else
+                responseMSg(object);
         } catch (Exception e) {
             e.printStackTrace();
         }

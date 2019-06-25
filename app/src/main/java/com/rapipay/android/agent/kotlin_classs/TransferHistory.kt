@@ -38,8 +38,8 @@ class TransferHistory : BaseFragment(), RequestHandler,View.OnClickListener {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         var v = inflater.inflate(R.layout.txn_history_layout, container, false);
         reqFor = arguments!!.getString("reqFor")
-        if (BaseCompactActivity.db != null && BaseCompactActivity.db.details_Rapi)
-            list = BaseCompactActivity.db.details
+        if (BaseCompactActivity.dbRealm != null && BaseCompactActivity.dbRealm.details_Rapi)
+            list = BaseCompactActivity.dbRealm.details
         trans_details = v.findViewById<View>(R.id.trans_details) as ListView
         date2_text = v.findViewById<View>(R.id.date2) as AutofitTextView
         date1_text = v.findViewById<View>(R.id.date1) as AutofitTextView
@@ -50,10 +50,8 @@ class TransferHistory : BaseFragment(), RequestHandler,View.OnClickListener {
         toimage = v.findViewById<View>(R.id.toimage) as ImageView
         v.findViewById<View>(R.id.btn_fund).setOnClickListener(this)
         toimage!!.setOnClickListener(toDateClicked)
-//        toimage!!.setColorFilter(resources.getColor(R.color.colorPrimaryDark))
         fromimage = v.findViewById<View>(R.id.fromimage) as ImageView
         fromimage!!.setOnClickListener(fromDateClicked)
-//        loadUrl()
         return v
     }
     protected var toDateClicked: View.OnClickListener = View.OnClickListener {
@@ -151,26 +149,12 @@ class TransferHistory : BaseFragment(), RequestHandler,View.OnClickListener {
                 date1_text!!.setError("Please enter mandatory field")
                 date1_text!!.requestFocus()
             } else if (printDifference(mainDate(date2_text!!.getText().toString()), mainDate(date1_text!!.getText().toString()))) {
-//                val fromDate = date1_text!!.getText().toString()
-//                val ToDate = date2_text!!.getText().toString()
-//
-//                /* val dateBeforeString = fromDate.replace("/", "-")
-//                 val dateAfterString = ToDate.replace("/", "-")
-//                 val dateBefore = LocalDate.parse(dateBeforeString)
-//                 val dateAfter = LocalDate.parse(dateAfterString)
-//                 //calculating number of days in between
-//                 val noOfDaysBetween = ChronoUnit.DAYS.between(ToDate ,fromDate)*/
-////                var checkval: Boolean? = false
-//                var checkval= date_Different(ToDate ,fromDate, 31)
-//                if(!checkval) {
+                trans_details!!.setVisibility(View.VISIBLE)
                 loadUrl()
             } else {
                 customDialog_Common("Statement can only view from one month")
-//                    transactionPozoArrayList = ArrayList<ChannelHistoryPozo>()
-//                    initializeTransAdapter(transactionPozoArrayList!!)
+                trans_details!!.setVisibility(View.GONE)
             }
-//            }else
-//                Toast.makeText(activity, "Please select correct date", Toast.LENGTH_SHORT).show()
         }
     }
     fun loadUrl() {
@@ -200,7 +184,6 @@ class TransferHistory : BaseFragment(), RequestHandler,View.OnClickListener {
     }
 
     override fun chechStat(`object`: String?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun chechStatus(`object`: JSONObject?) {
@@ -211,6 +194,9 @@ class TransferHistory : BaseFragment(), RequestHandler,View.OnClickListener {
                         insertLastTransDetails(`object`.getJSONArray("getTxnHistory"))
                     }
                 }
+            }else {
+                responseMSg(`object`)
+                trans_details!!.setVisibility(View.GONE)
             }
         } catch (e: Exception) {
             e.printStackTrace()

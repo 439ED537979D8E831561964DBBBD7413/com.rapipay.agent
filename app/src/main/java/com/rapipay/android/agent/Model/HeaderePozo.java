@@ -1,6 +1,10 @@
 package com.rapipay.android.agent.Model;
 
-public class HeaderePozo {
+import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
+
+public class HeaderePozo extends RealmObject {
+    @PrimaryKey
     String headerValue;
     String headerData;
     String headerID;

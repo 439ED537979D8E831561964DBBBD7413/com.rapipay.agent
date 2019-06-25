@@ -110,10 +110,13 @@ public class PassbookActivity extends BaseCompactActivity implements View.OnClic
                     } else if (date1_text.getText().toString().isEmpty()) {
                         date1_text.setError("Please enter mandatory field");
                         date1_text.requestFocus();
-                    } else if (printDifference(mainDate(date2_text.getText().toString()), mainDate(date1_text.getText().toString())))
+                    } else if (printDifference(mainDate(date2_text.getText().toString()), mainDate(date1_text.getText().toString()))) {
+                        trans_details.setVisibility(View.VISIBLE);
                         new AsyncPostMethod(WebConfig.CommonReport, channel_request(first, last).toString(), headerData, PassbookActivity.this, getString(R.string.responseTimeOut)).execute();
-                    else
-                        Toast.makeText(PassbookActivity.this, "Please select correct date", Toast.LENGTH_SHORT).show();
+                    } else {
+                        customDialog_Common("Statement can only view from one month");
+                        trans_details.setVisibility(View.GONE);
+                    }
                 }
                 handlercontrol();
                 break;
@@ -148,9 +151,14 @@ public class PassbookActivity extends BaseCompactActivity implements View.OnClic
             if (object.getString("responseCode").equalsIgnoreCase("200")) {
                 if (object.getString("serviceType").equalsIgnoreCase("GET_LEADGER_DETAILS")) {
                     if (object.has("leadgerCount"))
-                        if (Integer.parseInt(object.getString("leadgerCount")) > 0)
+                        if (Integer.parseInt(object.getString("leadgerCount")) > 0) {
                             insertLastTransDetails(object.getJSONArray("leadgerList"));
+                            trans_details.setVisibility(View.VISIBLE);
+                        }
                 }
+            } else {
+                responseMSg(object);
+                trans_details.setVisibility(View.GONE);
             }
         } catch (Exception e) {
             e.printStackTrace();

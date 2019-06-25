@@ -57,8 +57,8 @@ public class ProfileFragment extends BaseFragment implements RequestHandler, Vie
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View rv = (View) inflater.inflate(R.layout.profile_view, container, false);
-        if (BaseCompactActivity.db != null && BaseCompactActivity.db.getDetails_Rapi())
-            list = BaseCompactActivity.db.getDetails();
+        if (BaseCompactActivity.dbRealm != null && BaseCompactActivity.dbRealm.getDetails_Rapi())
+            list = BaseCompactActivity.dbRealm.getDetails();
         localStorage = LocalStorage.getInstance(getActivity());
         initialize(rv);
         loadApi();
@@ -106,7 +106,8 @@ public class ProfileFragment extends BaseFragment implements RequestHandler, Vie
                 } else if (object.getString("serviceType").equalsIgnoreCase("UPDATE_USER_PROFILE_DETAILS")) {
                     customDialog_Ben(object.getString("responseMessage"), "Profile Updated Successfully");
                 }
-            }
+            }else
+                responseMSg(object);
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -1,6 +1,10 @@
 package com.rapipay.android.agent.Model;
 
-public class PaymentModePozo {
+import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
+
+public class PaymentModePozo extends RealmObject {
+    @PrimaryKey
     String typeID;
     String paymentMode;
     public PaymentModePozo() {

@@ -23,6 +23,10 @@ import android.widget.Toast;
 
 import com.rapipay.android.agent.Database.RapipayDB;
 import com.rapipay.android.agent.Model.NewKYCPozo;
+import com.rapipay.android.agent.Model.NewKycAddress;
+import com.rapipay.android.agent.Model.NewKycBusiness;
+import com.rapipay.android.agent.Model.NewKycPersion;
+import com.rapipay.android.agent.Model.NewKycVerification;
 import com.rapipay.android.agent.Model.RapiPayPozo;
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.interfaces.RequestHandler;
@@ -56,16 +60,20 @@ public class AgentKYCFragment extends BaseFragment implements RequestHandler, Vi
     String[] items = new String[]{"Select Document Type", "Aadhar Card", "Voter Id Card", "Driving License", "Passport"};
     String spinner_value = "";
     String type = "MANUAL";
-    private ArrayList<NewKYCPozo> newKYCList_Personal = null, newKYCList_Address = null, newKYCList_Buisness = null, newKYCList_Verify = null;
+    private ArrayList<NewKycPersion> newKYCList_Personal = null;
+    private ArrayList<NewKycAddress> newKYCList_Address = null;
+    private ArrayList<NewKycBusiness>  newKYCList_Buisness = null;
+    private ArrayList<NewKycVerification>  newKYCList_Verify = null;
     protected String headerData = (WebConfig.BASIC_USERID + ":" + WebConfig.BASIC_PASSWORD);
     private View rv = null;
+    ArrayList<String> stcondition;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         rv = (View) inflater.inflate(R.layout.activity_kyc_new, container, false);
-        if (BaseCompactActivity.db != null && BaseCompactActivity.db.getDetails_Rapi())
-            list = BaseCompactActivity.db.getDetails();
+        if (BaseCompactActivity.dbRealm != null && BaseCompactActivity.dbRealm.getDetails_Rapi())
+            list = BaseCompactActivity.dbRealm.getDetails();
         TYPE = getActivity().getIntent().getStringExtra("type");
         customerType = getActivity().getIntent().getStringExtra("customerType");
         initialize(rv);
@@ -330,10 +338,13 @@ public class AgentKYCFragment extends BaseFragment implements RequestHandler, Vi
             resumeCall();
         }
     }
-
     private void resumeCall() {
-        String condition = "where " + RapipayDB.MOBILENO + "='" + mobile_no.getText().toString() + "'" + " AND " + RapipayDB.DOCUMENTTYPE + "='" + spinner_value + "'" + " AND " + RapipayDB.DOCUMENTID + "='" + documentid.getText().toString() + "'";
-        newKYCList_Personal = BaseCompactActivity.db.getKYCDetails_Personal(condition);
+        //  String condition = "where " + RapipayRealmDB.MOBILENO + "='" + mobile_no.getText().toString() + "'" + " AND " + RapipayRealmDB.DOCUMENTTYPE + "='" + spinner_value + "'" + " AND " + RapipayRealmDB.DOCUMENTID + "='" + documentid.getText().toString() + "'";
+        stcondition = new ArrayList<>();
+        stcondition.add(mobile_no.getText().toString());
+        stcondition.add(spinner_value);
+        stcondition.add(documentid.getText().toString());
+        newKYCList_Personal = BaseCompactActivity.dbRealm.getKYCDetails_Personal(stcondition);
         if (newKYCList_Personal != null && newKYCList_Personal.size() != 0) {
             rv.findViewById(R.id.prsnl_btn).setBackgroundColor(getResources().getColor(R.color.green));
             documentid.setText(newKYCList_Personal.get(0).getDOCUMENTID());
@@ -347,15 +358,15 @@ public class AgentKYCFragment extends BaseFragment implements RequestHandler, Vi
             scan_data.setVisibility(View.GONE);
             mobile_no.setEnabled(false);
             kyc_layout_bottom.setVisibility(View.VISIBLE);
-            newKYCList_Address = BaseCompactActivity.db.getKYCDetails_Address(condition);
+            newKYCList_Address = BaseCompactActivity.dbRealm.getKYCDetails_Address(stcondition);
             if (newKYCList_Address.size() != 0) {
                 rv.findViewById(R.id.adrs_btn).setBackgroundColor(getResources().getColor(R.color.green));
                 rv.findViewById(R.id.address_layout).setVisibility(View.VISIBLE);
-                newKYCList_Buisness = BaseCompactActivity.db.getKYCDetails_BUISNESS(condition);
+                newKYCList_Buisness = BaseCompactActivity.dbRealm.getKYCDetails_BUISNESS(stcondition);
                 if (newKYCList_Buisness.size() != 0) {
                     rv.findViewById(R.id.business_btn).setBackgroundColor(getResources().getColor(R.color.green));
                     rv.findViewById(R.id.buisness_layout).setVisibility(View.VISIBLE);
-                    newKYCList_Verify = BaseCompactActivity.db.getKYCDetails_VERIFY(condition);
+                    newKYCList_Verify = BaseCompactActivity.dbRealm.getKYCDetails_VERIFY(stcondition);
                     if (newKYCList_Verify.size() != 0) {
                         rv.findViewById(R.id.verification_btn).setBackgroundColor(getResources().getColor(R.color.green));
                         rv.findViewById(R.id.verification_button).setVisibility(View.VISIBLE);
@@ -366,17 +377,20 @@ public class AgentKYCFragment extends BaseFragment implements RequestHandler, Vi
             } else
                 rv.findViewById(R.id.address_layout).setVisibility(View.VISIBLE);
         } else {
-            scan_data.setVisibility(View.GONE);
-            sub_btn.setVisibility(View.VISIBLE);
-            kyc_layout_bottom.setVisibility(View.GONE);
-            rv.findViewById(R.id.adrs_btn).setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
-            rv.findViewById(R.id.business_btn).setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
-            rv.findViewById(R.id.verification_btn).setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
-            rv.findViewById(R.id.prsnl_btn).setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
-            rv.findViewById(R.id.address_layout).setVisibility(View.GONE);
-            rv.findViewById(R.id.buisness_layout).setVisibility(View.GONE);
-            rv.findViewById(R.id.verification_button).setVisibility(View.GONE);
+            showcon();
         }
+    }
+    public void showcon() {
+        scan_data.setVisibility(View.GONE);
+        sub_btn.setVisibility(View.VISIBLE);
+        kyc_layout_bottom.setVisibility(View.GONE);
+        rv.findViewById(R.id.adrs_btn).setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
+        rv.findViewById(R.id.business_btn).setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
+        rv.findViewById(R.id.verification_btn).setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
+        rv.findViewById(R.id.prsnl_btn).setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
+        rv.findViewById(R.id.address_layout).setVisibility(View.GONE);
+        rv.findViewById(R.id.buisness_layout).setVisibility(View.GONE);
+        rv.findViewById(R.id.verification_button).setVisibility(View.GONE);
     }
 
     public void hideKeyboard(Activity activity) {
@@ -415,8 +429,12 @@ public class AgentKYCFragment extends BaseFragment implements RequestHandler, Vi
             if (object.getString("responseCode").equalsIgnoreCase("200")) {
                 if (object.getString("serviceType").equalsIgnoreCase("VALIDATE_KYC_DETAILS")) {
                     if (object.getString("responseMessage").equalsIgnoreCase("success")) {
-                        String condition = "where " + RapipayDB.MOBILENO + "='" + mobile_no.getText().toString() + "'" + " AND " + RapipayDB.DOCUMENTTYPE + "='" + spinner_value + "'" + " AND " + RapipayDB.DOCUMENTID + "='" + documentid.getText().toString() + "'";
-                        newKYCList_Personal = BaseCompactActivity.db.getKYCDetails_Personal(condition);
+                        //  String condition = "where " + RapipayRealmDB.MOBILENO + "='" + mobile_no.getText().toString() + "'" + " AND " + RapipayRealmDB.DOCUMENTTYPE + "='" + spinner_value + "'" + " AND " + RapipayRealmDB.DOCUMENTID + "='" + documentid.getText().toString() + "'";
+                        stcondition = new ArrayList<>();
+                        stcondition.add(mobile_no.getText().toString());
+                        stcondition.add(spinner_value);
+                        stcondition.add(documentid.getText().toString());
+                        newKYCList_Personal = BaseCompactActivity.dbRealm.getKYCDetails_Personal(stcondition);
                         if (newKYCList_Personal != null && newKYCList_Personal.size() != 0) {
                             rv.findViewById(R.id.prsnl_btn).setBackgroundColor(getResources().getColor(R.color.green));
                             documentid.setText(newKYCList_Personal.get(0).getDOCUMENTID());
@@ -430,15 +448,15 @@ public class AgentKYCFragment extends BaseFragment implements RequestHandler, Vi
                             sub_btn.setVisibility(View.GONE);
                             scan_data.setVisibility(View.GONE);
                             kyc_layout_bottom.setVisibility(View.VISIBLE);
-                            newKYCList_Address = BaseCompactActivity.db.getKYCDetails_Address(condition);
+                            newKYCList_Address = BaseCompactActivity.dbRealm.getKYCDetails_Address(stcondition);
                             if (newKYCList_Address.size() != 0) {
                                 rv.findViewById(R.id.adrs_btn).setBackgroundColor(getResources().getColor(R.color.green));
                                 rv.findViewById(R.id.address_layout).setVisibility(View.VISIBLE);
-                                newKYCList_Buisness = BaseCompactActivity.db.getKYCDetails_BUISNESS(condition);
+                                newKYCList_Buisness = BaseCompactActivity.dbRealm.getKYCDetails_BUISNESS(stcondition);
                                 if (newKYCList_Buisness.size() != 0) {
                                     rv.findViewById(R.id.business_btn).setBackgroundColor(getResources().getColor(R.color.green));
                                     rv.findViewById(R.id.buisness_layout).setVisibility(View.VISIBLE);
-                                    newKYCList_Verify = BaseCompactActivity.db.getKYCDetails_VERIFY(condition);
+                                    newKYCList_Verify = BaseCompactActivity.dbRealm.getKYCDetails_VERIFY(stcondition);
                                     if (newKYCList_Verify.size() != 0) {
                                         rv.findViewById(R.id.verification_btn).setBackgroundColor(getResources().getColor(R.color.green));
                                         rv.findViewById(R.id.verification_button).setVisibility(View.VISIBLE);
@@ -468,6 +486,8 @@ public class AgentKYCFragment extends BaseFragment implements RequestHandler, Vi
                         hideKeyboard(getActivity());
                     }
                 }
+            }else{
+                responseMSg(object);
             }
         } catch (Exception e) {
             e.printStackTrace();

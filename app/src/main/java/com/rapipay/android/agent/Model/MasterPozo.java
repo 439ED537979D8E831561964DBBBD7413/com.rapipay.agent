@@ -1,6 +1,8 @@
 package com.rapipay.android.agent.Model;
 
-public class MasterPozo {
+import io.realm.RealmObject;
+
+public class MasterPozo extends RealmObject {
 
     private String displayName;
     private String displayType;

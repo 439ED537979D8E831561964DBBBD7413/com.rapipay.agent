@@ -7,13 +7,18 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.DatePicker;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
+import com.rapipay.android.agent.Model.NetworkHistoryPozo;
 import com.rapipay.android.agent.Model.NetworkTransHistPozo;
 import com.rapipay.android.agent.R;
+import com.rapipay.android.agent.adapter.NetworkHistoryAdapter;
 import com.rapipay.android.agent.adapter.NetworkTranHistAdapter;
+import com.rapipay.android.agent.fragments.NetworkHistoryFragment;
 import com.rapipay.android.agent.interfaces.ClickListener;
 import com.rapipay.android.agent.interfaces.CustomInterface;
 import com.rapipay.android.agent.interfaces.RequestHandler;
@@ -35,8 +40,8 @@ import me.grantland.widget.AutofitTextView;
 public class NetworkTransHistory extends BaseCompactActivity implements RequestHandler, View.OnClickListener, CustomInterface {
 
     AutofitTextView date1_text, date2_text;
-    RecyclerView trans_details;
-    ArrayList<NetworkTransHistPozo> transactionPozoArrayList;
+    ListView trans_details;
+    ArrayList<NetworkHistoryPozo> transactionPozoArrayList;
     TextView heading;
     ImageView btn_fund;
     private int selectedDate, selectedMonth, selectedYear;
@@ -45,7 +50,7 @@ public class NetworkTransHistory extends BaseCompactActivity implements RequestH
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.credit_hist_layout);
+        setContentView(R.layout.networkhislayout);
         initialize();
     }
 
@@ -65,18 +70,17 @@ public class NetworkTransHistory extends BaseCompactActivity implements RequestH
         date1_text.setText(selectedYear + "-" + selectedMonth + "-" + selectedDate);
         btn_fund = (ImageView) findViewById(R.id.btn_fund);
         btn_fund.setOnClickListener(this);
-        trans_details = (RecyclerView) findViewById(R.id.trans_details);
-        trans_details.addOnItemTouchListener(new RecyclerTouchListener(NetworkTransHistory.this, trans_details, new ClickListener() {
+        trans_details = (ListView) findViewById(R.id.trans_details);
+        trans_details.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
-            public void onClick(View view, int position) {
-                NetworkTransHistPozo pozo = transactionPozoArrayList.get(position);
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+
             }
 
             @Override
-            public void onLongClick(View view, int position) {
-
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
             }
-        }));
+        });
         findViewById(R.id.todate).setOnClickListener(toDateClicked);
         findViewById(R.id.date1).setOnClickListener(toDateClicked);
         findViewById(R.id.fromdate).setOnClickListener(fromDateClicked);
@@ -163,8 +167,13 @@ public class NetworkTransHistory extends BaseCompactActivity implements RequestH
                     } else if (date1_text.getText().toString().isEmpty()) {
                         date1_text.setError("Please enter valid data");
                         date1_text.requestFocus();
-                    } else if (printDifference(mainDate(date2_text.getText().toString()), mainDate(date1_text.getText().toString())))
+                    } else if (printDifference(mainDate(date2_text.getText().toString()), mainDate(date1_text.getText().toString()))) {
+                        trans_details.setVisibility(View.VISIBLE);
                         new AsyncPostMethod(WebConfig.CommonReport, channel_request().toString(), headerData, NetworkTransHistory.this, getString(R.string.responseTimeOut)).execute();
+                    } else {
+                        customDialog_Common("Statement can only view from one month");
+                        trans_details.setVisibility(View.GONE);
+                    }
                 }
                 handlercontrol();
                 break;
@@ -246,8 +255,17 @@ public class NetworkTransHistory extends BaseCompactActivity implements RequestH
             if (object.getString("responseCode").equalsIgnoreCase("200")) {
                 if (object.getString("serviceType").equalsIgnoreCase("NETWORK_TRANSFER_HISTORY")) {
                     if (object.has("netTransferHistList"))
-                        insertLastTransDetails(object.getJSONArray("netTransferHistList"));
+                        if (object.isNull("netTransferHistList") && object.getJSONArray("netTransferHistList").length() == 0)
+                            customDialog_Common("No Record Found");
+                        else {
+                            insertLastTransDetails(object.getJSONArray("netTransferHistList"));
+                            trans_details.setVisibility(View.VISIBLE);
+                        }
+
                 }
+            } else {
+                responseMSg(object);
+                trans_details.setVisibility(View.GONE);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -255,11 +273,11 @@ public class NetworkTransHistory extends BaseCompactActivity implements RequestH
     }
 
     private void insertLastTransDetails(JSONArray array) {
-        transactionPozoArrayList = new ArrayList<NetworkTransHistPozo>();
+        transactionPozoArrayList = new ArrayList<NetworkHistoryPozo>();
         try {
             for (int i = 0; i < array.length(); i++) {
                 JSONObject object = array.getJSONObject(i);
-                transactionPozoArrayList.add(new NetworkTransHistPozo(object.getString("payeeMobileNo"), object.getString("payeeName"), object.getString("transactionDate"), object.getString("lastTxnAmount"), object.getString("totalAmount"), object.getString("companyName")));
+                transactionPozoArrayList.add(new NetworkHistoryPozo(object.getString("requestID"), object.getString("requestAmount"), object.getString("crDrAmount"), object.getString("createdOn"), object.getString("sysRemarks"), object.getString("requestType")));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -268,10 +286,10 @@ public class NetworkTransHistory extends BaseCompactActivity implements RequestH
             initializeTransAdapter(transactionPozoArrayList);
     }
 
-    private void initializeTransAdapter(ArrayList<NetworkTransHistPozo> list) {
-        LinearLayoutManager layoutManager = new LinearLayoutManager(NetworkTransHistory.this, LinearLayoutManager.VERTICAL, false);
-        trans_details.setLayoutManager(layoutManager);
-        trans_details.setAdapter(new NetworkTranHistAdapter(NetworkTransHistory.this, trans_details, list));
+    private void initializeTransAdapter(ArrayList<NetworkHistoryPozo> list) {
+//        LinearLayoutManager layoutManager = new LinearLayoutManager(NetworkTransHistory.this, LinearLayoutManager.VERTICAL, false);
+//        trans_details.setLayoutManager(layoutManager);
+        trans_details.setAdapter(new NetworkHistoryAdapter(list, NetworkTransHistory.this));
     }
 
     @Override

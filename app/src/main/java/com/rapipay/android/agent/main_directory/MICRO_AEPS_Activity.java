@@ -175,7 +175,8 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
             @Override
             public void afterTextChanged(Editable s) {
                 if (s.length()!=0 && s.length()<10) {
-                    input_text.setText(EnglishNumberToWords.convert(Integer.parseInt(s.toString())));
+                    input_text.setText("");
+                    input_text.setText(EnglishNumberToWords.convert(Integer.parseInt(s.toString()))+" rupee");
                     input_text.setVisibility(View.VISIBLE);
                 }else
                     input_text.setVisibility(View.GONE);
@@ -372,7 +373,6 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
                                 response = data.getStringExtra("ClientResponse");
                                 strDecryptResponse = AES_BC.getInstance().decryptDecode(Utils.replaceNewLine(response), requestKey);
                                 new AsyncPostMethod(WebConfig.CASHOUT_URL, updateDetails(updateDetailsResponseData(response, "0").toString(), transactionIDAEPS).toString(), headerData, MICRO_AEPS_Activity.this, getString(R.string.responseTimeOut), "AEPS-MATM").execute();
-//                    Utils.showOneBtnDialog(this, getString(com.finopaytech.finosdk.R.string.STR_INFO), strDecryptResponse, false);
                             } else if (data.hasExtra("ErrorDtls")) {
                                 response = data.getStringExtra("ErrorDtls");
                                 String errorMsg = "", errorDtlsMsg = "";
@@ -382,7 +382,6 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
                                         if (error_dtls.length > 0) {
                                             strDecryptResponse = error_dtls[0];
                                             new AsyncPostMethod(WebConfig.CASHOUT_URL, updateDetails(updateDetailsResponseData(strDecryptResponse, "1").toString(), transactionIDAEPS).toString(), headerData, MICRO_AEPS_Activity.this, getString(R.string.responseTimeOut), "AEPS-MATM").execute();
-//                                Utils.showOneBtnDialog(this, getString(com.finopaytech.finosdk.R.string.STR_INFO), "Error Message : " + errorMsg , false);
                                         }
                                     } catch (ArrayIndexOutOfBoundsException exp) {
                                     }
@@ -564,7 +563,6 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
                 ArrayList<String> left = new ArrayList<>();
                 left.add("TransactionDatetime:" + " " + type.getString("TransactionDatetime"));
                 ArrayList<String> right = new ArrayList<>();
-//                right.add("TxnTime:" + " " + type.getString("TxnTime"));
                 ArrayList<String> bottom = new ArrayList<>();
                 bottom.add("Amount : " + type.getString("TxnAmt"));
                 bottom.add("TerminalID :" + type.getString("TerminalID"));
@@ -579,7 +577,6 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
                 ArrayList<String> left = new ArrayList<>();
                 left.add("TransactionDatetime:" + " " + type.getString("TransactionDatetime"));
                 ArrayList<String> right = new ArrayList<>();
-//                right.add("TxnTime:" + " " + type.getString("TxnTime"));
                 ArrayList<String> bottom = new ArrayList<>();
                 bottom.add("AccountNo : " + type.getString("AccountNo"));
                 bottom.add("TerminalID :" + type.getString("TerminalID"));
@@ -638,6 +635,8 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
                 } else if (object.getString("serviceType").equalsIgnoreCase("AEPS_TRANSACTION_STATUS") || object.getString("serviceType").equalsIgnoreCase("MATM_TRANSACTION_STATUS")) {
                     customReceiptNew("Transaction Status Receipt", object, MICRO_AEPS_Activity.this);
                 }
+            }else {
+                responseMSg(object);
             }
         } catch (Exception e) {
             e.printStackTrace();

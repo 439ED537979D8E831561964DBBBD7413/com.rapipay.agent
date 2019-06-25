@@ -42,8 +42,8 @@ public class ChangePassword extends BaseFragment implements RequestHandler, View
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View rv = (View) inflater.inflate(R.layout.changepassword_layout, container, false);
-        if (BaseCompactActivity.db != null && BaseCompactActivity.db.getDetails_Rapi())
-            list = BaseCompactActivity.db.getDetails();
+        if (BaseCompactActivity.dbRealm != null && BaseCompactActivity.dbRealm.getDetails_Rapi())
+            list = BaseCompactActivity.dbRealm.getDetails();
         localStorage = LocalStorage.getInstance(getActivity());
         initialize(rv);
         return rv;
@@ -121,7 +121,8 @@ public class ChangePassword extends BaseFragment implements RequestHandler, View
                 if (object.getString("serviceType").equalsIgnoreCase("CHANGE_PASSWORD")) {
                     customDialog_Ben("Password Change", object.getString("responseMessage"));
                 }
-            }
+            }else
+                responseMSg(object);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -160,18 +161,5 @@ public class ChangePassword extends BaseFragment implements RequestHandler, View
         dialog.show();
         Window window = dialog.getWindow();
         window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-    }
-
-    protected void deleteTables(String type) {
-        SQLiteDatabase dba = BaseCompactActivity.db.getWritableDatabase();
-        dba.execSQL("delete from " + RapipayDB.TABLE_BANK);
-        dba.execSQL("delete from " + RapipayDB.TABLE_PAYMENT);
-        dba.execSQL("delete from " + RapipayDB.TABLE_STATE);
-        dba.execSQL("delete from " + RapipayDB.TABLE_OPERATOR);
-        dba.execSQL("delete from " + RapipayDB.TABLE_FOOTER);
-        dba.execSQL("delete from " + RapipayDB.TABLE_TRANSFERLIST);
-        dba.execSQL("delete from " + RapipayDB.TABLE_PAYERPAYEE);
-        if (!type.equalsIgnoreCase(""))
-            dba.execSQL("delete from " + RapipayDB.TABLE_NAME);
     }
 }

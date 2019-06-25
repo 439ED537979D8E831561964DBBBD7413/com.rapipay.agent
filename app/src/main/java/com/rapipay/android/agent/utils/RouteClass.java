@@ -5,7 +5,14 @@ import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.rapipay.android.agent.Database.RapipayDB;
+import com.rapipay.android.agent.Model.BankDetailsPozo;
+import com.rapipay.android.agent.Model.CreaditPaymentModePozo;
+import com.rapipay.android.agent.Model.HeaderePozo;
+import com.rapipay.android.agent.Model.NewKYCPozo;
+import com.rapipay.android.agent.Model.PaymentModePozo;
 import com.rapipay.android.agent.Model.RapiPayPozo;
+import com.rapipay.android.agent.Model.StatePozo;
+import com.rapipay.android.agent.Model.TbOperatorPozo;
 import com.rapipay.android.agent.main_directory.LoginScreenActivity;
 import com.rapipay.android.agent.main_directory.PinActivity;
 import com.rapipay.android.agent.main_directory.PinVerification;
@@ -13,6 +20,9 @@ import com.rapipay.android.agent.main_directory.PinVerification;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+
+import io.realm.Realm;
+import io.realm.RealmResults;
 
 public class RouteClass {
     Intent intent = null;
@@ -22,7 +32,7 @@ public class RouteClass {
 
     private void define_Route(final Context context, JSONObject object, String mobileNo, LocalStorage localStorage, String type) {
         try {
-            ArrayList<RapiPayPozo> list = BaseCompactActivity.db.getDetails();
+            ArrayList<RapiPayPozo> list = BaseCompactActivity.dbRealm.getDetails();
             if (list.size() == 0) {
                 if (type!=null && type.equalsIgnoreCase("PINENTERED")) {
                     intent = new Intent(context, PinActivity.class);
@@ -48,6 +58,7 @@ public class RouteClass {
                     intent = new Intent(context, PinVerification.class);
                 }else if (list.get(0).getAftersessionRefNo().isEmpty() && localStorage.getActivityState(LocalStorage.ROUTESTATE).equalsIgnoreCase("0")) {
                     deleteTables("forgot");
+                    deleteTablesOld("forgot");
                     intent = new Intent(context, LoginScreenActivity.class);
                 }
             }
@@ -62,7 +73,34 @@ public class RouteClass {
             e.printStackTrace();
         }
     }
-    protected void deleteTables(String type) {
+    protected void deleteTables(final String type) {
+        final RealmResults<RapiPayPozo> realmResults = BaseCompactActivity.realm.where(RapiPayPozo.class).findAll();
+        final RealmResults<PaymentModePozo> realmResults1 = BaseCompactActivity.realm.where(PaymentModePozo.class).findAll();
+        //  SQLiteDatabase dba = BaseCompactActivity.db.getWritableDatabase();
+        final RealmResults<StatePozo> statePozoRealmResults = BaseCompactActivity.realm.where(StatePozo.class).findAll();
+        final RealmResults<TbOperatorPozo> tbOperatorPozoRealmResults = BaseCompactActivity.realm.where(TbOperatorPozo.class).findAll();
+        final RealmResults<NewKYCPozo> newKYCPozoRealmResults = BaseCompactActivity.realm.where(NewKYCPozo.class).findAll();
+        final RealmResults<BankDetailsPozo> bankDetailsPozoRealmResults = BaseCompactActivity.realm.where(BankDetailsPozo.class).findAll();
+        final RealmResults<HeaderePozo> headerePozoRealmResults = BaseCompactActivity.realm.where(HeaderePozo.class).findAll();
+        final RealmResults<CreaditPaymentModePozo> creaditPaymentModePozos = BaseCompactActivity.realm.where(CreaditPaymentModePozo.class).findAll();
+        BaseCompactActivity.realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                realmResults1.deleteAllFromRealm();
+                statePozoRealmResults.deleteAllFromRealm();
+                tbOperatorPozoRealmResults.deleteAllFromRealm();
+                bankDetailsPozoRealmResults.deleteAllFromRealm();
+                headerePozoRealmResults.deleteAllFromRealm();
+                creaditPaymentModePozos.deleteAllFromRealm();
+                if (!type.equalsIgnoreCase("")) {
+                    realmResults.deleteAllFromRealm();
+                    newKYCPozoRealmResults.deleteAllFromRealm();
+                }
+            }
+        });
+    }
+
+    protected void deleteTablesOld(String type) {
         SQLiteDatabase dba = BaseCompactActivity.db.getWritableDatabase();
         dba.execSQL("delete from " + RapipayDB.TABLE_BANK);
         dba.execSQL("delete from " + RapipayDB.TABLE_PAYMENT);

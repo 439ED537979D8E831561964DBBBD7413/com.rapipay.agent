@@ -163,8 +163,13 @@ public class CreditTransHistActivity extends BaseCompactActivity implements Requ
                     } else if (date1_text.getText().toString().isEmpty()) {
                         date1_text.setError("Please enter valid data");
                         date1_text.requestFocus();
-                    } else if (printDifference(mainDate(date2_text.getText().toString()), mainDate(date1_text.getText().toString())))
+                    } else if (printDifference(mainDate(date2_text.getText().toString()), mainDate(date1_text.getText().toString()))) {
+                        trans_details.setVisibility(View.VISIBLE);
                         new AsyncPostMethod(WebConfig.CommonReport, channel_request().toString(), headerData, CreditTransHistActivity.this, getString(R.string.responseTimeOut)).execute();
+                    }else {
+                        customDialog_Common("Statement can only view from one month");
+                        trans_details.setVisibility(View.GONE);
+                    }
                 }
                 handlercontrol();
                 break;
@@ -246,9 +251,14 @@ public class CreditTransHistActivity extends BaseCompactActivity implements Requ
             if (object.getString("responseCode").equalsIgnoreCase("200")) {
                 if (object.getString("serviceType").equalsIgnoreCase("CREDIT_FUND_REQ_REPORT")) {
                     if (object.has("creditFundCount"))
-                        if (Integer.parseInt(object.getString("creditFundCount")) > 0)
+                        if (Integer.parseInt(object.getString("creditFundCount")) > 0) {
+                            trans_details.setVisibility(View.VISIBLE);
                             insertLastTransDetails(object.getJSONArray("creditFundList"));
+                        }
                 }
+            }else {
+                trans_details.setVisibility(View.GONE);
+                responseMSg(object);
             }
         } catch (Exception e) {
             e.printStackTrace();
