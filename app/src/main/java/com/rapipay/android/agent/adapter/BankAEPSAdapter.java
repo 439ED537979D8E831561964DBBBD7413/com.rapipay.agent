@@ -7,17 +7,17 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import com.pnsol.sdk.vo.AcquirerEmiDetailsVO;
+import com.rapipay.android.agent.Model.microaeps.Microdata;
 import com.rapipay.android.agent.R;
 
-import java.util.ArrayList;
+import java.util.List;
 
-public class AcquirerBanksListAdapter extends BaseAdapter {
+public class BankAEPSAdapter extends BaseAdapter {
     Context context;
-    ArrayList<AcquirerEmiDetailsVO> list;
+    List<Microdata> list;
     LayoutInflater inflter;
 
-    public AcquirerBanksListAdapter(Context applicationContext, ArrayList<AcquirerEmiDetailsVO> list) {
+    public BankAEPSAdapter(Context applicationContext, List<Microdata> list) {
         this.context = applicationContext;
         this.list = list;
         inflter = (LayoutInflater.from(applicationContext));
@@ -38,12 +38,11 @@ public class AcquirerBanksListAdapter extends BaseAdapter {
         return 0;
     }
 
-
     @Override
-    public View getView(int i, View view, ViewGroup viewGroup){
-        view = inflter.inflate(R.layout.spinner_view,null);
-        TextView names = (TextView)view.findViewById(R.id.spiner_text);
-        names.setText(list.get(i).getAcquirerName());
+    public View getView(int i, View view, ViewGroup viewGroup) {
+        view = inflter.inflate(R.layout.spinner_view, null);
+        TextView names = (TextView) view.findViewById(R.id.spiner_text);
+        names.setText(list.get(i).getBankName());
         return view;
     }
 }

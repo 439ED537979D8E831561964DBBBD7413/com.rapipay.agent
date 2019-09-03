@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 
 import com.rapipay.android.agent.Model.LoadSummaryPozo;
 import com.rapipay.android.agent.R;
@@ -16,13 +17,13 @@ import java.util.Locale;
 import me.grantland.widget.AutofitTextView;
 
 public class TransactionHistAdapter extends ArrayAdapter<LoadSummaryPozo> {
-
     private ArrayList<LoadSummaryPozo> mValues;
     Context mContext;
     private ArrayList<LoadSummaryPozo> arraylist = null;
     private class ViewHolder {
         public View mView;
         public AutofitTextView btn_p_bank, btn_name, p_transid, btn_p_amounts, btn_status, transferType, Status, payeeaccount, payeebank, bankrrm;
+        public LinearLayout ln_1;
     }
 
     public TransactionHistAdapter(ArrayList<LoadSummaryPozo> data, Context context) {
@@ -50,13 +51,7 @@ public class TransactionHistAdapter extends ArrayAdapter<LoadSummaryPozo> {
             viewHolder.btn_name = (AutofitTextView) view.findViewById(R.id.btn_name);
             viewHolder.btn_p_amounts = (AutofitTextView) view.findViewById(R.id.btn_p_amounts);
             viewHolder.p_transid = (AutofitTextView) view.findViewById(R.id.btn_p_transid);
-//            viewHolder.btn_p_bank = (AutofitTextView) view.findViewById(R.id.btn_p_bank);
-//            viewHolder.btn_status = (AutofitTextView) view.findViewById(R.id.btn_status);
-//            viewHolder.transferType = (AutofitTextView) view.findViewById(R.id.transferType);
-//            viewHolder.Status = (AutofitTextView) view.findViewById(R.id.status);
-//            viewHolder.payeeaccount = (AutofitTextView) view.findViewById(R.id.payeeaccount);
-//            viewHolder.payeebank = (AutofitTextView) view.findViewById(R.id.payeebank);
-//            viewHolder.bankrrm = (AutofitTextView) view.findViewById(R.id.bankrrm);
+            viewHolder.ln_1 = (LinearLayout) view.findViewById(R.id.ln_1);
             result = view;
 
             view.setTag(viewHolder);
@@ -64,17 +59,12 @@ public class TransactionHistAdapter extends ArrayAdapter<LoadSummaryPozo> {
             viewHolder = (ViewHolder) view.getTag();
             result = view;
         }
-
-        viewHolder.btn_p_amounts.setText("Service Type : " + mValues.get(position).getServiceType());
-        viewHolder.btn_name.setText("Debit Amount : " + mValues.get(position).getDebitAmount());
-        viewHolder.p_transid.setText("Credit Amount : " + mValues.get(position).getCreditAmount());
-//        viewHolder.btn_p_bank.setText("Transaction ID : " + mValues.get(position).getTxnID());
-//        viewHolder.btn_status.setText("Transaction Amount : " + format(mValues.get(position).getTxnAmount()));
-//        viewHolder.transferType.setText("Transaction Date : " + mValues.get(position).getTxnDate());
-//        viewHolder.Status.setText("Status : " + mValues.get(position).getTxnStatus());
-//        viewHolder.payeeaccount.setText("Payee Account : " + mValues.get(position).getPayeeAccount());
-//        viewHolder.payeebank.setText("Payee Bank Name : " + mValues.get(position).getPayeeBankName());
-//        viewHolder.bankrrm.setText("Bank RRN : " + mValues.get(position).getBankRRN());
+        if(position==0) {
+            viewHolder.ln_1.setVisibility(View.GONE);
+        }
+            viewHolder.btn_p_amounts.setText(mValues.get(0).getServiceType()+" : " + mValues.get(position).getServiceType());
+            viewHolder.btn_name.setText(mValues.get(0).getDebitAmount()+" : "+ mValues.get(position).getDebitAmount());
+            viewHolder.p_transid.setText(mValues.get(0).getCreditAmount()+" : " + mValues.get(position).getCreditAmount());
         return view;
     }
 
@@ -96,8 +86,6 @@ public class TransactionHistAdapter extends ArrayAdapter<LoadSummaryPozo> {
         } else {
             for (LoadSummaryPozo wp : arraylist) {
                 if (wp.getServiceType().toLowerCase(Locale.getDefault()).contains(charText)||wp.getCreditAmount().toLowerCase(Locale.getDefault()).contains(charText)||wp.getDebitAmount().toLowerCase(Locale.getDefault()).contains(charText)){
-//                        ||wp.getSenderName().toLowerCase(Locale.getDefault()).contains(charText)||wp.getTxnAmount().toLowerCase(Locale.getDefault()).contains(charText)||wp.getPayeeBankName().toLowerCase(Locale.getDefault()).contains(charText)||wp.getPayeeAccount().toLowerCase(Locale.getDefault()).contains(charText)
-//                        ||wp.getTxnStatus().toLowerCase(Locale.getDefault()).contains(charText)) {
                     mValues.add(wp);
                 }
             }

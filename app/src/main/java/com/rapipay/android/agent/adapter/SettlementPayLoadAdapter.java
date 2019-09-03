@@ -70,7 +70,8 @@ public class SettlementPayLoadAdapter extends RecyclerView.Adapter<SettlementPay
         holder.account_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                customDeleteAccount("DELETEACCOUNT",mValues.get(position),"Are you sure?","Do You Want To De-Activate Account ?");
+                holder.account_button.setEnabled(false);
+                customDeleteAccount("DELETEACCOUNT",mValues.get(position),"Are you sure?","Do You Want To De-Activate Account ?",holder.account_button);
             }
         });
     }
@@ -80,7 +81,7 @@ public class SettlementPayLoadAdapter extends RecyclerView.Adapter<SettlementPay
         return mValues.size();
     }
 
-    protected void customDeleteAccount(final String type, final Object ob, String msg, String output) {
+    protected void customDeleteAccount(final String type, final Object ob, String msg, String output, final Button account_button) {
         dialog = new AlertDialog.Builder(context);
         LayoutInflater inflater = context.getLayoutInflater();
         View alertLayout = inflater.inflate(R.layout.custom_layout_common, null);
@@ -111,18 +112,21 @@ public class SettlementPayLoadAdapter extends RecyclerView.Adapter<SettlementPay
                 if (type.equalsIgnoreCase("DELETEACCOUNT"))
                     anInterface.okClicked(type,ob);
                 alertDialog.dismiss();
+                account_button.setEnabled(true);
             }
         });
         btn_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 alertDialog.dismiss();
+                account_button.setEnabled(true);
             }
         });
         dialog_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 alertDialog.dismiss();
+                account_button.setEnabled(true);
             }
         });
         alertDialog = dialog.show();

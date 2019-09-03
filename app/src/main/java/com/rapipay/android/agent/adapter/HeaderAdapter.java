@@ -24,13 +24,13 @@ public class HeaderAdapter extends RecyclerView.Adapter<HeaderAdapter.ViewHolder
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
-        public AutofitTextView input_name;
+        public TextView input_name;
         TextView btn_name;
 
         public ViewHolder(View view) {
             super(view);
             mView = view;
-            input_name = (AutofitTextView) view.findViewById(R.id.input_name);
+            input_name = (TextView) view.findViewById(R.id.input_name);
             btn_name = (TextView) view.findViewById(R.id.btn_name);
         }
     }

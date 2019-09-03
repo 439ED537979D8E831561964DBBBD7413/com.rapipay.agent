@@ -49,10 +49,12 @@ public class SlidingImage_Adapter extends PagerAdapter {
         view.addView(imageLayout, 0);
         return imageLayout;
     }
+
     protected void byteConvert(ImageView imageViews,byte[] decodedString) {
         Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
         imageViews.setImageBitmap(decodedByte);
     }
+
     @Override
     public boolean isViewFromObject(View view, Object object) {
         return view.equals(object);
