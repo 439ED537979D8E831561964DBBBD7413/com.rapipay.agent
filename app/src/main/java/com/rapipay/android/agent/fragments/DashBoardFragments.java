@@ -13,8 +13,10 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatButton;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,6 +34,7 @@ import com.rapipay.android.agent.adapter.SimpleStringRecyclerViewAdapter;
 import com.rapipay.android.agent.interfaces.ClickListener;
 import com.rapipay.android.agent.kotlin_classs.BCTab;
 import com.rapipay.android.agent.main_directory.AEPS_BBPS_RegistrationActivity;
+import com.rapipay.android.agent.main_directory.Aeps1Activity;
 import com.rapipay.android.agent.main_directory.CashOutClass;
 import com.rapipay.android.agent.main_directory.ChannelHistoryActivity;
 import com.rapipay.android.agent.main_directory.CreditTabPage;
@@ -40,6 +43,7 @@ import com.rapipay.android.agent.main_directory.FundTransferActivity;
 import com.rapipay.android.agent.main_directory.MICRO_AEPS_Activity;
 import com.rapipay.android.agent.main_directory.MPOSRegistration;
 import com.rapipay.android.agent.main_directory.MainActivity;
+import com.rapipay.android.agent.main_directory.MatmActivity;
 import com.rapipay.android.agent.main_directory.MyCommission;
 import com.rapipay.android.agent.main_directory.NetworkTab;
 import com.rapipay.android.agent.main_directory.NetworkTransHistory;
@@ -55,6 +59,7 @@ import com.rapipay.android.agent.main_directory.WalletDetailsActivity;
 import com.rapipay.android.agent.utils.BaseFragment;
 import com.rapipay.android.agent.utils.ImageUtils;
 import com.rapipay.android.agent.utils.RecyclerTouchListener;
+import com.rapipay.android.agent.view.MovableFloatingActionButton;
 
 import java.util.ArrayList;
 
@@ -65,9 +70,12 @@ import static android.app.Activity.RESULT_OK;
 public class DashBoardFragments extends BaseFragment {
     RecyclerView recycler_view, recycler_view2, recycler_view3, recycler_view4, recycler_view5, recycler_view6, recycler_view7, recycler_view8;
     View rv;
-    TextView bankdetails;
+    public static TextView bankdetails;
+    public static MovableFloatingActionButton movablefloating;
     protected static final int CONTACT_PICKER_RESULT = 1;
     final protected static int PERMISSIONS_REQUEST_READ_PHONE_STATE = 0;
+    ImageView rv_left_4, rv_right_4, rv_left_1, rv_right_1, rv_left_5, rv_right_5;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rv = (View) inflater.inflate(R.layout.dashboard_layout, container, false);
@@ -87,23 +95,44 @@ public class DashBoardFragments extends BaseFragment {
     private void setupRecyclerView(View view) {
         recycler_view = (RecyclerView) view.findViewById(R.id.recycler_view);
         recycler_view2 = (RecyclerView) view.findViewById(R.id.recycler_view2);
-//        recycler_view3 = (RecyclerView) view.findViewById(R.id.recycler_view3);
+        movablefloating = (MovableFloatingActionButton) view.findViewById(R.id.movablefloating);
         recycler_view4 = (RecyclerView) view.findViewById(R.id.recycler_view4);
+        rv_left_4 = (ImageView) view.findViewById(R.id.rv_left_4);
+        rv_left_4.setClickable(true);
+        rv_right_4 = (ImageView) view.findViewById(R.id.rv_right_4);
+        rv_right_4.setClickable(true);
+        rv_left_1 = (ImageView) view.findViewById(R.id.rv_left_1);
+        rv_left_1.setClickable(true);
+        rv_right_1 = (ImageView) view.findViewById(R.id.rv_right_1);
+        rv_right_1.setClickable(true);
+        rv_right_5 = (ImageView) view.findViewById(R.id.rv_right_5);
+        rv_right_5.setClickable(true);
+        rv_left_5 = (ImageView) view.findViewById(R.id.rv_left_5);
+        rv_left_5.setClickable(true);
         recycler_view5 = (RecyclerView) view.findViewById(R.id.recycler_view5);
         recycler_view6 = (RecyclerView) view.findViewById(R.id.recycler_view6);
         recycler_view7 = (RecyclerView) view.findViewById(R.id.recycler_view7);
         recycler_view8 = (RecyclerView) view.findViewById(R.id.recycler_view8);
+        movablefloating.setVisibility(View.GONE);
         bankdetails = (TextView) view.findViewById(R.id.bankdetails);
         bankdetails.setVisibility(View.VISIBLE);
         bankdetails.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 bankdetails.setVisibility(View.GONE);
+                movablefloating.setVisibility(View.VISIBLE);
             }
         });
-        view.findViewById(R.id.matm).setVisibility(View.VISIBLE);
+        movablefloating.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                bankdetails.setVisibility(View.VISIBLE);
+                movablefloating.setVisibility(View.GONE);
+            }
+        });
+        view.findViewById(R.id.matm).setVisibility(View.GONE);
         view.findViewById(R.id.aeps).setVisibility(View.VISIBLE);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
+        final LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
         recycler_view.setLayoutManager(layoutManager);
 //        recycler_view.setAdapter(new SimpleStringRecyclerViewAdapter(getActivity(), recycler_view, ImageUtils.getFirstImageUrl(), "first"));
         LinearLayoutManager layoutManager2 = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
@@ -133,9 +162,132 @@ public class DashBoardFragments extends BaseFragment {
             recycler_view.setAdapter(new SimpleStringRecyclerViewAdapter(getActivity(), recycler_view, ImageUtils.getFirstImageUrl(), "first"));
         }
 
-        LinearLayoutManager layoutManager4 = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
+        final LinearLayoutManager layoutManager4 = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
         recycler_view4.setLayoutManager(layoutManager4);
         recycler_view4.setAdapter(new SimpleStringRecyclerViewAdapter(getActivity(), recycler_view4, ImageUtils.getFourthImageUrl(), "fourth"));
+        rv_right_4.setVisibility(View.VISIBLE);
+        rv_left_4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (layoutManager4.findFirstVisibleItemPosition() > 0) {
+                    recycler_view4.smoothScrollToPosition(layoutManager4.findFirstVisibleItemPosition() - 1);
+                    rv_right_4.setVisibility(View.VISIBLE);
+                } else {
+                    recycler_view4.smoothScrollToPosition(0);
+                    rv_left_4.setVisibility(View.GONE);
+                }
+            }
+        });
+        rv_right_4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                rv_right_4.setVisibility(View.GONE);
+                rv_left_4.setVisibility(View.VISIBLE);
+                recycler_view4.smoothScrollToPosition(layoutManager4.findLastVisibleItemPosition() + 1);
+            }
+        });
+        recycler_view4.addItemDecoration(new DividerItemDecoration(getActivity(), 0));
+        recycler_view4.setOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if (layoutManager4.findLastCompletelyVisibleItemPosition() > 3) {
+                    rv_right_4.setVisibility(View.GONE);
+                    rv_left_4.setVisibility(View.VISIBLE);
+                } else {
+                    rv_left_4.setVisibility(View.GONE);
+                    rv_right_4.setVisibility(View.VISIBLE);
+                }
+
+                //Toast.makeText(getActivity(), layoutManager4.findLastVisibleItemPosition() + "", Toast.LENGTH_LONG).show();
+
+            }
+        });
+        // recyclerview first scrollable functionality
+        rv_right_1.setVisibility(View.VISIBLE);
+        rv_left_1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                rv_left_1.setVisibility(View.GONE);
+                rv_right_1.setVisibility(View.VISIBLE);
+                if (layoutManager.findFirstVisibleItemPosition() > 0) {
+                    recycler_view.smoothScrollToPosition(layoutManager.findFirstVisibleItemPosition() - 1);
+                } else {
+                    recycler_view.smoothScrollToPosition(0);
+                }
+
+            }
+        });
+        rv_right_1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                rv_right_1.setVisibility(View.GONE);
+                rv_left_1.setVisibility(View.VISIBLE);
+                recycler_view.smoothScrollToPosition(layoutManager.findLastVisibleItemPosition() + 1);
+            }
+        });
+        recycler_view.addItemDecoration(new DividerItemDecoration(getActivity(), 0));
+        recycler_view.setOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if (layoutManager.findLastCompletelyVisibleItemPosition() > 3) {
+                    rv_right_1.setVisibility(View.GONE);
+                    rv_left_1.setVisibility(View.VISIBLE);
+                } else {
+                    rv_left_1.setVisibility(View.GONE);
+                    rv_right_1.setVisibility(View.VISIBLE);
+                }
+
+                //  Toast.makeText(getActivity(), layoutManager.findLastCompletelyVisibleItemPosition() + "", Toast.LENGTH_LONG).show();
+
+            }
+        });
+
+        // recyclerview second scrollable functionality
+        rv_right_5.setVisibility(View.VISIBLE);
+        rv_left_5.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (layoutManager5.findLastCompletelyVisibleItemPosition() > 1) {
+                    recycler_view5.smoothScrollToPosition(layoutManager5.findFirstVisibleItemPosition() - 1);
+                } else {
+                    rv_right_5.setVisibility(View.VISIBLE);
+                    rv_left_5.setVisibility(View.GONE);
+                }
+
+            }
+        });
+
+        rv_right_5.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (layoutManager5.findFirstVisibleItemPosition() < 10) {
+                    recycler_view5.smoothScrollToPosition(layoutManager5.findLastCompletelyVisibleItemPosition() + 1);
+                } else {
+                    rv_right_5.setVisibility(View.GONE);
+                    rv_left_5.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+
+        recycler_view5.addItemDecoration(new DividerItemDecoration(getActivity(), 0));
+        recycler_view5.setOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if (layoutManager5.findLastCompletelyVisibleItemPosition() > 9) {
+                    rv_right_5.setVisibility(View.GONE);
+                    rv_left_5.setVisibility(View.VISIBLE);
+                } else if (layoutManager5.findLastCompletelyVisibleItemPosition() < 3){
+                    rv_right_5.setVisibility(View.VISIBLE);
+                    rv_left_5.setVisibility(View.GONE);
+                }
+
+
+            }
+        });
+
         LinearLayoutManager layoutManager6 = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
         recycler_view6.setLayoutManager(layoutManager6);
         recycler_view6.setAdapter(new SimpleStringRecyclerViewAdapter(getActivity(), recycler_view6, ImageUtils.getSixthImageUrl(), "fourth"));
@@ -145,32 +297,15 @@ public class DashBoardFragments extends BaseFragment {
         LinearLayoutManager layoutManager8 = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
         recycler_view8.setLayoutManager(layoutManager8);
         recycler_view8.setAdapter(new SimpleStringRecyclerViewAdapter(getActivity(), recycler_view8, ImageUtils.getEigthImageUrl(), "eigth"));
-
         recycler_view6.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), recycler_view6, new ClickListener() {
             @Override
             public void onClick(View view, int position) {
                 Intent intent = null;
                 if (position == 0) {
                     intent = new Intent(getActivity(), CashOutClass.class);
-                    intent.putExtra("typeput", "CASHOUT");
-                    intent.putExtra("serviceType", "MPOS_CASHOUT");
-                    intent.putExtra("requestChannel", "MPOS_CHANNEL");
-                    intent.putExtra("requestType", "MPOS-CASHOUT");
-                    intent.putExtra("reqFor", "MPOS");
-                } else if (position == 1) {
-                    intent = new Intent(getActivity(), CashOutClass.class);
-                    intent.putExtra("typeput", "SALE");
-                    intent.putExtra("serviceType", "MPOS_SALE");
-                    intent.putExtra("requestChannel", "MPOS_CHANNEL");
-                    intent.putExtra("requestType", "MPOS-SALE");
-                    intent.putExtra("reqFor", "MPOS");
-                } else if (position == 2) {
-                    intent = new Intent(getActivity(), CashOutClass.class);
-                    intent.putExtra("typeput", "EMI");
-                    intent.putExtra("serviceType", "MPOS_EMI");
-                    intent.putExtra("requestChannel", "MPOS_CHANNEL");
-                    intent.putExtra("requestType", "MPOS-EMI");
-                    intent.putExtra("reqFor", "MPOS");
+                }
+                if (position == 1) {
+                    intent = new Intent(getActivity(), MatmActivity.class);
                 }
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
@@ -181,34 +316,13 @@ public class DashBoardFragments extends BaseFragment {
 
             }
         }));
+
         recycler_view7.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), recycler_view7, new ClickListener() {
             @Override
             public void onClick(View view, int position) {
                 Intent intent = null;
                 if (position == 0) {
-                    intent = new Intent(getActivity(), MICRO_AEPS_Activity.class);
-                    intent.putExtra("typeput", "Cash Withdrawal");
-                    intent.putExtra("serviceType", "MATM_CASHOUT");
-                    intent.putExtra("updateServiceType", "UPDATE_MATM_CASHOUT");
-                    intent.putExtra("requestChannel", "MATM_CHANNEL");
-                    intent.putExtra("requestType", "MATM-CASHOUT");
-                    intent.putExtra("reqFor", "MATM");
-                } else if (position == 1) {
-                    intent = new Intent(getActivity(), MICRO_AEPS_Activity.class);
-                    intent.putExtra("typeput", "Balance Enquiry");
-                    intent.putExtra("serviceType", "MATM_BALANCE_ENQ");
-                    intent.putExtra("updateServiceType", "UPDATE_MATM_BALANCE_ENQ");
-                    intent.putExtra("requestChannel", "MATM_CHANNEL");
-                    intent.putExtra("requestType", "MATM-BE");
-                    intent.putExtra("reqFor", "MATM");
-                } else if (position == 2) {
-                    intent = new Intent(getActivity(), BankDetails.class);
-                    intent.putExtra("typeput", "EMI");
-                    intent.putExtra("serviceType", "MPOS_EMI");
-                    intent.putExtra("updateServiceType", "MATM_CASHOUT");
-                    intent.putExtra("requestChannel", "MPOS_CHANNEL");
-                    intent.putExtra("requestType", "MPOS_EMI");
-                    intent.putExtra("reqFor", "MPOS");
+                    intent = new Intent(getActivity(), MatmActivity.class);
                 }
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
@@ -219,27 +333,15 @@ public class DashBoardFragments extends BaseFragment {
 
             }
         }));
+
         recycler_view8.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), recycler_view8, new ClickListener() {
             @Override
             public void onClick(View view, int position) {
                 Intent intent = null;
                 if (position == 0) {
-                    intent = new Intent(getActivity(), MICRO_AEPS_Activity.class);
-                    intent.putExtra("typeput", "Cash Withdrawal");
-                    intent.putExtra("serviceType", "AEPS_CASHOUT");
-                    intent.putExtra("updateServiceType", "UPDATE_AEPS_CASHOUT");
-                    intent.putExtra("requestChannel", "AEPS_CHANNEL");
-                    intent.putExtra("requestType", "AEPS-CASHOUT");
-                    intent.putExtra("reqFor", "AEPS");
+                    intent = new Intent(getActivity(), Aeps1Activity.class);
                 } else if (position == 1) {
                     intent = new Intent(getActivity(), MICRO_AEPS_Activity.class);
-                    intent.putExtra("typeput", "Balance Enquiry");
-                    intent.putExtra("serviceType", "AEPS_BALANCE_ENQ");
-                    intent.putExtra("updateServiceType", "UPDATE_AEPS_BALANCE_ENQ");
-                    intent.putExtra("requestChannel", "AEPS_CHANNEL");
-                    intent.putExtra("requestType", "AEPS-BE");
-                    intent.putExtra("reqFor", "AEPS");
-                } else if (position == 2) {
                 }
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
@@ -259,6 +361,22 @@ public class DashBoardFragments extends BaseFragment {
                 } else if (position == 1) {
                     intent = new Intent(getActivity(), NetworkTab.class);
                     intent.putExtra("CLICKED", "0");
+//                } else if (position == 0) {
+//                    if (MainActivity.pozoArrayList.size() != 0) {
+//                        for (int i = 0; i < MainActivity.pozoArrayList.size(); i++) {
+//                            if (MainActivity.pozoArrayList.get(i).getHeaderID().equalsIgnoreCase("10"))
+//                    if (MainActivity.relailerDetails) {
+//                        Toast.makeText(getActivity(), "Not Authorized to create New User!.", Toast.LENGTH_SHORT).show();
+//                    } else {
+//                        Intent intent = new Intent(getActivity(), RegisterKYCTab.class);
+//                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                        intent.putExtra("type", "outside");
+//                        intent.putExtra("customerType", "A");
+//                        intent.putExtra("mobileNo", "");
+//                        startActivity(intent);
+//                    }
+//                        }
+//                    }
                 } else if (position == 2) {
                     intent = new Intent(getActivity(), PassbookActivity.class);
                     intent.putExtra("TYPE", "");
@@ -291,10 +409,12 @@ public class DashBoardFragments extends BaseFragment {
 
             }
         }));
+
         recycler_view4.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), recycler_view4, new ClickListener() {
             @Override
             public void onClick(View view, int position) {
                 if (position == 1) {
+//                    customDialog_Ben("BC FUND TRANSFER", "FundTransfer");
                     Intent intent = new Intent(getActivity(), BCTab.class);
                     intent.putExtra("reqFor", "BCS");
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -304,7 +424,9 @@ public class DashBoardFragments extends BaseFragment {
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                 } else if (position == 0) {
+//                    customDialog_Ben("RAPIPAY WALLET FUND TRANSFER", "WALLETTransfer");
                     Intent intent = new Intent(getActivity(), WalletDetailsActivity.class);
+//                    intent.putExtra("mobileNo", input_number.getText().toString());
                     intent.putExtra("type", "");
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
@@ -314,7 +436,9 @@ public class DashBoardFragments extends BaseFragment {
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                 } else if (position == 4) {
+//                    customDialog_Ben("INDO-NEPAL Remittance", "PMTTransfer");
                     Intent intent = new Intent(getActivity(), PMTRemittanceActivity.class);
+//                    intent.putExtra("MOBILENO", input_number.getText().toString());
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                 }
@@ -371,7 +495,6 @@ public class DashBoardFragments extends BaseFragment {
                     intent.putExtra("mobileNo", "");
                     startActivity(intent);
                 }
-
             }
 
             @Override
@@ -412,170 +535,176 @@ public class DashBoardFragments extends BaseFragment {
         }
     }
 
+    LinearLayoutManager layoutManager5;
+
     private void initializeTransAdapter(ArrayList<HeaderePozo> list) {
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
-        recycler_view5.setLayoutManager(layoutManager);
+        layoutManager5 = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
+        recycler_view5.setLayoutManager(layoutManager5);
         recycler_view5.setAdapter(new HeaderAdapter(getActivity(), recycler_view5, list));
         if (MainActivity.bankdetails == null || MainActivity.bankdetails.isEmpty()) {
             bankdetails.setVisibility(View.GONE);
+            movablefloating.setVisibility(View.VISIBLE);
         } else {
             bankdetails.setText(MainActivity.bankdetails);
             bankdetails.setVisibility(View.VISIBLE);
+            movablefloating.setVisibility(View.GONE);
         }
     }
 
-//    AlertDialog alertDialog;
+    //    AlertDialog alertDialog;
     EditText input_number;
-    private void customDialog_Ben(String title, final String type) {
-        dialog = new Dialog(getActivity());
-        final LayoutInflater inflater = getActivity().getLayoutInflater();
-        View alertLayout = inflater.inflate(R.layout.dash_pop_layout, null);
-        alertLayout.setKeepScreenOn(true);
-        AppCompatButton btn_cancel = (AppCompatButton) alertLayout.findViewById(R.id.btn_cancel);
-        AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
-        input_number = (EditText) alertLayout.findViewById(R.id.input_number);
-        final EditText input_amount = (EditText) alertLayout.findViewById(R.id.input_amount);
-        final ImageView btn_search = (ImageView)alertLayout.findViewById(R.id.btn_search);
-        TextView texttitle = (TextView) alertLayout.findViewById(R.id.dialog_title);
-        texttitle.setText(title);
-        if (type.equalsIgnoreCase("MposCashoutTransfer") || type.equalsIgnoreCase("MposSaleTransfer") || type.equalsIgnoreCase("MposEmiTransfer"))
-            input_amount.setVisibility(View.VISIBLE);
-        dialog.setCancelable(false);
-        dialog.setContentView(alertLayout);
-        btn_search.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                loadIMEI();
-            }
-        });
-        btn_ok.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (type.equalsIgnoreCase("FundTransfer")) {
-                    if (input_number.length() != 10) {
-                        input_number.setError("Please enter the correct number");
-                        input_number.requestFocus();
-                    } else {
-                        hideKeyboard(getActivity());
-                        Intent intent = new Intent(getActivity(), FundTransferActivity.class);
-                        intent.putExtra("MOBILENO", input_number.getText().toString());
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        startActivity(intent);
-                        dialog.dismiss();
-                    }
-                } else if (type.equalsIgnoreCase("WALLETTransfer")) {
-                    if (input_number.length() != 10) {
-                        input_number.setError("Please enter the correct number");
-                        input_number.requestFocus();
-                    } else {
-                        hideKeyboard(getActivity());
-                        Intent intent = new Intent(getActivity(), WalletDetailsActivity.class);
-                        intent.putExtra("mobileNo", input_number.getText().toString());
-                        intent.putExtra("type", "");
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        startActivity(intent);
-                        dialog.dismiss();
-                    }
-                }else if (type.equalsIgnoreCase("RefundTransfer")) {
-                    if (input_number.length() != 10) {
-                        input_number.setError("Please enter the correct number");
-                        input_number.requestFocus();
-                    } else {
-                        hideKeyboard(getActivity());
-                        Intent intent = new Intent(getActivity(), PendingRefundActivity.class);
-                        intent.putExtra("mobileNo", input_number.getText().toString());
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        startActivity(intent);
-                        dialog.dismiss();
-                    }
-                } else if (type.equalsIgnoreCase("PMTTransfer")) {
-                    if (input_number.length() != 10) {
-                        input_number.setError("Please enter the correct number");
-                        input_number.requestFocus();
-                    } else {
-                        hideKeyboard(getActivity());
-                        Intent intent = new Intent(getActivity(), PMTRemittanceActivity.class);
-                        intent.putExtra("MOBILENO", input_number.getText().toString());
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        startActivity(intent);
-                        dialog.dismiss();
-                    }
-                } else if (type.equalsIgnoreCase("MposCashoutTransfer")) {
-                    if (input_number.length() != 10) {
-                        input_number.setError("Please enter the correct number");
-                        input_number.requestFocus();
-                    } else if (input_amount.getText().toString().isEmpty()) {
-                        input_amount.setError("Please enter the correct number");
-                        input_amount.requestFocus();
-                    } else {
-                        hideKeyboard(getActivity());
-                        Intent intent = new Intent(getActivity(), CashOutClass.class);
-                        intent.putExtra("mobileNo", input_number.getText().toString());
-                        intent.putExtra("amount", input_amount.getText().toString());
-                        intent.putExtra("typeput", "CASHOUT");
-                        intent.putExtra("serviceType", "MPOS_CASHOUT");
-                        intent.putExtra("requestChannel", "MPOS_CHANNEL");
-                        intent.putExtra("requestType", "MPOS-CASHOUT");
-                        intent.putExtra("reqFor", "MPOS");
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        startActivity(intent);
-                        dialog.dismiss();
-                    }
-                } else if (type.equalsIgnoreCase("MposSaleTransfer")) {
-                    if (input_number.length() != 10) {
-                        input_number.setError("Please enter the correct number");
-                        input_number.requestFocus();
-                    } else if (input_amount.getText().toString().isEmpty()) {
-                        input_amount.setError("Please enter the correct number");
-                        input_amount.requestFocus();
-                    } else {
-                        hideKeyboard(getActivity());
-                        Intent intent = new Intent(getActivity(), CashOutClass.class);
-                        intent.putExtra("mobileNo", input_number.getText().toString());
-                        intent.putExtra("amount", input_amount.getText().toString());
-                        intent.putExtra("typeput", "SALE");
-                        intent.putExtra("serviceType", "MPOS_SALE");
-                        intent.putExtra("requestChannel", "MPOS_CHANNEL");
-                        intent.putExtra("requestType", "MPOS-SALE");
-                        intent.putExtra("reqFor", "MPOS");
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        startActivity(intent);
-                        dialog.dismiss();
-                    }
-                } else if (type.equalsIgnoreCase("MposEmiTransfer")) {
-                    if (input_number.length() != 10) {
-                        input_number.setError("Please enter the correct number");
-                        input_number.requestFocus();
-                    } else if (input_amount.getText().toString().isEmpty()) {
-                        input_amount.setError("Please enter the correct number");
-                        input_amount.requestFocus();
-                    } else {
-                        hideKeyboard(getActivity());
-                        Intent intent = new Intent(getActivity(), CashOutClass.class);
-                        intent.putExtra("mobileNo", input_number.getText().toString());
-                        intent.putExtra("amount", input_amount.getText().toString());
-                        intent.putExtra("typeput", "EMI");
-                        intent.putExtra("serviceType", "MPOS_EMI");
-                        intent.putExtra("requestChannel", "MPOS_CHANNEL");
-                        intent.putExtra("requestType", "MPOS-EMI");
-                        intent.putExtra("reqFor", "MPOS");
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        startActivity(intent);
-                        dialog.dismiss();
-                    }
-                }
-            }
-        });
-        btn_cancel.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                dialog.dismiss();
-            }
-        });
-        dialog.show();
-        Window window = dialog.getWindow();
-        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-    }
+
+    /* private void customDialog_Ben(String title, final String type) {
+         dialog = new Dialog(getActivity());
+         final LayoutInflater inflater = getActivity().getLayoutInflater();
+         View alertLayout = inflater.inflate(R.layout.dash_pop_layout, null);
+         alertLayout.setKeepScreenOn(true);
+         AppCompatButton btn_cancel = (AppCompatButton) alertLayout.findViewById(R.id.btn_cancel);
+         AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
+         input_number = (EditText) alertLayout.findViewById(R.id.input_number);
+         final EditText input_amount = (EditText) alertLayout.findViewById(R.id.input_amount);
+         final ImageView btn_search = (ImageView) alertLayout.findViewById(R.id.btn_search);
+         TextView texttitle = (TextView) alertLayout.findViewById(R.id.dialog_title);
+         texttitle.setText(title);
+         if (type.equalsIgnoreCase("MposCashoutTransfer") || type.equalsIgnoreCase("MposSaleTransfer") || type.equalsIgnoreCase("MposEmiTransfer"))
+             input_amount.setVisibility(View.VISIBLE);
+         dialog.setCancelable(false);
+         dialog.setContentView(alertLayout);
+         btn_search.setOnClickListener(new View.OnClickListener() {
+             @Override
+             public void onClick(View v) {
+                 loadIMEI();
+             }
+         });
+         btn_ok.setOnClickListener(new View.OnClickListener() {
+             @Override
+             public void onClick(View v) {
+                 if (type.equalsIgnoreCase("FundTransfer")) {
+                     if (input_number.length() != 10) {
+                         input_number.setError("Please enter the correct number");
+                         input_number.requestFocus();
+                     } else {
+                         hideKeyboard(getActivity());
+                         Intent intent = new Intent(getActivity(), FundTransferActivity.class);
+                         intent.putExtra("MOBILENO", input_number.getText().toString());
+                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                         startActivity(intent);
+                         dialog.dismiss();
+                     }
+                 } else if (type.equalsIgnoreCase("WALLETTransfer")) {
+                     if (input_number.length() != 10) {
+                         input_number.setError("Please enter the correct number");
+                         input_number.requestFocus();
+                     } else {
+                         hideKeyboard(getActivity());
+                         Intent intent = new Intent(getActivity(), WalletDetailsActivity.class);
+                         intent.putExtra("mobileNo", input_number.getText().toString());
+                         intent.putExtra("type", "");
+                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                         startActivity(intent);
+                         dialog.dismiss();
+                     }
+                 } else if (type.equalsIgnoreCase("RefundTransfer")) {
+                     if (input_number.length() != 10) {
+                         input_number.setError("Please enter the correct number");
+                         input_number.requestFocus();
+                     } else {
+                         hideKeyboard(getActivity());
+                         Intent intent = new Intent(getActivity(), PendingRefundActivity.class);
+                         intent.putExtra("mobileNo", input_number.getText().toString());
+                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                         startActivity(intent);
+                         dialog.dismiss();
+                     }
+                 } else if (type.equalsIgnoreCase("PMTTransfer")) {
+                     if (input_number.length() != 10) {
+                         input_number.setError("Please enter the correct number");
+                         input_number.requestFocus();
+                     } else {
+                         hideKeyboard(getActivity());
+                         Intent intent = new Intent(getActivity(), PMTRemittanceActivity.class);
+                         intent.putExtra("MOBILENO", input_number.getText().toString());
+                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                         startActivity(intent);
+                         dialog.dismiss();
+                     }
+                 } else if (type.equalsIgnoreCase("MposCashoutTransfer")) {
+                     if (input_number.length() != 10) {
+                         input_number.setError("Please enter the correct number");
+                         input_number.requestFocus();
+                     } else if (input_amount.getText().toString().isEmpty()) {
+                         input_amount.setError("Please enter the correct number");
+                         input_amount.requestFocus();
+                     } else {
+                         hideKeyboard(getActivity());
+                         Intent intent = new Intent(getActivity(), CashOutClass.class);
+                         intent.putExtra("mobileNo", input_number.getText().toString());
+                         intent.putExtra("amount", input_amount.getText().toString());
+                         intent.putExtra("typeput", "CASHOUT");
+                         intent.putExtra("serviceType", "MPOS_CASHOUT");
+                         intent.putExtra("requestChannel", "MPOS_CHANNEL");
+                         intent.putExtra("requestType", "MPOS-CASHOUT");
+                         intent.putExtra("reqFor", "MPOS");
+                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                         startActivity(intent);
+                         dialog.dismiss();
+                     }
+                 } else if (type.equalsIgnoreCase("MposSaleTransfer")) {
+                     if (input_number.length() != 10) {
+                         input_number.setError("Please enter the correct number");
+                         input_number.requestFocus();
+                     } else if (input_amount.getText().toString().isEmpty()) {
+                         input_amount.setError("Please enter the correct number");
+                         input_amount.requestFocus();
+                     } else {
+                         hideKeyboard(getActivity());
+                         Intent intent = new Intent(getActivity(), CashOutClass.class);
+                         intent.putExtra("mobileNo", input_number.getText().toString());
+                         intent.putExtra("amount", input_amount.getText().toString());
+                         intent.putExtra("typeput", "SALE");
+                         intent.putExtra("serviceType", "MPOS_SALE");
+                         intent.putExtra("requestChannel", "MPOS_CHANNEL");
+                         intent.putExtra("requestType", "MPOS-SALE");
+                         intent.putExtra("reqFor", "MPOS");
+                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                         startActivity(intent);
+                         dialog.dismiss();
+                     }
+                 } else if (type.equalsIgnoreCase("MposEmiTransfer")) {
+                     if (input_number.length() != 10) {
+                         input_number.setError("Please enter the correct number");
+                         input_number.requestFocus();
+                     } else if (input_amount.getText().toString().isEmpty()) {
+                         input_amount.setError("Please enter the correct number");
+                         input_amount.requestFocus();
+                     } else {
+                         hideKeyboard(getActivity());
+                         Intent intent = new Intent(getActivity(), CashOutClass.class);
+                         intent.putExtra("mobileNo", input_number.getText().toString());
+                         intent.putExtra("amount", input_amount.getText().toString());
+                         intent.putExtra("typeput", "EMI");
+                         intent.putExtra("serviceType", "MPOS_EMI");
+                         intent.putExtra("requestChannel", "MPOS_CHANNEL");
+                         intent.putExtra("requestType", "MPOS-EMI");
+                         intent.putExtra("reqFor", "MPOS");
+                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                         startActivity(intent);
+                         dialog.dismiss();
+                     }
+                 }
+             }
+         });
+         btn_cancel.setOnClickListener(new View.OnClickListener() {
+             @Override
+             public void onClick(View v) {
+                 dialog.dismiss();
+             }
+         });
+         dialog.show();
+         Window window = dialog.getWindow();
+         window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+     }
+ */
     public void loadIMEI() {
         if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_CONTACTS)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -639,6 +768,7 @@ public class DashBoardFragments extends BaseFragment {
             startActivityForResult(contactPickerIntent, CONTACT_PICKER_RESULT);
         }
     }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -681,5 +811,4 @@ public class DashBoardFragments extends BaseFragment {
             }
         }
     }
-
 }
