@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -22,14 +23,25 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.finopaytech.finosdk.activity.MainTransactionActivity;
 import com.finopaytech.finosdk.encryption.AES_BC;
 import com.finopaytech.finosdk.helpers.Utils;
@@ -45,9 +57,13 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
+import com.google.gson.Gson;
 import com.rapipay.android.agent.Model.AEPSPendingPozo;
+import com.rapipay.android.agent.Model.microaeps.Microdata1;
+import com.rapipay.android.agent.Model.microaeps.Microresponse1;
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.adapter.MATMAEPSAdapter;
+import com.rapipay.android.agent.adapter.MicroAepsAdapter;
 import com.rapipay.android.agent.interfaces.ClickListener;
 import com.rapipay.android.agent.interfaces.CustomInterface;
 import com.rapipay.android.agent.interfaces.RequestHandler;
@@ -61,99 +77,306 @@ import com.rapipay.android.agent.view.EnglishNumberToWords;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import io.realm.Realm;
+
+import static com.example.rfplmantra.MantraActivity.callmantraDeviceinfo;
+import static com.example.rfplmantra.MantraActivity.display;
+import static com.example.rfplmorphof.MorphoActivity.callmophoDeviceinfo;
+import static com.example.rfplstartek.StratekActivity.callStartekDeviceinfo;
+
 public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnClickListener, RequestHandler, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener, CustomInterface {
-    String serviceType, requestChannel, requestType, reqFor, typeput, updateServiceType;
-    EditText input_mobile, input_amount;
+    String serviceType, requestChannel, requestType, reqFor, typeput, updateServiceType, innno, devicetype, aeps_type, bankName;
+    EditText input_mobile, input_amount, input_userid;
     AutoCompleteTextView input_deviceid;
     private ImageView btn_contact;
-    AppCompatButton btn_submit_aeps;
+    AppCompatButton btn_submit_aeps, btn_capture;
     String requestData, requestKey, headerDatas, clientRefID;
-    private static final int MATM_AEPS_Resposne = 140;
-    String strDecryptResponse = "";
-    ArrayList<String> deviceID;
-    LinearLayout pending_tran_layout;
+    LinearLayout pending_tran_layout, ln_amount, ln_morpho, ln_mantra, ln_startek;
     RecyclerView pendingtrans_details;
     ArrayList<AEPSPendingPozo> pendingPozoArrayList;
+    //  Spinner select_deviceid, select_device;
+    TextView pending, bank_select,adhar_select;
+    List<Microdata1> microdata1;
+    private long mLastClickTime = System.currentTimeMillis();
+    private static final long CLICK_TIME_INTERVAL = 1000;
+    ArrayList<String> dpdevicetype;
+    int flagdevicetype;
+    RadioGroup radioGroup;
+    RadioButton cashid, balanceid;
+    boolean radioflag = false;
+    ImageView img_morpho_check, img_mantra_check, img_startek_check;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.aeps_bbps_layout);
-        typeput = getIntent().getStringExtra("typeput");
-        serviceType = getIntent().getStringExtra("serviceType");
-        updateServiceType = getIntent().getStringExtra("updateServiceType");
-        requestChannel = getIntent().getStringExtra("requestChannel");
-        requestType = getIntent().getStringExtra("requestType");
-        reqFor = getIntent().getStringExtra("reqFor");
-        setUpGClient();
+        deletebankTables();
+        dpdevicetype = new ArrayList<>();
+        dpdevicetype.add("Select Device Type");
+        dpdevicetype.add("Morpho");
+        dpdevicetype.add("Mantra");
+        dpdevicetype.add("StarTek");
+        //  select_deviceid = findViewById(R.id.select_deviceid);
+        //  select_device = findViewById(R.id.select_device);
+        pending = findViewById(R.id.pending);
+        bank_select = findViewById(R.id.bank_select);
+        adhar_select = findViewById(R.id.adhar_select);
+        adhar_select.setClickable(true);
+        getBankDetails();
+
+        bank_select.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ArrayList<String> list_bank = new ArrayList<>();
+                ArrayList<Microdata1> list_bank1 = BaseCompactActivity.dbRealm.geBankList("");
+                for (int i = 0; i < list_bank1.size(); i++) {
+                    list_bank.add(list_bank1.get(i).getBankName());
+                }
+                customSpinner(bank_select, "Select Bank", list_bank);
+            }
+        });
+
+        adhar_select.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                input_deviceid.setEnabled(true);
+                input_deviceid.setText("");
+                adhar_select.setVisibility(View.GONE);
+            }
+        });
+        /*select_device.setAdapter(new MicroAepsAdapter(this, dpdevicetype));
+        select_device.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (position == 1) {
+                    flagdevicetype = position;
+                } else if (position == 2) {
+                    flagdevicetype = position;
+                } else if (position == 3) {
+                    flagdevicetype = position;
+                }
+            }
+
+            @Overridel
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });*/
         initialize();
-        if (!typeput.equalsIgnoreCase("Balance Enquiry"))
+        setUpGClient();
+        /*if (!typeput.equalsIgnoreCase("Balance Enquiry")) {
             loadUrl();
-        else
-            reset.setVisibility(View.GONE);
+        } else
+            reset.setVisibility(View.GONE);*/
+    }
+
+    private void getBankDetails() {
+        //  String url = "https://fingpayap.tapits.in/fingpay/getBankDetailsMasterData";
+        String url = "https://fingpayap.tapits.in/fpaepsservice/api/bankdata/bank/details";
+        RequestQueue queue = Volley.newRequestQueue(this);
+        final Microdata1 microdatas1 = new Microdata1();
+        // Request a string response from the provided URL.
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(final String response) {
+                        try {
+                            final Microresponse1 microresponse = new Microresponse1();
+                            realm.executeTransaction(new Realm.Transaction() {
+                                @Override
+                                public void execute(Realm realm) {
+                                    try {
+                                        Gson gson = new Gson();
+                                        Microresponse1 clicks = gson.fromJson(response, Microresponse1.class);
+                                        microdata1 = clicks.getData();
+                                        for (int i = 0; i < microdata1.size(); i++) {
+                                            microdatas1.setId(microdata1.get(i).getId());
+                                            microdatas1.setBankName(microdata1.get(i).getBankName());
+                                            microdatas1.setDetails(microdata1.get(i).getDetails());
+                                            microdatas1.setIINNo(microdata1.get(i).getIINNo());
+                                            microdatas1.setRemarks(microdata1.get(i).getRemarks());
+                                            microdatas1.setTimestamp(microdata1.get(i).getTimestamp());
+                                            realm.copyToRealm(microdatas1);
+                                        }
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            });
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                //post_des.setText("That didn't work!");
+                Log.e("response url", error + "");
+            }
+        });
+        // Add the request to the RequestQueue.
+        queue.add(stringRequest);
     }
 
     private void loadUrl() {
         new AsyncPostMethod(WebConfig.CASHOUT_URL, getPendingTransaction().toString(), headerData, MICRO_AEPS_Activity.this, getString(R.string.responseTimeOut), typeput).execute();
     }
 
-    private void initialize() {
-        heading = (TextView) findViewById(R.id.toolbar_title);
-        btn_contact = (ImageView) findViewById(R.id.btn_contact);
-        reset = (ImageView) findViewById(R.id.reset);
-        reset.setOnClickListener(this);
-        reset.setColorFilter(getResources().getColor(R.color.colorPrimaryDark));
-        reset.setVisibility(View.VISIBLE);
-        input_deviceid = (AutoCompleteTextView) findViewById(R.id.input_deviceid);
-        if (balance != null)
-            heading.setText(typeput + " (Balance : Rs." + balance + ")");
-        else
-            heading.setText(typeput);
-        input_mobile = (EditText) findViewById(R.id.input_mobile);
-        input_amount = (EditText) findViewById(R.id.input_amount);
-        btn_submit_aeps = (AppCompatButton) findViewById(R.id.btn_submit_aeps);
-        btn_submit_aeps.setOnClickListener(this);
-        pending_tran_layout = (LinearLayout) findViewById(R.id.pending_tran_layout);
-        pendingtrans_details = (RecyclerView) findViewById(R.id.pendingtrans_details);
-        final TextView input_text = (TextView) findViewById(R.id.input_texts);
-        if (typeput.equalsIgnoreCase("Balance Enquiry")) {
-            input_amount.setText("0");
-            input_amount.setEnabled(false);
+    public void assignBundleValue(int position) {
+        if (position == 0) {
+            radioflag = true;
+            typeput = "Cash Withdrawal";
+            serviceType = "AEPS_CASHOUT";
+            requestChannel = "AEPS_CHANNEL";
+            requestType = "AEPS-CASHOUT";
+            devicetype = "other";
+            ln_amount.setVisibility(View.VISIBLE);
+        } else if (position == 1) {
+            radioflag = true;
+            typeput = "Balance Enquiry";
+            serviceType = "AEPS_BALANCE_ENQ";
+            requestChannel = "AEPS_CHANNEL";
+            requestType = "AEPS-BE";
+            devicetype = "others";
+            ln_amount.setVisibility(View.GONE);
         }
-        if (reqFor.equalsIgnoreCase("AEPS")) {
-            deviceID = new ArrayList<>();
-//            if (MainActivity.deviceDetailsPozoArrayList != null && MainActivity.deviceDetailsPozoArrayList.size() != 0) {
-//                deviceID.add("Enter Device ID");
-            for (int i = 0; i < MainActivity.deviceDetailsPozoArrayList.size(); i++) {
-                if (MainActivity.deviceDetailsPozoArrayList.get(i).getDeviceType().equalsIgnoreCase("AEPS")) {
-                    deviceID.add(MainActivity.deviceDetailsPozoArrayList.get(i).getBluetoothID());
+    }
+
+    TextView input_text;
+
+    private void initialize() {
+        reqFor = "AEPS";
+        aeps_type = "aeps2";
+        if (typeput == null) {
+            typeput = "Cash Withdrawal";
+            devicetype = "other";
+        }
+        input_amount = findViewById(R.id.input_amount);
+        input_userid = findViewById(R.id.input_userid);
+        ln_amount = findViewById(R.id.ln_amount);
+        radioGroup = findViewById(R.id.myRadioGroup);
+        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                if (checkedId == R.id.cashid) {
+                    assignBundleValue(0);
+                } else if (checkedId == R.id.balanceid) {
+                    assignBundleValue(1);
                 }
             }
-            if (deviceID.size() >= 1) {
-                ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(MICRO_AEPS_Activity.this,
-                        android.R.layout.simple_list_item_1, deviceID);
-                input_deviceid.setAdapter(dataAdapter);
-                input_deviceid.setThreshold(1);
+        });
+        cashid = findViewById(R.id.cashid);
+        balanceid = findViewById(R.id.balanceid);
+        heading = findViewById(R.id.toolbar_title);
+        btn_contact = findViewById(R.id.btn_contact);
+        reset = findViewById(R.id.reset);
+        reset.setVisibility(View.GONE);
+        /*reset = findViewById(R.id.reset);
+        reset.setOnClickListener(this);
+        reset.setColorFilter(getResources().getColor(R.color.colorPrimaryDark));
+        reset.setVisibility(View.VISIBLE);*/
+        input_deviceid = findViewById(R.id.input_deviceid);
+        if (balance != null) {
+            heading.setText("AEPS2" + " (Balance : Rs." + balance + ")");
+        } else {
+            heading.setText("AEPS2");
+        }
+        input_mobile = findViewById(R.id.input_mobile);
+        btn_submit_aeps = findViewById(R.id.btn_submit_aeps);
+        btn_submit_aeps.setOnClickListener(this);
+        if (aeps_type.equalsIgnoreCase("aeps2")) {
+            btn_submit_aeps.setVisibility(View.GONE);
+            //   select_device.setVisibility(View.VISIBLE);
+        } else {
+            btn_submit_aeps.setVisibility(View.VISIBLE);
+            //   select_device.setVisibility(View.GONE);
+        }
+        btn_capture = findViewById(R.id.btn_capture);
+        img_morpho_check = findViewById(R.id.img_morpho_check);
+        img_mantra_check = findViewById(R.id.img_mantra_check);
+        img_startek_check = findViewById(R.id.img_startek_check);
+        btn_capture.setOnClickListener(this);
+        pending_tran_layout = findViewById(R.id.pending_tran_layout);
+        //   ImageView img_morpho_check,img_mantra_check,img_startek_check;
+        ln_morpho = findViewById(R.id.ln_morpho);
+        ln_morpho.setOnClickListener(this);
+        ln_morpho.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                flagdevicetype = 1;
+                img_morpho_check.setVisibility(View.VISIBLE);
+                img_mantra_check.setVisibility(View.GONE);
+                img_startek_check.setVisibility(View.GONE);
             }
-        } else
-            input_deviceid.setVisibility(View.GONE);
-
+        });
+        ln_mantra = findViewById(R.id.ln_mantra);
+        ln_mantra.setOnClickListener(this);
+        ln_mantra.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                flagdevicetype = 2;
+                img_morpho_check.setVisibility(View.GONE);
+                img_mantra_check.setVisibility(View.VISIBLE);
+                img_startek_check.setVisibility(View.GONE);
+            }
+        });
+        ln_startek = findViewById(R.id.ln_startek);
+        ln_startek.setOnClickListener(this);
+        ln_startek.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                flagdevicetype = 3;
+                img_morpho_check.setVisibility(View.GONE);
+                img_mantra_check.setVisibility(View.GONE);
+                img_startek_check.setVisibility(View.VISIBLE);
+            }
+        });
+        pendingtrans_details = findViewById(R.id.pendingtrans_details);
+        input_text = findViewById(R.id.input_texts);
+        if (typeput.equalsIgnoreCase("Balance Enquiry")) {
+            input_text.setVisibility(View.GONE);
+        }
+        if ((typeput.equalsIgnoreCase("Balance Enquiry") || typeput.equalsIgnoreCase("Cash Withdrawal")) && aeps_type.equalsIgnoreCase("aeps2")) {
+            bank_select.setVisibility(View.VISIBLE);
+            pending_tran_layout.setVisibility(View.GONE);
+            pendingtrans_details.setVisibility(View.GONE);
+            btn_capture.setVisibility(View.VISIBLE);
+            pending.setVisibility(View.GONE);
+            if (devicetype.equalsIgnoreCase("other")) {
+                input_amount.setVisibility(View.VISIBLE);
+            } else {
+                input_amount.setText("0");
+                input_amount.setVisibility(View.GONE);
+            }
+        }
         pendingtrans_details.addOnItemTouchListener(new RecyclerTouchListener(this, pendingtrans_details, new ClickListener() {
             @Override
             public void onClick(View view, int position) {
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    if (pendingPozoArrayList.size() != 0) {
-                        new AsyncPostMethod(WebConfig.CASHOUT_URL, getTransactionStatus(pendingPozoArrayList.get(position).getTransactionID()).toString(), headerData, MICRO_AEPS_Activity.this, getString(R.string.responseTimeOut), typeput).execute();
-                    }
-                }handlercontrol();
+                long now = System.currentTimeMillis();
+                if (now - mLastClickTime < CLICK_TIME_INTERVAL) {
+                    return;
+                }
+                mLastClickTime = now;
+                if (pendingPozoArrayList.size() != 0) {
+                    // new AsyncPostMethod(WebConfig.CASHOUT_URL, getTransactionStatus(pendingPozoArrayList.get(position).getTransactionID()).toString(), headerData, MICRO_AEPS_Activity.this, getString(R.string.responseTimeOut), typeput).execute();
+                    new AsyncPostMethod(WebConfig.CASHOUT_URL, getTransactionStatus(pendingPozoArrayList.get(position).getTransactionID()).toString(), headerData, MICRO_AEPS_Activity.this, getString(R.string.responseTimeOut), typeput).execute();
+                }
             }
 
             @Override
@@ -161,6 +384,8 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
 
             }
         }));
+
+
         input_amount.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -174,14 +399,34 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
 
             @Override
             public void afterTextChanged(Editable s) {
-                if (s.length()!=0 && s.length()<10) {
+                if (s.length() != 0 && s.length() < 10) {
                     input_text.setText("");
-                    input_text.setText(EnglishNumberToWords.convert(Integer.parseInt(s.toString()))+" rupee");
-                    input_text.setVisibility(View.VISIBLE);
-                }else
+                    try {
+                        if (devicetype.equalsIgnoreCase("other"))
+                            input_text.setText(EnglishNumberToWords.convert(Integer.parseInt(s.toString())) + " rupee");
+                        input_text.setVisibility(View.VISIBLE);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                } else
                     input_text.setVisibility(View.GONE);
             }
         });
+    }
+
+    public boolean isClickable = false;
+
+    public static boolean setClickable(View view, boolean clickable) {
+        if (view != null) {
+            if (view instanceof ViewGroup) {
+                ViewGroup viewGroup = (ViewGroup) view;
+                for (int i = 0; i < viewGroup.getChildCount(); i++) {
+                    setClickable(viewGroup.getChildAt(i), clickable);
+                }
+            }
+            view.setClickable(clickable);
+        }
+        return clickable;
     }
 
     public JSONObject getPendingTransaction() {
@@ -195,7 +440,6 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
             jsonObject.put("reqFor", reqFor);
             jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -220,12 +464,12 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
             jsonObject.put("reqFor", reqFor);
             jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
-
         } catch (Exception e) {
             e.printStackTrace();
         }
         return jsonObject;
     }
+
 
     private synchronized void setUpGClient() {
         googleApiClient = new GoogleApiClient.Builder(this)
@@ -326,7 +570,7 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[],
+    public void onRequestPermissionsResult(int requestCode, String[] permissions,
                                            int[] grantResults) {
         int permissionLocation = ContextCompat.checkSelfPermission(MICRO_AEPS_Activity.this,
                 Manifest.permission.ACCESS_FINE_LOCATION);
@@ -335,62 +579,69 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
         }
     }
 
+    DocumentBuilder builder = null;
+    String pidData;
+    Document doc;
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (data != null) {
+            if (resultCode == Activity.RESULT_OK) {
+                if (resultCode == Activity.RESULT_OK) {
+                    try {
+                        if (data != null) {
+                            display = "";
+                            display = data.getStringExtra("PID_DATA");
+                            // customDialog_Common("Device Info", display , MainActivitys.this);
+                            if (display != null) {
+                                try {
+                                    builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+                                } catch (ParserConfigurationException e) {
+                                    e.printStackTrace();
+                                }
+                                InputSource src = new InputSource();
+                                src.setCharacterStream(new StringReader(display));
+                                try {
+                                    doc = builder.parse(src);
+                                } catch (SAXException e) {
+                                    e.printStackTrace();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+
+                                pidData = doc.getElementsByTagName("PidData").item(0).getTextContent();
+                                if (pidData.length() < 50) {
+                                    btn_submit_aeps.setVisibility(View.GONE);
+                                    btn_capture.setText("capture");
+                                    Toast.makeText(this, "Finger print data not capture / worng device type, Please check your device type", Toast.LENGTH_LONG).show();
+                                } else {
+                                    btn_submit_aeps.setVisibility(View.VISIBLE);
+                                    btn_capture.setText("Re-capture");
+                                    Toast.makeText(this, "Successfully capture data", Toast.LENGTH_LONG).show();
+                                }
+                            }
+                        }
+                    } catch (Exception e) {
+                        Log.e("Error", "Error while deserialze pid data", e);
+                    }
+                }
+            }
+
             switch (requestCode) {
                 case REQUEST_CHECK_SETTINGS_GPS:
                     switch (resultCode) {
                         case Activity.RESULT_OK:
-                            if (btnstatus == false) {
-                                btnstatus = true;
-                                getMyLocation();
-                            }
-                            handlercontrol();
+
+                            getMyLocation();
                             break;
                         case Activity.RESULT_CANCELED:
-                            if (btnstatus == false) {
-                                btnstatus = true;
-                                finish();
-                            }
-                            handlercontrol();
+                            finish();
                             break;
                     }
                     break;
                 case CONTACT_PICKER_RESULT:
-                    if (btnstatus == false) {
-                        btnstatus = true;
-                        contactRead(data, input_mobile);
-                    }
-                    handlercontrol();
-                    break;
-                case MATM_AEPS_Resposne:
-                    if (btnstatus == false) {
-                        btnstatus = true;
-                        String response;
-                        if (data != null) {
-                            if (data.hasExtra("ClientResponse")) {
-                                response = data.getStringExtra("ClientResponse");
-                                strDecryptResponse = AES_BC.getInstance().decryptDecode(Utils.replaceNewLine(response), requestKey);
-                                new AsyncPostMethod(WebConfig.CASHOUT_URL, updateDetails(updateDetailsResponseData(response, "0").toString(), transactionIDAEPS).toString(), headerData, MICRO_AEPS_Activity.this, getString(R.string.responseTimeOut), "AEPS-MATM").execute();
-                            } else if (data.hasExtra("ErrorDtls")) {
-                                response = data.getStringExtra("ErrorDtls");
-                                String errorMsg = "", errorDtlsMsg = "";
-                                if (!response.equalsIgnoreCase("")) {
-                                    try {
-                                        String[] error_dtls = response.split("\\|");
-                                        if (error_dtls.length > 0) {
-                                            strDecryptResponse = error_dtls[0];
-                                            new AsyncPostMethod(WebConfig.CASHOUT_URL, updateDetails(updateDetailsResponseData(strDecryptResponse, "1").toString(), transactionIDAEPS).toString(), headerData, MICRO_AEPS_Activity.this, getString(R.string.responseTimeOut), "AEPS-MATM").execute();
-                                        }
-                                    } catch (ArrayIndexOutOfBoundsException exp) {
-                                    }
-                                }
-                            }
-                            ErrorSingletone.getFreshInstance();
-                        }
-                    }
-                    handlercontrol();
+
+                    contactRead(data, input_mobile);
                     break;
                 case 2:
                     dialog.dismiss();
@@ -400,71 +651,6 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
             if (dialog != null)
                 dialog.dismiss();
         }
-    }
-
-    private JSONObject updateDetailsResponseData(String errorMsg, String ResponseCode) {
-        JSONObject jsonObject = new JSONObject();
-        try {
-            if (ResponseCode.equalsIgnoreCase("1")) {
-                jsonObject.put("ClientResponse", Utils.replaceNewLine(AES_BC.getInstance().encryptEncode(clientResponseData(errorMsg).toString(), requestKey)));
-                jsonObject.put("DisplayMessage", errorMsg);
-            } else if (ResponseCode.equalsIgnoreCase("0")) {
-                jsonObject.put("ClientResponse", errorMsg);
-                jsonObject.put("DisplayMessage", "Success");
-            }
-            jsonObject.put("ResponseCode", ResponseCode);
-            jsonObject.put("ClientRefID", clientRefID);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return jsonObject;
-    }
-
-    private JSONObject clientResponseData(String status) {
-        JSONObject jsonObject = new JSONObject();
-        try {
-            if (reqFor.equalsIgnoreCase("MATM")) {
-                jsonObject.put("TxnStatus", status);
-                jsonObject.put("TxnAmt", "");
-                jsonObject.put("CardNumber", "");
-                jsonObject.put("TransactionDatetime", "");
-                jsonObject.put("TerminalID", "");
-            } else if (reqFor.equalsIgnoreCase("AEPS")) {
-                jsonObject.put("Status", status);
-                jsonObject.put("Amount", "");
-                jsonObject.put("AdhaarNo", "");
-                jsonObject.put("TxnTime", "");
-                jsonObject.put("TxnDate", "");
-                jsonObject.put("BankName", "");
-                jsonObject.put("CustomerMobile", "");
-                jsonObject.put("LedgerBalance", "");
-            }
-            jsonObject.put("AvailableBalance", "");
-            jsonObject.put("RRN", "");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return jsonObject;
-    }
-
-    private JSONObject updateDetails(String responseData, String orderID) {
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("serviceType", updateServiceType);
-            jsonObject.put("requestChannel", requestChannel);
-            jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("transactionID", ImageUtils.miliSeconds());
-            jsonObject.put("agentMobile", list.get(0).getMobilno());
-            jsonObject.put("responseData", responseData);
-            jsonObject.put("orderID", orderID);
-            jsonObject.put("reqFor", reqFor);
-            jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
-            jsonObject.put("requestType", requestType);
-            jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return jsonObject;
     }
 
     private void bluetooth() {
@@ -490,6 +676,21 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
                 Log.d("GoPosActivity", "bluetooth is enable");
                 accessBluetoothDetails();
             }
+        }
+    }
+
+    String deviceName = "";
+
+    public void initDevice(int no) {
+        if (no == 1) {
+            callmophoDeviceinfo(MICRO_AEPS_Activity.this);
+            deviceName = "Morpho";
+        } else if (no == 2) {
+            deviceName = "Mantra";
+            callmantraDeviceinfo(MICRO_AEPS_Activity.this);
+        } else if (no == 3) {
+            deviceName = "StarTek";
+            callStartekDeviceinfo(MICRO_AEPS_Activity.this);
         }
     }
 
@@ -525,74 +726,81 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
         return null;
     }
 
-    @Override
-    public void chechStat(String object) {
-        if (object.equalsIgnoreCase("AEPS-MATM")) {
-            if (strDecryptResponse.contains("Amount") || strDecryptResponse.contains("TxnAmt") || strDecryptResponse.contains("AccountNo"))
-                generateReceipt(strDecryptResponse);
-            else {
-                Utils.showOneBtnDialog(this, getString(com.finopaytech.finosdk.R.string.STR_INFO), strDecryptResponse, false);
-                clear();
-            }
-        }
-    }
 
-    private void generateReceipt(String object) {
+    private void generateReceipt1(String object, String adhar) {
         try {
+            input_deviceid.setEnabled(false);
+            adhar_select.setVisibility(View.VISIBLE);
             JSONObject type = new JSONObject(object);
-            if (serviceType.equalsIgnoreCase("AEPS_CASHOUT") || serviceType.equalsIgnoreCase("AEPS_BALANCE_ENQ")) {
+            if (aeps_type.equalsIgnoreCase("aeps2") && serviceType.equalsIgnoreCase("AEPS_BALANCE_ENQ")) {
                 ArrayList<String> left = new ArrayList<>();
-                left.add("TxnDate:" + " " + type.getString("TxnDate"));
+                left.add("Date:" + " " + getCurrentDate() + " " + type.getString("requestTransactionTime"));
                 ArrayList<String> right = new ArrayList<>();
-                right.add("TxnTime:" + " " + type.getString("TxnTime"));
+                //  right.add("Time(hh:mm:ss:" + " " + type.getString("requestTransactionTime"));
                 ArrayList<String> bottom = new ArrayList<>();
-                bottom.add("Amount : " + type.getString("Amount"));
-                bottom.add("AdhaarNo :" + type.getString("AdhaarNo"));
-                bottom.add("BankName : " + type.getString("BankName"));
-                bottom.add("CustomerMobile : " + input_mobile.getText().toString());
-                bottom.add("RRN : " + type.getString("RRN"));
-                bottom.add("AvailableBalance : " + type.getString("AvailableBalance"));
-                bottom.add("Status : " + type.getString("Status"));
-                ArrayList<String> medium = new ArrayList<>();
-                medium.add(serviceType);
-                if (serviceType.equalsIgnoreCase("AEPS_BALANCE_ENQ"))
-                    customReceiptCastSaleOut(list.get(0).getAgentName(), left, right, bottom, medium, serviceType, type.getString("CustomerMobile"), MICRO_AEPS_Activity.this);
+                /*if (type.getString("bcName").equals("null") || type.getString("bcName").equals(""))
+                    bottom.add("BC Name: " + list.get(0).getAgentName());
                 else
-                    customReceiptCastSaleOut(list.get(0).getAgentName(), left, right, bottom, medium, String.valueOf(type.getString("Amount")), type.getString("CustomerMobile"), MICRO_AEPS_Activity.this);
-            } else if (serviceType.equalsIgnoreCase("MATM_CASHOUT")) {
-                ArrayList<String> left = new ArrayList<>();
-                left.add("TransactionDatetime:" + " " + type.getString("TransactionDatetime"));
-                ArrayList<String> right = new ArrayList<>();
-                ArrayList<String> bottom = new ArrayList<>();
-                bottom.add("Amount : " + type.getString("TxnAmt"));
-                bottom.add("TerminalID :" + type.getString("TerminalID"));
-                bottom.add("CardNumber : " + type.getString("CardNumber"));
-                bottom.add("RRN : " + type.getString("RRN"));
-                bottom.add("AvailableBalance : " + type.getString("AvailableBalance"));
-                bottom.add("Status : " + type.getString("TxnStatus"));
+                    bottom.add("BC Name: " + type.getString("bcName"));*/
+                if (type.getString("agentId").equals("null") || type.getString("agentId").equals(""))
+                    bottom.add("Agent Id :" + list.get(0).getMobilno());
+                else
+                    bottom.add("Agent Id :" + type.getString("agentId"));
+                //  bottom.add("BC Location : " + type.getString("BankName"));
+                bottom.add("Customer Adhar No : " + "XXXXXX" + adhar);
+                //  bottom.add("Customer Name : " + type.getString("RRN"));
+               /* if (type.getString("stan").equals("null") || type.getString("stan").equals(""))
+                    bottom.add("STAN : " + "");
+                else bottom.add("STAN : " + type.getString("stan"));*/
+                bottom.add("RRN: : " + type.getString("bankRRN"));
+                /*if (type.getString("uidaiAuthCode").equals("null") || type.getString("uidaiAuthCode").equals(""))
+                    bottom.add("UIDAI Auth. Code: : " + "");
+                else
+                    bottom.add("UIDAI Auth. Code: : " + type.getString("uidaiAuthCode"));*/
+                bottom.add("Transaction Status: : " + type.getString("transactionStatus"));
+                bottom.add("A/C Balance: : " + type.getString("balanceAmount"));
                 ArrayList<String> medium = new ArrayList<>();
-                medium.add(serviceType);
-                customReceiptCastSaleOut(list.get(0).getAgentName(), left, right, bottom, medium, String.valueOf(type.getString("TxnAmt")), type.getString("CardNumber"), MICRO_AEPS_Activity.this);
-            } else if (serviceType.equalsIgnoreCase("MATM_BALANCE_ENQ")) {
+                medium.add("Balance Enquiry");
+                if (serviceType.equalsIgnoreCase("AEPS_BALANCE_ENQ"))
+                    customReceiptCastSaleOut(list.get(0).getAgentName(), left, right, bottom, medium, serviceType, type.getString("bankRRN"), MICRO_AEPS_Activity.this, "other");
+            } else if (aeps_type.equalsIgnoreCase("aeps2") && serviceType.equalsIgnoreCase("AEPS_CASHOUT")) {
                 ArrayList<String> left = new ArrayList<>();
-                left.add("TransactionDatetime:" + " " + type.getString("TransactionDatetime"));
+                left.add("Date:" + " " + getCurrentDate() + " " + type.getString("requestTransactionTime"));
                 ArrayList<String> right = new ArrayList<>();
+                //  right.add("Time(hh:mm:ss:" + " " + type.getString("requestTransactionTime"));
                 ArrayList<String> bottom = new ArrayList<>();
-                bottom.add("AccountNo : " + type.getString("AccountNo"));
-                bottom.add("TerminalID :" + type.getString("TerminalID"));
-                bottom.add("CardNumber : " + type.getString("CardNumber"));
-                bottom.add("RRN : " + type.getString("RRN"));
-                bottom.add("AvailableBalance : " + type.getString("AvailableBalance"));
-                bottom.add("BalanceEnquiryStatus : " + type.getString("BalanceEnquiryStatus"));
+                /*if (type.getString("bcName").equals("null") || type.getString("bcName").equals(""))
+                    bottom.add("BC Name: " + list.get(0).getAgentName());
+                else
+                    bottom.add("BC Name: " + type.getString("bcName"));*/
+                if (type.getString("agentId").equals("null") || type.getString("agentId").equals(""))
+                    bottom.add("Agent Id :" + list.get(0).getMobilno());
+                else
+                    bottom.add("Agent Id :" + type.getString("agentId"));
+                //  bottom.add("BC Location : " + type.getString("BankName"));
+                bottom.add("Customer Adhar No : " + "XXXXXX" + adhar);
+                //  bottom.add("Customer Name : " + type.getString("RRN"));
+               /* if (type.getString("stan").equals("null") || type.getString("stan").equals(""))
+                    bottom.add("STAN : " + "");
+                else bottom.add("STAN : " + type.getString("stan"));*/
+                bottom.add("RRN: : " + type.getString("bankRRN"));
+                /*if (type.getString("uidaiAuthCode").equals("null") || type.getString("uidaiAuthCode").equals(""))
+                    bottom.add("UIDAI Auth. Code: : " + "");
+                else
+                    bottom.add("UIDAI Auth. Code: : " + type.getString("uidaiAuthCode"));*/
+                bottom.add("Transaction Status: : " + type.getString("transactionStatus"));
+                bottom.add("A/C Balance : " + type.getString("balanceAmount"));
+                bottom.add("Transaction Amount : " + type.getString("transactionAmount"));
                 ArrayList<String> medium = new ArrayList<>();
-                medium.add(serviceType);
-                customReceiptCastSaleOut(list.get(0).getAgentName(), left, right, bottom, medium, serviceType, type.getString("CardNumber"), MICRO_AEPS_Activity.this);
+                medium.add("Cash Withdrawal");
+                customReceiptCastSaleOut(list.get(0).getAgentName(), left, right, bottom, medium, serviceType, type.getString("bankRRN"), MICRO_AEPS_Activity.this, "other");
             }
             clear();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
 
     private void clear() {
         if (typeput.equalsIgnoreCase("Balance Enquiry")) {
@@ -602,12 +810,29 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
             input_amount.setText("");
         }
         input_mobile.setText("");
-        input_deviceid.setText("");
+        input_userid.setText("");
+        input_amount.setText("");
+        input_amount.setText("");
+        input_amount.setEnabled(true);
+        bank_select.setText("Select Bank");
+        img_morpho_check.setVisibility(View.GONE);
+        img_mantra_check.setVisibility(View.GONE);
+        img_startek_check.setVisibility(View.GONE);
+        cashid.setChecked(false);
+        balanceid.setChecked(false);
+        btn_capture.setText("Capture");
+        btn_submit_aeps.setVisibility(View.GONE);
+        radioflag = false;
         requestData = "";
         requestKey = "";
         headerDatas = "";
         clientRefID = "";
+        flagdevicetype = 0;
+        flag = 0;
     }
+
+    int flag = 0;
+
 
     @Override
     public void chechStatus(JSONObject object) {
@@ -618,16 +843,19 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
                 heading.setText(typeput + " (Balance : Rs." + format(balance) + ")");
             }
             if (object.getString("responseCode").equalsIgnoreCase("200")) {
-                if (object.getString("serviceType").equalsIgnoreCase(serviceType)) {
-                    JSONArray array = object.getJSONArray("objMposData");
-                    requestData = object.getString("requestData");
+                if (object.getString("serviceType").equalsIgnoreCase("INITIATE_AEPS_CASHOUT")) {
+                    //  JSONArray array = object.getJSONArray("objMposData");
+                    requestData = object.getString("requestData"); //encdata
                     requestKey = object.getString("requestKey");
-                    headerDatas = object.getString("headerData");
+                    headerDatas = object.getString("headerData"); //authdata
                     clientRefID = object.getString("clientRefID");
-                    if (array.length() != 0)
-                        customReceipt("Transaction Details", object, MICRO_AEPS_Activity.this);
-                } else if (object.getString("serviceType").equalsIgnoreCase(updateServiceType)) {
-                    generateReceipt(strDecryptResponse);
+                    if (requestData != "" && headerDatas != "" && pidData != "" && aeps_type.equals("aeps2") && serviceType.equalsIgnoreCase("AEPS_CASHOUT") && devicetype.equalsIgnoreCase("other") && flag == 0) {
+                        flag = 1;
+                        new AsyncPostMethod(WebConfig.CASHOUT_URL1, getCashOutDetails2(clientRefID, input_mobile.getText().toString(), requestData, headerDatas, input_amount.getText().toString(), serviceType, requestChannel, reqFor, requestType, input_deviceid.getText().toString(), innno, bankName).toString(), headerData, MICRO_AEPS_Activity.this, getString(R.string.responseTimeOut), typeput).execute();
+                    } else if (requestData != "" && headerDatas != "" && pidData != "" && aeps_type.equals("aeps2") && serviceType.equalsIgnoreCase("AEPS_BALANCE_ENQ") && devicetype.equalsIgnoreCase("others") && flag == 0) {
+                        flag = 1;
+                        new AsyncPostMethod(WebConfig.CASHOUT_URL1, getGetBalance(clientRefID, input_mobile.getText().toString(), requestData, headerDatas, input_deviceid.getText().toString(), serviceType, requestChannel, reqFor, requestType, input_deviceid.getText().toString(), innno, bankName).toString(), headerData, MICRO_AEPS_Activity.this, getString(R.string.responseTimeOut), typeput).execute();
+                    }
                 } else if (object.getString("serviceType").equalsIgnoreCase("CASHOUT_PENDING_TXN_LIST")) {
                     if (object.has("cashoutPendingList")) {
                         insertPendingTransDetails(object.getJSONArray("cashoutPendingList"));
@@ -635,12 +863,63 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
                 } else if (object.getString("serviceType").equalsIgnoreCase("AEPS_TRANSACTION_STATUS") || object.getString("serviceType").equalsIgnoreCase("MATM_TRANSACTION_STATUS")) {
                     customReceiptNew("Transaction Status Receipt", object, MICRO_AEPS_Activity.this);
                 }
-            }else {
+            } else if (object.getString("responseCode").equalsIgnoreCase("60217")) {
+                customDialog_Common_device(object.getString("responseMessage"));
+            } else if (object.getString("responseCode").equalsIgnoreCase("86039")) {
+                customDialog_Common_device(object.getString("responseMessage"));
+            } else if (reqFor.equalsIgnoreCase("MATM")) {
                 responseMSg(object);
+            } else if (object.getString("responseCode").equalsIgnoreCase("904")) {
+                customDialog_Common_device(object.getString("responseMessage"));
+            } else if (object.getString("responseCode").equalsIgnoreCase("60067")) {
+                customDialog_List_info(object.getString("respnseMessage"));
+            } else {
+                customDialog_List_info(object.getString("responseMessage"));
             }
+            try { //balanceAmount
+                if (object.getBoolean("status") && aeps_type.equalsIgnoreCase("aeps2")) {
+                    condition = true;
+                    generateReceipt1(String.valueOf(object), convertString(input_deviceid.getText().toString()));
+                } else {
+                    condition = true;
+                    customDialog_Common_device(object.getString("respnseMessage"));// respnseMessage
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            try { //balanceAmount
+                if (object.getString("status").equalsIgnoreCase("1000") && aeps_type.equalsIgnoreCase("aeps2")) {
+                    generateReceipt1(String.valueOf(object), convertString(input_deviceid.getText().toString()));
+                } else {
+                    if (!condition)
+                        customDialog_Common_device(object.getString("respnseMessage"));
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            btn_submit_aeps.setClickable(true);
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void chechStat(String object) {
+
+    }
+
+
+    boolean condition = false;
+
+    // aeps2 balance enquery
+    /* "\"requestTransactionTime\":\"30\/08\/2019 11:03:16\", */
+    public String convertString(String inputadhar) {
+        String lastFourDigits = "";     //substring containing last 4 characters
+        if (inputadhar.length() > 6) {
+            lastFourDigits = inputadhar.substring(inputadhar.length() - 6);
+        }
+        Log.e("string conversion", lastFourDigits);
+        return lastFourDigits;
     }
 
     private void insertPendingTransDetails(JSONArray array) {
@@ -665,20 +944,9 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
         pendingtrans_details.setAdapter(new MATMAEPSAdapter(this, list));
     }
 
+    // comment for mpos,mantra,astrtek
     @Override
     public void okClicked(String type, Object ob) {
-        if (type.equalsIgnoreCase("Transaction Details")) {
-            try {
-                Intent intent = new Intent(this, MainTransactionActivity.class);
-                intent.putExtra("RequestData", requestData);
-                intent.putExtra("HeaderData", headerDatas);
-                intent.putExtra("ReturnTime", 5);// Application return time in second
-                startActivityForResult(intent, MATM_AEPS_Resposne);
-//                resetData(cbMicroATM.getId());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
 
     }
 
@@ -697,52 +965,110 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_contact:
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    loadIMEI();
+                btn_contact.setClickable(false);
+                loadIMEI();
+                break;
+            case R.id.btn_capture:
+                btn_submit_aeps.setClickable(false);
+                if (!radioflag) {
+                    btn_submit_aeps.setClickable(true);
+                    Toast.makeText(MICRO_AEPS_Activity.this, "Please select transaction mode", Toast.LENGTH_SHORT).show();
+                } else if (flagdevicetype == 0) {
+                    btn_submit_aeps.setClickable(true);
+                    Toast.makeText(this, "Please select device type", Toast.LENGTH_LONG).show();
+                } else if (!ImageUtils.commonAmount(input_mobile.getText().toString())) {
+                    input_mobile.setError("Please enter mobile number");
+                    input_mobile.requestFocus();
+                    btn_submit_aeps.setClickable(true);
+                } else if (!ImageUtils.commonAmount(input_amount.getText().toString()) && devicetype.equalsIgnoreCase("other")) {
+                    input_amount.setError("Please enter amount");
+                    input_amount.requestFocus();
+                    btn_submit_aeps.setClickable(true);
+                } else if ((bank_select.getText().toString()).equalsIgnoreCase("Select Bank")) {
+                    bank_select.setError("Please select bank");
+                    bank_select.requestFocus();
+                    btn_submit_aeps.setClickable(true);
+                } else if ((input_deviceid.getText().toString()).isEmpty()) {
+                    input_deviceid.setError("Please enter aadhar no.");
+                    input_deviceid.requestFocus();
+                    btn_submit_aeps.setClickable(true);
+                } else if (input_userid.getText().toString().isEmpty()) {
+                    input_userid.setError("Please enter name");
+                    input_userid.requestFocus();
+                    btn_submit_aeps.setClickable(true);
+                } else {
+                    initDevice(flagdevicetype);
                 }
-                handlercontrol();
+                try {
+                    String condition = bank_select.getText().toString();
+                    bankName = BaseCompactActivity.dbRealm.getBankNames(condition).get(0);
+                    innno = BaseCompactActivity.dbRealm.getBankIINNo(condition).get(0);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 break;
             case R.id.btn_submit_aeps:
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    hideKeyboard(MICRO_AEPS_Activity.this);
-                    if (!ImageUtils.commonAmount(input_mobile.getText().toString())) {
-                        input_mobile.setError("Please enter mobile number");
-                        input_mobile.requestFocus();
-                    } else if (!ImageUtils.commonAmount(input_amount.getText().toString())) {
-                        input_amount.setError("Please enter amount");
-                        input_amount.requestFocus();
-                    } else if (reqFor.equalsIgnoreCase("MATM") && !input_amount.getText().toString().isEmpty() && (Integer.valueOf(input_amount.getText().toString()) % 100 != 0)) {
-                        input_amount.setError("Please enter amount in multiple of hundred");
-                        input_amount.requestFocus();
+                btn_submit_aeps.setClickable(false);
+                hideKeyboard(MICRO_AEPS_Activity.this);
+                if (!radioflag) {
+                    btn_submit_aeps.setClickable(true);
+                    Toast.makeText(MICRO_AEPS_Activity.this, "Please select transaction mode", Toast.LENGTH_SHORT).show();
+                } else if (!ImageUtils.commonAmount(input_mobile.getText().toString())) {
+                    input_mobile.setError("Please enter mobile number");
+                    input_mobile.requestFocus();
+                    btn_submit_aeps.setClickable(true);
+                } else if (!ImageUtils.commonAmount(input_amount.getText().toString()) && devicetype.equalsIgnoreCase("other")) {
+                    input_amount.setError("Please enter amount");
+                    input_amount.requestFocus();
+                    btn_submit_aeps.setClickable(true);
+                } else if ((bank_select.getText().toString()).equalsIgnoreCase("Select Bank")) {
+                    bank_select.setError("Please select bank");
+                    bank_select.requestFocus();
+                    btn_submit_aeps.setClickable(true);
+                } else if (!ImageUtils.commonAmount(input_deviceid.getText().toString())) {
+                    input_deviceid.setError("Please enter aadhar no.");
+                    input_deviceid.requestFocus();
+                    btn_submit_aeps.setClickable(true);
+                } else if (input_userid.getText().toString().isEmpty()) {
+                    input_userid.setError("Please enter name");
+                    input_userid.requestFocus();
+                    btn_submit_aeps.setClickable(true);
+                } else {
+                    if (reqFor.equalsIgnoreCase("AEPS") && !input_deviceid.getText().toString().isEmpty() && aeps_type.equals("aeps2")) {
+                        Log.e("Device pid=", pidData);
+                        // Log.e("Device pid=", display);
+                        //   new AsyncPostMethod(WebConfig.CASHOUT_URL, getCashOutDetail1(deviceName, input_mobile.getText().toString(), input_amount.getText().toString(), serviceType, requestChannel, reqFor, requestType, input_deviceid.getText().toString()).toString(), headerData, MICRO_AEPS_Activity.this, getString(R.string.responseTimeOut), typeput).execute();
+                        new AsyncPostMethod(WebConfig.AEPS2_INIT, getCashOutDetail1(deviceName, input_mobile.getText().toString(), input_amount.getText().toString(), input_deviceid.getText().toString(), input_userid.getText().toString(), serviceType, requestChannel, reqFor, requestType, input_deviceid.getText().toString(), innno, bankName).toString(), headerData, MICRO_AEPS_Activity.this, getString(R.string.responseTimeOut), typeput).execute();
                     } else {
-                        if (reqFor.equalsIgnoreCase("MATM") && accessBluetoothDetails() != null && !accessBluetoothDetails().equalsIgnoreCase(""))
-                            new AsyncPostMethod(WebConfig.CASHOUT_URL, getCashOutDetails(input_mobile.getText().toString(), input_amount.getText().toString(), serviceType, requestChannel, reqFor, requestType, accessBluetoothDetails()).toString(), headerData, MICRO_AEPS_Activity.this, getString(R.string.responseTimeOut), typeput).execute();
-                        else if (reqFor.equalsIgnoreCase("AEPS") && !input_deviceid.getText().toString().isEmpty())
-                            new AsyncPostMethod(WebConfig.CASHOUT_URL, getCashOutDetails(input_mobile.getText().toString(), input_amount.getText().toString(), serviceType, requestChannel, reqFor, requestType, input_deviceid.getText().toString()).toString(), headerData, MICRO_AEPS_Activity.this, getString(R.string.responseTimeOut), typeput).execute();
-                        else
-                            Toast.makeText(MICRO_AEPS_Activity.this, "Please pair device through bluetooth", Toast.LENGTH_SHORT).show();
+                        btn_submit_aeps.setClickable(true);
+                        // Toast.makeText(MICRO_AEPS_Activity.this, "Please pair your device through bluetooth", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MICRO_AEPS_Activity.this, "Please pair your device", Toast.LENGTH_SHORT).show();
                     }
                 }
-                handlercontrol();
                 break;
             case R.id.back_click:
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    setBack_click(this);
-                    finish();
-                }
-                handlercontrol();
+                findViewById(R.id.back_click).setClickable(false);
+                setBack_click(this);
+                finish();
                 break;
-            case R.id.reset:
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    if (!typeput.equalsIgnoreCase("Balance Enquiry"))
-                        loadUrl();
-                }
-                handlercontrol();
-                break;
+           /* case R.id.reset:
+                reset.setClickable(false);
+                if (!typeput.equalsIgnoreCase("Balance Enquiry"))
+                    loadUrl();
+                break;*/
         }
+    }
+
+    public void clickable() {
+        findViewById(R.id.back_click).setClickable(true);
+        reset.setClickable(true);
+        btn_submit_aeps.setClickable(true);
+        btn_contact.setClickable(true);
+    }
+
+    @Override
+    protected void onPause() {
+        clickable();
+        super.onPause();
     }
 }
