@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.rapipay.android.agent.Model.PendingKYCPozo;
 import com.rapipay.android.agent.Model.RapiPayPozo;
@@ -39,7 +40,6 @@ public class PendingKyc extends BaseFragment implements RequestHandler {
     private boolean isLoading;
     ArrayList<PendingKYCPozo> transactionPozoArrayList;
 
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
@@ -50,6 +50,7 @@ public class PendingKyc extends BaseFragment implements RequestHandler {
         customerType = getActivity().getIntent().getStringExtra("customerType");
         initialize(rv);
         loadApi();
+        trans_details.setClickable(true);
         return rv;
     }
 
@@ -67,7 +68,7 @@ public class PendingKyc extends BaseFragment implements RequestHandler {
                 if (totalItemCount != 0 && totalItemCount == last && lastInScreen == totalItemCount && !isLoading) {
                     first = last + 1;
                     last += 25;
-                    new AsyncPostMethod(WebConfig.EKYC, request_user().toString(), headerData, PendingKyc.this, getActivity(),getString(R.string.responseTimeOut)).execute();
+                    new AsyncPostMethod(WebConfig.EKYC, request_user().toString(), headerData, PendingKyc.this, getActivity(), getString(R.string.responseTimeOut)).execute();
                     isLoading = true;
                 }
             }
@@ -75,26 +76,34 @@ public class PendingKyc extends BaseFragment implements RequestHandler {
         trans_details.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    PendingKYCPozo pendingKYCPozo = transactionPozoArrayList.get(position);
-                    if (pendingKYCPozo.getIsKycSubmitted().equalsIgnoreCase("N") && pendingKYCPozo.getStatusAction().equalsIgnoreCase("DENIED")) {
-                        try {
-                            String formData = getsession_ValidateKyc(customerType, pendingKYCPozo);
-                            Intent intent = new Intent(getActivity(), WebViewVerify.class);
-                            intent.putExtra("persons", "pending");
-                            intent.putExtra("mobileNo", pendingKYCPozo.getMobileNo());
-                            intent.putExtra("formData", formData);
-                            intent.putExtra("documentType", "");
-                            intent.putExtra("documentID", "");
-                            startActivity(intent);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+                trans_details.setClickable(false);
+                PendingKYCPozo pendingKYCPozo = transactionPozoArrayList.get(position);
+                if (pendingKYCPozo.getIsKycSubmitted().equalsIgnoreCase("N") && pendingKYCPozo.getStatusAction().equalsIgnoreCase("DENIED")) {
+                    try {
+                        String formData = getsession_ValidateKyc(customerType, pendingKYCPozo);
+                        Intent intent = new Intent(getActivity(), WebViewVerify.class);
+                        intent.putExtra("persons", "pending");
+                        intent.putExtra("mobileNo", pendingKYCPozo.getMobileNo());
+                        intent.putExtra("formData", formData);
+                        intent.putExtra("documentType", "");
+                        intent.putExtra("documentID", "");
+                        startActivity(intent);
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                }handlercontrol();
+                }
             }
         });
+    }
+
+    @Override
+    public void onPause() {
+        try {
+            trans_details.setEnabled(true);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        super.onPause();
     }
 
     public String getsession_ValidateKyc(String kycType, PendingKYCPozo pendingKYCPozo) {
@@ -114,7 +123,7 @@ public class PendingKyc extends BaseFragment implements RequestHandler {
             jsonObject.put("isreKYC", "Y");
             jsonObject.put("isAuto", "1");
             jsonObject.put("isEditable", "Y");
-            jsonObject.put("txnRef",ImageUtils.miliSeconds());
+            jsonObject.put("txnRef", ImageUtils.miliSeconds());
             jsonObject.put("listdata", kycMapData.toString());
             jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
             form = "<html>\n" +
@@ -136,7 +145,7 @@ public class PendingKyc extends BaseFragment implements RequestHandler {
     }
 
     private void loadApi() {
-        new AsyncPostMethod(WebConfig.EKYC, request_user().toString(), headerData, PendingKyc.this, getActivity(),getString(R.string.responseTimeOut)).execute();
+        new AsyncPostMethod(WebConfig.EKYC, request_user().toString(), headerData, PendingKyc.this, getActivity(), getString(R.string.responseTimeOut)).execute();
     }
 
     private String getDataBase64(String data) {
@@ -174,12 +183,15 @@ public class PendingKyc extends BaseFragment implements RequestHandler {
                         if (object.isNull("agentKycPendingList") && object.getJSONArray("agentKycPendingList").length() == 0)
                             customDialog_Common("No Record Found");
                         else
-                        insertLastTransDetails(object.getJSONArray("agentKycPendingList"));
+                            insertLastTransDetails(object.getJSONArray("agentKycPendingList"));
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-            }else
+            } else if (object.getString("responseCode").equalsIgnoreCase("60147")) {
+                Toast.makeText(getActivity(),object.getString("responseCode"),Toast.LENGTH_LONG).show();
+                setBack_click1(getActivity());
+            } else
                 responseMSg(object);
         } catch (Exception e) {
             e.printStackTrace();

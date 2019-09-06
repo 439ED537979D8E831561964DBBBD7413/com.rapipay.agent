@@ -107,7 +107,8 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
     private static final int CAMERA_REQUEST = 1888, SELECT_PDF_DIALOG = 2999;
     private int SELECT_FILE = 1889;
     private TextInputLayout state_update_top, gender_layout, document_layout;
-
+    private long mLastClickTime = System.currentTimeMillis();
+    private static final long CLICK_TIME_INTERVAL = 300;
     Spinner bank_district, bank_city, account_type, gender_spinner, spinner_docType;
     private ArrayList<NepalDistrictPozo> nepalDistrictPozoArrayList = null;
     private ArrayList<NepalCityPozo> nepalCityPozoArrayList = null;
@@ -186,12 +187,14 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
         trans_details.addOnItemTouchListener(new RecyclerTouchListener(this, trans_details, new ClickListener() {
             @Override
             public void onClick(View view, int position) {
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    pmtPozo = pmtTransactionHistoryArrayList.get(position);
-                    customDialog_Doc("PMTDOC", pmtPozo, "Upload Document to verify Transaction");
+                long now = System.currentTimeMillis();
+                if (now - mLastClickTime < CLICK_TIME_INTERVAL) {
+                    return;
                 }
-                handlercontrol();
+                mLastClickTime = now;
+                pmtPozo = pmtTransactionHistoryArrayList.get(position);
+                customDialog_Doc("PMTDOC", pmtPozo, "Upload Document to verify Transaction");
+
             }
 
             @Override
@@ -202,12 +205,14 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
         beneficiary_details.addOnItemTouchListener(new RecyclerTouchListener(this, beneficiary_details, new ClickListener() {
             @Override
             public void onClick(View view, int position) {
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    pozo = beneficiaryDetailsPozoslist.get(position);
-                    customDialog_Common("FUNDTRANSFER", pozo, "Select Payment Mode");
+                long now = System.currentTimeMillis();
+                if (now - mLastClickTime < CLICK_TIME_INTERVAL) {
+                    return;
                 }
-                handlercontrol();
+                mLastClickTime = now;
+                pozo = beneficiaryDetailsPozoslist.get(position);
+                customDialog_Common("FUNDTRANSFER", pozo, "Select Payment Mode");
+
             }
 
             @Override
@@ -281,6 +286,21 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
 
             }
         });
+    }
+
+    public boolean isClickable = false;
+
+    public static boolean setClickable(View view, boolean clickable) {
+        if (view != null) {
+            if (view instanceof ViewGroup) {
+                ViewGroup viewGroup = (ViewGroup) view;
+                for (int i = 0; i < viewGroup.getChildCount(); i++) {
+                    setClickable(viewGroup.getChildAt(i), clickable);
+                }
+            }
+            view.setClickable(clickable);
+        }
+        return clickable;
     }
 
     private void reset() {
@@ -549,20 +569,15 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
     @Override
     public void chechStatus(JSONObject object) {
         try {
-            if (object.has("apiCommonResposne")) {
+            if (object.has("apiCommonResposne") && !object.isNull("apiCommonResposne")) {
                 JSONObject object1 = object.getJSONObject("apiCommonResposne");
                 if (object1 != null) {
                     String balance = object1.getString("runningBalance");
                     heading.setText("INDO NEPAL (Balance : Rs." + format(balance) + ")");
                 }
             }
-            if (object.getString("serviceType").equalsIgnoreCase("SENDER_COMPLETE_DETAILS")) {
-                if (object.getString("responseCode").equalsIgnoreCase("86001") || object.getString("responseCode").equalsIgnoreCase("86004")) {
-                    sender_layout.setVisibility(View.VISIBLE);
-                    otp_flag = true;
-                } else if (object.getString("responseCode").equalsIgnoreCase("86002")) {
-                    sender_layout.setVisibility(View.VISIBLE);
-                } else if (object.getString("responseCode").equalsIgnoreCase("200")) {
+            if (object.getString("responseCode").equalsIgnoreCase("200")) {
+                if (object.getString("serviceType").equalsIgnoreCase("SENDER_COMPLETE_DETAILS")) {
                     sender_layout.setVisibility(View.GONE);
                     reset.setVisibility(View.VISIBLE);
                     if (object.has("senderDetails")) {
@@ -582,43 +597,31 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
                             insertTransDetails(object.getJSONArray("getTxnHistory"));
                         }
                     }
-                }
-            } else if (object.getString("serviceType").equalsIgnoreCase("GET_SERVICE_FEE")) {
-                if (object.getString("responseCode").equalsIgnoreCase("200")) {
+                } else if (object.getString("serviceType").equalsIgnoreCase("GET_SERVICE_FEE")) {
                     customDialog_Common("Fund Transfer Confirmation", object, pozo, "Sure you want to Transfer?", input_mobile.getText().toString(), input_name.getText().toString(), PMTRemittanceActivity.this);
                     bene_update = false;
                     amount = "";
-                }
-            } else if (object.getString("serviceType").equalsIgnoreCase("MONEY_TRANSFER_PMT")) {
-                if (object.getString("responseCode").equalsIgnoreCase("200")) {
+                } else if (object.getString("serviceType").equalsIgnoreCase("MONEY_TRANSFER_PMT")) {
                     dialog.dismiss();
                     if (object.has("getTxnReceiptDataList"))
                         customReceiptNewTransaction("INDO-NEPAL BILL PAYMENT", object, PMTRemittanceActivity.this);
-                }
-            } else if (object.getString("serviceType").equalsIgnoreCase("ADD_SENDER_DETAILS")) {
-                if (object.getString("responseCode").equalsIgnoreCase("200")) {
-                    otpRefId = object.getString("otpRefId");
-                    if (otp_flag)
-                        customDialog_Common("OTPLAYOUT", null, null, "Add Sender Details", null, null, PMTRemittanceActivity.this);
-                    else {
-                        new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, getSender_Validate().toString(), headerData, PMTRemittanceActivity.this, getString(R.string.responseTimeOutTrans)).execute();
-                        delete_all.setVisibility(View.VISIBLE);
-                        sender_layout.setVisibility(View.GONE);
+                } else if (object.getString("serviceType").equalsIgnoreCase("ADD_SENDER_DETAILS")) {
+                    if (object.getString("responseCode").equalsIgnoreCase("200")) {
+                        otpRefId = object.getString("otpRefId");
+                        if (otp_flag)
+                            customDialog_Common("OTPLAYOUT", null, null, "Add Sender Details", null, null, PMTRemittanceActivity.this);
+                        else {
+                            new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, getSender_Validate().toString(), headerData, PMTRemittanceActivity.this, getString(R.string.responseTimeOutTrans)).execute();
+                            delete_all.setVisibility(View.VISIBLE);
+                            sender_layout.setVisibility(View.GONE);
+                        }
                     }
-                }
-            } else if (object.getString("serviceType").equalsIgnoreCase("VERIFY_SENDER_OTP")) {
-                if (object.getString("responseCode").equalsIgnoreCase("200")) {
+                } else if (object.getString("serviceType").equalsIgnoreCase("VERIFY_SENDER_OTP")) {
                     dialog.dismiss();
                     new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, getSender_Validate().toString(), headerData, PMTRemittanceActivity.this, getString(R.string.responseTimeOutTrans)).execute();
                     sender_layout.setVisibility(View.GONE);
                     delete_all.setVisibility(View.VISIBLE);
-                } else if (object.getString("responseCode").equalsIgnoreCase("60236")) {
-                    otpView.setText("");
-                    otpView.setError("Please enter correct otp");
-                    otpView.requestFocus();
-                }
-            } else if (object.getString("serviceType").equalsIgnoreCase("ADD_BENEFICIARY_DETAILS")) {
-                if (object.getString("responseCode").equalsIgnoreCase("200")) {
+                } else if (object.getString("serviceType").equalsIgnoreCase("ADD_BENEFICIARY_DETAILS")) {
                     branchID = "";
                     nepalBank = "";
                     nepalDistrict = "";
@@ -626,33 +629,44 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
                         new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, getServiceFee(amount, paymode).toString(), headerData, PMTRemittanceActivity.this, getString(R.string.responseTimeOutTrans)).execute();
                     else
                         customDialog_Common("KYCLAYOUTS", null, null, "Alert", null, object.getString("responseMessage"), PMTRemittanceActivity.this);
-                }
-            } else if (object.getString("serviceType").equalsIgnoreCase("GET_BANK_DISTRICT")) {
-                if (object.getString("responseCode").equalsIgnoreCase("200")) {
+                } else if (object.getString("serviceType").equalsIgnoreCase("GET_BANK_DISTRICT")) {
                     if (object.has("pmtBankResDtoList")) {
                         JSONArray array = object.getJSONArray("pmtBankResDtoList");
                         getDistrict(array);
                     }
-                }
-            } else if (object.getString("serviceType").equalsIgnoreCase("GET_BRANCH_CITY")) {
-                if (object.getString("responseCode").equalsIgnoreCase("200")) {
+                } else if (object.getString("serviceType").equalsIgnoreCase("GET_BRANCH_CITY")) {
                     if (object.has("pmtBankResDtoList")) {
                         JSONArray array = object.getJSONArray("pmtBankResDtoList");
                         getCity(array);
                     }
-                }
-            } else if (object.getString("serviceType").equalsIgnoreCase("UPLOAD_SIGNED_TXN_RECEIPT")) {
-                if (object.getString("responseCode").equalsIgnoreCase("200")) {
+                } else if (object.getString("serviceType").equalsIgnoreCase("UPLOAD_SIGNED_TXN_RECEIPT")) {
                     customDialog_Common("KYCLAYOUTS", null, null, "INDO-NEPAL Remittance", "", object.getString("responseMessage"), PMTRemittanceActivity.this);
                 }
-            }else {
+            } else if (object.getString("responseCode").equalsIgnoreCase("60236")) {
+                if (object.getString("serviceType").equalsIgnoreCase("VERIFY_SENDER_OTP")) {
+                    otpView.setText("");
+                    otpView.setError("Please enter correct otp");
+                    otpView.requestFocus();
+                }
+            } else if (object.getString("responseCode").equalsIgnoreCase("86001") || object.getString("responseCode").equalsIgnoreCase("86004")) {
+                if (object.getString("serviceType").equalsIgnoreCase("SENDER_COMPLETE_DETAILS")) {
+                    sender_layout.setVisibility(View.VISIBLE);
+                    otp_flag = true;
+                }
+            } else if (object.getString("responseCode").equalsIgnoreCase("86002")) {
+                if (object.getString("serviceType").equalsIgnoreCase("SENDER_COMPLETE_DETAILS")) {
+                    sender_layout.setVisibility(View.VISIBLE);
+                }
+            } else if (object.getString("responseCode").equalsIgnoreCase("60147")) {
+                Toast.makeText(this,object.getString("responseCode"),Toast.LENGTH_LONG).show();
+                setBack_click1(this);
+            } else {
                 responseMSg(object);
             }
+            findViewById(R.id.btn_submit).setClickable(true);
             hideKeyboard(PMTRemittanceActivity.this);
-        } catch (
-                Exception e)
-
-        {
+            delete_all.setClickable(true);
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -703,89 +717,105 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
                 }
                 break;
             case R.id.reset:
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    reset();
-                    input_mobile.setText("");
-                }
-                handlercontrol();
+                reset.setClickable(false);
+                reset();
+                input_mobile.setText("");
                 break;
             case R.id.delete_all:
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    addBeneDetails("FUNDTRANSFER", "Add Beneficiary Detail");
-                }
-                handlercontrol();
+                delete_all.setClickable(false);
+                addBeneDetails("FUNDTRANSFER", "Add Beneficiary Detail");
                 break;
             case R.id.back_click:
                 setBack_click(this);
                 finish();
                 break;
             case R.id.btn_search:
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    hideKeyboard(PMTRemittanceActivity.this);
-                    loadIMEI();
-                }
-                handlercontrol();
+                findViewById(R.id.btn_search).setClickable(false);
+                hideKeyboard(PMTRemittanceActivity.this);
+                loadIMEI();
                 break;
             case R.id.images:
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    loadCamera();
-                }
-                handlercontrol();
+                findViewById(R.id.images).setClickable(false);
+                loadCamera();
                 break;
             case R.id.select_state:
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    ArrayList<String> list_state1 = new ArrayList<>();
-                    ArrayList<StatePozo> list_state = dbRealm.getState_Details();
-                    for (int i = 0; i < list_state.size(); i++) {
-                        list_state1.add(list_state.get(i).getHeaderValue());
-                    }
-                    customSpinner((TextView) findViewById(R.id.select_state), "Select State*", list_state1);
+                select_state.setClickable(false);
+                ArrayList<String> list_state1 = new ArrayList<>();
+                ArrayList<StatePozo> list_state = dbRealm.getState_Details();
+                for (int i = 0; i < list_state.size(); i++) {
+                    list_state1.add(list_state.get(i).getHeaderValue());
                 }
-                handlercontrol();
+                customSpinner((TextView) findViewById(R.id.select_state), "Select State*", list_state1);
                 break;
             case R.id.btn_submit:
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    if (input_name.getText().toString().isEmpty()) {
-                        input_name.setError("Please enter valid name");
-                        input_name.requestFocus();
-                    } else if (sendernation.getText().toString().isEmpty()) {
-                        sendernation.setError("Please enter valid nationality");
-                        sendernation.requestFocus();
-                    } else if (address_name.getText().toString().isEmpty()) {
-                        address_name.setError("Please enter valid address");
-                        address_name.requestFocus();
-                    } else if (docType.equalsIgnoreCase("Select Document Type")) {
-                        Toast.makeText(PMTRemittanceActivity.this, "Please Select document type", Toast.LENGTH_SHORT).show();
-                    } else if (documentid.getText().toString().isEmpty()) {
-                        documentid.setError("Please enter valid document id");
-                        documentid.requestFocus();
-                    } else if (select_state.getText().toString().isEmpty() || select_state.getText().toString().equalsIgnoreCase("Select State*")) {
-                        select_state.setError("Please enter valid state");
-                        select_state.requestFocus();
-                    } else if (incomesource.getText().toString().isEmpty()) {
-                        incomesource.setError("Please enter valid income source");
-                        incomesource.requestFocus();
-                    } else if (date1_text.getText().toString().isEmpty()) {
-                        date1_text.setError("Please enter valid date");
-                        date1_text.requestFocus();
-                    } else if (image.getText().toString().isEmpty() || imageBase64 == null || imgType.equalsIgnoreCase("")) {
-                        image.setError("Please Select document");
-                        image.requestFocus();
-                    } else if (selectGender.equalsIgnoreCase("Select Gender")) {
-                        Toast.makeText(PMTRemittanceActivity.this, "Please Select Gender", Toast.LENGTH_SHORT).show();
-                    } else {
-                        new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, addSenderDetails().toString(), headerData, PMTRemittanceActivity.this, getString(R.string.responseTimeOutTrans)).execute();
-                    }
+                if (input_name.getText().toString().isEmpty()) {
+                    input_name.setError("Please enter valid name");
+                    input_name.requestFocus();
+                    findViewById(R.id.btn_submit).setClickable(true);
+                } else if (sendernation.getText().toString().isEmpty()) {
+                    sendernation.setError("Please enter valid nationality");
+                    sendernation.requestFocus();
+                    findViewById(R.id.btn_submit).setClickable(true);
+                } else if (address_name.getText().toString().isEmpty()) {
+                    address_name.setError("Please enter valid address");
+                    address_name.requestFocus();
+                    findViewById(R.id.btn_submit).setClickable(true);
+                } else if (docType.equalsIgnoreCase("Select Document Type")) {
+                    Toast.makeText(PMTRemittanceActivity.this, "Please Select document type", Toast.LENGTH_SHORT).show();
+                    findViewById(R.id.btn_submit).setClickable(true);
+                } else if (documentid.getText().toString().isEmpty()) {
+                    documentid.setError("Please enter valid document id");
+                    documentid.requestFocus();
+                    findViewById(R.id.btn_submit).setClickable(true);
+                } else if (select_state.getText().toString().isEmpty() || select_state.getText().toString().equalsIgnoreCase("Select State*")) {
+                    select_state.setError("Please enter valid state");
+                    select_state.requestFocus();
+                    findViewById(R.id.btn_submit).setClickable(true);
+                } else if (incomesource.getText().toString().isEmpty()) {
+                    incomesource.setError("Please enter valid income source");
+                    incomesource.requestFocus();
+                    findViewById(R.id.btn_submit).setClickable(true);
+                } else if (date1_text.getText().toString().isEmpty()) {
+                    date1_text.setError("Please enter valid date");
+                    date1_text.requestFocus();
+                    findViewById(R.id.btn_submit).setClickable(true);
+                } else if (image.getText().toString().isEmpty() || imageBase64 == null || imgType.equalsIgnoreCase("")) {
+                    image.setError("Please Select document");
+                    image.requestFocus();
+                    findViewById(R.id.btn_submit).setClickable(true);
+                } else if (selectGender.equalsIgnoreCase("Select Gender")) {
+                    Toast.makeText(PMTRemittanceActivity.this, "Please Select Gender", Toast.LENGTH_SHORT).show();
+                    findViewById(R.id.btn_submit).setClickable(true);
+                } else {
+                    findViewById(R.id.btn_submit).setClickable(false);
+                    new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, addSenderDetails().toString(), headerData, PMTRemittanceActivity.this, getString(R.string.responseTimeOutTrans)).execute();
                 }
-                handlercontrol();
                 break;
         }
+    }
+
+
+    public void clickable() {
+        try {
+            beneficiary_details.setClickable(true);
+            trans_details.setClickable(true);
+            reset.setClickable(true);
+            findViewById(R.id.btn_search).setClickable(true);
+            findViewById(R.id.images).setClickable(true);
+            select_state.setClickable(true);
+            findViewById(R.id.btn_submit).setClickable(true);
+            delete_all.setClickable(true);
+            btn_ok.setClickable(true);
+            add_bank_details.setClickable(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        clickable();
+        super.onPause();
     }
 
     @Override
@@ -863,6 +893,9 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
         }
     }
 
+    AppCompatButton btn_cancel;
+    AppCompatButton btn_ok;
+
     protected void customDialog_Doc(final String type, final PMTTransactionHistory ob, String msg) {
         imageBase64 = null;
         imgType = "";
@@ -873,8 +906,8 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
         TextView text = (TextView) alertLayout.findViewById(R.id.dialog_title);
         TextView dialog_cancel = (TextView) alertLayout.findViewById(R.id.dialog_cancel);
         text.setText(msg);
-        AppCompatButton btn_cancel = (AppCompatButton) alertLayout.findViewById(R.id.btn_cancel);
-        AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
+        btn_cancel = (AppCompatButton) alertLayout.findViewById(R.id.btn_cancel);
+        btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
         try {
             if (type.equalsIgnoreCase("PMTDOC")) {
                 alertLayout.findViewById(R.id.pmt_doc).setVisibility(View.VISIBLE);
@@ -895,17 +928,15 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
         btn_ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    if (image.getText().toString().isEmpty() || imageBase64 == null || imgType.equalsIgnoreCase("")) {
-                        image.setError("Please Select document");
-                        image.requestFocus();
-                    } else {
-                        new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, docUpload(ob.getUserTxnId()).toString(), headerData, PMTRemittanceActivity.this, getString(R.string.responseTimeOutTrans)).execute();
-                        dialognew.dismiss();
-                    }
+                btn_ok.setClickable(false);
+                if (image.getText().toString().isEmpty() || imageBase64 == null || imgType.equalsIgnoreCase("")) {
+                    image.setError("Please Select document");
+                    image.requestFocus();
+                    btn_ok.setClickable(true);
+                } else {
+                    new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, docUpload(ob.getUserTxnId()).toString(), headerData, PMTRemittanceActivity.this, getString(R.string.responseTimeOutTrans)).execute();
+                    dialognew.dismiss();
                 }
-                handlercontrol();
             }
         });
         btn_cancel.setOnClickListener(new View.OnClickListener() {
@@ -926,6 +957,7 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
         window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
     }
 
+
     protected void customDialog_Common(final String type, final PMTBenefPozo ob, String msg) {
         dialog = new Dialog(this);
         LayoutInflater inflater = getLayoutInflater();
@@ -935,7 +967,7 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
         TextView dialog_cancel = (TextView) alertLayout.findViewById(R.id.dialog_cancel);
         text.setText(msg);
         AppCompatButton btn_cancel = (AppCompatButton) alertLayout.findViewById(R.id.btn_cancel);
-        AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
+        final AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
         try {
             if (type.equalsIgnoreCase("FUNDTRANSFER")) {
                 alertLayout.findViewById(R.id.fundtransfer).setVisibility(View.VISIBLE);
@@ -955,11 +987,11 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
 
                     @Override
                     public void afterTextChanged(Editable s) {
-                        if (s.length()!=0 && s.length()<10) {
+                        if (s.length() != 0 && s.length() < 10) {
                             input_text.setText("");
-                            input_text.setText(EnglishNumberToWords.convert(Integer.parseInt(s.toString()))+" rupee");
+                            input_text.setText(EnglishNumberToWords.convert(Integer.parseInt(s.toString())) + " rupee");
                             input_text.setVisibility(View.VISIBLE);
-                        }else
+                        } else
                             input_text.setVisibility(View.GONE);
                     }
                 });
@@ -990,7 +1022,7 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
                 bank_district = (Spinner) alertLayout.findViewById(R.id.bank_districts);
                 bank_city = (Spinner) alertLayout.findViewById(R.id.bank_citys);
                 account_type = (Spinner) alertLayout.findViewById(R.id.account_types);
-                final ArrayList<TbNepalPaymentModePozo > list_bank = dbRealm.getBankNepal();
+                final ArrayList<TbNepalPaymentModePozo> list_bank = dbRealm.getBankNepal();
                 if (list_bank.size() != 0)
                     bank_name.setAdapter(new PaymentNepalAdapter(PMTRemittanceActivity.this, list_bank));
                 final ArrayList<PaymentModePozo> list_account_type = new ArrayList<>();
@@ -1070,47 +1102,55 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
         btn_ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    if (paymode.equalsIgnoreCase("")) {
-                        Toast.makeText(PMTRemittanceActivity.this, "Please select payment mode", Toast.LENGTH_SHORT).show();
-                    } else if (input_amountss.getText().toString().isEmpty()) {
-                        input_amountss.setError("Please enter valid data");
-                        input_amountss.requestFocus();
-                    } else if (Integer.parseInt(input_amountss.getText().toString()) >= 47501) {
-                        input_amountss.setError("Maximum transfer amount would be 47500.");
-                        input_amountss.requestFocus();
-                    } else if (!paymode.equalsIgnoreCase("PMTAD")) {
-                        new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, getServiceFee(input_amountss.getText().toString(), paymode).toString(), headerData, PMTRemittanceActivity.this, getString(R.string.responseTimeOutTrans)).execute();
-                        dialog.dismiss();
-                    } else if (paymode.equalsIgnoreCase("PMTAD") && !(ob.getAccount_Number().equalsIgnoreCase("null") || ob.getAccount_Number().equalsIgnoreCase("")) && !(ob.getBank_Details().equalsIgnoreCase("null") || ob.getBank_Details().equalsIgnoreCase(""))) {
-                        new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, getServiceFee(input_amountss.getText().toString(), paymode).toString(), headerData, PMTRemittanceActivity.this, getString(R.string.responseTimeOutTrans)).execute();
+                btn_ok.setClickable(false);
+                if (paymode.equalsIgnoreCase("")) {
+                    btn_ok.setClickable(true);
+                    Toast.makeText(PMTRemittanceActivity.this, "Please select payment mode", Toast.LENGTH_SHORT).show();
+                } else if (input_amountss.getText().toString().isEmpty()) {
+                    input_amountss.setError("Please enter valid data");
+                    input_amountss.requestFocus();
+                    btn_ok.setClickable(true);
+                } else if (Integer.parseInt(input_amountss.getText().toString()) >= 47501) {
+                    input_amountss.setError("Maximum transfer amount would be 47500.");
+                    input_amountss.requestFocus();
+                    btn_ok.setClickable(true);
+                } else if (!paymode.equalsIgnoreCase("PMTAD")) {
+                    new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, getServiceFee(input_amountss.getText().toString(), paymode).toString(), headerData, PMTRemittanceActivity.this, getString(R.string.responseTimeOutTrans)).execute();
+                    dialog.dismiss();
+                } else if (paymode.equalsIgnoreCase("PMTAD") && !(ob.getAccount_Number().equalsIgnoreCase("null") || ob.getAccount_Number().equalsIgnoreCase("")) && !(ob.getBank_Details().equalsIgnoreCase("null") || ob.getBank_Details().equalsIgnoreCase(""))) {
+                    new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, getServiceFee(input_amountss.getText().toString(), paymode).toString(), headerData, PMTRemittanceActivity.this, getString(R.string.responseTimeOutTrans)).execute();
+                    dialog.dismiss();
+                } else {
+                    if (nepalBank.equalsIgnoreCase("")) {
+                        btn_ok.setClickable(true);
+                        Toast.makeText(PMTRemittanceActivity.this, "Please select bank", Toast.LENGTH_SHORT).show();
+                    } else if (nepalDistrict.equalsIgnoreCase("")) {
+                        btn_ok.setClickable(true);
+                        Toast.makeText(PMTRemittanceActivity.this, "Please select district", Toast.LENGTH_SHORT).show();
+                    } else if (branchID.equalsIgnoreCase("")) {
+                        btn_ok.setClickable(true);
+                        Toast.makeText(PMTRemittanceActivity.this, "Please select city", Toast.LENGTH_SHORT).show();
+                    } else if (!ImageUtils.commonAccount(accountno.getText().toString(), 8, 30)) {
+                        accountno.setError("Please enter account number");
+                        accountno.requestFocus();
+                        btn_ok.setClickable(true);
+                    } else if (!ImageUtils.commonAccount(confirmAccountNo.getText().toString(), 8, 30)) {
+                        confirmAccountNo.setError("Please confirm account number");
+                        confirmAccountNo.requestFocus();
+                        btn_ok.setClickable(true);
+                    } else if (accountType.equalsIgnoreCase("")) {
+                        btn_ok.setClickable(true);
+                        Toast.makeText(PMTRemittanceActivity.this, "Please Select Account Type", Toast.LENGTH_SHORT).show();
+                    } else if (accountno.getText().toString().equalsIgnoreCase(confirmAccountNo.getText().toString())) {
+                        String split[] = ob.getReceiver_Details().split(",");
+                        new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, addBene(ob.getReceiver_Mobile(), split[0], split[1], split[2], ob.getRelation_With_Sender(), "U", branchID, accountno.getText().toString(), confirmAccountNo.getText().toString(), ob.getPmt_Bene_Id(), accountType).toString(), headerData, PMTRemittanceActivity.this, getString(R.string.responseTimeOutTrans)).execute();
+                        bene_update = true;
+                        amount = input_amountss.getText().toString();
                         dialog.dismiss();
                     } else {
-                        if (nepalBank.equalsIgnoreCase(""))
-                            Toast.makeText(PMTRemittanceActivity.this, "Please select bank", Toast.LENGTH_SHORT).show();
-                        else if (nepalDistrict.equalsIgnoreCase(""))
-                            Toast.makeText(PMTRemittanceActivity.this, "Please select district", Toast.LENGTH_SHORT).show();
-                        else if (branchID.equalsIgnoreCase(""))
-                            Toast.makeText(PMTRemittanceActivity.this, "Please select city", Toast.LENGTH_SHORT).show();
-                        else if (!ImageUtils.commonAccount(accountno.getText().toString(), 8, 30)) {
-                            accountno.setError("Please enter account number");
-                            accountno.requestFocus();
-                        } else if (!ImageUtils.commonAccount(confirmAccountNo.getText().toString(), 8, 30)) {
-                            confirmAccountNo.setError("Please confirm account number");
-                            confirmAccountNo.requestFocus();
-                        } else if (accountType.equalsIgnoreCase(""))
-                            Toast.makeText(PMTRemittanceActivity.this, "Please Select Account Type", Toast.LENGTH_SHORT).show();
-                        else if (accountno.getText().toString().equalsIgnoreCase(confirmAccountNo.getText().toString())) {
-                            String split[] = ob.getReceiver_Details().split(",");
-                            new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, addBene(ob.getReceiver_Mobile(), split[0], split[1], split[2], ob.getRelation_With_Sender(), "U", branchID, accountno.getText().toString(), confirmAccountNo.getText().toString(), ob.getPmt_Bene_Id(), accountType).toString(), headerData, PMTRemittanceActivity.this, getString(R.string.responseTimeOutTrans)).execute();
-                            bene_update = true;
-                            amount = input_amountss.getText().toString();
-                            dialog.dismiss();
-                        } else
-                            Toast.makeText(PMTRemittanceActivity.this, "Account number not match", Toast.LENGTH_SHORT).show();
+                        btn_ok.setClickable(true);
+                        Toast.makeText(PMTRemittanceActivity.this, "Account number not match", Toast.LENGTH_SHORT).show();
                     }
-                    handlercontrol();
                 }
             }
         });
@@ -1140,7 +1180,7 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
         TextView dialog_cancel = (TextView) alertLayout.findViewById(R.id.dialog_cancel);
         text.setText(msg);
         AppCompatButton btn_cancel = (AppCompatButton) alertLayout.findViewById(R.id.btn_cancel);
-        AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
+        final AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
         try {
             if (type.equalsIgnoreCase("FUNDTRANSFER")) {
                 alertLayout.findViewById(R.id.add_bene_details).setVisibility(View.VISIBLE);
@@ -1155,11 +1195,9 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
                 add_bank_details.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if (btnstatus == false) {
-                            btnstatus = true;
-                            add_bank_details.setVisibility(View.GONE);
-                            alertLayout.findViewById(R.id.accountlayouted).setVisibility(View.VISIBLE);
-                        }handlercontrol();
+                        add_bank_details.setClickable(false);
+                        add_bank_details.setVisibility(View.GONE);
+                        alertLayout.findViewById(R.id.accountlayouted).setVisibility(View.VISIBLE);
                     }
                 });
                 Spinner bank_name = (Spinner) alertLayout.findViewById(R.id.bank_name);
@@ -1246,55 +1284,67 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
         btn_ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    if (!bene_number.getText().toString().matches("^[2-9]{1}[0-9]{4,9}$")) {
-                        bene_number.setError("Please enter valid data");
-                        bene_number.requestFocus();
-                    } else if (bene_name.getText().toString().isEmpty()) {
-                        bene_name.setError("Please enter valid data");
-                        bene_name.requestFocus();
-                    } else if (bene_city.getText().toString().isEmpty()) {
-                        bene_city.setError("Please enter valid data");
-                        bene_city.requestFocus();
-                    } else if (bene_address.getText().toString().isEmpty()) {
-                        bene_address.setError("Please enter valid data");
-                        bene_address.requestFocus();
-                    } else if (bene_relation.getText().toString().isEmpty()) {
-                        bene_relation.setError("Please enter valid data");
-                        bene_relation.requestFocus();
-                    } else if (!nepalBank.equalsIgnoreCase("") || !nepalDistrict.equalsIgnoreCase("") || !branchID.equalsIgnoreCase("") || !accountno.getText().toString().isEmpty() || !confirmAccountNo.getText().toString().isEmpty()) {
-                        if (nepalBank.equalsIgnoreCase(""))
-                            Toast.makeText(PMTRemittanceActivity.this, "Please select bank", Toast.LENGTH_SHORT).show();
-                        else if (nepalDistrict.equalsIgnoreCase(""))
-                            Toast.makeText(PMTRemittanceActivity.this, "Please select district", Toast.LENGTH_SHORT).show();
-                        else if (branchID.equalsIgnoreCase(""))
-                            Toast.makeText(PMTRemittanceActivity.this, "Please select city", Toast.LENGTH_SHORT).show();
-                        else if (!ImageUtils.commonAccount(accountno.getText().toString(), 8, 30)) {
-                            accountno.setError("Please enter account number");
-                            accountno.requestFocus();
-                        } else if (!ImageUtils.commonAccount(confirmAccountNo.getText().toString(), 8, 30)) {
-                            confirmAccountNo.setError("Please confirm account number");
-                            confirmAccountNo.requestFocus();
-                        } else if (accountType.equalsIgnoreCase(""))
-                            Toast.makeText(PMTRemittanceActivity.this, "Please Select Account Type", Toast.LENGTH_SHORT).show();
-                        else if (accountno.getText().toString().equalsIgnoreCase(confirmAccountNo.getText().toString())) {
-                            new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, addBene(bene_number.getText().toString(), bene_name.getText().toString(), bene_city.getText().toString(), bene_address.getText().toString(), bene_relation.getText().toString(), "I", branchID, accountno.getText().toString(), confirmAccountNo.getText().toString(), "", accountType).toString(), headerData, PMTRemittanceActivity.this, getString(R.string.responseTimeOutTrans)).execute();
-                            dialog.dismiss();
-                        } else
-                            Toast.makeText(PMTRemittanceActivity.this, "Account number not match", Toast.LENGTH_SHORT).show();
-                    } else {
-                        new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, addBene(bene_number.getText().toString(), bene_name.getText().toString(), bene_city.getText().toString(), bene_address.getText().toString(), bene_relation.getText().toString(), "I", branchID, "", "", "", "").toString(), headerData, PMTRemittanceActivity.this, getString(R.string.responseTimeOutTrans)).execute();
+                btn_ok.setClickable(false);
+                if (!bene_number.getText().toString().matches("^[2-9]{1}[0-9]{4,9}$")) {
+                    bene_number.setError("Please enter valid data");
+                    bene_number.requestFocus();
+                    btn_ok.setClickable(true);
+                } else if (bene_name.getText().toString().isEmpty()) {
+                    bene_name.setError("Please enter valid data");
+                    bene_name.requestFocus();
+                    btn_ok.setClickable(true);
+                } else if (bene_city.getText().toString().isEmpty()) {
+                    bene_city.setError("Please enter valid data");
+                    bene_city.requestFocus();
+                    btn_ok.setClickable(true);
+                } else if (bene_address.getText().toString().isEmpty()) {
+                    bene_address.setError("Please enter valid data");
+                    bene_address.requestFocus();
+                } else if (bene_relation.getText().toString().isEmpty()) {
+                    bene_relation.setError("Please enter valid data");
+                    bene_relation.requestFocus();
+                    btn_ok.setClickable(true);
+                } else if (!nepalBank.equalsIgnoreCase("") || !nepalDistrict.equalsIgnoreCase("") || !branchID.equalsIgnoreCase("") || !accountno.getText().toString().isEmpty() || !confirmAccountNo.getText().toString().isEmpty()) {
+                    if (nepalBank.equalsIgnoreCase("")) {
+                        btn_ok.setClickable(true);
+                        Toast.makeText(PMTRemittanceActivity.this, "Please select bank", Toast.LENGTH_SHORT).show();
+                    } else if (nepalDistrict.equalsIgnoreCase("")) {
+                        btn_ok.setClickable(true);
+                        Toast.makeText(PMTRemittanceActivity.this, "Please select district", Toast.LENGTH_SHORT).show();
+                    } else if (branchID.equalsIgnoreCase("")) {
+                        btn_ok.setClickable(true);
+                        Toast.makeText(PMTRemittanceActivity.this, "Please select city", Toast.LENGTH_SHORT).show();
+                    } else if (!ImageUtils.commonAccount(accountno.getText().toString(), 8, 30)) {
+                        accountno.setError("Please enter account number");
+                        accountno.requestFocus();
+                        btn_ok.setClickable(true);
+                    } else if (!ImageUtils.commonAccount(confirmAccountNo.getText().toString(), 8, 30)) {
+                        confirmAccountNo.setError("Please confirm account number");
+                        confirmAccountNo.requestFocus();
+                        btn_ok.setClickable(true);
+                    } else if (accountType.equalsIgnoreCase("")) {
+                        btn_ok.setClickable(true);
+                        Toast.makeText(PMTRemittanceActivity.this, "Please Select Account Type", Toast.LENGTH_SHORT).show();
+                    } else if (accountno.getText().toString().equalsIgnoreCase(confirmAccountNo.getText().toString())) {
+                        new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, addBene(bene_number.getText().toString(), bene_name.getText().toString(), bene_city.getText().toString(), bene_address.getText().toString(), bene_relation.getText().toString(), "I", branchID, accountno.getText().toString(), confirmAccountNo.getText().toString(), "", accountType).toString(), headerData, PMTRemittanceActivity.this, getString(R.string.responseTimeOutTrans)).execute();
                         dialog.dismiss();
+                    } else {
+                        delete_all.setClickable(true);
+                        btn_ok.setClickable(true);
+                        Toast.makeText(PMTRemittanceActivity.this, "Account number not match", Toast.LENGTH_SHORT).show();
                     }
+                    delete_all.setClickable(true);
+                } else {
+                    new AsyncPostMethod(WebConfig.PMTSERVICE_DETAILS, addBene(bene_number.getText().toString(), bene_name.getText().toString(), bene_city.getText().toString(), bene_address.getText().toString(), bene_relation.getText().toString(), "I", branchID, "", "", "", "").toString(), headerData, PMTRemittanceActivity.this, getString(R.string.responseTimeOutTrans)).execute();
+                    dialog.dismiss();
                 }
-                handlercontrol();
             }
         });
         btn_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dialog.dismiss();
+                delete_all.setClickable(true);
             }
         });
         dialog.show();

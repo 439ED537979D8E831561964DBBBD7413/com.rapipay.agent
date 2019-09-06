@@ -66,12 +66,9 @@ public class ChannelHistoryActivity extends BaseCompactActivity implements View.
         trans_details.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    ChannelHistoryPozo pozo = transactionPozoArrayList.get(position);
-                    new AsyncPostMethod(WebConfig.WALLETRECEIPTURL, receipt_request(pozo).toString(), headerData, ChannelHistoryActivity.this, getString(R.string.responseTimeOut), "RECEIPTREQUEST").execute();
-                }
-                handlercontrol();
+                trans_details.setEnabled(false);
+                ChannelHistoryPozo pozo = transactionPozoArrayList.get(position);
+                new AsyncPostMethod(WebConfig.WALLETRECEIPTURL, receipt_request(pozo).toString(), headerData, ChannelHistoryActivity.this, getString(R.string.responseTimeOut), "RECEIPTREQUEST").execute();
             }
         });
         findViewById(R.id.todate).setOnClickListener(toDateClicked);
@@ -103,6 +100,17 @@ public class ChannelHistoryActivity extends BaseCompactActivity implements View.
         });
     }
 
+    public void clickable() {
+        trans_details.setEnabled(true);
+        btn_fund.setClickable(true);
+    }
+
+    @Override
+    protected void onPause() {
+        clickable();
+        super.onPause();
+    }
+
     public JSONObject receipt_request(ChannelHistoryPozo pozo) {
         JSONObject jsonObject = new JSONObject();
         try {
@@ -131,23 +139,21 @@ public class ChannelHistoryActivity extends BaseCompactActivity implements View.
                 finish();
                 break;
             case R.id.btn_fund:
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    if (date2_text.getText().toString().isEmpty()) {
-                        date2_text.setError("Please enter mandatory field");
-                        Toast.makeText(this, "Please enter mandatory field", Toast.LENGTH_SHORT).show();
-                    } else if (date1_text.getText().toString().isEmpty()) {
-                        date1_text.setError("Please enter mandatory field");
-                        Toast.makeText(this, "Please enter mandatory field", Toast.LENGTH_SHORT).show();
-                    } else if (printDifference(mainDate(date2_text.getText().toString()), mainDate(date1_text.getText().toString()))) {
-                        trans_details.setVisibility(View.VISIBLE);
-                        new AsyncPostMethod(WebConfig.CommonReport, channel_request(first, last).toString(), headerData, ChannelHistoryActivity.this, getString(R.string.responseTimeOut), "TRANSACTIONHISTORY").execute();
-                    }else {
-                        customDialog_Common("Statement can only view from one month");
-                        trans_details.setVisibility(View.GONE);
-                    }
+                btn_fund.setClickable(false);
+                if (date2_text.getText().toString().isEmpty()) {
+                    date2_text.setError("Please enter mandatory field");
+                    Toast.makeText(this, "Please enter mandatory field", Toast.LENGTH_SHORT).show();
+                } else if (date1_text.getText().toString().isEmpty()) {
+                    date1_text.setError("Please enter mandatory field");
+                    Toast.makeText(this, "Please enter mandatory field", Toast.LENGTH_SHORT).show();
+                } else if (printDifference(mainDate(date2_text.getText().toString()), mainDate(date1_text.getText().toString()))) {
+                    trans_details.setVisibility(View.VISIBLE);
+                    new AsyncPostMethod(WebConfig.CommonReport, channel_request(first, last).toString(), headerData, ChannelHistoryActivity.this, getString(R.string.responseTimeOut), "TRANSACTIONHISTORY").execute();
+                } else {
+                    customDialog_Common("Statement can only view from one month");
+                    trans_details.setVisibility(View.GONE);
+                    btn_fund.setClickable(true);
                 }
-                handlercontrol();
                 break;
         }
     }
@@ -191,10 +197,15 @@ public class ChannelHistoryActivity extends BaseCompactActivity implements View.
                             customDialog_Common("KYCLAYOUTS", null, null, "Transaction Receipt", "", "Cannot generate receipt now please try later!", ChannelHistoryActivity.this);
                         }
                 }
+            } else if (object.getString("responseCode").equalsIgnoreCase("60147")) {
+                Toast.makeText(this,object.getString("responseCode"),Toast.LENGTH_LONG).show();
+                setBack_click1(this);
             } else {
                 responseMSg(object);
                 trans_details.setVisibility(View.GONE);
             }
+            trans_details.setEnabled(true);
+            btn_fund.setClickable(true);
         } catch (Exception e) {
             e.printStackTrace();
         }

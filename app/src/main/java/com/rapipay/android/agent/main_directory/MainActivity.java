@@ -23,6 +23,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -68,7 +69,6 @@ import java.util.List;
 
 public class MainActivity extends BaseCompactActivity
         implements RequestHandler, CustomInterface, View.OnClickListener {
-
     public static ImageView ivHeaderPhoto;
     NavigationView navigationView;
     DrawerLayout drawer;
@@ -78,13 +78,12 @@ public class MainActivity extends BaseCompactActivity
     private static final int dpPhoto1 = 2001;
     private static final int dpPhoto2 = 2002;
     public static String bankdetails = null;
-    public static String Parent_Mobile = null,FN_TIME_OUT=null;
+    public static String Parent_Mobile = null, FN_TIME_OUT = null;
     public static String regBankDetails = null;
     public static boolean relailerDetails = false;
     public static ArrayList<DeviceDetailsPozo> deviceDetailsPozoArrayList;
     boolean isUrl = false;
     boolean isclicked = false;
-
 
     ExpandableListAdapter expandableListAdapter;
     ExpandableListView expandableListView;
@@ -97,7 +96,8 @@ public class MainActivity extends BaseCompactActivity
         setContentView(R.layout.activity_main);
         initialization();
         if (dbRealm != null && dbRealm.getDetails_Rapi()) {
-            String condition = "where " + RapipayDB.IMAGE_NAME + "='invoiceLogo.jpg'";
+            //    String condition = "where " + RapipayDB.IMAGE_NAME + "='invoiceLogo.jpg'";
+            String condition = "loginLogo.jpg";
             ArrayList<ImagePozo> imagePozoArrayList = dbRealm.getImageDetails(condition);
             if (imagePozoArrayList.size() != 0) {
                 byteConvert(back_click, imagePozoArrayList.get(0).getImagePath());
@@ -158,8 +158,10 @@ public class MainActivity extends BaseCompactActivity
         switch (v.getId()) {
             case R.id.reset:
                 loadBalance();
-                tv.setText("");
-                tv.setVisibility(View.GONE);
+                DashBoardFragments.movablefloating.setVisibility(View.GONE);
+                //  tv.setText("");
+                DashBoardFragments.bankdetails.setVisibility(View.VISIBLE);
+                tv.setVisibility(View.VISIBLE);
                 break;
             case R.id.bankde:
                 Intent intent = new Intent(MainActivity.this, BankDetails.class);
@@ -313,7 +315,6 @@ public class MainActivity extends BaseCompactActivity
         childModel = new MenuModel("Change Mobile", false, false, "");
         childModelsList.add(childModel);
 
-
         if (menuModel.hasChildren) {
             Log.d("API123", "here");
             childList.put(menuModel, childModelsList);
@@ -384,10 +385,10 @@ public class MainActivity extends BaseCompactActivity
 
                 if (childList.get(headerList.get(groupPosition)) != null) {
                     MenuModel model = childList.get(headerList.get(groupPosition)).get(childPosition);
-                        int index = parent.getFlatListPosition(ExpandableListView.getPackedPositionForChild(groupPosition, childPosition));
-                        parent.setItemChecked(index, true);
-                        openChildfragment(groupPosition, childPosition);
-                        closeDrawer();
+                    int index = parent.getFlatListPosition(ExpandableListView.getPackedPositionForChild(groupPosition, childPosition));
+                    parent.setItemChecked(index, true);
+                    openChildfragment(groupPosition, childPosition);
+                    closeDrawer();
                 }
 
                 return false;
@@ -554,7 +555,7 @@ public class MainActivity extends BaseCompactActivity
             isclicked = false;
             fragment = new TransactionReports();
             fragment.setArguments(bundle);
-        }else if (head == 8 && child == 5) {
+        } else if (head == 8 && child == 5) {
             isUrl = true;
             reset.setVisibility(View.GONE);
             bankde.setVisibility(View.GONE);
@@ -563,7 +564,7 @@ public class MainActivity extends BaseCompactActivity
             isclicked = false;
             fragment = new TransactionReports();
             fragment.setArguments(bundle);
-        }else if (head == 8 && child == 6) {
+        } else if (head == 8 && child == 6) {
             isUrl = true;
             reset.setVisibility(View.GONE);
             bankde.setVisibility(View.GONE);
@@ -617,7 +618,7 @@ public class MainActivity extends BaseCompactActivity
             bundle.putString("reqFor", "STLMNT");
             fragment = new SettlementTab();
             fragment.setArguments(bundle);
-        }else if (id == 5) {
+        } else if (id == 5) {
             isUrl = true;
             isclicked = false;
             reset.setVisibility(View.GONE);
@@ -635,7 +636,7 @@ public class MainActivity extends BaseCompactActivity
         try {
             if (object.getString("responseCode").equalsIgnoreCase("200")) {
                 if (object.getString("serviceType").equalsIgnoreCase("GET_MASTER_DATA")) {
-                    if (new MasterClass().getMasterData(object, dbRealm,realm))
+                    if (new MasterClass().getMasterData(object, dbRealm, realm))
                         if (term.equalsIgnoreCase("N"))
                             new AsyncPostMethod(WebConfig.NETWORKTRANSFER_URL, acknowledge(data, term).toString(), headerData, MainActivity.this, getString(R.string.responseTimeOut), "DOWMLOADDATA").execute();
                 } else if (object.getString("serviceType").equalsIgnoreCase("GET_NODE_HEADER_DATA")) {
@@ -655,9 +656,12 @@ public class MainActivity extends BaseCompactActivity
                         deviceDetails(object.getJSONArray("deviceList"));
                     }
                 }
-            }else {
+            } else if (object.getString("responseCode").equalsIgnoreCase("60147")) {
+                Toast.makeText(this, object.getString("responseCode"), Toast.LENGTH_LONG).show();
+                setBack_click1(this);
+            } /*else {
                 responseMSg(object);
-            }
+            }*/
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -714,9 +718,13 @@ public class MainActivity extends BaseCompactActivity
                             JSONObject object1 = array.getJSONObject(i + 1);
                             if (object1.getString("headerValue").equalsIgnoreCase("TCLINK")) {
                                 new AsyncPostMethod(object1.getString("headerData"), "", "", MainActivity.this, getString(R.string.responseTimeOut)).execute();
-                            }
+                            } //{"headerId":"9999","headerValue":"TCLINK","headerData":"http:\/\/192.168.1.110:8080\/RapiPayAPIHub\/views\/termCondition.jsp","displayFlag":"N"}
+                          //  customDialog_Common("TERMCONDITION", null, null, "Term and Condition", null, object.getString("headerData"), MainActivity.this);
+                            customDialog_Common("TERMCONDITION", null, null, "Term and Condition", null, "http://172.16.50.210:8080/RapiPayAPIHub/views/termCondition.jsp", MainActivity.this);
                         }
-                    }
+                    } /*if(object.getString("headerValue").equalsIgnoreCase("TCLINK")){
+
+                    }*/
                     if (object.getString("headerValue").equalsIgnoreCase("DOWNLOAD_MASTER_DATA")) {
                         data = object.getString("headerData");
                         if (object.getString("headerData").equalsIgnoreCase("Y")) {
@@ -731,9 +739,7 @@ public class MainActivity extends BaseCompactActivity
                     balance = format(pozoArrayList.get(j).getHeaderData());
                 }
             }
-        } catch (Exception e)
-
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -800,7 +806,7 @@ public class MainActivity extends BaseCompactActivity
 
     @Override
     public void onBackPressed() {
-        if (!isclicked ) {
+        if (!isclicked) {
             isclicked = true;
             bankde.setVisibility(View.GONE);
             reset.setVisibility(View.VISIBLE);

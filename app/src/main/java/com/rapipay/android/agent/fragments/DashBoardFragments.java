@@ -1,7 +1,6 @@
 package com.rapipay.android.agent.fragments;
 
 import android.Manifest;
-import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -12,15 +11,12 @@ import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -35,11 +31,11 @@ import com.rapipay.android.agent.interfaces.ClickListener;
 import com.rapipay.android.agent.kotlin_classs.BCTab;
 import com.rapipay.android.agent.main_directory.AEPS_BBPS_RegistrationActivity;
 import com.rapipay.android.agent.main_directory.Aeps1Activity;
+import com.rapipay.android.agent.main_directory.BC2TransferActivity;
 import com.rapipay.android.agent.main_directory.CashOutClass;
 import com.rapipay.android.agent.main_directory.ChannelHistoryActivity;
 import com.rapipay.android.agent.main_directory.CreditTabPage;
 import com.rapipay.android.agent.main_directory.CreditTransHistActivity;
-import com.rapipay.android.agent.main_directory.FundTransferActivity;
 import com.rapipay.android.agent.main_directory.MICRO_AEPS_Activity;
 import com.rapipay.android.agent.main_directory.MPOSRegistration;
 import com.rapipay.android.agent.main_directory.MainActivity;
@@ -249,7 +245,7 @@ public class DashBoardFragments extends BaseFragment {
         rv_left_5.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (layoutManager5.findLastCompletelyVisibleItemPosition() > 1) {
+                if (layoutManager5.findFirstVisibleItemPosition() < layoutManager5.getItemCount()-2) {
                     recycler_view5.smoothScrollToPosition(layoutManager5.findFirstVisibleItemPosition() - 1);
                 } else {
                     rv_right_5.setVisibility(View.VISIBLE);
@@ -262,7 +258,7 @@ public class DashBoardFragments extends BaseFragment {
         rv_right_5.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (layoutManager5.findFirstVisibleItemPosition() < 10) {
+                if (layoutManager5.findFirstVisibleItemPosition() < layoutManager5.getItemCount()-2) {
                     recycler_view5.smoothScrollToPosition(layoutManager5.findLastCompletelyVisibleItemPosition() + 1);
                 } else {
                     rv_right_5.setVisibility(View.GONE);
@@ -276,15 +272,14 @@ public class DashBoardFragments extends BaseFragment {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                if (layoutManager5.findLastCompletelyVisibleItemPosition() > 9) {
+                if (layoutManager5.findLastCompletelyVisibleItemPosition() > layoutManager5.getItemCount()-2) {
                     rv_right_5.setVisibility(View.GONE);
                     rv_left_5.setVisibility(View.VISIBLE);
-                } else if (layoutManager5.findLastCompletelyVisibleItemPosition() < 3){
+                } else if (layoutManager5.findFirstVisibleItemPosition()-1 < 3){
                     rv_right_5.setVisibility(View.VISIBLE);
                     rv_left_5.setVisibility(View.GONE);
                 }
-
-
+               //   Toast.makeText(getActivity(), layoutManager5.findFirstVisibleItemPosition() + "", Toast.LENGTH_LONG).show();
             }
         });
 
@@ -420,6 +415,12 @@ public class DashBoardFragments extends BaseFragment {
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                 } else if (position == 2) {
+//                    customDialog_Ben("BC FUND TRANSFER", "FundTransfer");
+                    Intent intent = new Intent(getActivity(), BC2TransferActivity.class);
+                    intent.putExtra("reqFor", "BCS");
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                } else if (position == 3) {
                     Intent intent = new Intent(getActivity(), PendingRefundActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
@@ -430,12 +431,12 @@ public class DashBoardFragments extends BaseFragment {
                     intent.putExtra("type", "");
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
-                } else if (position == 3) {
+                } else if (position == 4) {
                     Intent intent = new Intent(getActivity(), ChannelHistoryActivity.class);
                     intent.putExtra("TYPE", "");
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
-                } else if (position == 4) {
+                } else if (position == 5) {
 //                    customDialog_Ben("INDO-NEPAL Remittance", "PMTTransfer");
                     Intent intent = new Intent(getActivity(), PMTRemittanceActivity.class);
 //                    intent.putExtra("MOBILENO", input_number.getText().toString());

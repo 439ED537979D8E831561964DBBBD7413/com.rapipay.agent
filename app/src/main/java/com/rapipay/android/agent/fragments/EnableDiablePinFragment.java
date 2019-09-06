@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.interfaces.RequestHandler;
@@ -56,17 +57,21 @@ public class EnableDiablePinFragment extends BaseFragment implements View.OnClic
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_login:
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    if (enterpin.length() < 4) {
-                        enterpin.setError("Please enter 4 digin pin");
-                        enterpin.requestFocus();
-                    } else
-                        new AsyncPostMethod(WebConfig.LOGIN_URL, getJson_Validate().toString(), "", EnableDiablePinFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
-                }
-                handlercontrol();
+                btn_login.setClickable(false);
+                if (enterpin.length() < 4) {
+                    enterpin.setError("Please enter 4 digin pin");
+                    enterpin.requestFocus();
+                    btn_login.setClickable(true);
+                } else
+                    new AsyncPostMethod(WebConfig.LOGIN_URL, getJson_Validate().toString(), "", EnableDiablePinFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
                 break;
         }
+    }
+
+    @Override
+    public void onPause() {
+        btn_login.setClickable(true);
+        super.onPause();
     }
 
     public JSONObject getJson_Validate() {
@@ -114,8 +119,12 @@ public class EnableDiablePinFragment extends BaseFragment implements View.OnClic
                 if (object.getString("serviceType").equalsIgnoreCase("Txn_PIN_ENABLE")) {
                     customDialog_Ben("Alert", object.getString("responseMessage"));
                 }
-            }else
+            } else if (object.getString("responseCode").equalsIgnoreCase("60147")) {
+                Toast.makeText(getActivity(), object.getString("responseCode"), Toast.LENGTH_LONG).show();
+                setBack_click1(getActivity());
+            } else
                 responseMSg(object);
+            btn_login.setClickable(true);
         } catch (Exception e) {
             e.printStackTrace();
         }

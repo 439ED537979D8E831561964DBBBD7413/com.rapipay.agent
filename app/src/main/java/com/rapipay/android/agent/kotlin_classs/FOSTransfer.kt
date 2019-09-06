@@ -32,19 +32,19 @@ class FOSTransfer : BaseFragment(), RequestHandler {
     var trans_details: ListView? = null
     protected var headerData = WebConfig.BASIC_USERID + ":" + WebConfig.BASIC_PASSWORD
     var adapters: NetworkTransferAdapter? = null
-    var pozoClick: NetworkTransferPozo?=null
-    var textsss: TextView?=null
+    var pozoClick: NetworkTransferPozo? = null
+    var textsss: TextView? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        var view = inflater.inflate(R.layout.fos_layout_transfer,container,false) as View
+        var view = inflater.inflate(R.layout.fos_layout_transfer, container, false) as View
         init(view)
         loadUrl()
         return view
     }
 
-    fun init(v:View) {
+    fun init(v: View) {
         var heading = v.findViewById<EditText>(R.id.headingsearch)
-        heading?.onChange {  "test"}
+        heading?.onChange { "test" }
         nodeAgentID = arguments!!.getString("nodeAgentID")
         agentID = arguments!!.getString("AgentID")
         sessionRefNo = arguments!!.getString("sessionRefNo")
@@ -60,44 +60,56 @@ class FOSTransfer : BaseFragment(), RequestHandler {
                 if (totalItemCount != 0 && totalItemCount == last && lastInScreen == totalItemCount && !isLoading) {
                     first = last + 1
                     last += 25
-                    AsyncPostMethod(WebConfig.CommonReport, getTransgerRequest(first,last).toString(), headerData,this@FOSTransfer,  activity, getString(R.string.responseTimeOut)).execute()
+                    AsyncPostMethod(WebConfig.CommonReport, getTransgerRequest(first, last).toString(), headerData, this@FOSTransfer, activity, getString(R.string.responseTimeOut)).execute()
                     isLoading = true
                 }
             }
         })
         trans_details!!.setOnItemClickListener(AdapterView.OnItemClickListener { parent, view, position, id ->
-            if (btnstatus == false) {
-                btnstatus = true
-                pozoClick = transactionPozoArrayList!!.get(position)
-                customDialog_Ben(transactionPozoArrayList!!.get(position), "Network Transfer", "BENLAYOUT", pozoClick!!.getConsentStatus(), "Credit To Network")
-            }
-            handlercontrol()
+            trans_details!!.setClickable(false)
+            pozoClick = transactionPozoArrayList!!.get(position)
+            customDialog_Ben(transactionPozoArrayList!!.get(position), "Network Transfer", "BENLAYOUT", pozoClick!!.getConsentStatus(), "Credit To Network")
         })
     }
 
+    public override fun clickable() {
+        trans_details!!.setClickable(true)
+        btn_ok!!.setClickable(true)
+        btn_cancel!!.setClickable(true)
+    }
+
+    override fun onPause() {
+        clickable()
+        super.onPause()
+    }
+
     fun loadUrl() {
-        AsyncPostMethod(WebConfig.CommonReport, getTransgerRequest(first,last).toString(), headerData, this, activity, getString(R.string.responseTimeOut)).execute()
+        AsyncPostMethod(WebConfig.CommonReport, getTransgerRequest(first, last).toString(), headerData, this, activity, getString(R.string.responseTimeOut)).execute()
     }
 
     override fun chechStat(`object`: String?) {
     }
-    var s:String?=null
+
+    var s: String? = null
     override fun chechStatus(`object`: JSONObject?) {
         try {
             if (`object`!!.has("responseCode") && `object`.getString("responseCode").equals("200", true)) {
                 if (`object`.getString("serviceType").equals("GET_MY_NODE_DETAILS", true)) {
                     if (`object`.has("objAgentNodeList")) {
                         s = formatss(`object`!!.getString("subAgentLimit")!!)
-                        FOSMainActivity.setCount("Balance : "+ s)
+                        FOSMainActivity.setCount("Balance : " + s)
                         if (Integer.parseInt(`object`.getString("agentCount")) > 0) {
                             insertLastTransDetails(`object`.getJSONArray("objAgentNodeList"))
                         }
                     }
 
-                }else if (`object`.getString("serviceType").equals("C2C_NETWORK_CREDIT",true)) {
+                } else if (`object`.getString("serviceType").equals("C2C_NETWORK_CREDIT", true)) {
                     customDialog_Ben(null, `object`.getString("responseMessage"), "NETWORK_CREDIT", null, "Credit Confirmation")
                 }
-            }else
+            } else if (`object`.getString("responseCode").equals("60147", ignoreCase = true)) run {
+                Toast.makeText(context, `object`.getString("responseCode"), Toast.LENGTH_LONG).show()
+                setBack_click1(context)
+            } else
                 responseMSg(`object`)
         } catch (e: Exception) {
             e.printStackTrace()
@@ -130,7 +142,7 @@ class FOSTransfer : BaseFragment(), RequestHandler {
         isLoading = false
     }
 
-    fun getTransgerRequest(first:Int,last:Int): JSONObject {
+    fun getTransgerRequest(first: Int, last: Int): JSONObject {
         var jsonObject = JSONObject()
         try {
             jsonObject.put("serviceType", "GET_MY_NODE_DETAILS")
@@ -148,16 +160,20 @@ class FOSTransfer : BaseFragment(), RequestHandler {
         }
         return jsonObject
     }
+
     fun EditText.onChange(cb: (String) -> Unit) {
-        this.addTextChangedListener(object: TextWatcher {
+        this.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 adapters!!.filter(s.toString())
             }
+
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
     }
 
+    var btn_ok: AppCompatButton? = null
+    var btn_cancel: AppCompatButton? = null
     private fun customDialog_Ben(pozo: NetworkTransferPozo?, msg: String, type: String, amount: String?, title: String) {
         val btn_p_bank: AutofitTextView
         val btn_name: AutofitTextView
@@ -167,19 +183,19 @@ class FOSTransfer : BaseFragment(), RequestHandler {
         val inflater = activity!!.layoutInflater
         val alertLayout = inflater.inflate(R.layout.custom_layout_common, null)
         alertLayout.keepScreenOn = true
-        val btn_cancel = alertLayout.findViewById<View>(R.id.btn_cancel) as AppCompatButton
-        val btn_ok = alertLayout.findViewById<View>(R.id.btn_ok) as AppCompatButton
+        btn_cancel = alertLayout.findViewById<View>(R.id.btn_cancel) as AppCompatButton
+        btn_ok = alertLayout.findViewById<View>(R.id.btn_ok) as AppCompatButton
         val btn_regenerate = alertLayout.findViewById<View>(R.id.btn_regenerate) as AppCompatButton
         if (type.equals("BENLAYOUT", ignoreCase = true)) {
 //            if (amount?.equals("null")||amount!!.equals("N", ignoreCase = true))
-                btn_cancel.visibility = View.GONE
-            btn_cancel.text = "Reverse transfer"
+            btn_cancel!!.visibility = View.GONE
+            btn_cancel!!.text = "Reverse transfer"
             btn_regenerate.text = "Cancel"
             btn_regenerate.textSize = 10f
             btn_regenerate.visibility = View.VISIBLE
-            btn_cancel.textSize = 10f
-            btn_ok.text = "Fund Transfer"
-            btn_ok.textSize = 10f
+            btn_cancel!!.textSize = 10f
+            btn_ok!!.text = "Fund Transfer"
+            btn_ok!!.textSize = 10f
             dialog.setContentView(alertLayout)
         } else if (type.equals("AMOUNTTRANSFER", ignoreCase = true)) {
             alertLayout.findViewById<View>(R.id.custom_popup).visibility = View.VISIBLE
@@ -189,8 +205,8 @@ class FOSTransfer : BaseFragment(), RequestHandler {
             btn_name.text = "Company Name : " + pozo!!.companyName
             p_transid.text = pozo.agentName + " - " + pozo.mobileNo
             btn_p_bank.text = "Current Balance : " + formatss(pozo.agentBalance)!!
-        }  else if (type.equals("NETWORK_CREDIT", ignoreCase = true)) {
-            btn_cancel.visibility = View.GONE
+        } else if (type.equals("NETWORK_CREDIT", ignoreCase = true)) {
+            btn_cancel!!.visibility = View.GONE
             val otpView = alertLayout.findViewById<View>(R.id.dialog_msg) as TextView
             otpView.text = msg
             otpView.visibility = View.VISIBLE
@@ -200,42 +216,36 @@ class FOSTransfer : BaseFragment(), RequestHandler {
         val texttitle = alertLayout.findViewById<View>(R.id.dialog_title) as TextView
         texttitle.text = title
         dialog.setCancelable(false)
-        btn_ok.setOnClickListener {
-            if (btnstatus == false) {
-                btnstatus = true
-                if (type.equals("AMOUNTTRANSFER", ignoreCase = true)) {
-                    hideKeyboard(activity)
-                    if (!ImageUtils.commonAmount(textsss!!.getText().toString())) {
-                        textsss!!.setError("Please enter valid data")
-                        textsss!!.requestFocus()
-                    } else if (!(Integer.parseInt(textsss!!.getText().toString()) <= Integer.parseInt(formatss(s!!)))) {
-                        textsss!!.setError("Please enter valid amount")
-                        textsss!!.requestFocus()
-                    } else {
-                        dialog.dismiss()
-                        customDialogConfirm(pozo, "Are you sure you want to Transfer?", "CONFIRMATION", textsss!!.getText().toString(), "", "Credit Confirmation")
-                    }
-                }
-                if (type.equals("NETWORK_CREDIT", ignoreCase = true)) {
-                    loadUrl()
+        btn_ok!!.setOnClickListener {
+            btn_ok!!.setClickable(false)
+            if (type.equals("AMOUNTTRANSFER", ignoreCase = true)) {
+                hideKeyboard(activity)
+                if (!ImageUtils.commonAmount(textsss!!.getText().toString())) {
+                    textsss!!.setError("Please enter valid data")
+                    textsss!!.requestFocus()
+                } else if (!(Integer.parseInt(textsss!!.getText().toString()) <= Integer.parseInt(formatss(s!!)))) {
+                    textsss!!.setError("Please enter valid amount")
+                    textsss!!.requestFocus()
+                } else {
                     dialog.dismiss()
-                } else if (type.equals("BENLAYOUT", ignoreCase = true)) {
-                    dialog.dismiss()
-                    customDialog_Ben(pozo, "Network Transfer", "AMOUNTTRANSFER", "", "Credit To Network")
+                    customDialogConfirm(pozo, "Are you sure you want to Transfer?", "CONFIRMATION", textsss!!.getText().toString(), "", "Credit Confirmation")
                 }
             }
-            handlercontrol()
+            if (type.equals("NETWORK_CREDIT", ignoreCase = true)) {
+                loadUrl()
+                dialog.dismiss()
+            } else if (type.equals("BENLAYOUT", ignoreCase = true)) {
+                dialog.dismiss()
+                customDialog_Ben(pozo, "Network Transfer", "AMOUNTTRANSFER", "", "Credit To Network")
+            }
         }
-        btn_cancel.setOnClickListener {
-            if (btnstatus == false) {
-                btnstatus = true
-                if (type.equals("BENLAYOUT", ignoreCase = true)) {
-                    dialog.dismiss()
-                    customDialog_Ben(pozo, "Network Transfer", "REVERSETRANSFER", "", "Credit To Network")
-                } else
-                    dialog.dismiss()
-            }
-            handlercontrol()
+        btn_cancel!!.setOnClickListener {
+            btn_cancel!!.setClickable(false)
+            if (type.equals("BENLAYOUT", ignoreCase = true)) {
+                dialog.dismiss()
+                customDialog_Ben(pozo, "Network Transfer", "REVERSETRANSFER", "", "Credit To Network")
+            } else
+                dialog.dismiss()
         }
         dialog.show()
         btn_regenerate.setOnClickListener { dialog.dismiss() }
@@ -250,7 +260,7 @@ class FOSTransfer : BaseFragment(), RequestHandler {
         val alertLayout = inflater.inflate(R.layout.custom_layout_common, null)
         alertLayout.keepScreenOn = true
         val btn_cancel = alertLayout.findViewById<View>(R.id.btn_cancel) as AppCompatButton
-        val btn_ok = alertLayout.findViewById<View>(R.id.btn_ok) as AppCompatButton
+        btn_ok = alertLayout.findViewById<View>(R.id.btn_ok) as AppCompatButton
         if (type.equals("CONFIRMATION", ignoreCase = true)) {
             val otpView = alertLayout.findViewById<View>(R.id.dialog_msg) as TextView
             otpView.text = msg
@@ -260,15 +270,12 @@ class FOSTransfer : BaseFragment(), RequestHandler {
         val texttitle = alertLayout.findViewById<View>(R.id.dialog_title) as TextView
         texttitle.text = title
         dialognew.setCancelable(false)
-        btn_ok.setOnClickListener {
-            if (btnstatus == false) {
-                btnstatus = true
-                if (type.equals("CONFIRMATION", ignoreCase = true)) {
-                    dialognew.dismiss()
-                    AsyncPostMethod(WebConfig.CRNF, getNetwork_Transfer(pozo!!.mobileNo, amount, tpin).toString(), headerData, this@FOSTransfer, activity, getString(R.string.responseTimeOut)).execute()
-                }
+        btn_ok!!.setOnClickListener {
+            btn_ok!!.setClickable(false)
+            if (type.equals("CONFIRMATION", ignoreCase = true)) {
+                dialognew.dismiss()
+                AsyncPostMethod(WebConfig.CRNF, getNetwork_Transfer(pozo!!.mobileNo, amount, tpin).toString(), headerData, this@FOSTransfer, activity, getString(R.string.responseTimeOut)).execute()
             }
-            handlercontrol()
         }
         btn_cancel.setOnClickListener { dialognew.dismiss() }
         dialognew.show()

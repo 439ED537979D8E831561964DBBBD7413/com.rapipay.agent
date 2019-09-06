@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.rapipay.android.agent.Model.RapiPayPozo;
 import com.rapipay.android.agent.R;
@@ -56,20 +57,23 @@ public class ChangePinFragment extends BaseFragment implements RequestHandler, V
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_login:
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    if (otppinView.length() < 6)
-                        otppinView.setError("Please enter 6 digin pin");
-                    else if (pinView.length() < 6)
-                        pinView.setError("Please enter 6 digin pin");
-                    else if (otppinView.getText().toString().equalsIgnoreCase(pinView.getText().toString()))
-                        pinView.setError("Old and Current pin cannot be same");
-                    else
-                        new AsyncPostMethod(WebConfig.UAT, getJson_Validate().toString(), "", ChangePinFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
-                }
-                handlercontrol();
+                btn_login.setClickable(false);
+                if (otppinView.length() < 6)
+                    otppinView.setError("Please enter 6 digin pin");
+                else if (pinView.length() < 6)
+                    pinView.setError("Please enter 6 digin pin");
+                else if (otppinView.getText().toString().equalsIgnoreCase(pinView.getText().toString()))
+                    pinView.setError("Old and Current pin cannot be same");
+                else
+                    new AsyncPostMethod(WebConfig.UAT, getJson_Validate().toString(), "", ChangePinFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
                 break;
         }
+    }
+
+    @Override
+    public void onPause() {
+        btn_login.setClickable(true);
+        super.onPause();
     }
 
     public JSONObject getJson_Validate() {
@@ -109,7 +113,10 @@ public class ChangePinFragment extends BaseFragment implements RequestHandler, V
                 if (object.getString("serviceType").equalsIgnoreCase("ChangePin")) {
                     customDialog_Ben("Pin Change", object.getString("responseMessage"));
                 }
-            }else
+            } else if (object.getString("responseCode").equalsIgnoreCase("60147")) {
+                Toast.makeText(getActivity(), object.getString("responseCode"), Toast.LENGTH_LONG).show();
+                setBack_click1(getActivity());
+            } else
                 responseMSg(object);
         } catch (Exception e) {
             e.printStackTrace();

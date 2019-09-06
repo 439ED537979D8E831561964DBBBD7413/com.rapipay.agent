@@ -55,20 +55,50 @@ class SettlementBak : BaseFragment(), RequestHandler {
         trans_details = v.findViewById<RecyclerView>(R.id.trans_details)
         trans_details!!.addOnItemTouchListener(RecyclerTouchListener(activity, trans_details, object : ClickListener {
             override fun onClick(view: View?, position: Int) {
-                if (btnstatus == false) {
-                    btnstatus = true
+                if (setClickable(view, isClickable) == false) {
+                    isClickable = true
+                } else {
+                    isClickable = false
+                    setClickable(view, isClickable)
                     pozoClick = transactionPozoArrayList!!.get(position)
                     if (pozoClick!!.transferAmount != 0)
                         customDialog_Ben(transactionPozoArrayList!!.get(position), "Network Transfer", "BENLAYOUT", "Transfer Amount")
                     else
                         Toast.makeText(activity, "Transfer Amount is not available for fund transfer.", Toast.LENGTH_SHORT).show()
                 }
-                handlercontrol()
             }
-
             override fun onLongClick(view: View?, position: Int) {
             }
         }))
+    }
+
+    var isClickable = true
+    fun setClickable(view: View?, clickable: Boolean): Boolean {
+        if (view != null) {
+            if (view is ViewGroup) {
+                val viewGroup = view as ViewGroup?
+                for (i in 0 until viewGroup!!.childCount) {
+                    setClickable(viewGroup.getChildAt(i), clickable)
+                }
+            }
+            view.isClickable = clickable
+        }
+        return clickable
+    }
+
+    public override fun clickable() {
+        try {
+            trans_details!!.setClickable(true)
+            btn_ok!!.setClickable(true)
+            btn_cancel!!.setClickable(true)
+        }catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    override fun onPause() {
+        clickable()
+        super.onPause()
     }
 
     fun loadUrl() {
@@ -92,10 +122,13 @@ class SettlementBak : BaseFragment(), RequestHandler {
 
                 } else if (`object`.getString("serviceType").equals("C2C_NETWORK_CREDIT", true)) {
                     customDialog_Ben(null, `object`.getString("responseMessage"), "NETWORK_CREDIT", "Credit Confirmation")
-                }else if (`object`.getString("serviceType").equals("INITIATE_STLMNT_TRANSFER_FUND", true)) {
-                    customDialog_Ben(null, `object`.getString("responseMessage"),"KYCLAYOUTS", "Alert")
+                } else if (`object`.getString("serviceType").equals("INITIATE_STLMNT_TRANSFER_FUND", true)) {
+                    customDialog_Ben(null, `object`.getString("responseMessage"), "KYCLAYOUTS", "Alert")
                 }
-            }else
+            } else if (`object`.getString("responseCode").equals("60147", ignoreCase = true)) run {
+                Toast.makeText(context, `object`.getString("responseCode"), Toast.LENGTH_LONG).show()
+                setBack_click1(context)
+            } else
                 responseMSg(`object`)
         } catch (e: Exception) {
             e.printStackTrace()
@@ -203,8 +236,8 @@ class SettlementBak : BaseFragment(), RequestHandler {
 
             override fun afterTextChanged(s: Editable) {
                 if (s.length != 0 && s.length < 10) {
-                    input_text.text=""
-                    input_text.text = EnglishNumberToWords.convert(Integer.parseInt(s.toString()))+" rupee"
+                    input_text.text = ""
+                    input_text.text = EnglishNumberToWords.convert(Integer.parseInt(s.toString())) + " rupee"
                     input_text.visibility = View.VISIBLE
                 } else
                     input_text.visibility = View.GONE
@@ -215,59 +248,54 @@ class SettlementBak : BaseFragment(), RequestHandler {
         texttitle.text = title
         dialog.setCancelable(false)
         btn_ok.setOnClickListener {
-            if (btnstatus == false) {
-                btnstatus = true
-                if (type.equals("AMOUNTTRANSFER", ignoreCase = true)) {
-                    hideKeyboard(activity)
-                    if (!ImageUtils.commonAmount(textsss!!.getText().toString())) {
-                        textsss!!.setError("Please enter valid data")
-                        textsss!!.requestFocus()
-                    } else if (!(Integer.parseInt(textsss!!.getText().toString()) <= pozo!!.transferAmount!!.toInt())) {
-                        textsss!!.setError("Please enter valid amount")
-                        textsss!!.requestFocus()
-                    } else {
-                        dialog.dismiss()
-                        customDialogConfirm(pozo, "Are you sure you want to Transfer?", "CONFIRMATION", textsss!!.getText().toString(), "Credit Confirmation")
-                    }
-                }
-                if (type.equals("NETWORK_CREDIT", ignoreCase = true)) {
-                    loadUrl()
+            btn_ok!!.setClickable(false)
+            if (type.equals("AMOUNTTRANSFER", ignoreCase = true)) {
+                hideKeyboard(activity)
+                if (!ImageUtils.commonAmount(textsss!!.getText().toString())) {
+                    textsss!!.setError("Please enter valid data")
+                    textsss!!.requestFocus()
+                } else if (!(Integer.parseInt(textsss!!.getText().toString()) <= pozo!!.transferAmount!!.toInt())) {
+                    textsss!!.setError("Please enter valid amount")
+                    textsss!!.requestFocus()
+                } else {
                     dialog.dismiss()
-                } else if (type.equals("BENLAYOUT", ignoreCase = true)) {
-                    dialog.dismiss()
-                    customDialog_Ben(pozo, "Network Transfer", "AMOUNTTRANSFER", "Fund Transfer")
-                } else if (type.equals("KYCLAYOUTS", ignoreCase = true)) {
-                    dialog.dismiss()
-                    loadUrl()
+                    customDialogConfirm(pozo, "Are you sure you want to Transfer?", "CONFIRMATION", textsss!!.getText().toString(), "Credit Confirmation")
                 }
             }
-            handlercontrol()
+            if (type.equals("NETWORK_CREDIT", ignoreCase = true)) {
+                loadUrl()
+                dialog.dismiss()
+            } else if (type.equals("BENLAYOUT", ignoreCase = true)) {
+                dialog.dismiss()
+                customDialog_Ben(pozo, "Network Transfer", "AMOUNTTRANSFER", "Fund Transfer")
+            } else if (type.equals("KYCLAYOUTS", ignoreCase = true)) {
+                dialog.dismiss()
+                loadUrl()
+            }
         }
         btn_cancel.setOnClickListener {
-            if (btnstatus == false) {
-                btnstatus = true
-                if (type.equals("BENLAYOUT", ignoreCase = true)) {
-                    dialog.dismiss()
-                    customDialog_Ben(pozo, "Network Transfer", "REVERSETRANSFER", "Fund Transfer")
-                } else
-                    dialog.dismiss()
-            }
-            handlercontrol()
+            btn_cancel!!.setClickable(false)
+            if (type.equals("BENLAYOUT", ignoreCase = true)) {
+                dialog.dismiss()
+                customDialog_Ben(pozo, "Network Transfer", "REVERSETRANSFER", "Fund Transfer")
+            } else
+                dialog.dismiss()
         }
         dialog.show()
         btn_regenerate.setOnClickListener { dialog.dismiss() }
         val window = dialog.window
         window!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
     }
-
+    var btn_ok: AppCompatButton? = null
+    var btn_cancel: AppCompatButton? = null
     private fun customDialogConfirm(pozo: SettlementPozoo?, msg: String,
                                     type: String, amount: String, title: String) {
         dialognew = Dialog(activity!!)
         val inflater = activity!!.layoutInflater
         val alertLayout = inflater.inflate(R.layout.custom_layout_common, null)
         alertLayout.keepScreenOn = true
-        val btn_cancel = alertLayout.findViewById<View>(R.id.btn_cancel) as AppCompatButton
-        val btn_ok = alertLayout.findViewById<View>(R.id.btn_ok) as AppCompatButton
+        btn_cancel = alertLayout.findViewById<View>(R.id.btn_cancel) as AppCompatButton
+        btn_ok = alertLayout.findViewById<View>(R.id.btn_ok) as AppCompatButton
         if (type.equals("CONFIRMATION", ignoreCase = true)) {
             val otpView = alertLayout.findViewById<View>(R.id.dialog_msg) as TextView
             otpView.text = msg
@@ -277,17 +305,14 @@ class SettlementBak : BaseFragment(), RequestHandler {
         val texttitle = alertLayout.findViewById<View>(R.id.dialog_title) as TextView
         texttitle.text = title
         dialognew.setCancelable(false)
-        btn_ok.setOnClickListener {
-            if (btnstatus == false) {
-                btnstatus = true
-                if (type.equals("CONFIRMATION", ignoreCase = true)) {
-                    dialognew.dismiss()
-                    AsyncPostMethod(WebConfig.CRNF, getNetwork_Transfer(pozo, amount).toString(), headerData, this@SettlementBak, activity, getString(R.string.responseTimeOut)).execute()
-                }
+        btn_ok!!.setOnClickListener {
+            btn_cancel!!.setClickable(false)
+            if (type.equals("CONFIRMATION", ignoreCase = true)) {
+                dialognew.dismiss()
+                AsyncPostMethod(WebConfig.CRNF, getNetwork_Transfer(pozo, amount).toString(), headerData, this@SettlementBak, activity, getString(R.string.responseTimeOut)).execute()
             }
-            handlercontrol()
         }
-        btn_cancel.setOnClickListener { dialognew.dismiss() }
+        btn_cancel!!.setOnClickListener { dialognew.dismiss() }
         dialognew.show()
         val window = dialognew.window
         window!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)

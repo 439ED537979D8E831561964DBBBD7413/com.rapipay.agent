@@ -12,6 +12,7 @@ import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.rapipay.android.agent.Model.NetworkHistoryPozo;
 import com.rapipay.android.agent.Model.NetworkTransHistPozo;
@@ -159,25 +160,28 @@ public class NetworkTransHistory extends BaseCompactActivity implements RequestH
                 finish();
                 break;
             case R.id.btn_fund:
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    if (date2_text.getText().toString().isEmpty()) {
-                        date2_text.setError("Please enter valid data");
-                        date2_text.requestFocus();
-                    } else if (date1_text.getText().toString().isEmpty()) {
-                        date1_text.setError("Please enter valid data");
-                        date1_text.requestFocus();
-                    } else if (printDifference(mainDate(date2_text.getText().toString()), mainDate(date1_text.getText().toString()))) {
-                        trans_details.setVisibility(View.VISIBLE);
-                        new AsyncPostMethod(WebConfig.CommonReport, channel_request().toString(), headerData, NetworkTransHistory.this, getString(R.string.responseTimeOut)).execute();
-                    } else {
-                        customDialog_Common("Statement can only view from one month");
-                        trans_details.setVisibility(View.GONE);
-                    }
+                btn_fund.setClickable(false);
+                if (date2_text.getText().toString().isEmpty()) {
+                    date2_text.setError("Please enter valid data");
+                    date2_text.requestFocus();
+                } else if (date1_text.getText().toString().isEmpty()) {
+                    date1_text.setError("Please enter valid data");
+                    date1_text.requestFocus();
+                } else if (printDifference(mainDate(date2_text.getText().toString()), mainDate(date1_text.getText().toString()))) {
+                    trans_details.setVisibility(View.VISIBLE);
+                    new AsyncPostMethod(WebConfig.CommonReport, channel_request().toString(), headerData, NetworkTransHistory.this, getString(R.string.responseTimeOut)).execute();
+                } else {
+                    customDialog_Common("Statement can only view from one month");
+                    trans_details.setVisibility(View.GONE);
                 }
-                handlercontrol();
                 break;
         }
+    }
+
+    @Override
+    protected void onPause() {
+        btn_fund.setClickable(true);
+        super.onPause();
     }
 
     View.OnClickListener toDateClicked = new View.OnClickListener() {
@@ -263,6 +267,9 @@ public class NetworkTransHistory extends BaseCompactActivity implements RequestH
                         }
 
                 }
+            } else if (object.getString("responseCode").equalsIgnoreCase("60147")) {
+                Toast.makeText(this,object.getString("responseCode"),Toast.LENGTH_LONG).show();
+                setBack_click1(this);
             } else {
                 responseMSg(object);
                 trans_details.setVisibility(View.GONE);

@@ -2,8 +2,10 @@ package com.rapipay.android.agent.main_directory;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
 import com.rapipay.android.agent.BuildConfig;
 import com.rapipay.android.agent.Database.RapipayDB;
 import com.rapipay.android.agent.Model.ImagePozo;
@@ -13,16 +15,18 @@ import com.rapipay.android.agent.utils.BaseCompactActivity;
 import com.rapipay.android.agent.utils.LocalStorage;
 import com.rapipay.android.agent.utils.RouteClass;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 public class SpashScreenActivity extends BaseCompactActivity implements CustomInterface {
 
-    ImageView imageView;
+    ImageView imageView,gifimageview;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
-
         localStorage.setActivityState(LocalStorage.LOGOUT, "0");
         initialization();
         new Handler().postDelayed(new Runnable() {
@@ -32,9 +36,14 @@ public class SpashScreenActivity extends BaseCompactActivity implements CustomIn
             }
         }, 2500);
     }
+
     private void initialization(){
         imageView = (ImageView)findViewById(R.id.imageView);
-        String condition = "where " + RapipayDB.IMAGE_NAME + "='loginLogo.jpg'";
+        gifimageview = (ImageView)findViewById(R.id.gifimageview);
+        Glide.with(this).load(R.drawable.overlay_loader).into(gifimageview);
+
+       // String condition = "where " + RapipayDB.IMAGE_NAME + "='loginLogo.jpg'";
+        String condition = "loginLogo.jpg";
         if(dbRealm!=null) {
             ArrayList<ImagePozo> imagePozoArrayList = dbRealm.getImageDetails(condition);
             if (imagePozoArrayList.size() != 0) {
@@ -42,10 +51,11 @@ public class SpashScreenActivity extends BaseCompactActivity implements CustomIn
             } else {
                 route_path(false);
             }
-        }else {
+        } else {
             route_path(true);
         }
     }
+
 
     private void route() {
         new RouteClass(this, null, null, localStorage, null);

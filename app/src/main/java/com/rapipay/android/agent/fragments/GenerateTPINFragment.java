@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.interfaces.RequestHandler;
@@ -54,21 +55,21 @@ public class GenerateTPINFragment extends BaseFragment implements View.OnClickLi
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_login:
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    if (enterpin.length() < 4) {
-                        enterpin.setError("Please enter 4 digin pin");
-                        enterpin.requestFocus();
-                    } else if (confirmpin.length() < 4) {
-                        confirmpin.setError("Please enter 4 digin pin");
-                        confirmpin.requestFocus();
-                    } else if (!enterpin.getText().toString().equalsIgnoreCase(confirmpin.getText().toString())) {
-                        confirmpin.setError("TPIN Not matched");
-                        confirmpin.requestFocus();
-                    } else
-                        new AsyncPostMethod(WebConfig.LOGIN_URL, getJson_Validate().toString(), "", GenerateTPINFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
-                }
-                handlercontrol();
+                btn_login.setClickable(false);
+                if (enterpin.length() < 4) {
+                    enterpin.setError("Please enter 4 digin pin");
+                    enterpin.requestFocus();
+                    btn_login.setClickable(true);
+                } else if (confirmpin.length() < 4) {
+                    confirmpin.setError("Please enter 4 digin pin");
+                    confirmpin.requestFocus();
+                    btn_login.setClickable(true);
+                } else if (!enterpin.getText().toString().equalsIgnoreCase(confirmpin.getText().toString())) {
+                    confirmpin.setError("TPIN Not matched");
+                    confirmpin.requestFocus();
+                    btn_login.setClickable(true);
+                } else
+                    new AsyncPostMethod(WebConfig.LOGIN_URL, getJson_Validate().toString(), "", GenerateTPINFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
                 break;
         }
     }
@@ -133,21 +134,41 @@ public class GenerateTPINFragment extends BaseFragment implements View.OnClickLi
                     dialog.dismiss();
                     customDialog_Ben("", object.getString("responseMessage"), "Alert");
                 }
-            }else
+            } else if (object.getString("responseCode").equalsIgnoreCase("60147")) {
+                Toast.makeText(getActivity(),object.getString("responseCode"),Toast.LENGTH_LONG).show();
+                setBack_click1(getActivity());
+            } else
                 responseMSg(object);
+            btn_login.setClickable(true);
+            btn_ok.setClickable(true);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    public void clickable(){
+        try {
+            btn_ok.setClickable(true);
+            btn_login.setClickable(true);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 
+    @Override
+    public void onPause() {
+        clickable();
+        super.onPause();
+    }
+
+    AppCompatButton btn_ok;
     private void customDialog_Ben(final String type, final String msg, String title) {
         dialog = new Dialog(getActivity());
         LayoutInflater inflater = getLayoutInflater();
         View alertLayout = inflater.inflate(R.layout.custom_layout_common, null);
         AppCompatButton btn_cancel = (AppCompatButton) alertLayout.findViewById(R.id.btn_cancel);
-        btn_cancel.setVisibility(View.GONE);
-        AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
+      //  btn_cancel.setVisibility(View.GONE);
+        btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
         final TextView otpView = (TextView) alertLayout.findViewById(R.id.input_otp);
         TextView texttitle = (TextView) alertLayout.findViewById(R.id.dialog_title);
         texttitle.setText(title);
@@ -167,20 +188,17 @@ public class GenerateTPINFragment extends BaseFragment implements View.OnClickLi
         btn_ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    if (type.equalsIgnoreCase("OTPLAYOUT")) {
-                        new AsyncPostMethod(WebConfig.LOGIN_URL, getVerifyOTP(otpView.getText().toString(), msg).toString(), "", GenerateTPINFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
-                    } else {
-                        enterpin.setText("");
-                        confirmpin.setText("");
-                        enterpin.setHint("Enter New TPIN");
-                        confirmpin.setHint("Confirm New TPIN");
-                        dialog.dismiss();
-                    }
-
+                btn_ok.setClickable(false);
+                if (type.equalsIgnoreCase("OTPLAYOUT")) {
+                    new AsyncPostMethod(WebConfig.LOGIN_URL, getVerifyOTP(otpView.getText().toString(), msg).toString(), "", GenerateTPINFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
+                } else {
+                    enterpin.setText("");
+                    confirmpin.setText("");
+                    enterpin.setHint("Enter New TPIN");
+                    confirmpin.setHint("Confirm New TPIN");
+                    dialog.dismiss();
+                    btn_ok.setClickable(true);
                 }
-                handlercontrol();
             }
         });
         btn_cancel.setOnClickListener(new View.OnClickListener() {

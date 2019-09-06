@@ -17,15 +17,18 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.Formatter;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
 import com.rapipay.android.agent.BuildConfig;
 import com.rapipay.android.agent.Database.RapipayDB;
 import com.rapipay.android.agent.Database.RapipayRealmDB;
 import com.rapipay.android.agent.Model.BankDetailsPozo;
 import com.rapipay.android.agent.Model.CreaditPaymentModePozo;
+import com.rapipay.android.agent.Model.HandsetRegistration;
 import com.rapipay.android.agent.Model.HeaderePozo;
 import com.rapipay.android.agent.Model.ImagePozo;
 import com.rapipay.android.agent.Model.MasterPozo;
@@ -93,6 +96,13 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
         super.onCreate(savedInstanceState);
         setContentView(R.layout.pinverification_layout);
         localStorage.setActivityState(LocalStorage.LOGOUT, "0");
+        // sysnch data from sqlite to Realm database if the existing user
+        if(!checkInternetConenction()){
+            customDialog_List_info("Please check your network connectivity");
+        }
+        if (listHandsetRegistration == null) {
+            jumpPage();
+        }
         if (db != null && db.getDetails_Rapi()) {
             listOld = db.getDetails();
             copyData(listOld);
@@ -120,8 +130,6 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
         } else
             dbNull(PinVerification.this);
     }
-
-
 
     private void copyData(final ArrayList<RapiPayPozo> list) {
         realm.executeTransaction(new Realm.Transaction() {
@@ -704,6 +712,12 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
         toolbar_title.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
         toolbar_title.setText("Hello, " + list.get(0).getAgentName());
         toolbar_title.setTextColor(getResources().getColor(R.color.white));
+        TextView verionName = findViewById(R.id.btn_sing_in);
+        try {
+            verionName.setText("Version " + getPackageManager().getPackageInfo(getPackageName(), 0).versionName);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
         confirmpinView.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -755,9 +769,7 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
                 handler.post(Update);
             }
         }, 3000, 3000);
-
         indicator.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-
             @Override
             public void onPageSelected(int position) {
                 currentPage = position;
@@ -776,7 +788,12 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
         });
 
     }
+   /*
+    2019-08-23 12:54:38.654 23099-23099/com.rapipay.android.agents E/json: {"serviceType":"PinVerify","requestType":"handset_CHannel","typeMobileWeb":"mobile","txnRefId":"133854120823625","agentId":"9168360492",
+    "nodeAgentId":"9168360492","pin":"111111","imeiNo":"356477080688252","deviceName":"motorola","sessionRefNo":"6JAJ8XRFPZ","osType":"ANDROID","domainName":"agent.rapipay.com","clientRequestIP":"172.16.50.246",
+    "checkSum":"319ABCC1DB3FCE5075C3258AD732F27E779F52F29EAAE6C3EA5AB8408E228FA8AA0553AAE8553188B4DC36D6C25100830A2CDEE6D461887BC2E167504FCFBDC8"}
 
+*/
     public JSONObject getJson_Validate(String pinResults) {
         JSONObject jsonObject = new JSONObject();
         WifiManager wm = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
@@ -792,16 +809,16 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
                 jsonObject.put("pin", pinResults);
                 jsonObject.put("imeiNo", list.get(0).getImei());
                 jsonObject.put("deviceName", Build.MANUFACTURER);
-                jsonObject.put("sessionRefNo", list.get(0).getSessionRefNo());
+                jsonObject.put("sessionRefNo", listHandsetRegistration.get(0).getSessionRefNo());
                 jsonObject.put("osType", "ANDROID");
                 jsonObject.put("domainName", BuildConfig.DOMAINNAME);
                 jsonObject.put("clientRequestIP", ImageUtils.ipAddress(PinVerification.this));
-                jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getSession(), jsonObject.toString()));
-
+                jsonObject.put("checkSum", GenerateChecksum.checkSum(listHandsetRegistration.get(0).getSessionKey(), jsonObject.toString()));
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
+        Log.e("json",jsonObject+"");
         return jsonObject;
     }
 
@@ -811,6 +828,7 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
             if (object.getString("responseCode").equalsIgnoreCase("200")) {
                 if (object.getString("serviceType").equalsIgnoreCase("PinVerify")) {
                     String whereArgs1 = list.get(0).getApikey();
+
                     final RapiPayPozo pinVeriPojo1 = realm.where(RapiPayPozo.class).equalTo("apikey", whereArgs1).findFirst();
                     realm.executeTransaction(new Realm.Transaction() {
                         @Override
@@ -942,9 +960,8 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
                     jsonObject.put("timeStamp", dbRealm.getFooterDetail("banner").get(0).getTimeStamp());
                 else
                     jsonObject.put("timeStamp", "");
-                jsonObject.put("sessionRefNo", list.get(0).getSessionRefNo());
-                jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getSession(), jsonObject.toString()));
-
+                jsonObject.put("sessionRefNo", listHandsetRegistration.get(0).getSessionRefNo());
+                jsonObject.put("checkSum", GenerateChecksum.checkSum(listHandsetRegistration.get(0).getSessionKey(), jsonObject.toString()));
             } catch (Exception e) {
                 e.printStackTrace();
             }

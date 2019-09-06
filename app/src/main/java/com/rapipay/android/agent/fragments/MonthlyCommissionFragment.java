@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.rapipay.android.agent.Model.CommissionPozo;
 import com.rapipay.android.agent.R;
@@ -105,7 +106,10 @@ public class MonthlyCommissionFragment extends BaseFragment implements RequestHa
                         }
                     }
                 }
-            }else
+            } else if (object.getString("responseCode").equalsIgnoreCase("60147")) {
+                Toast.makeText(getActivity(),object.getString("responseCode"),Toast.LENGTH_LONG).show();
+                setBack_click1(getActivity());
+            } else
                 responseMSg(object);
         } catch (Exception e) {
             e.printStackTrace();

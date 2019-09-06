@@ -14,6 +14,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -47,7 +48,6 @@ import java.util.List;
 public class NetworkTab extends BaseCompactActivity implements View.OnClickListener, RequestHandler, CustomInterface, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener {
-
     TabLayout tabLayout;
     NetworkTransFragment fragment_credit;
     NetworkHistoryFragment transFragment;
@@ -127,13 +127,21 @@ public class NetworkTab extends BaseCompactActivity implements View.OnClickListe
                 finish();
                 break;
             case R.id.consent:
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    new AsyncPostMethod(WebConfig.CRNF, getConsentDetails().toString(), headerData, NetworkTab.this, getString(R.string.responseTimeOut)).execute();
-                }
-                handlercontrol();
+                consent.setClickable(false);
+                new AsyncPostMethod(WebConfig.CRNF, getConsentDetails().toString(), headerData, NetworkTab.this, getString(R.string.responseTimeOut)).execute();
                 break;
         }
+    }
+
+    public void clickable(){
+        consent.setClickable(true);
+    }
+
+
+    @Override
+    protected void onPause() {
+        clickable();
+        super.onPause();
     }
 
     public JSONObject getConsentDetails() {
@@ -221,6 +229,7 @@ public class NetworkTab extends BaseCompactActivity implements View.OnClickListe
                     customDialog_Common("KYCLAYOUT", object, null, "Successfull", null, object.getString("responseMessage"), NetworkTab.this);
                 }
             }
+            consent.setClickable(true);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -301,6 +310,7 @@ public class NetworkTab extends BaseCompactActivity implements View.OnClickListe
                                     if (permissionLocation == PackageManager.PERMISSION_GRANTED) {
                                         mylocation = LocationServices.FusedLocationApi
                                                 .getLastLocation(googleApiClient);
+                                        Log.e("present location:",mylocation+"");
                                     }
                                     break;
                                 case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:

@@ -27,10 +27,10 @@ import java.util.Date
 
 class BankDetails : BaseFragment(), RequestHandler {
     protected var headerData = WebConfig.BASIC_USERID + ":" + WebConfig.BASIC_PASSWORD
-    var detailPozoArrayList: ArrayList<BankDetailPozo>?=null
-    var recycler_view: RecyclerView?=null
-    var note1: TextView?=null
-    var note2: TextView?=null
+    var detailPozoArrayList: ArrayList<BankDetailPozo>? = null
+    var recycler_view: RecyclerView? = null
+    var note1: TextView? = null
+    var note2: TextView? = null
 
     val wlDetails: JSONObject
         get() {
@@ -56,6 +56,7 @@ class BankDetails : BaseFragment(), RequestHandler {
             }
             return jsonObject
         }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         var view = inflater.inflate(R.layout.bankdetail_layout, container, false);
         if (BaseCompactActivity.dbRealm != null && BaseCompactActivity.dbRealm.details_Rapi)
@@ -65,14 +66,14 @@ class BankDetails : BaseFragment(), RequestHandler {
         return view;
     }
 
-    private fun initialize(view:View) {
+    private fun initialize(view: View) {
         recycler_view = view.findViewById<View>(R.id.recycler_view) as RecyclerView
         note1 = view.findViewById<View>(R.id.note1) as TextView
         note2 = view.findViewById<View>(R.id.note2) as TextView
     }
 
     private fun url() {
-        AsyncPostMethod(WebConfig.LOGIN_URL, wlDetails.toString(), headerData, this,activity, getString(R.string.responseTimeOut)).execute()
+        AsyncPostMethod(WebConfig.LOGIN_URL, wlDetails.toString(), headerData, this, activity, getString(R.string.responseTimeOut)).execute()
     }
 
     override fun chechStat(`object`: String) {
@@ -88,7 +89,11 @@ class BankDetails : BaseFragment(), RequestHandler {
                     parseBankDetails(JSONObject(text))
 
                 }
-            }else
+            } else if (`object`.getString("responseCode").equals("60147", ignoreCase = true))
+                run {
+                    Toast.makeText(context, `object`.getString("responseCode"), Toast.LENGTH_LONG).show()
+                    setBack_click1(context)
+                } else
                 responseMSg(`object`)
         } catch (e: Exception) {
             e.printStackTrace()

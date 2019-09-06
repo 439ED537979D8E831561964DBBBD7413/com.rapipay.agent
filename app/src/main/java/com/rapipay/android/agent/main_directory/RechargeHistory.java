@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
@@ -107,12 +108,14 @@ public class RechargeHistory extends BaseCompactActivity implements View.OnClick
         trans_details.addOnItemTouchListener(new RecyclerTouchListener(this, trans_details, new ClickListener() {
             @Override
             public void onClick(View view, int position) {
-                if (btnstatus == false) {
-                    btnstatus = true;
+                if (setClickable(view, isClickable) == false) {
+                    isClickable = true;
+                } else {
+                    isClickable = false;
+                    setClickable(view, isClickable);
                     RechargePozo pozo = transactionPozoArrayList.get(position);
                     new AsyncPostMethod(WebConfig.WALLETRECEIPTURL, receipt_request(pozo).toString(), headerData, RechargeHistory.this, getString(R.string.responseTimeOut)).execute();
                 }
-                handlercontrol();
             }
 
             @Override
@@ -121,6 +124,23 @@ public class RechargeHistory extends BaseCompactActivity implements View.OnClick
             }
         }));
     }
+
+    public boolean isClickable = false;
+
+    public static boolean setClickable(View view, boolean clickable) {
+        if (view != null) {
+            if (view instanceof ViewGroup) {
+                ViewGroup viewGroup = (ViewGroup) view;
+                for (int i = 0; i < viewGroup.getChildCount(); i++) {
+                    setClickable(viewGroup.getChildAt(i), clickable);
+                }
+            }
+            view.setClickable(clickable);
+        }
+        return clickable;
+    }
+
+    int position;
 
     public JSONObject receipt_request(RechargePozo pozo) {
         JSONObject jsonObject = new JSONObject();
@@ -150,25 +170,25 @@ public class RechargeHistory extends BaseCompactActivity implements View.OnClick
                 finish();
                 break;
             case R.id.btn_fund:
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    if (payee.isEmpty())
-                        Toast.makeText(this, "Please select recharge type", Toast.LENGTH_SHORT).show();
-                    else if (date2_text.getText().toString().isEmpty()) {
-                        date2_text.setError("Please enter mandatory field");
-                        date2_text.requestFocus();
-                    } else if (date1_text.getText().toString().isEmpty()) {
-                        date1_text.setError("Please enter mandatory field");
-                        date1_text.requestFocus();
-                    } else if (printDifference(mainDate(date2_text.getText().toString()), mainDate(date1_text.getText().toString()))){
-                        trans_details.setVisibility(View.VISIBLE);
-                        new AsyncPostMethod(WebConfig.RECHARGE_URL, channel_request(0, 5).toString(), headerData, RechargeHistory.this, getString(R.string.responseTimeOut)).execute();
-                    } else {
-                        customDialog_Common("Statement can only view from one month");
-                        trans_details.setVisibility(View.GONE);
-                    }
+                v.findViewById(R.id.btn_fund).setClickable(false);
+                if (payee.isEmpty()) {
+                    Toast.makeText(this, "Please select recharge type", Toast.LENGTH_SHORT).show();
+                    v.findViewById(R.id.btn_fund).setClickable(true);
+                } else if (date2_text.getText().toString().isEmpty()) {
+                    date2_text.setError("Please enter mandatory field");
+                    date2_text.requestFocus();
+                } else if (date1_text.getText().toString().isEmpty()) {
+                    date1_text.setError("Please enter mandatory field");
+                    date1_text.requestFocus();
+                    v.findViewById(R.id.btn_fund).setClickable(true);
+                } else if (printDifference(mainDate(date2_text.getText().toString()), mainDate(date1_text.getText().toString()))) {
+                    trans_details.setVisibility(View.VISIBLE);
+                    new AsyncPostMethod(WebConfig.RECHARGE_URL, channel_request(0, 5).toString(), headerData, RechargeHistory.this, getString(R.string.responseTimeOut)).execute();
+                } else {
+                    customDialog_Common("Statement can only view from one month");
+                    trans_details.setVisibility(View.GONE);
+                    v.findViewById(R.id.btn_fund).setClickable(true);
                 }
-                handlercontrol();
                 break;
         }
     }
@@ -188,13 +208,26 @@ public class RechargeHistory extends BaseCompactActivity implements View.OnClick
             jsonObject.put("toIndex", String.valueOf(toIndex));
             jsonObject.put("rechargeType", payee);
             jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
-
         } catch (Exception e) {
             e.printStackTrace();
         }
         return jsonObject;
     }
 
+    public void clickable() {
+        try {
+            findViewById(R.id.btn_fund).setClickable(true);
+            trans_details.getChildAt(position).setClickable(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        clickable();
+        super.onPause();
+    }
 
     @Override
     public void chechStatus(JSONObject object) {
@@ -219,10 +252,14 @@ public class RechargeHistory extends BaseCompactActivity implements View.OnClick
                             customDialog_Common("KYCLAYOUTS", null, null, "Transaction Receipt", "", "Cannot generate receipt now please try later!", RechargeHistory.this);
                         }
                 }
+            } else if (object.getString("responseCode").equalsIgnoreCase("60147")) {
+                Toast.makeText(this,object.getString("responseCode"),Toast.LENGTH_LONG).show();
+                setBack_click1(this);
             } else {
                 responseMSg(object);
                 trans_details.setVisibility(View.GONE);
             }
+            findViewById(R.id.btn_fund).setClickable(true);
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 import com.rapipay.android.agent.R
 import com.rapipay.android.agent.interfaces.RequestHandler
 import com.rapipay.android.agent.utils.*
@@ -37,8 +38,7 @@ class ServiceEnable : BaseFragment(), View.OnClickListener, RequestHandler {
     override fun onClick(v: View) {
         when (v.id) {
             R.id.btn_login -> {
-                if (btnstatus == false) {
-                    btnstatus = true
+                btn_login!!.setClickable(false)
                     if (enterpin!!.text.toString().isEmpty()) {
                         enterpin?.error = "Please enter serial number"
                         enterpin?.requestFocus()
@@ -47,10 +47,13 @@ class ServiceEnable : BaseFragment(), View.OnClickListener, RequestHandler {
                         confirmpin?.requestFocus()
                     } else
                         AsyncPostMethod(WebConfig.SCRATCH_URL, getJson_Validate().toString(), headerData, this@ServiceEnable, getActivity(), getString(R.string.responseTimeOut)).execute()
-                }
-                handlercontrol()
             }
         }
+    }
+
+    override fun onPause() {
+        btn_login!!.setClickable(true)
+        super.onPause()
     }
 
     fun getJson_Validate(): JSONObject {
@@ -90,7 +93,10 @@ class ServiceEnable : BaseFragment(), View.OnClickListener, RequestHandler {
                 if (`object`.getString("serviceType").equals("Txn_PIN_ENABLE", ignoreCase = true)) {
                     customDialog_Ben("Alert", `object`.getString("responseMessage"))
                 }
-            }else
+            } else if (`object`.getString("responseCode").equals("60147", ignoreCase = true)) run {
+                Toast.makeText(context, `object`.getString("responseCode"), Toast.LENGTH_LONG).show()
+                setBack_click1(context)
+            } else
                 responseMSg(`object`)
         } catch (e: Exception) {
             e.printStackTrace()

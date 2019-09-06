@@ -111,7 +111,7 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
     RecyclerView pendingtrans_details;
     ArrayList<AEPSPendingPozo> pendingPozoArrayList;
     //  Spinner select_deviceid, select_device;
-    TextView pending, bank_select,adhar_select;
+    TextView pending, bank_select, adhar_select;
     List<Microdata1> microdata1;
     private long mLastClickTime = System.currentTimeMillis();
     private static final long CLICK_TIME_INTERVAL = 1000;
@@ -867,12 +867,15 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
                 customDialog_Common_device(object.getString("responseMessage"));
             } else if (object.getString("responseCode").equalsIgnoreCase("86039")) {
                 customDialog_Common_device(object.getString("responseMessage"));
+            } else if (object.getString("responseCode").equalsIgnoreCase("60147")) {
+                customDialog_Common_device(object.getString("responseCode"));
             } else if (reqFor.equalsIgnoreCase("MATM")) {
                 responseMSg(object);
             } else if (object.getString("responseCode").equalsIgnoreCase("904")) {
                 customDialog_Common_device(object.getString("responseMessage"));
             } else if (object.getString("responseCode").equalsIgnoreCase("60067")) {
-                customDialog_List_info(object.getString("respnseMessage"));
+                Toast.makeText(this,object.getString("responseCode"),Toast.LENGTH_LONG).show();
+                setBack_click1(this);
             } else {
                 customDialog_List_info(object.getString("responseMessage"));
             }

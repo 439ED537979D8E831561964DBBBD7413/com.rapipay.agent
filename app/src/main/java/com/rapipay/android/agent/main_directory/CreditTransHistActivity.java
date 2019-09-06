@@ -10,10 +10,12 @@ import android.view.View;
 import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.rapipay.android.agent.Model.CreditHistoryPozo;
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.adapter.CreditHistoryAdapter;
+import com.rapipay.android.agent.adapter.CreditHistoryLoadingAdapter;
 import com.rapipay.android.agent.interfaces.ClickListener;
 import com.rapipay.android.agent.interfaces.CustomInterface;
 import com.rapipay.android.agent.interfaces.RequestHandler;
@@ -155,23 +157,23 @@ public class CreditTransHistActivity extends BaseCompactActivity implements Requ
                 finish();
                 break;
             case R.id.btn_fund:
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    if (date2_text.getText().toString().isEmpty()) {
-                        date2_text.setError("Please enter valid data");
-                        date2_text.requestFocus();
-                    } else if (date1_text.getText().toString().isEmpty()) {
-                        date1_text.setError("Please enter valid data");
-                        date1_text.requestFocus();
-                    } else if (printDifference(mainDate(date2_text.getText().toString()), mainDate(date1_text.getText().toString()))) {
-                        trans_details.setVisibility(View.VISIBLE);
-                        new AsyncPostMethod(WebConfig.CommonReport, channel_request().toString(), headerData, CreditTransHistActivity.this, getString(R.string.responseTimeOut)).execute();
-                    }else {
-                        customDialog_Common("Statement can only view from one month");
-                        trans_details.setVisibility(View.GONE);
-                    }
+                btn_fund.setClickable(false);
+                if (date2_text.getText().toString().isEmpty()) {
+                    date2_text.setError("Please enter valid data");
+                    date2_text.requestFocus();
+                    btn_fund.setClickable(true);
+                } else if (date1_text.getText().toString().isEmpty()) {
+                    date1_text.setError("Please enter valid data");
+                    date1_text.requestFocus();
+                    btn_fund.setClickable(true);
+                } else if (printDifference(mainDate(date2_text.getText().toString()), mainDate(date1_text.getText().toString()))) {
+                    trans_details.setVisibility(View.VISIBLE);
+                    new AsyncPostMethod(WebConfig.CommonReport, channel_request().toString(), headerData, CreditTransHistActivity.this, getString(R.string.responseTimeOut)).execute();
+                } else {
+                    customDialog_Common("Statement can only view from one month");
+                    trans_details.setVisibility(View.GONE);
+                    btn_fund.setClickable(true);
                 }
-                handlercontrol();
                 break;
         }
     }
@@ -256,10 +258,14 @@ public class CreditTransHistActivity extends BaseCompactActivity implements Requ
                             insertLastTransDetails(object.getJSONArray("creditFundList"));
                         }
                 }
-            }else {
+            } else if (object.getString("responseCode").equalsIgnoreCase("60147")) {
+                Toast.makeText(this,object.getString("responseCode"),Toast.LENGTH_LONG).show();
+                setBack_click1(this);
+            } else {
                 trans_details.setVisibility(View.GONE);
                 responseMSg(object);
             }
+            btn_fund.setClickable(true);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -282,7 +288,7 @@ public class CreditTransHistActivity extends BaseCompactActivity implements Requ
     private void initializeTransAdapter(ArrayList<CreditHistoryPozo> list) {
         LinearLayoutManager layoutManager = new LinearLayoutManager(CreditTransHistActivity.this, LinearLayoutManager.VERTICAL, false);
         trans_details.setLayoutManager(layoutManager);
-        trans_details.setAdapter(new CreditHistoryAdapter(CreditTransHistActivity.this, trans_details, list));
+        trans_details.setAdapter(new CreditHistoryLoadingAdapter(CreditTransHistActivity.this, trans_details, list));
     }
 
     @Override

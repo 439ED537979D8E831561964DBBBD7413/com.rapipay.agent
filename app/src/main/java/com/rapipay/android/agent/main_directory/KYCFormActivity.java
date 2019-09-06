@@ -88,7 +88,7 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
     String type, button, mobileNo, persons, scandata = null, documentType = null, documentID = null, customerType;
     ImageView back_click, delete_all;
     TextView input_name, input_number, input_address, input_email, input_comp, select_state, gsin_no, pan_no, city_name, pin_code, document_id;
-    ImageView documentfrontimage, documentbackimage, panphoto, selfphoto, shopPhoto, signphoto, passportphotoimage;
+    ImageView documentfrontimage, documentbackimage, panphoto, selfphoto, shopPhoto, signphoto, passportphotoimage, otherphotoimage;
     AppCompatButton documentback, documentfront;
     private static final int DOCUMENT_FRONT1 = 1888;
     private static final int DOCUMENT_FRONT2 = 1889;
@@ -105,6 +105,8 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
     private static final int signphoto1 = 1990;
     private static final int signphoto2 = 1991;
     private static final int passportphoto1 = 1992;
+    private static final int passportphoto3 = 1994;
+    private static final int passportphoto4 = 1995;
     private static final int passportphoto2 = 1993;
     private JSONObject kycMapData = new JSONObject();
     private JSONObject kycMapImage = new JSONObject();
@@ -166,6 +168,7 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
         shopPhoto = (ImageView) findViewById(R.id.shopphoto);
         signphoto = (ImageView) findViewById(R.id.signphoto);
         passportphotoimage = (ImageView) findViewById(R.id.passportphotoimage);
+        otherphotoimage = (ImageView) findViewById(R.id.otherphotoimage);
         if (type.equalsIgnoreCase("SCAN")) {
             if (button.equalsIgnoreCase("personal")) {
                 scandata = getIntent().getStringExtra("scandata");
@@ -195,6 +198,7 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
             input_comp.setHint("Company Name (Optional)");
             pan_no.setHint("Pan Number (Optional)");
             findViewById(R.id.passportphoto).setVisibility(View.GONE);
+            findViewById(R.id.otherdocumentphoto).setVisibility(View.GONE);
             findViewById(R.id.sign_photo).setVisibility(View.GONE);
             findViewById(R.id.gsin_no).setVisibility(View.GONE);
             findViewById(R.id.shop_photo).setVisibility(View.GONE);
@@ -226,7 +230,9 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
             getPersonalDetails();
         }
     }
+
     ArrayList<String> stcondition;
+
     private void getPersonalDetails() {
         stcondition = new ArrayList<>();
         try {
@@ -246,6 +252,12 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
                         findViewById(R.id.passportphoto).setVisibility(View.GONE);
                         if (!kycMapImage.has("passportPhoto"))
                             kycMapImage.put("passportPhoto", getBase64(addWaterMark(getBitmap((ImageView) findViewById(R.id.passportphotoimage)))));
+                    }
+                    if (newKYCList_Personal.get(0).getOTHERDOCUMENTPHOTO() != null) {
+                        byteConvert((ImageView) findViewById(R.id.otherphotoimage), newKYCList_Personal.get(0).getOTHERDOCUMENTPHOTO());
+                        findViewById(R.id.otherdocumentphoto).setVisibility(View.GONE);
+                        if (!kycMapImage.has("otherdocumentphoto"))
+                            kycMapImage.put("otherdocumentphoto", getBase64(addWaterMark(getBitmap((ImageView) findViewById(R.id.otherphotoimage)))));
                     }
                     if (newKYCList_Personal.get(0).getSCANIMAGEPATH() != null) {
                         if (!kycMapImage.has("kycImage"))
@@ -425,8 +437,30 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
         AgentKYCFragment.byteBase64 = "";
         CustomerKYCActivity.bitmap_trans = null;
         CustomerKYCActivity.byteBase64 = "";
-        dbRealm.deleteRow(mobileNo, "",documentID,documentType);
+        dbRealm.deleteRow(mobileNo, "", documentID, documentType);
+        findViewById(R.id.pan_photo).setClickable(false);
         finish();
+    }
+
+    public void clickable() {
+        delete_all.setClickable(true);
+        findViewById(R.id.documentfront).setClickable(true);
+        findViewById(R.id.passportphoto).setClickable(true);
+        findViewById(R.id.otherdocumentphoto).setClickable(true);
+        findViewById(R.id.documentback).setClickable(true);
+        findViewById(R.id.shop_photo).setClickable(true);
+        findViewById(R.id.self_photo).setClickable(true);
+        findViewById(R.id.sign_photo).setClickable(true);
+        findViewById(R.id.sub_btn_present).setClickable(true);
+        findViewById(R.id.sub_btn_address).setClickable(true);
+        findViewById(R.id.sub_btn_buisness).setClickable(true);
+        findViewById(R.id.sub_btn_verify).setClickable(true);
+    }
+
+    @Override
+    protected void onPause() {
+        clickable();
+        super.onPause();
     }
 
     @Override
@@ -434,173 +468,139 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
         try {
             switch (v.getId()) {
                 case R.id.delete_all:
-                    if (btnstatus == false) {
-                        btnstatus = true;
-                        dbRealm.deleteRow(mobileNo, "",documentID,documentType);
-                        clearVerify();
-                    }
-                    handlercontrol();
+                    // delete_all.setClickable(false);
+                    dbRealm.deleteRow(mobileNo, "", documentID, documentType);
+                    clearVerify();
                     break;
                 case R.id.back_click:
                     finish();
                     break;
                 case R.id.documentfront:
-                    if (btnstatus == false) {
-                        btnstatus = true;
-                        selectImage(DOCUMENT_FRONT1, DOCUMENT_FRONT2, "uploadFront");
-                    }
-                    handlercontrol();
+                    //  findViewById(R.id.documentfront).setClickable(false);
+                    selectImage(DOCUMENT_FRONT1, DOCUMENT_FRONT2, "uploadFront");
                     break;
                 case R.id.passportphoto:
-                    if (btnstatus == false) {
-                        btnstatus = true;
-                        selectImage(passportphoto1, passportphoto2, "passportPhoto");
-                    }
-                    handlercontrol();
+                    selectImage(passportphoto1, passportphoto2, "passportPhoto");
+                    break;
+                case R.id.otherdocumentphoto:
+                    selectImage(passportphoto3, passportphoto4, "otherdocumentphoto");
                     break;
                 case R.id.documentback:
-                    if (btnstatus == false) {
-                        btnstatus = true;
-                        selectImage(DOCUMENT_BACK1, DOCUMENT_BACK2, "uploadBack");
-                    }
-                    handlercontrol();
+                    //  findViewById(R.id.documentback).setClickable(false);
+                    selectImage(DOCUMENT_BACK1, DOCUMENT_BACK2, "uploadBack");
                     break;
                 case R.id.pan_photo:
-                    if (btnstatus == false) {
-                        btnstatus = true;
-                        if (persons.equalsIgnoreCase("internal") || persons.equalsIgnoreCase("outside"))
-                            if (!pan_no.getText().toString().isEmpty())
-                                selectImage(PANPIC1, PANPIC2, "pancardImg");
-                            else
-                                Toast.makeText(KYCFormActivity.this, "Please enter pancard number first.", Toast.LENGTH_SHORT).show();
-                    }
-                    handlercontrol();
+                    //  findViewById(R.id.pan_photo).setClickable(false);
+                    if (persons.equalsIgnoreCase("internal") || persons.equalsIgnoreCase("outside"))
+                        if (!pan_no.getText().toString().isEmpty())
+                            selectImage(PANPIC1, PANPIC2, "pancardImg");
+                        else
+                            Toast.makeText(KYCFormActivity.this, "Please enter pancard number first.", Toast.LENGTH_SHORT).show();
                     break;
                 case R.id.cust_pan_photo:
-                    if (btnstatus == false) {
-                        btnstatus = true;
-                        selectImage(CUSTPANPIC1, CUSTPANPIC2, "custpanphoto");
-                    }
-                    handlercontrol();
+                    // findViewById(R.id.cust_pan_photo).setClickable(false);
+                    selectImage(CUSTPANPIC1, CUSTPANPIC2, "custpanphoto");
                     break;
                 case R.id.shop_photo:
-                    if (btnstatus == false) {
-                        btnstatus = true;
-                        selectImage(SHOPPIC1, SHOPPIC2, "shopPhoto");
-                    }
-                    handlercontrol();
+                    //  findViewById(R.id.shop_photo).setClickable(false);
+                    selectImage(SHOPPIC1, SHOPPIC2, "shopPhoto");
                     break;
                 case R.id.self_photo:
-                    if (btnstatus == false) {
-                        btnstatus = true;
-                        selectImage(selfphoto1, selfphoto2, "selfPhoto");
-                    }
-                    handlercontrol();
+                    // findViewById(R.id.self_photo).setClickable(false);
+                    selectImage(selfphoto1, selfphoto2, "selfPhoto");
                     break;
                 case R.id.sign_photo:
-                    if (btnstatus == false) {
-                        btnstatus = true;
-                        selectImage(signphoto1, signphoto2, "signPhoto");
-                    }
-                    handlercontrol();
+                    //  findViewById(R.id.sign_photo).setClickable(false);
+                    selectImage(signphoto1, signphoto2, "signPhoto");
                     break;
                 case R.id.sub_btn_present:
-                    if (btnstatus == false) {
-                        btnstatus = true;
-                        if (personalValidation()) {
-                            kycMapData.put("mobileNo", input_number.getText().toString());
-                            kycMapData.put("dob", date1_text.getText().toString());
-                            kycMapData.put("email", input_email.getText().toString());
-                            kycMapData.put("companyName", input_comp.getText().toString());
-                            String[] token = input_name.getText().toString().split(" ");
-                            kycMapData.put("firstName", token[0]);
-                            int count = token.length;
-                            if (count > 2) {
-                                kycMapData.put("middleName", token[1]);
-                                StringBuilder builder = new StringBuilder();
-                                for (int i = 2; i < count; i++) {
-                                    builder.append(token[i] + " ");
-                                }
-                                kycMapData.put("lastName", builder.toString());
-                            } else if (count >= 2)
-                                kycMapData.put("lastName", token[1]);
-                            findViewById(R.id.personal_layout).setVisibility(View.GONE);
-                            findViewById(R.id.address_details).setVisibility(View.VISIBLE);
-                            if (getIntent().hasExtra("localAddress"))
-                                getAddressDetails();
-                            parseAddressJson(scandata);
-                            if (type.equalsIgnoreCase("SCAN")) {
-                                if (customerType.equalsIgnoreCase("C")) {
-                                    if (CustomerKYCActivity.bitmap_trans != null)
-                                        kycMapImage.put("kycImage", getBase64(CustomerKYCActivity.bitmap_trans, 100));
-                                    else
-                                        kycMapImage.put("kycImage", null);
-                                } else if (customerType.equalsIgnoreCase("A")) {
-                                    if (AgentKYCFragment.bitmap_trans != null)
-                                        kycMapImage.put("kycImage", getBase64(AgentKYCFragment.bitmap_trans, 100));
-                                    else
-                                        kycMapImage.put("kycImage", null);
-                                }
+                    findViewById(R.id.sub_btn_present).setClickable(false);
+                    if (personalValidation()) {
+                        kycMapData.put("mobileNo", input_number.getText().toString());
+                        kycMapData.put("dob", date1_text.getText().toString());
+                        kycMapData.put("email", input_email.getText().toString());
+                        kycMapData.put("companyName", input_comp.getText().toString());
+                        String[] token = input_name.getText().toString().split(" ");
+                        kycMapData.put("firstName", token[0]);
+                        int count = token.length;
+                        if (count > 2) {
+                            kycMapData.put("middleName", token[1]);
+                            StringBuilder builder = new StringBuilder();
+                            for (int i = 2; i < count; i++) {
+                                builder.append(token[i] + " ");
                             }
-                            if (getIntent().getStringExtra("localPersonal").equalsIgnoreCase("false"))
-                                insertPersonal(kycMapData, kycMapImage, input_name.getText().toString(), documentID, documentType, customerType);
-                            clicked = "personal";
+                            kycMapData.put("lastName", builder.toString());
+                        } else if (count >= 2)
+                            kycMapData.put("lastName", token[1]);
+                        findViewById(R.id.personal_layout).setVisibility(View.GONE);
+                        findViewById(R.id.address_details).setVisibility(View.VISIBLE);
+                        if (getIntent().hasExtra("localAddress"))
+                            getAddressDetails();
+                        parseAddressJson(scandata);
+                        if (type.equalsIgnoreCase("SCAN")) {
+                            if (customerType.equalsIgnoreCase("C")) {
+                                if (CustomerKYCActivity.bitmap_trans != null)
+                                    kycMapImage.put("kycImage", getBase64(CustomerKYCActivity.bitmap_trans, 100));
+                                else
+                                    kycMapImage.put("kycImage", null);
+                            } else if (customerType.equalsIgnoreCase("A")) {
+                                if (AgentKYCFragment.bitmap_trans != null)
+                                    kycMapImage.put("kycImage", getBase64(AgentKYCFragment.bitmap_trans, 100));
+                                else
+                                    kycMapImage.put("kycImage", null);
+                            }
                         }
+                        if (getIntent().getStringExtra("localPersonal").equalsIgnoreCase("false"))
+                            insertPersonal(kycMapData, kycMapImage, input_name.getText().toString(), documentID, documentType, customerType);
+                        clicked = "personal";
                     }
-                    handlercontrol();
                     break;
                 case R.id.sub_btn_address:
-                    if (btnstatus == false) {
-                        btnstatus = true;
-                        if (addressValidation()) {
-                            kycMapData.put("address", input_address.getText().toString());
-                            kycMapData.put("city", city_name.getText().toString());
-                            kycMapData.put("state", select_state.getText().toString());
-                            kycMapData.put("pinCode", pin_code.getText().toString());
-                            kycMapData.put("documentId", document_id.getText().toString());
-                            kycMapData.put("documentType", documentType);
-                            findViewById(R.id.personal_layout).setVisibility(View.GONE);
-                            findViewById(R.id.address_details).setVisibility(View.GONE);
-                            findViewById(R.id.business_detail).setVisibility(View.VISIBLE);
-                            if (getIntent().hasExtra("localAddress")) {
-                                if (getIntent().getStringExtra("localAddress").equalsIgnoreCase("false"))
-                                    insertAddress(kycMapData, kycMapImage, documentID, documentType, customerType);
-                            } else if (clicked.equalsIgnoreCase("personal")) {
+                    findViewById(R.id.sub_btn_address).setClickable(false);
+                    if (addressValidation()) {
+                        kycMapData.put("address", input_address.getText().toString());
+                        kycMapData.put("city", city_name.getText().toString());
+                        kycMapData.put("state", select_state.getText().toString());
+                        kycMapData.put("pinCode", pin_code.getText().toString());
+                        kycMapData.put("documentId", document_id.getText().toString());
+                        kycMapData.put("documentType", documentType);
+                        findViewById(R.id.personal_layout).setVisibility(View.GONE);
+                        findViewById(R.id.address_details).setVisibility(View.GONE);
+                        findViewById(R.id.business_detail).setVisibility(View.VISIBLE);
+                        if (getIntent().hasExtra("localAddress")) {
+                            if (getIntent().getStringExtra("localAddress").equalsIgnoreCase("false"))
                                 insertAddress(kycMapData, kycMapImage, documentID, documentType, customerType);
-                                clicked = "address";
-                            }
-                            if (getIntent().hasExtra("localBusiness"))
-                                getBusinessDetails();
+                        } else if (clicked.equalsIgnoreCase("personal")) {
+                            insertAddress(kycMapData, kycMapImage, documentID, documentType, customerType);
+                            clicked = "address";
                         }
+                        if (getIntent().hasExtra("localBusiness"))
+                            getBusinessDetails();
                     }
-                    handlercontrol();
                     break;
                 case R.id.sub_btn_buisness:
-                    if (btnstatus == false) {
-                        btnstatus = true;
-                        if (buisnessValidation()) {
-                            kycMapData.put("panNo", pan_no.getText().toString());
-                            kycMapData.put("gstIN", gsin_no.getText().toString());
-                            findViewById(R.id.personal_layout).setVisibility(View.GONE);
-                            findViewById(R.id.address_details).setVisibility(View.GONE);
-                            findViewById(R.id.business_detail).setVisibility(View.GONE);
-                            findViewById(R.id.verification_layout).setVisibility(View.VISIBLE);
-                            if (getIntent().hasExtra("localBusiness")) {
-                                if (getIntent().getStringExtra("localBusiness").equalsIgnoreCase("false"))
-                                    insertBuisness(kycMapData, kycMapImage, documentID, documentType, customerType);
-                            } else if (clicked.equalsIgnoreCase("address")) {
+                    findViewById(R.id.sub_btn_buisness).setClickable(false);
+                    if (buisnessValidation()) {
+                        kycMapData.put("panNo", pan_no.getText().toString());
+                        kycMapData.put("gstIN", gsin_no.getText().toString());
+                        findViewById(R.id.personal_layout).setVisibility(View.GONE);
+                        findViewById(R.id.address_details).setVisibility(View.GONE);
+                        findViewById(R.id.business_detail).setVisibility(View.GONE);
+                        findViewById(R.id.verification_layout).setVisibility(View.VISIBLE);
+                        if (getIntent().hasExtra("localBusiness")) {
+                            if (getIntent().getStringExtra("localBusiness").equalsIgnoreCase("false"))
                                 insertBuisness(kycMapData, kycMapImage, documentID, documentType, customerType);
-                                clicked = "business";
-                            }
-                            if (getIntent().hasExtra("localVerify"))
-                                getVerifyDetails();
+                        } else if (clicked.equalsIgnoreCase("address")) {
+                            insertBuisness(kycMapData, kycMapImage, documentID, documentType, customerType);
+                            clicked = "business";
                         }
+                        if (getIntent().hasExtra("localVerify"))
+                            getVerifyDetails();
                     }
-                    handlercontrol();
                     break;
                 case R.id.sub_btn_verify:
-                    if (btnstatus == false) {
-                        btnstatus = true;
+                    if (liveValidation()) {
+                        // findViewById(R.id.sub_btn_verify).setClickable(false);
                         if (getIntent().hasExtra("localPersonal"))
                             getPersonalDetails();
                         if (getIntent().hasExtra("localAddress"))
@@ -621,7 +621,6 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
                                         reDirectWebView();
                                     }
                     }
-                    handlercontrol();
                     break;
             }
         } catch (Exception e) {
@@ -715,7 +714,7 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
     private JSONObject getKycMapImage() {
         CustomProgessDialog dialog = new CustomProgessDialog(KYCFormActivity.this);
         JSONObject jsonObject = new JSONObject();
-        String passportPhoto = "", signPhoto = "", shopPhoto = "", pancardImg = "", kycImage = "";
+        String passportPhoto = "", otherdocumentphoto = "", signPhoto = "", shopPhoto = "", pancardImg = "", kycImage = "";
         try {
             if (kycMapImage.has("kycImage"))
                 kycImage = kycMapImage.get("kycImage").toString();
@@ -723,6 +722,8 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
                 pancardImg = kycMapImage.get("pancardImg").toString();
             if (kycMapImage.has("passportPhoto"))
                 passportPhoto = kycMapImage.get("passportPhoto").toString();
+            if (kycMapImage.has("otherdocumentphoto"))
+                otherdocumentphoto = kycMapImage.get("otherdocumentphoto").toString();
             if (kycMapImage.has("signPhoto"))
                 signPhoto = kycMapImage.get("signPhoto").toString();
             if (kycMapImage.has("shopPhoto"))
@@ -740,6 +741,7 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
             jsonObject.put("isKYCImageAvailable", "Y");
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
             jsonObject.put("passportPhoto", passportPhoto);
+            jsonObject.put("otherdocument", otherdocumentphoto);
             jsonObject.put("signPhoto", signPhoto);
             jsonObject.put("uploadFront", kycMapImage.get("uploadFront").toString());
             jsonObject.put("uploadBack", kycMapImage.get("uploadBack").toString());
@@ -780,6 +782,7 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
                 TextView self_photo = (TextView) findViewById(R.id.self_photo);
                 self_photo.setError("Please upload valid live image");
                 self_photo.requestFocus();
+                clickbtn();
                 return false;
             } else
                 return true;
@@ -791,33 +794,46 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
         if (!ImageUtils.commonNumber(input_number.getText().toString(), 10)) {
             input_number.setError("Please enter valid mobile number");
             input_number.requestFocus();
+            clickbtn();
             return false;
         } else if (!ImageUtils.commonRegex(input_name.getText().toString(), 150, ". ")) {
             input_name.setError("Please enter valid name");
             input_name.requestFocus();
+            clickbtn();
             return false;
         } else if (date1_text.getText().toString().isEmpty()) {
             Toast.makeText(KYCFormActivity.this, "Please select valid date of birth", Toast.LENGTH_SHORT).show();
             date1_text.setError("Please enter valid date");
             date1_text.requestFocus();
+            clickbtn();
             return false;
         } else if (customerType.equalsIgnoreCase("C") && date1_text.getText().toString().isEmpty()) {
             date1_text.setError("Please enter valid date");
             date1_text.requestFocus();
+            clickbtn();
+            return false;
+        } else if (customerType.equalsIgnoreCase("A") && passportphotoimage.getDrawable() == null) {
+            TextView documentfront = (TextView) findViewById(R.id.passportphoto);
+            documentfront.setError("Please upload valid passport side image");
+            documentfront.requestFocus();
+            clickbtn();
             return false;
         } else if (persons.equalsIgnoreCase("outside")) {
             if (!ImageUtils.commonRegex(input_comp.getText().toString(), 150, "0-9 .&")) {
                 input_comp.setError("Please enter valid company name");
                 input_comp.requestFocus();
+                clickbtn();
                 return false;
             } else if (!Patterns.EMAIL_ADDRESS.matcher(input_email.getText().toString()).matches()) {
                 input_email.setError("Please enter valid email address");
                 input_email.requestFocus();
+                clickbtn();
                 return false;
             } else if (!printDifference(mainDate(date1_text.getText().toString()))) {
                 Toast.makeText(KYCFormActivity.this, "Please select valid date of birth", Toast.LENGTH_SHORT).show();
                 date1_text.setError("Please enter valid date");
                 date1_text.requestFocus();
+                clickbtn();
                 return false;
             } else
                 return true;
@@ -829,35 +845,66 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
         if (!ImageUtils.commonAddress(input_address.getText().toString(), 250)) {
             input_address.setError("Please enter valid address");
             input_address.requestFocus();
+            clickbtn();
             return false;
         } else if (!ImageUtils.commonAddress(city_name.getText().toString(), 250)) {
             city_name.setError("Please enter valid city");
             city_name.requestFocus();
+            clickbtn();
             return false;
         } else if (select_state.getText().toString().equalsIgnoreCase("Select State")) {
             select_state.setError("Please enter valid state");
             select_state.requestFocus();
+            clickbtn();
             return false;
         } else if (pin_code.getText().toString().isEmpty() || pin_code.getText().toString().length() != 6) {
             pin_code.setError("Please enter valid pincode");
+            clickbtn();
             pin_code.requestFocus();
             return false;
         } else if (document_id.getText().toString().isEmpty()) {
             document_id.setError("Please enter valid DocumentID");
+            clickbtn();
             document_id.requestFocus();
             return false;
         } else if (documentfrontimage.getDrawable() == null) {
             TextView documentfront = (TextView) findViewById(R.id.documentfront);
             documentfront.setError("Please upload valid document front side image");
             documentfront.requestFocus();
+            clickbtn();
             return false;
         } else if (documentbackimage.getDrawable() == null) {
             TextView documentfront = (TextView) findViewById(R.id.documentback);
             documentfront.setError("Please upload valid document back side image");
             documentfront.requestFocus();
+            clickbtn();
             return false;
         } else
             return true;
+    }
+
+    private Boolean liveValidation() {
+        if (selfphoto.getDrawable() == null) {
+            TextView documentfront = (TextView) findViewById(R.id.self_photo);
+            documentfront.setError("Please upload live image");
+            documentfront.requestFocus();
+            clickbtn();
+            return false;
+        } else if (customerType.equalsIgnoreCase("A") && signphoto.getDrawable() == null) {
+            TextView documentfront = (TextView) findViewById(R.id.sign_photo);
+            documentfront.setError("Please upload sign image");
+            documentfront.requestFocus();
+            clickbtn();
+            return false;
+        } else
+            return true;
+    }
+
+    public void clickbtn() {
+        findViewById(R.id.sub_btn_verify).setClickable(true);
+        findViewById(R.id.sub_btn_address).setClickable(true);
+        findViewById(R.id.sub_btn_buisness).setClickable(true);
+        findViewById(R.id.sub_btn_present).setClickable(true);
     }
 
     private Boolean buisnessValidation() {
@@ -865,18 +912,27 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
             if (!pan_no.getText().toString().matches("^[A-Za-z]{5}[0-9]{4}[A-Za-z]{1}$")) {
                 pan_no.setError("Please enter valid pancard number");
                 pan_no.requestFocus();
+                clickbtn();
                 return false;
             } else if (panphoto.getDrawable() == null) {
                 TextView pan_photo = (TextView) findViewById(R.id.pan_photo);
                 pan_photo.setError("Please upload valid pancard image");
                 pan_photo.requestFocus();
+                clickbtn();
                 return false;
             } else if (gsin_no.getText().toString().length() != 0) {
                 if (!gsin_no.getText().toString().matches("^[0-9]{2}[a-zA-Z]{5}[0-9]{4}[a-zA-Z]{1}[0-9]{1}[a-zA-Z]{1}[a-z0-9A-Z]{1}$")) {
                     gsin_no.setError("Please upload valid data");
                     gsin_no.requestFocus();
+                    clickbtn();
                     return false;
                 }
+            } else if (shopPhoto.getDrawable() == null) {
+                TextView documentfront = (TextView) findViewById(R.id.shop_photo);
+                documentfront.setError("Please upload valid shop image");
+                documentfront.requestFocus();
+                clickbtn();
+                return false;
             } else
                 return true;
         } else if (persons.equalsIgnoreCase("internal")) {
@@ -884,12 +940,14 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
                 if (!pan_no.getText().toString().matches("^[A-Za-z]{5}[0-9]{4}[A-Za-z]{1}$")) {
                     pan_no.setError("Please upload valid pancard number");
                     pan_no.requestFocus();
+                    clickbtn();
                     return false;
                 } else if (pan_no.getText().toString().matches("^[A-Za-z]{5}[0-9]{4}[A-Za-z]{1}$")) {
                     if (panphoto.getDrawable() == null) {
                         TextView pan_photo = (TextView) findViewById(R.id.pan_photo);
                         pan_photo.setError("Please upload valid pancard image");
                         pan_photo.requestFocus();
+                        clickbtn();
                         return false;
                     } else
                         return true;
@@ -908,6 +966,12 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
                     setImage((ImageView) findViewById(R.id.passportphotoimage), 1, 0, data, "passportPhoto", (TextView) findViewById(R.id.passportphoto));
                 else if (requestCode == passportphoto2)
                     setImage((ImageView) findViewById(R.id.passportphotoimage), 0, 1, data, "passportPhoto", (TextView) findViewById(R.id.passportphoto));
+            }
+            if (requestCode == passportphoto3 || requestCode == passportphoto4) {
+                if (requestCode == passportphoto3)
+                    setImage((ImageView) findViewById(R.id.otherphotoimage), 1, 0, data, "otherdocumentphoto", (TextView) findViewById(R.id.otherdocumentphoto));
+                else if (requestCode == passportphoto4)
+                    setImage((ImageView) findViewById(R.id.otherphotoimage), 0, 1, data, "otherdocumentphoto", (TextView) findViewById(R.id.otherdocumentphoto));
             } else if (requestCode == DOCUMENT_FRONT1 || requestCode == DOCUMENT_FRONT2) {
                 if (requestCode == DOCUMENT_FRONT1)
                     setImage((ImageView) findViewById(R.id.documentfrontimage), 1, 0, data, "uploadFront", (TextView) findViewById(R.id.documentfront));
@@ -1253,9 +1317,13 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
                     intent.putExtra("documentID", documentID);
                     startActivity(intent);
                 }
-            }else {
+            } else if (object.getString("responseCode").equalsIgnoreCase("60147")) {
+                Toast.makeText(this,object.getString("responseCode"),Toast.LENGTH_LONG).show();
+                setBack_click1(this);
+            } else {
                 responseMSg(object);
             }
+            clickbtn();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -1265,6 +1333,7 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
     NewKYCPozo newKYCPozo;
     NewKycPersion newKycPersion;
     ArrayList<NewKYCPozo> newKYCPozos;
+
     private void insertPersonal(final JSONObject mapValue, final JSONObject mapPhoto, final String name, final String
             documentID, final String documentType, String customerType) {
         customProgessDialog = new CustomProgessDialog(KYCFormActivity.this);
@@ -1286,6 +1355,8 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
                     newKycPersion.setSCANTYPE(type);
                     if (mapPhoto.has("passportPhoto"))
                         newKycPersion.setPASSPORT_PHOTO(byteConvert(mapPhoto.getString("passportPhoto")));
+                    if (mapPhoto.has("otherdocumentphoto"))
+                        newKycPersion.setOTHERDOCUMENTPHOTO(byteConvert(mapPhoto.getString("otherdocumentphoto")));
                     if (type.equalsIgnoreCase("SCAN")) {
                         String scanImageName = "scanPhoto_" + mobileNo + ".jpg";
                         String pathScan = saveToInternalStorage(base64Convert(mapPhoto.getString("kycImage")), scanImageName);
@@ -1300,7 +1371,9 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
             }
         });
     }
+
     NewKycAddress newKycAddress;
+
     private void insertAddress(final JSONObject mapValue, final JSONObject mapPhoto, final String
             documentID, final String documentType, String customerType) {
         customProgessDialog = new CustomProgessDialog(KYCFormActivity.this);
@@ -1339,6 +1412,7 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
     }
 
     NewKycBusiness newKycBusiness;
+
     private void insertBuisness(final JSONObject mapValue, final JSONObject mapPhoto, final String
             documentID, final String documentType, String customerType) {
         customProgessDialog = new CustomProgessDialog(KYCFormActivity.this);
@@ -1371,6 +1445,7 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
     }
 
     NewKycVerification newKycVerification;
+
     private void insertVerify(final JSONObject mapValue, final JSONObject mapPhoto, final String
             documentID, final String documentType, String customerType) {
         customProgessDialog = new CustomProgessDialog(KYCFormActivity.this);

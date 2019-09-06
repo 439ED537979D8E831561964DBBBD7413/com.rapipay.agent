@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.rapipay.android.agent.Model.LienHistoryPozo;
 import com.rapipay.android.agent.R;
@@ -114,8 +115,12 @@ public class LienHistory extends BaseFragment implements WalletRequestHandler, V
                         insertLastTransDetails(object.getJSONArray("agentLienList"));
                     }
                 }
-            }else
+            } else if (object.getString("responseCode").equalsIgnoreCase("60147")) {
+                Toast.makeText(getActivity(),object.getString("responseCode"),Toast.LENGTH_LONG).show();
+                setBack_click1(getActivity());
+            } else
                 responseMSg(object);
+            rv.findViewById(R.id.btn_fund).setClickable(true);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -156,26 +161,32 @@ public class LienHistory extends BaseFragment implements WalletRequestHandler, V
     }
 
     @Override
+    public void onPause() {
+        rv.findViewById(R.id.btn_fund).setClickable(true);
+        super.onPause();
+    }
+
+    @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_fund:
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    if (date2_text.getText().toString().isEmpty()) {
-                        date2_text.setError("Please enter valid data");
-                        date2_text.requestFocus();
-                    } else if (date1_text.getText().toString().isEmpty()) {
-                        date1_text.setError("Please enter valid data");
-                        date1_text.requestFocus();
-                    } else if (printDifference(mainDate(date2_text.getText().toString()), mainDate(date1_text.getText().toString()))) {
+                v.findViewById(R.id.btn_fund).setClickable(false);
+                if (date2_text.getText().toString().isEmpty()) {
+                    date2_text.setError("Please enter valid data");
+                    date2_text.requestFocus();
+                    v.findViewById(R.id.btn_fund).setClickable(true);
+                } else if (date1_text.getText().toString().isEmpty()) {
+                    date1_text.setError("Please enter valid data");
+                    date1_text.requestFocus();
+                    v.findViewById(R.id.btn_fund).setClickable(true);
+                } else if (printDifference(mainDate(date2_text.getText().toString()), mainDate(date1_text.getText().toString()))) {
 //                    boolean checkval= date_Different(date2_text.getText().toString() ,date1_text.getText().toString(), 31);
 //                    if(!checkval) {
-                        loadUrl();
-                    } else
-                        customDialog_Common("Statement can only view from one month");
-//                }
+                    loadUrl();
+                } else {
+                    v.findViewById(R.id.btn_fund).setClickable(true);
+                    customDialog_Common("Statement can only view from one month");
                 }
-                handlercontrol();
                 break;
         }
     }

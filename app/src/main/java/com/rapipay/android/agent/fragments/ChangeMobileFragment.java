@@ -38,11 +38,12 @@ public class ChangeMobileFragment extends BaseFragment implements RequestHandler
     AppCompatButton sub_btn, sub_btn_oldotp, sub_btn_newotp;
     String otpRefId = null, orgTxnId = null;
     protected LocalStorage localStorage;
+    View rv;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        View rv = (View) inflater.inflate(R.layout.change_number_layout, container, false);
+        rv = (View) inflater.inflate(R.layout.change_number_layout, container, false);
         localStorage = LocalStorage.getInstance(getActivity());
         if (BaseCompactActivity.dbRealm != null && BaseCompactActivity.dbRealm.getDetails_Rapi())
             list = BaseCompactActivity.dbRealm.getDetails();
@@ -69,39 +70,45 @@ public class ChangeMobileFragment extends BaseFragment implements RequestHandler
         Intent intent = null;
         switch (v.getId()) {
             case R.id.sub_btn:
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    if (!ImageUtils.commonNumber(newmobileno.getText().toString(), 10)) {
-                        newmobileno.setError("Please enter valid data");
-                        newmobileno.requestFocus();
-                    } else
-                        new AsyncPostMethod(WebConfig.LOGIN_URL, request_user().toString(), headerData, ChangeMobileFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
-                }
-                handlercontrol();
+                sub_btn.setClickable(false);
+                if (!ImageUtils.commonNumber(newmobileno.getText().toString(), 10)) {
+                    newmobileno.setError("Please enter valid data");
+                    newmobileno.requestFocus();
+                    sub_btn.setClickable(true);
+                } else
+                    new AsyncPostMethod(WebConfig.LOGIN_URL, request_user().toString(), headerData, ChangeMobileFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
                 break;
             case R.id.sub_btn_oldotp:
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    if (!ImageUtils.commonNumber(oldotp.getText().toString(), 6)) {
-                        oldotp.setError("Please enter valid data");
-                        oldotp.requestFocus();
-                    } else
-                        new AsyncPostMethod(WebConfig.LOGIN_URL, oldRequest_user().toString(), headerData, ChangeMobileFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
-                }
-                handlercontrol();
+                sub_btn_oldotp.setClickable(false);
+                if (!ImageUtils.commonNumber(oldotp.getText().toString(), 6)) {
+                    oldotp.setError("Please enter valid data");
+                    oldotp.requestFocus();
+                    sub_btn_oldotp.setClickable(true);
+                } else
+                    new AsyncPostMethod(WebConfig.LOGIN_URL, oldRequest_user().toString(), headerData, ChangeMobileFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
                 break;
             case R.id.sub_btn_newotp:
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    if (!ImageUtils.commonNumber(newotp.getText().toString(), 6)) {
-                        newotp.setError("Please enter valid data");
-                        newotp.requestFocus();
-                    } else
-                        new AsyncPostMethod(WebConfig.LOGIN_URL, newRequest_user().toString(), headerData, ChangeMobileFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
-                }
-                handlercontrol();
+                sub_btn_newotp.setClickable(false);
+                if (!ImageUtils.commonNumber(newotp.getText().toString(), 6)) {
+                    newotp.setError("Please enter valid data");
+                    newotp.requestFocus();
+                    sub_btn_newotp.setClickable(true);
+                } else
+                    new AsyncPostMethod(WebConfig.LOGIN_URL, newRequest_user().toString(), headerData, ChangeMobileFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
                 break;
         }
+    }
+
+    public void clickable() {
+        sub_btn_newotp.setClickable(true);
+        rv.findViewById(R.id.sub_btn_oldotp).setClickable(true);
+        sub_btn.setClickable(true);
+    }
+
+    @Override
+    public void onPause() {
+        clickable();
+        super.onPause();
     }
 
     public JSONObject request_user() {
@@ -190,8 +197,14 @@ public class ChangeMobileFragment extends BaseFragment implements RequestHandler
                     Toast.makeText(getActivity(), object.getString("responseMessage"), Toast.LENGTH_SHORT).show();
                     new RouteClass(getActivity(), null, "", localStorage, "0");
                 }
-            }else
+            }else if (object.getString("responseCode").equalsIgnoreCase("60147")) {
+                Toast.makeText(getActivity(),object.getString("responseCode"),Toast.LENGTH_LONG).show();
+                setBack_click1(getActivity());
+            }  else
                 responseMSg(object);
+            sub_btn_newotp.setClickable(true);
+            sub_btn_oldotp.setClickable(true);
+            sub_btn.setClickable(true);
         } catch (Exception e) {
             e.printStackTrace();
         }

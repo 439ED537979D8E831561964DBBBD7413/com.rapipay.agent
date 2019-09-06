@@ -6,6 +6,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.AppCompatButton;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -105,11 +106,8 @@ public class PinActivity extends BaseCompactActivity implements View.OnClickList
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_login:
-                if (btnstatus == false) {
-                    btnstatus = true;
+                btn_login.setClickable(false);
                     new AsyncPostMethod(WebConfig.LOGIN_URL, getJson_Validate().toString(), "", PinActivity.this, getString(R.string.responseTimeOut)).execute();
-                }
-                handlercontrol();
                 break;
         }
     }
@@ -117,6 +115,7 @@ public class PinActivity extends BaseCompactActivity implements View.OnClickList
     @Override
     public void chechStatus(final JSONObject object) {
         try {
+            Log.e("GET_MASTER_DATA",object+"");
            rapiPayPozo = new RapiPayPozo();
             if (object.getString("responseCode").equalsIgnoreCase("200")) {
                 if (object.getString("serviceType").equalsIgnoreCase("ProcessHandsetRegistration")) {
@@ -174,10 +173,12 @@ public class PinActivity extends BaseCompactActivity implements View.OnClickList
                     localStorage.setActivityState(LocalStorage.ROUTESTATE, "PINVERIFIED");
                     customDialog_Common("KYCLAYOUTS", null, null, "Pin Registration", null, "Pin Registration Successful, Do you want to proceed ?", PinActivity.this);
                 }
-            }else {
+                btn_login.setClickable(true);
+            } else {
                 pinView.setText("");
                 confirmpinView.setText("");
                 otppinView.setText("");
+                btn_login.setClickable(true);
                 responseMSg(object);
             }
         } catch (Exception e) {
@@ -272,7 +273,6 @@ public class PinActivity extends BaseCompactActivity implements View.OnClickList
                 jsonObject.put("nodeAgentId", list.get(0).getMobilno());
                 jsonObject.put("sessionRefNo", list.get(0).getSessionRefNo());
                 jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getSession(), jsonObject.toString()));
-
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -304,7 +304,7 @@ public class PinActivity extends BaseCompactActivity implements View.OnClickList
         pinView.setText("");
         confirmpinView.setText("");
         otppinView.setText("");
-
+        btn_login.setClickable(true);
     }
 
     @Override

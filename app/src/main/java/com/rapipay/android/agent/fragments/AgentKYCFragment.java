@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.AppCompatButton;
 import android.text.InputFilter;
@@ -62,8 +63,8 @@ public class AgentKYCFragment extends BaseFragment implements RequestHandler, Vi
     String type = "MANUAL";
     private ArrayList<NewKycPersion> newKYCList_Personal = null;
     private ArrayList<NewKycAddress> newKYCList_Address = null;
-    private ArrayList<NewKycBusiness>  newKYCList_Buisness = null;
-    private ArrayList<NewKycVerification>  newKYCList_Verify = null;
+    private ArrayList<NewKycBusiness> newKYCList_Buisness = null;
+    private ArrayList<NewKycVerification> newKYCList_Verify = null;
     protected String headerData = (WebConfig.BASIC_USERID + ":" + WebConfig.BASIC_PASSWORD);
     private View rv = null;
     ArrayList<String> stcondition;
@@ -134,199 +135,203 @@ public class AgentKYCFragment extends BaseFragment implements RequestHandler, Vi
 
     }
 
+    public void clikable() {
+        sub_btn.setClickable(true);
+        rv.findViewById(R.id.scan_btn).setClickable(true);
+        rv.findViewById(R.id.manual_btn).setClickable(true);
+        rv.findViewById(R.id.prsnl_btn).setClickable(true);
+        rv.findViewById(R.id.adrs_btn).setClickable(true);
+        rv.findViewById(R.id.business_btn).setClickable(true);
+        rv.findViewById(R.id.verification_btn).setClickable(true);
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        clikable();
+        super.onSaveInstanceState(outState);
+    }
+
     @Override
     public void onClick(View v) {
         Intent intent = null;
         switch (v.getId()) {
             case R.id.sub_btn:
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    if (!ImageUtils.commonNumber(mobile_no.getText().toString(), 10)) {
-                        mobile_no.setError("Please enter valid data");
-                        mobile_no.requestFocus();
-                    } else if (spinner_value.isEmpty())
-                        Toast.makeText(getActivity(), "Please Select document type", Toast.LENGTH_SHORT).show();
-                    else if (spinner_value.equalsIgnoreCase("Aadhar Card") && (documentid.getText().toString().isEmpty() || documentid.getText().toString().length() != 12)) {
-                        documentid.setError("Please enter valid data");
-                        documentid.requestFocus();
-                    } else if (spinner_value.equalsIgnoreCase("Aadhar Card") && !ImageUtils.validateVerhoeff(documentid.getText().toString())) {
-                        documentid.setError("Please enter valid Aadhar Number");
-                        documentid.requestFocus();
-                    } else if (spinner_value.equalsIgnoreCase("Voter Id Card") && (documentid.getText().toString().isEmpty() || documentid.getText().toString().length() != 10)) {
-                        documentid.setError("Please enter valid data");
-                        documentid.requestFocus();
-                    } else if (spinner_value.equalsIgnoreCase("Passport") && !documentid.getText().toString().matches("^[A-Z]{1}-[0-9]{7}$")) {
-                        documentid.setError("Please enter valid data");
-                        documentid.requestFocus();
-                    } else if (documentid.getText().toString().isEmpty()) {
-                        documentid.setError("Please enter valid data");
-                        documentid.requestFocus();
-                    } else
-                        new AsyncPostMethod(WebConfig.EKYC, request_user(customerType).toString(), headerData, AgentKYCFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
+                sub_btn.setClickable(false);
+                if (!ImageUtils.commonNumber(mobile_no.getText().toString(), 10)) {
+                    mobile_no.setError("Please enter valid data");
+                    mobile_no.requestFocus();
+                    sub_btn.setClickable(true);
+                } else if (spinner_value.isEmpty())
+                    Toast.makeText(getActivity(), "Please Select document type", Toast.LENGTH_SHORT).show();
+                else if (spinner_value.equalsIgnoreCase("Aadhar Card") && (documentid.getText().toString().isEmpty() || documentid.getText().toString().length() != 12)) {
+                    documentid.setError("Please enter valid data");
+                    documentid.requestFocus();
+                    sub_btn.setClickable(true);
+                } else if (spinner_value.equalsIgnoreCase("Aadhar Card") && !ImageUtils.validateVerhoeff(documentid.getText().toString())) {
+                    documentid.setError("Please enter valid Aadhar Number");
+                    documentid.requestFocus();
+                    sub_btn.setClickable(true);
+                } else if (spinner_value.equalsIgnoreCase("Voter Id Card") && (documentid.getText().toString().isEmpty() || documentid.getText().toString().length() != 10)) {
+                    documentid.setError("Please enter valid data");
+                    documentid.requestFocus();
+                    sub_btn.setClickable(true);
+                } else if (spinner_value.equalsIgnoreCase("Passport") && !documentid.getText().toString().matches("^[A-Z]{1}-[0-9]{7}$")) {
+                    documentid.setError("Please enter valid data");
+                    documentid.requestFocus();
+                    sub_btn.setClickable(true);
+                } else if (documentid.getText().toString().isEmpty()) {
+                    documentid.setError("Please enter valid data");
+                    documentid.requestFocus();
+                    sub_btn.setClickable(true);
+                } else {
+                    new AsyncPostMethod(WebConfig.EKYC, request_user(customerType).toString(), headerData, AgentKYCFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
+                    sub_btn.setClickable(false);
                 }
-                handlercontrol();
                 break;
             case R.id.scan_btn:
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    type = "SCAN";
-                    mobile_no.setEnabled(false);
-                    documentid.setEnabled(false);
-                    spinner.setEnabled(false);
-                    spinner.setClickable(false);
-                    intent = new Intent(getActivity(), BarcodeActivity.class);
-                    intent.putExtra("type", TYPE);
-                    startActivityForResult(intent, 1);
-                }
-                handlercontrol();
+                rv.findViewById(R.id.scan_btn).setClickable(false);
+                type = "SCAN";
+                mobile_no.setEnabled(false);
+                documentid.setEnabled(false);
+                spinner.setEnabled(false);
+                spinner.setClickable(false);
+                intent = new Intent(getActivity(), BarcodeActivity.class);
+                intent.putExtra("type", TYPE);
+                startActivityForResult(intent, 1);
                 break;
             case R.id.manual_btn:
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    type = "MANUAL";
-                    mobile_no.setEnabled(false);
-                    documentid.setEnabled(false);
-                    spinner.setEnabled(false);
-                    spinner.setClickable(false);
-                    scan_data.setVisibility(View.GONE);
-                    jsonObject = null;
-                    kyc_layout_bottom.setVisibility(View.VISIBLE);
-                }
-                handlercontrol();
+                rv.findViewById(R.id.manual_btn).setClickable(false);
+                type = "MANUAL";
+                mobile_no.setEnabled(false);
+                documentid.setEnabled(false);
+                spinner.setEnabled(false);
+                spinner.setClickable(false);
+                scan_data.setVisibility(View.GONE);
+                jsonObject = null;
+                kyc_layout_bottom.setVisibility(View.VISIBLE);
                 break;
             case R.id.prsnl_btn:
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    scan = false;
-                    intent = new Intent(getActivity(), KYCFormActivity.class);
-                    intent.putExtra("type", type);
-                    intent.putExtra("persons", TYPE);
-                    intent.putExtra("button", "personal");
-                    intent.putExtra("customerType", customerType);
-                    if (newKYCList_Personal != null && newKYCList_Personal.size() != 0) {
-                        intent.putExtra("localPersonal", "true");
-                        if (newKYCList_Address != null && newKYCList_Address.size() != 0) {
-                            intent.putExtra("localAddress", "true");
-                            if (newKYCList_Buisness != null && newKYCList_Buisness.size() != 0) {
-                                intent.putExtra("localBusiness", "true");
-                                if (newKYCList_Verify != null && newKYCList_Verify.size() != 0)
-                                    intent.putExtra("localVerify", "true");
-                                else
-                                    intent.putExtra("localVerify", "false");
-                            } else
-                                intent.putExtra("localBusiness", "false");
+                rv.findViewById(R.id.prsnl_btn).setClickable(false);
+                scan = false;
+                intent = new Intent(getActivity(), KYCFormActivity.class);
+                rv.findViewById(R.id.manual_btn).setClickable(true);
+                intent.putExtra("type", type);
+                intent.putExtra("persons", TYPE);
+                intent.putExtra("button", "personal");
+                intent.putExtra("customerType", customerType);
+                if (newKYCList_Personal != null && newKYCList_Personal.size() != 0) {
+                    intent.putExtra("localPersonal", "true");
+                    if (newKYCList_Address != null && newKYCList_Address.size() != 0) {
+                        intent.putExtra("localAddress", "true");
+                        if (newKYCList_Buisness != null && newKYCList_Buisness.size() != 0) {
+                            intent.putExtra("localBusiness", "true");
+                            if (newKYCList_Verify != null && newKYCList_Verify.size() != 0)
+                                intent.putExtra("localVerify", "true");
+                            else
+                                intent.putExtra("localVerify", "false");
                         } else
-                            intent.putExtra("localAddress", "false");
+                            intent.putExtra("localBusiness", "false");
                     } else
-                        intent.putExtra("localPersonal", "false");
-                    intent.putExtra("mobileNo", mobile_no.getText().toString());
-                    if (jsonObject != null) {
-                        intent.putExtra("scandata", jsonObject.toString());
-                    }
-                    intent.putExtra("documentType", spinner_value);
-                    intent.putExtra("documentID", documentid.getText().toString());
-                    startActivityForResult(intent, 2);
+                        intent.putExtra("localAddress", "false");
+                } else
+                    intent.putExtra("localPersonal", "false");
+                intent.putExtra("mobileNo", mobile_no.getText().toString());
+                if (jsonObject != null) {
+                    intent.putExtra("scandata", jsonObject.toString());
                 }
-                handlercontrol();
+                intent.putExtra("documentType", spinner_value);
+                intent.putExtra("documentID", documentid.getText().toString());
+                startActivityForResult(intent, 2);
                 break;
             case R.id.adrs_btn:
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    intent = new Intent(getActivity(), KYCFormActivity.class);
-                    intent.putExtra("type", type);
-                    intent.putExtra("persons", TYPE);
-                    intent.putExtra("button", "address");
-                    intent.putExtra("customerType", customerType);
-                    intent.putExtra("mobileNo", mobile_no.getText().toString());
-                    if (newKYCList_Personal != null && newKYCList_Personal.size() != 0) {
-                        intent.putExtra("localPersonal", "true");
-                        if (newKYCList_Address != null && newKYCList_Address.size() != 0) {
-                            intent.putExtra("localAddress", "true");
-                            if (newKYCList_Buisness != null && newKYCList_Buisness.size() != 0) {
-                                intent.putExtra("localBusiness", "true");
-                                if (newKYCList_Verify != null && newKYCList_Verify.size() != 0)
-                                    intent.putExtra("localVerify", "true");
-                                else
-                                    intent.putExtra("localVerify", "false");
-                            } else
-                                intent.putExtra("localBusiness", "false");
+                rv.findViewById(R.id.adrs_btn).setClickable(false);
+                intent = new Intent(getActivity(), KYCFormActivity.class);
+                intent.putExtra("type", type);
+                intent.putExtra("persons", TYPE);
+                intent.putExtra("button", "address");
+                intent.putExtra("customerType", customerType);
+                intent.putExtra("mobileNo", mobile_no.getText().toString());
+                if (newKYCList_Personal != null && newKYCList_Personal.size() != 0) {
+                    intent.putExtra("localPersonal", "true");
+                    if (newKYCList_Address != null && newKYCList_Address.size() != 0) {
+                        intent.putExtra("localAddress", "true");
+                        if (newKYCList_Buisness != null && newKYCList_Buisness.size() != 0) {
+                            intent.putExtra("localBusiness", "true");
+                            if (newKYCList_Verify != null && newKYCList_Verify.size() != 0)
+                                intent.putExtra("localVerify", "true");
+                            else
+                                intent.putExtra("localVerify", "false");
                         } else
-                            intent.putExtra("localAddress", "false");
+                            intent.putExtra("localBusiness", "false");
                     } else
-                        intent.putExtra("localPersonal", "false");
-                    if (jsonObject != null) {
-                        intent.putExtra("scandata", jsonObject.toString());
-                    }
-                    intent.putExtra("documentType", spinner_value);
-                    intent.putExtra("documentID", documentid.getText().toString());
-                    startActivityForResult(intent, 2);
+                        intent.putExtra("localAddress", "false");
+                } else
+                    intent.putExtra("localPersonal", "false");
+                if (jsonObject != null) {
+                    intent.putExtra("scandata", jsonObject.toString());
                 }
-                handlercontrol();
+                intent.putExtra("documentType", spinner_value);
+                intent.putExtra("documentID", documentid.getText().toString());
+                startActivityForResult(intent, 2);
                 break;
             case R.id.business_btn:
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    intent = new Intent(getActivity(), KYCFormActivity.class);
-                    intent.putExtra("type", type);
-                    intent.putExtra("persons", TYPE);
-                    intent.putExtra("button", "buisness");
-                    intent.putExtra("customerType", customerType);
-                    intent.putExtra("mobileNo", mobile_no.getText().toString());
-                    intent.putExtra("documentType", spinner_value);
-                    intent.putExtra("documentID", documentid.getText().toString());
-                    if (newKYCList_Personal != null && newKYCList_Personal.size() != 0) {
-                        intent.putExtra("localPersonal", "true");
-                        if (newKYCList_Address != null && newKYCList_Address.size() != 0) {
-                            intent.putExtra("localAddress", "true");
-                            if (newKYCList_Buisness != null && newKYCList_Buisness.size() != 0) {
-                                intent.putExtra("localBusiness", "true");
-                                if (newKYCList_Verify != null && newKYCList_Verify.size() != 0)
-                                    intent.putExtra("localVerify", "true");
-                                else
-                                    intent.putExtra("localVerify", "false");
-                            } else
-                                intent.putExtra("localBusiness", "false");
+                rv.findViewById(R.id.business_btn).setClickable(false);
+                intent = new Intent(getActivity(), KYCFormActivity.class);
+                intent.putExtra("type", type);
+                intent.putExtra("persons", TYPE);
+                intent.putExtra("button", "buisness");
+                intent.putExtra("customerType", customerType);
+                intent.putExtra("mobileNo", mobile_no.getText().toString());
+                intent.putExtra("documentType", spinner_value);
+                intent.putExtra("documentID", documentid.getText().toString());
+                if (newKYCList_Personal != null && newKYCList_Personal.size() != 0) {
+                    intent.putExtra("localPersonal", "true");
+                    if (newKYCList_Address != null && newKYCList_Address.size() != 0) {
+                        intent.putExtra("localAddress", "true");
+                        if (newKYCList_Buisness != null && newKYCList_Buisness.size() != 0) {
+                            intent.putExtra("localBusiness", "true");
+                            if (newKYCList_Verify != null && newKYCList_Verify.size() != 0)
+                                intent.putExtra("localVerify", "true");
+                            else
+                                intent.putExtra("localVerify", "false");
                         } else
-                            intent.putExtra("localAddress", "false");
+                            intent.putExtra("localBusiness", "false");
                     } else
-                        intent.putExtra("localPersonal", "false");
-                    startActivityForResult(intent, 2);
-                }
-                handlercontrol();
+                        intent.putExtra("localAddress", "false");
+                } else
+                    intent.putExtra("localPersonal", "false");
+                startActivityForResult(intent, 2);
                 break;
             case R.id.verification_btn:
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    intent = new Intent(getActivity(), KYCFormActivity.class);
-                    intent.putExtra("type", type);
-                    intent.putExtra("persons", TYPE);
-                    intent.putExtra("customerType", customerType);
-                    intent.putExtra("button", "verification");
-                    intent.putExtra("mobileNo", mobile_no.getText().toString());
-                    intent.putExtra("documentType", spinner_value);
-                    intent.putExtra("documentID", documentid.getText().toString());
+                rv.findViewById(R.id.verification_btn).setClickable(false);
+                intent = new Intent(getActivity(), KYCFormActivity.class);
+                intent.putExtra("type", type);
+                intent.putExtra("persons", TYPE);
+                intent.putExtra("customerType", customerType);
+                intent.putExtra("button", "verification");
+                intent.putExtra("mobileNo", mobile_no.getText().toString());
+                intent.putExtra("documentType", spinner_value);
+                intent.putExtra("documentID", documentid.getText().toString());
+                intent.putExtra("localPersonal", "true");
+                intent.putExtra("localAddress", "true");
+                intent.putExtra("localBusiness", "true");
+                if (newKYCList_Personal != null && newKYCList_Personal.size() != 0) {
                     intent.putExtra("localPersonal", "true");
-                    intent.putExtra("localAddress", "true");
-                    intent.putExtra("localBusiness", "true");
-                    if (newKYCList_Personal != null && newKYCList_Personal.size() != 0) {
-                        intent.putExtra("localPersonal", "true");
-                        if (newKYCList_Address != null && newKYCList_Address.size() != 0) {
-                            intent.putExtra("localAddress", "true");
-                            if (newKYCList_Buisness != null && newKYCList_Buisness.size() != 0) {
-                                intent.putExtra("localBusiness", "true");
-                                if (newKYCList_Verify != null && newKYCList_Verify.size() != 0)
-                                    intent.putExtra("localVerify", "true");
-                                else
-                                    intent.putExtra("localVerify", "false");
-                            } else
-                                intent.putExtra("localBusiness", "false");
+                    if (newKYCList_Address != null && newKYCList_Address.size() != 0) {
+                        intent.putExtra("localAddress", "true");
+                        if (newKYCList_Buisness != null && newKYCList_Buisness.size() != 0) {
+                            intent.putExtra("localBusiness", "true");
+                            if (newKYCList_Verify != null && newKYCList_Verify.size() != 0)
+                                intent.putExtra("localVerify", "true");
+                            else
+                                intent.putExtra("localVerify", "false");
                         } else
-                            intent.putExtra("localAddress", "false");
+                            intent.putExtra("localBusiness", "false");
                     } else
-                        intent.putExtra("localPersonal", "false");
-                    startActivityForResult(intent, 2);
-                }
-                handlercontrol();
+                        intent.putExtra("localAddress", "false");
+                } else
+                    intent.putExtra("localPersonal", "false");
+                startActivityForResult(intent, 2);
                 break;
         }
     }
@@ -338,6 +343,7 @@ public class AgentKYCFragment extends BaseFragment implements RequestHandler, Vi
             resumeCall();
         }
     }
+
     private void resumeCall() {
         //  String condition = "where " + RapipayRealmDB.MOBILENO + "='" + mobile_no.getText().toString() + "'" + " AND " + RapipayRealmDB.DOCUMENTTYPE + "='" + spinner_value + "'" + " AND " + RapipayRealmDB.DOCUMENTID + "='" + documentid.getText().toString() + "'";
         stcondition = new ArrayList<>();
@@ -380,6 +386,7 @@ public class AgentKYCFragment extends BaseFragment implements RequestHandler, Vi
             showcon();
         }
     }
+
     public void showcon() {
         scan_data.setVisibility(View.GONE);
         sub_btn.setVisibility(View.VISIBLE);
@@ -486,9 +493,13 @@ public class AgentKYCFragment extends BaseFragment implements RequestHandler, Vi
                         hideKeyboard(getActivity());
                     }
                 }
-            }else{
+            }else if (object.getString("responseCode").equalsIgnoreCase("60147")) {
+                Toast.makeText(getActivity(),object.getString("responseCode"),Toast.LENGTH_LONG).show();
+                setBack_click1(getActivity());
+            }  else {
                 responseMSg(object);
             }
+            sub_btn.setClickable(true);
         } catch (Exception e) {
             e.printStackTrace();
         }

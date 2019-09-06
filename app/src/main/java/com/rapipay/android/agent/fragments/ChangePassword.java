@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.rapipay.android.agent.Database.RapipayDB;
 import com.rapipay.android.agent.Model.RapiPayPozo;
@@ -62,25 +63,32 @@ public class ChangePassword extends BaseFragment implements RequestHandler, View
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_login:
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    if (otppinView.getText().toString().isEmpty()) {
-                        otppinView.setError("Please enter current password");
-                        otppinView.requestFocus();
-                    } else if (pinView.getText().toString().isEmpty()) {
-                        pinView.setError("Please enter new password");
-                        pinView.requestFocus();
-                    } else if (confirmpinView.getText().toString().isEmpty()) {
-                        confirmpinView.setError("Please confirm new password");
-                        confirmpinView.requestFocus();
-                    } else if (!pinView.getText().toString().equalsIgnoreCase(confirmpinView.getText().toString()))
-                        pinView.setError("New and Confirm password cannot be different");
-                    else
-                        new AsyncPostMethod(WebConfig.LOGIN_URL, getJson_Validate().toString(), "", ChangePassword.this, getActivity(), getString(R.string.responseTimeOut)).execute();
-                }
-                handlercontrol();
+                btn_login.setClickable(false);
+                if (otppinView.getText().toString().isEmpty()) {
+                    otppinView.setError("Please enter current password");
+                    otppinView.requestFocus();
+                    btn_login.setClickable(true);
+                } else if (pinView.getText().toString().isEmpty()) {
+                    pinView.setError("Please enter new password");
+                    pinView.requestFocus();
+                    btn_login.setClickable(true);
+                } else if (confirmpinView.getText().toString().isEmpty()) {
+                    confirmpinView.setError("Please confirm new password");
+                    confirmpinView.requestFocus();
+                    btn_login.setClickable(true);
+                } else if (!pinView.getText().toString().equalsIgnoreCase(confirmpinView.getText().toString())) {
+                    pinView.setError("New and Confirm password cannot be different");
+                    btn_login.setClickable(true);
+                } else
+                    new AsyncPostMethod(WebConfig.LOGIN_URL, getJson_Validate().toString(), "", ChangePassword.this, getActivity(), getString(R.string.responseTimeOut)).execute();
                 break;
         }
+    }
+
+    @Override
+    public void onPause() {
+        btn_login.setClickable(true);
+        super.onPause();
     }
 
     public JSONObject getJson_Validate() {
@@ -121,8 +129,12 @@ public class ChangePassword extends BaseFragment implements RequestHandler, View
                 if (object.getString("serviceType").equalsIgnoreCase("CHANGE_PASSWORD")) {
                     customDialog_Ben("Password Change", object.getString("responseMessage"));
                 }
-            }else
+            } else if (object.getString("responseCode").equalsIgnoreCase("60147")) {
+                Toast.makeText(getActivity(), object.getString("responseCode"), Toast.LENGTH_LONG).show();
+                setBack_click1(getActivity());
+            } else
                 responseMSg(object);
+            btn_login.setClickable(true);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -161,5 +173,18 @@ public class ChangePassword extends BaseFragment implements RequestHandler, View
         dialog.show();
         Window window = dialog.getWindow();
         window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+    }
+
+    protected void deleteTables(String type) {
+        SQLiteDatabase dba = BaseCompactActivity.db.getWritableDatabase();
+        dba.execSQL("delete from " + RapipayDB.TABLE_BANK);
+        dba.execSQL("delete from " + RapipayDB.TABLE_PAYMENT);
+        dba.execSQL("delete from " + RapipayDB.TABLE_STATE);
+        dba.execSQL("delete from " + RapipayDB.TABLE_OPERATOR);
+        dba.execSQL("delete from " + RapipayDB.TABLE_FOOTER);
+        dba.execSQL("delete from " + RapipayDB.TABLE_TRANSFERLIST);
+        dba.execSQL("delete from " + RapipayDB.TABLE_PAYERPAYEE);
+        if (!type.equalsIgnoreCase(""))
+            dba.execSQL("delete from " + RapipayDB.TABLE_NAME);
     }
 }

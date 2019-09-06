@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.rapipay.android.agent.Model.NetworkTransferPozo;
 import com.rapipay.android.agent.R;
@@ -125,7 +126,10 @@ public class FOSTransFrag extends BaseFragment implements RequestHandler {
                         }
                     }
                 }
-            }else
+            } else if (object.getString("responseCode").equalsIgnoreCase("60147")) {
+                Toast.makeText(getActivity(), object.getString("responseCode"), Toast.LENGTH_LONG).show();
+                setBack_click1(getActivity());
+            } else
                 responseMSg(object);
         } catch (Exception e) {
             e.printStackTrace();

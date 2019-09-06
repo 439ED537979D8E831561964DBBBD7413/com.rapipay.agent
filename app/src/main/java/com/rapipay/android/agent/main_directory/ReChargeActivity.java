@@ -80,7 +80,7 @@ public class ReChargeActivity extends BaseCompactActivity implements View.OnClic
                     String condition = operator_clicked;
                     ArrayList<String> list_operator = new ArrayList<>();
                     ArrayList<TbRechargePozo> list_operator1 = dbRealm.getOperatorDetail(condition);
-                    for(int i=0; i<list_operator1.size(); i++){
+                    for (int i = 0; i < list_operator1.size(); i++) {
                         list_operator.add(list_operator1.get(i).getOperatorsData());
                     }
                     customSpinner(select_operator, "Select Operator", list_operator);
@@ -116,11 +116,11 @@ public class ReChargeActivity extends BaseCompactActivity implements View.OnClic
 
             @Override
             public void afterTextChanged(Editable s) {
-                if (s.length()!=0 && s.length()<10) {
+                if (s.length() != 0 && s.length() < 10) {
                     input_text.setText("");
-                    input_text.setText(EnglishNumberToWords.convert(Integer.parseInt(s.toString()))+" rupee");
+                    input_text.setText(EnglishNumberToWords.convert(Integer.parseInt(s.toString())) + " rupee");
                     input_text.setVisibility(View.VISIBLE);
-                }else
+                } else
                     input_text.setVisibility(View.GONE);
             }
         });
@@ -134,54 +134,65 @@ public class ReChargeActivity extends BaseCompactActivity implements View.OnClic
                 finish();
                 break;
             case R.id.btn_contact:
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    loadIMEI();
-                }
-                handlercontrol();
+                btn_contact.setClickable(false);
+                loadIMEI();
                 break;
             case R.id.btn_submit:
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    if (operator_clicked.equalsIgnoreCase("DTH")) {
-                        if (!ImageUtils.commonAccount(input_number.getText().toString(), 8, 15)) {
-                            input_number.setError("Please enter valid mobile number");
-                            input_number.requestFocus();
-                        } else if (!ImageUtils.commonAmount(input_amount.getText().toString())) {
-                            input_amount.setError("Please enter valid data");
-                            input_amount.requestFocus();
-                        } else if (select_operator.getText().toString().equalsIgnoreCase("Select Operator"))
-                            select_operator.setError("Please enter mandatory field");
-                        else if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && (newtpin.getText().toString().isEmpty() || newtpin.getText().toString().length() != 4)) {
-                            newtpin.setError("Please enter TPIN");
-                            newtpin.requestFocus();
-                        } else if (BaseCompactActivity.ENABLE_TPIN != null && (BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && newtpin.getText().toString().length() == 4) || BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("N"))
-                            new AsyncPostMethod(WebConfig.RECHARGENEW, reCharge_request().toString(), headerData, ReChargeActivity.this, "Response Time Out.Please Check your Transaction leadger or Contact Customer Support ... \\n\n" +
-                                    "  Recharge Number  -" + input_number.getText().toString() + "\n" +
-                                    "  Amount -" + input_amount.getText().toString() + "\n" +
-                                    "  Operater -" + select_operator.getText().toString() + "\n").execute();
-                    } else if (operator_clicked.equalsIgnoreCase("PRE") || operator_clicked.equalsIgnoreCase("POST") || operator_clicked.equalsIgnoreCase("MOBILE")) {
-                        if (!ImageUtils.commonNumber(input_number.getText().toString(), 10)) {
-                            input_number.setError("Please enter valid mobile number");
-                            input_number.requestFocus();
-                        } else if (!ImageUtils.commonAmount(input_amount.getText().toString())) {
-                            input_amount.setError("Please enter valid data");
-                            input_amount.requestFocus();
-                        } else if (select_operator.getText().toString().equalsIgnoreCase("Select Operator"))
-                            select_operator.setError("Please enter mandatory field");
-                        else if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && (newtpin.getText().toString().isEmpty() || newtpin.getText().toString().length() != 4)) {
-                            newtpin.setError("Please enter TPIN");
-                            newtpin.requestFocus();
-                        } else if (BaseCompactActivity.ENABLE_TPIN != null && (BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && newtpin.getText().toString().length() == 4) || BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("N"))
-                            new AsyncPostMethod(WebConfig.RECHARGENEW, reCharge_request().toString(), headerData, ReChargeActivity.this, "Response Time Out.Please Check your Transaction leadger or Contact Customer Support ... \\n\n" +
-                                    "  Recharge Number  -" + input_number.getText().toString() + "\n" +
-                                    "  Amount -" + input_amount.getText().toString() + "\n" +
-                                    "  Operater -" + select_operator.getText().toString() + "\n").execute();
-                    }
+                v.findViewById(R.id.btn_submit).setClickable(false);
+                if (operator_clicked.equalsIgnoreCase("DTH")) {
+                    if (!ImageUtils.commonAccount(input_number.getText().toString(), 8, 15)) {
+                        input_number.setError("Please enter valid mobile number");
+                        input_number.requestFocus();
+                        v.findViewById(R.id.btn_submit).setClickable(false);
+                    } else if (!ImageUtils.commonAmount(input_amount.getText().toString())) {
+                        input_amount.setError("Please enter valid data");
+                        input_amount.requestFocus();
+                        v.findViewById(R.id.btn_submit).setClickable(false);
+                    } else if (select_operator.getText().toString().equalsIgnoreCase("Select Operator"))
+                        select_operator.setError("Please enter mandatory field");
+                    else if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && (newtpin.getText().toString().isEmpty() || newtpin.getText().toString().length() != 4)) {
+                        newtpin.setError("Please enter TPIN");
+                        newtpin.requestFocus();
+                        v.findViewById(R.id.btn_submit).setClickable(false);
+                    } else if (BaseCompactActivity.ENABLE_TPIN != null && (BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && newtpin.getText().toString().length() == 4) || BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("N"))
+                        new AsyncPostMethod(WebConfig.RECHARGENEW, reCharge_request().toString(), headerData, ReChargeActivity.this, "Response Time Out.Please Check your Transaction leadger or Contact Customer Support ... \\n\n" +
+                                "  Recharge Number  -" + input_number.getText().toString() + "\n" +
+                                "  Amount -" + input_amount.getText().toString() + "\n" +
+                                "  Operater -" + select_operator.getText().toString() + "\n").execute();
+                } else if (operator_clicked.equalsIgnoreCase("PRE") || operator_clicked.equalsIgnoreCase("POST") || operator_clicked.equalsIgnoreCase("MOBILE")) {
+                    if (!ImageUtils.commonNumber(input_number.getText().toString(), 10)) {
+                        input_number.setError("Please enter valid mobile number");
+                        input_number.requestFocus();
+                        v.findViewById(R.id.btn_submit).setClickable(false);
+                    } else if (!ImageUtils.commonAmount(input_amount.getText().toString())) {
+                        input_amount.setError("Please enter valid data");
+                        input_amount.requestFocus();
+                        v.findViewById(R.id.btn_submit).setClickable(false);
+                    } else if (select_operator.getText().toString().equalsIgnoreCase("Select Operator"))
+                        select_operator.setError("Please enter mandatory field");
+                    else if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && (newtpin.getText().toString().isEmpty() || newtpin.getText().toString().length() != 4)) {
+                        newtpin.setError("Please enter TPIN");
+                        newtpin.requestFocus();
+                        v.findViewById(R.id.btn_submit).setClickable(false);
+                    } else if (BaseCompactActivity.ENABLE_TPIN != null && (BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && newtpin.getText().toString().length() == 4) || BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("N"))
+                        new AsyncPostMethod(WebConfig.RECHARGENEW, reCharge_request().toString(), headerData, ReChargeActivity.this, "Response Time Out.Please Check your Transaction leadger or Contact Customer Support ... \\n\n" +
+                                "  Recharge Number  -" + input_number.getText().toString() + "\n" +
+                                "  Amount -" + input_amount.getText().toString() + "\n" +
+                                "  Operater -" + select_operator.getText().toString() + "\n").execute();
                 }
-                handlercontrol();
                 break;
         }
+    }
+
+    public void clickable() {
+        btn_contact.setClickable(true);
+        findViewById(R.id.btn_submit).setClickable(true);
+    }
+
+    @Override
+    protected void onPause() {
+        clickable();
+        super.onPause();
     }
 
     public JSONObject reCharge_request() {
@@ -247,9 +258,13 @@ public class ReChargeActivity extends BaseCompactActivity implements View.OnClic
                         }
                 }
                 clear();
-            }else {
+            } else if (object.getString("responseCode").equalsIgnoreCase("60147")) {
+                Toast.makeText(this,object.getString("responseCode"),Toast.LENGTH_LONG).show();
+                setBack_click1(this);
+            } else {
                 responseMSg(object);
             }
+            findViewById(R.id.btn_submit).setClickable(true);
         } catch (Exception e) {
             e.printStackTrace();
         }

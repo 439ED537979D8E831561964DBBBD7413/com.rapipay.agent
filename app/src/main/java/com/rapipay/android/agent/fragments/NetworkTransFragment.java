@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.AppCompatButton;
 import android.text.Editable;
@@ -68,7 +69,7 @@ public class NetworkTransFragment extends BaseFragment implements RequestHandler
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         rv = (View) inflater.inflate(R.layout.network_fragment_layout, container, false);
         initialize(rv);
-        if (BaseCompactActivity.dbRealm != null && BaseCompactActivity.dbRealm.getDetails_Rapi()){
+        if (BaseCompactActivity.dbRealm != null && BaseCompactActivity.dbRealm.getDetails_Rapi()) {
             list = BaseCompactActivity.dbRealm.getDetails();
             loadApi();
         } else
@@ -97,17 +98,21 @@ public class NetworkTransFragment extends BaseFragment implements RequestHandler
     private void initialize(View rv) {
         header = (TextView) rv.findViewById(R.id.header);
         header.setVisibility(View.GONE);
+        heading = getActivity().findViewById(R.id.toolbar_title);
+        if (balance != null) {
+            heading.setText("Credit to Network" + " (Balance : Rs." + balance + ")");
+        } else {
+            heading.setText("Credit to Network");
+        }
         last_tran_layout = (LinearLayout) rv.findViewById(R.id.last_tran_layout);
         trans_details = (ListView) rv.findViewById(R.id.trans_details);
         searchfield = (EditText) rv.findViewById(R.id.searchfield);
         trans_details.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    pozoClick = transactionPozoArrayList.get(position);
-                    customDialog_Ben(transactionPozoArrayList.get(position), "Network Transfer", "BENLAYOUT", pozoClick.getConsentStatus(), "Credit To Network");
-                }handlercontrol();
+                trans_details.setEnabled(false);
+                pozoClick = transactionPozoArrayList.get(position);
+                customDialog_Ben(transactionPozoArrayList.get(position), "Network Transfer", "BENLAYOUT", pozoClick.getConsentStatus(), "Credit To Network");
             }
         });
         trans_details.setOnScrollListener(new AbsListView.OnScrollListener() {
@@ -140,10 +145,14 @@ public class NetworkTransFragment extends BaseFragment implements RequestHandler
 
             @Override
             public void afterTextChanged(Editable s) {
-                if (s.toString().length() != 0)
-                    adapter.filter(s.toString());
-                else if (s.toString().length() == 0)
-                    adapter.filter("");
+                try {
+                    if (s.toString().length() != 0)
+                        adapter.filter(s.toString());
+                    else if (s.toString().length() == 0)
+                        adapter.filter("");
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
             }
         });
     }
@@ -169,8 +178,12 @@ public class NetworkTransFragment extends BaseFragment implements RequestHandler
                         }
                     }
                 }
-            }else
+            } else if (object.getString("responseCode").equalsIgnoreCase("60147")) {
+                Toast.makeText(getActivity(),object.getString("responseCode"),Toast.LENGTH_LONG).show();
+                setBack_click1(getActivity());
+            } else
                 responseMSg(object);
+            trans_details.setEnabled(true);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -275,7 +288,6 @@ public class NetworkTransFragment extends BaseFragment implements RequestHandler
     TextView textsss;
     EditText newtpinss;
     EditText remarks;
-
     private void customDialog_BenNEW(final NetworkTransferPozo pozo, String msg, final String type, String amount, String title) {
         AutofitTextView btn_p_bank, btn_name, p_transid;
         dialognew1 = new Dialog(getActivity());
@@ -283,7 +295,7 @@ public class NetworkTransFragment extends BaseFragment implements RequestHandler
         View alertLayout = inflater.inflate(R.layout.custom_layout_common, null);
         alertLayout.setKeepScreenOn(true);
         AppCompatButton btn_cancel = (AppCompatButton) alertLayout.findViewById(R.id.btn_cancel);
-        AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
+        btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
         AppCompatButton btn_regenerate = (AppCompatButton) alertLayout.findViewById(R.id.btn_regenerate);
         if (type.equalsIgnoreCase("AMOUNTTRANSFER")) {
             alertLayout.findViewById(R.id.custom_popup).setVisibility(View.VISIBLE);
@@ -329,11 +341,11 @@ public class NetworkTransFragment extends BaseFragment implements RequestHandler
 
             @Override
             public void afterTextChanged(Editable s) {
-                if (s.length()!=0 && s.length()<10) {
+                if (s.length() != 0 && s.length() < 10) {
                     input_text.setText("");
                     input_text.setText(EnglishNumberToWords.convert(Integer.parseInt(s.toString()))+" rupee");
                     input_text.setVisibility(View.VISIBLE);
-                }else
+                } else
                     input_text.setVisibility(View.GONE);
             }
         });
@@ -344,36 +356,36 @@ public class NetworkTransFragment extends BaseFragment implements RequestHandler
         btn_ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    if (type.equalsIgnoreCase("AMOUNTTRANSFER")) {
-                        hideKeyboard(getActivity());
-                        if (!ImageUtils.commonAmount(textsss.getText().toString())) {
-                            textsss.setError("Please enter valid data");
-                            textsss.requestFocus();
-                        } else if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && (newtpinss.getText().toString().isEmpty() || newtpinss.getText().toString().length() != 4)) {
-                            newtpinss.setError("Please enter valid data");
-                            newtpinss.requestFocus();
-                        } else {
-                            dialognew1.dismiss();
-                            customDialogConfirm(pozo, "Are you sure you want to Transfer?", "CONFIRMATION", textsss.getText().toString(), newtpinss.getText().toString(), "Credit Confirmation", remarks.getText().toString());
-                        }
-                    }
-                    if (type.equalsIgnoreCase("REVERSETRANSFER")) {
-                        hideKeyboard(getActivity());
-                        if (!ImageUtils.commonAmount(textsss.getText().toString())) {
-                            textsss.setError("Please enter valid data");
-                            textsss.requestFocus();
-                        } else {
-                            dialognew1.dismiss();
-                            new AsyncPostMethod(WebConfig.CRNF, getReverseTransfer(pozo.getMobileNo(), remarks.getText().toString()).toString(), headerData, NetworkTransFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
-                        }
-                    } else if (type.equalsIgnoreCase("NETWORK_CREDIT")) {
-                        loadApi();
+                btn_ok.setClickable(false);
+                if (type.equalsIgnoreCase("AMOUNTTRANSFER")) {
+                    hideKeyboard(getActivity());
+                    if (!ImageUtils.commonAmount(textsss.getText().toString())) {
+                        textsss.setError("Please enter valid data");
+                        textsss.requestFocus();
+                        btn_ok.setClickable(true);
+                    } else if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && (newtpinss.getText().toString().isEmpty() || newtpinss.getText().toString().length() != 4)) {
+                        newtpinss.setError("Please enter valid data");
+                        newtpinss.requestFocus();
+                        btn_ok.setClickable(true);
+                    } else {
                         dialognew1.dismiss();
+                        customDialogConfirm(pozo, "Are you sure you want to Transfer?", "CONFIRMATION", textsss.getText().toString(), newtpinss.getText().toString(), "Credit Confirmation", remarks.getText().toString());
                     }
                 }
-                handlercontrol();
+                if (type.equalsIgnoreCase("REVERSETRANSFER")) {
+                    hideKeyboard(getActivity());
+                    if (!ImageUtils.commonAmount(textsss.getText().toString())) {
+                        textsss.setError("Please enter valid data");
+                        textsss.requestFocus();
+                        btn_ok.setClickable(true);
+                    } else {
+                        dialognew1.dismiss();
+                        new AsyncPostMethod(WebConfig.CRNF, getReverseTransfer(pozo.getMobileNo(), remarks.getText().toString()).toString(), headerData, NetworkTransFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
+                    }
+                } else if (type.equalsIgnoreCase("NETWORK_CREDIT")) {
+                    loadApi();
+                    dialognew1.dismiss();
+                }
             }
         });
         dialognew1.show();
@@ -387,21 +399,42 @@ public class NetworkTransFragment extends BaseFragment implements RequestHandler
             @Override
             public void onClick(View v) {
                 dialognew1.dismiss();
+                trans_details.setEnabled(true);
             }
         });
         Window window = dialognew1.getWindow();
         window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
     }
 
+    public void clickable(){
+        try {
+            btn_cancel.setClickable(true);
+            btn_ok.setClickable(true);
+            btn_regenerate.setClickable(true);
+            trans_details.setClickable(true);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        clickable();
+        super.onSaveInstanceState(outState);
+    }
+
+
+    AppCompatButton btn_cancel,btn_ok,btn_regenerate;
     private void customDialog_Ben(final NetworkTransferPozo pozo, String msg, final String type, String amount, String title) {
         AutofitTextView btn_p_bank, btn_name, p_transid;
         dialog = new Dialog(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View alertLayout = inflater.inflate(R.layout.custom_layout_common, null);
         alertLayout.setKeepScreenOn(true);
-        AppCompatButton btn_cancel = (AppCompatButton) alertLayout.findViewById(R.id.btn_cancel);
-        AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
-        AppCompatButton btn_regenerate = (AppCompatButton) alertLayout.findViewById(R.id.btn_regenerate);
+     //   trans_details.setEnabled(false);
+        btn_cancel = (AppCompatButton) alertLayout.findViewById(R.id.btn_cancel);
+        btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
+        btn_regenerate = (AppCompatButton) alertLayout.findViewById(R.id.btn_regenerate);
         if (type.equalsIgnoreCase("BENLAYOUT")) {
             if (amount.equalsIgnoreCase("N"))
                 btn_cancel.setVisibility(View.GONE);
@@ -450,53 +483,54 @@ public class NetworkTransFragment extends BaseFragment implements RequestHandler
         btn_ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    if (type.equalsIgnoreCase("AMOUNTTRANSFER")) {
-                        hideKeyboard(getActivity());
-                        if (!ImageUtils.commonAmount(textsss.getText().toString())) {
-                            textsss.setError("Please enter valid data");
-                            textsss.requestFocus();
-                        } else if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && (newtpinss.getText().toString().isEmpty() || newtpinss.getText().toString().length() != 4)) {
-                            newtpinss.setError("Please enter valid data");
-                            newtpinss.requestFocus();
-                        } else {
-                            dialog.dismiss();
-                            customDialogConfirm(pozo, "Are you sure you want to Transfer?", "CONFIRMATION", textsss.getText().toString(), newtpinss.getText().toString(), "Credit Confirmation", remarks.getText().toString());
-                        }
-                    }
-                    if (type.equalsIgnoreCase("REVERSETRANSFER")) {
-                        hideKeyboard(getActivity());
-                        if (!ImageUtils.commonAmount(textsss.getText().toString())) {
-                            textsss.setError("Please enter valid data");
-                            textsss.requestFocus();
-                        } else {
-                            dialog.dismiss();
-                            new AsyncPostMethod(WebConfig.CRNF, getReverseTransfer(pozo.getMobileNo(), remarks.getText().toString()).toString(), headerData, NetworkTransFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
-                        }
-                    } else if (type.equalsIgnoreCase("NETWORK_CREDIT")) {
-                        loadApi();
+                btn_ok.setClickable(false);
+                if (type.equalsIgnoreCase("AMOUNTTRANSFER")) {
+                    hideKeyboard(getActivity());
+                    if (!ImageUtils.commonAmount(textsss.getText().toString())) {
+                        textsss.setError("Please enter valid data");
+                        textsss.requestFocus();
+                        btn_ok.setClickable(true);
+                    } else if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && (newtpinss.getText().toString().isEmpty() || newtpinss.getText().toString().length() != 4)) {
+                        newtpinss.setError("Please enter valid data");
+                        newtpinss.requestFocus();
+                        btn_ok.setClickable(true);
+                    } else {
                         dialog.dismiss();
-                    } else if (type.equalsIgnoreCase("BENLAYOUT")) {
-                        dialog.dismiss();
-                        customDialog_BenNEW(pozo, "Network Transfer", "AMOUNTTRANSFER", "", "Credit To Network");
+                        customDialogConfirm(pozo, "Are you sure you want to Transfer?", "CONFIRMATION", textsss.getText().toString(), newtpinss.getText().toString(), "Credit Confirmation", remarks.getText().toString());
+                        trans_details.setEnabled(true);
                     }
                 }
-                handlercontrol();
+                if (type.equalsIgnoreCase("REVERSETRANSFER")) {
+                    hideKeyboard(getActivity());
+                    if (!ImageUtils.commonAmount(textsss.getText().toString())) {
+                        textsss.setError("Please enter valid data");
+                        textsss.requestFocus();
+                        btn_ok.setClickable(true);
+                    } else {
+                        dialog.dismiss();
+                        new AsyncPostMethod(WebConfig.CRNF, getReverseTransfer(pozo.getMobileNo(), remarks.getText().toString()).toString(), headerData, NetworkTransFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
+                    }
+                } else if (type.equalsIgnoreCase("NETWORK_CREDIT")) {
+                    loadApi();
+                    dialog.dismiss();
+                } else if (type.equalsIgnoreCase("BENLAYOUT")) {
+                    dialog.dismiss();
+                    customDialog_BenNEW(pozo, "Network Transfer", "AMOUNTTRANSFER", "", "Credit To Network");
+                }
             }
         });
         btn_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    if (type.equalsIgnoreCase("BENLAYOUT")) {
-                        dialog.dismiss();
-                        customDialog_BenNEW(pozo, "Network Transfer", "REVERSETRANSFER", "", "Credit To Network");
-                    } else
-                        dialog.dismiss();
+                if (type.equalsIgnoreCase("BENLAYOUT")) {
+                    dialog.dismiss();
+                    customDialog_BenNEW(pozo, "Network Transfer", "REVERSETRANSFER", "", "Credit To Network");
+                 //   trans_details.setEnabled(true);
+                   // btn_cancel.setClickable(false);
+                } else {
+                    dialog.dismiss();
+                    trans_details.setEnabled(true);
                 }
-                handlercontrol();
             }
         });
         dialog.show();
@@ -504,6 +538,8 @@ public class NetworkTransFragment extends BaseFragment implements RequestHandler
             @Override
             public void onClick(View v) {
                 dialog.dismiss();
+                btn_regenerate.setClickable(false);
+                trans_details.setEnabled(true);
             }
         });
         Window window = dialog.getWindow();

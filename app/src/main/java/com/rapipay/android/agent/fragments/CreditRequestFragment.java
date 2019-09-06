@@ -31,22 +31,28 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.rapipay.android.agent.Database.RapipayRealmDB;
 import com.rapipay.android.agent.Model.BankDetailsPozo;
 import com.rapipay.android.agent.Model.CreaditPaymentModePozo;
 import com.rapipay.android.agent.Model.PaymentModePozo;
 import com.rapipay.android.agent.Model.RapiPayPozo;
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.adapter.CreaditPaymentAdapter;
+import com.rapipay.android.agent.adapter.CreaditPaymentModAdapter;
 import com.rapipay.android.agent.interfaces.CustomInterface;
 import com.rapipay.android.agent.interfaces.RequestHandler;
+import com.rapipay.android.agent.main_directory.PinActivity;
 import com.rapipay.android.agent.utils.AsyncPostMethod;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
 import com.rapipay.android.agent.utils.BaseFragment;
 import com.rapipay.android.agent.utils.GenerateChecksum;
 import com.rapipay.android.agent.utils.ImageUtils;
+import com.rapipay.android.agent.utils.MasterClass;
 import com.rapipay.android.agent.utils.WebConfig;
 import com.rapipay.android.agent.view.EnglishNumberToWords;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
@@ -55,13 +61,17 @@ import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Set;
 
+import io.realm.Realm;
+import io.realm.RealmResults;
 import me.grantland.widget.AutofitTextView;
+
+import static com.rapipay.android.agent.utils.BaseCompactActivity.dbRealm;
 
 public class CreditRequestFragment extends BaseFragment implements RequestHandler, View.OnClickListener, CustomInterface {
     final private static int PERMISSIONS_REQUEST_READ_PHONE_STATE = 0;
     Spinner select_mode;
     TextView bank_select;
-    TextView input_account, input_remark, input_transid, input_amount, input_code;
+    TextView input_account, input_remark, input_transid, input_amount, input_code, img_pay_mod;
     AutofitTextView date1_text, image;
     private static final int CAMERA_REQUEST = 1888;
     private int SELECT_FILE = 1;
@@ -73,17 +83,30 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
     private int selectedDate, selectedMonth, selectedYear;
     String months = null, dayss = null;
     ArrayList<CreaditPaymentModePozo> cr_list_payment;
+    ArrayList<String> cr_mod_payment;
+    boolean flag = false;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         rv = (View) inflater.inflate(R.layout.credit_request_layout, container, false);
+        heading = (TextView) getActivity().findViewById(R.id.toolbar_title);
+
+        if (balance != null)
+            heading.setText("Credit Request (Balance : Rs." + balance + ")");
+        else
+            heading.setText("Credit Request");
         initialize(rv);
-        if (BaseCompactActivity.dbRealm != null && BaseCompactActivity.dbRealm.getDetails_Rapi())
-            list = BaseCompactActivity.dbRealm.getDetails();
+        if (dbRealm != null && dbRealm.getDetails_Rapi())
+            list = dbRealm.getDetails();
         else
             dbNull(CreditRequestFragment.this);
+        initBank();
         return rv;
+    }
+
+    private void initBank() {
+        new AsyncPostMethod(WebConfig.CREADITBANKLIST, credit_requestBank().toString(), headerData, CreditRequestFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
     }
 
     private void initialize(View view) {
@@ -93,6 +116,8 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
         date1_text.setHint(getResources().getString(R.string.p_dater));
         date1_text.setOnClickListener(this);
         bank_select = (TextView) view.findViewById(R.id.bank_select);
+        img_pay_mod = (TextView) view.findViewById(R.id.img_pay_mod);
+        img_pay_mod.setOnClickListener(this);
         select_mode = (Spinner) view.findViewById(R.id.select_mode);
         input_remark = (TextView) view.findViewById(R.id.input_remark);
         input_transid = (TextView) view.findViewById(R.id.input_transid);
@@ -104,29 +129,23 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
         bank_select.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ArrayList<String> list_bank= new ArrayList<>();
-                String condition = "Y";
-                ArrayList<BankDetailsPozo> stlist = BaseCompactActivity.dbRealm.geBankDetails(condition);
-                for(int i=0; i< stlist.size(); i++){
-                    list_bank.add(stlist.get(i).getBankName());
-                }
                 customSpinner(bank_select, "Select Bank", list_bank, null);
             }
         });
-        cr_list_payment = BaseCompactActivity.dbRealm.getPaymenttDetails();
-//        Set<CreaditPaymentModePozo> s= new HashSet<CreaditPaymentModePozo>();
-//        s.addAll(cr_list_payment);
-//        cr_list_payment.clear();
-//        cr_list_payment.addAll(s);
+        cr_list_payment = dbRealm.getPaymenttDetails();
         if (cr_list_payment.size() != 0)
             select_mode.setAdapter(new CreaditPaymentAdapter(getActivity(), cr_list_payment));
         select_mode.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (position != 0)
-                    paymode = cr_list_payment.get(position).getPaymentMode();
-                else
+                if (position != 0) {
+                    if (cr_list_payment != null)
+                        paymode = cr_list_payment.get(position).getPaymentMode();
+                    else
+                        paymode = cr_mod_payment.get(position);
+                } else
                     paymode = "";
+
             }
 
             @Override
@@ -153,15 +172,17 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
 
             @Override
             public void afterTextChanged(Editable s) {
-                if (s.length()!=0 && s.length()<10) {
+                if (s.length() != 0 && s.length() < 10) {
                     input_text.setText("");
-                    input_text.setText(EnglishNumberToWords.convert(Integer.parseInt(s.toString()))+" rupee");
+                    input_text.setText(EnglishNumberToWords.convert(Integer.parseInt(s.toString())) + " rupee");
                     input_text.setVisibility(View.VISIBLE);
-                }else
+                } else
                     input_text.setVisibility(View.GONE);
             }
         });
     }
+
+    ArrayList<String> list_bank;
 
     @Override
     public void chechStatus(JSONObject object) {
@@ -169,13 +190,28 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
             if (object.getString("responseCode").equalsIgnoreCase("200")) {
                 if (object.getString("serviceType").equalsIgnoreCase("CREDIT_FUND_REQUEST")) {
                     customDialog_Ben(object.getString("responseMessage"), "CREDIT FUND REQUEST");
+                } else if (object.getString("serviceType").equalsIgnoreCase("GET_MY_CREDIT_BANKS")) {
+                    String bankname = object.getString("objGetMyBanklList");
+                    list_bank = new ArrayList<>();
+                    JSONArray jsonArray = new JSONArray(bankname);
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject innInnerObj = jsonArray.getJSONObject(i);
+                        list_bank.add(innInnerObj.getString("bankName"));
+                    }
+                    // customSpinner(bank_select, "Select Bank", list_bank, null);
                 }
-            }else
+            } else if (object.getString("responseCode").equalsIgnoreCase("60147")) {
+                Toast.makeText(getActivity(),object.getString("responseCode"),Toast.LENGTH_LONG).show();
+                setBack_click1(getActivity());
+            } else {
                 responseMSg(object);
+                btn_fund.setClickable(true);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
 
     @Override
     public void okClicked(String type, Object ob) {
@@ -208,8 +244,8 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
         btn_ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                    clear();
-                    dialog.dismiss();
+                clear();
+                dialog.dismiss();
             }
         });
         btn_cancel.setOnClickListener(new View.OnClickListener() {
@@ -307,41 +343,75 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
             case R.id.images:
                 loadIMEI();
                 break;
+            case R.id.img_pay_mod:
+                flag = true;
+                cr_mod_payment = new ArrayList<>();
+                cr_mod_payment.add("Select Payment Mode");
+                cr_mod_payment.add("CASH");
+                cr_mod_payment.add("WALLET");
+                cr_mod_payment.add("IMPS");
+                cr_mod_payment.add("UPI");
+                cr_mod_payment.add("NETBANKING");
+                cr_mod_payment.add("DEBIT_CARD");
+                cr_mod_payment.add("CREDIT_CARD");
+                cr_mod_payment.add("ECOLLECT");
+                cr_mod_payment.add("TEBP");
+                select_mode.setAdapter(new CreaditPaymentModAdapter(getActivity(), cr_mod_payment));
+                break;
             case R.id.btn_fund:
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    if (!ImageUtils.commonRegex(input_account.getText().toString(), 150, " ")) {
-                        input_account.setError("Please enter valid data");
-                        input_account.requestFocus();
-                    } else if (!ImageUtils.commonRegex(input_code.getText().toString(), 20, "0-9")) {
-                        input_code.setError("Please enter valid data");
-                        input_code.requestFocus();
-                    } else if (!ImageUtils.commonAmount(input_amount.getText().toString())) {
-                        input_amount.setError("Please enter valid data");
-                        input_amount.requestFocus();
-                    } else if (!ImageUtils.commonRegex(input_transid.getText().toString(), 30, "0-9")) {
-                        input_transid.setError("Please enter valid data");
-                        input_transid.requestFocus();
-                    } else if (bank_select.getText().toString().equalsIgnoreCase("Select Bank"))
-                        bank_select.setError("Please enter valid data");
-                    else if (paymode.isEmpty())
-                        Toast.makeText(getActivity(), "Please select payment mode.", Toast.LENGTH_SHORT).show();
-                    else if (BaseCompactActivity.IS_CRIMAGE_REQUIRED != null && BaseCompactActivity.IS_CRIMAGE_REQUIRED.equalsIgnoreCase("Y") && image.getText().toString().isEmpty()) {
-                        image.setError("Please Select Image");
-                        image.requestFocus();
-                    } else if (date1_text.getText().toString().isEmpty()) {
-                        date1_text.setError("Please select date");
-                        date1_text.requestFocus();
-                    } else if (!paymode.isEmpty() && BaseCompactActivity.IS_CRIMAGE_REQUIRED == null)
+                btn_fund.setClickable(false);
+                if (!ImageUtils.commonRegex(input_account.getText().toString(), 150, " ")) {
+                    input_account.setError("Please enter valid data");
+                    input_account.requestFocus();
+                    btn_fund.setClickable(true);
+                } else if (!ImageUtils.commonRegex(input_code.getText().toString(), 20, "0-9")) {
+                    input_code.setError("Please enter valid data");
+                    input_code.requestFocus();
+                    btn_fund.setClickable(true);
+                } else if (!ImageUtils.commonAmount(input_amount.getText().toString())) {
+                    input_amount.setError("Please enter valid data");
+                    input_amount.requestFocus();
+                    btn_fund.setClickable(true);
+                } else if (!ImageUtils.commonRegex(input_transid.getText().toString(), 30, "0-9")) {
+                    input_transid.setError("Please enter valid data");
+                    input_transid.requestFocus();
+                    btn_fund.setClickable(true);
+                } else if (bank_select.getText().toString().equalsIgnoreCase("Select Bank")) {
+                    bank_select.setError("Please enter valid data");
+                    btn_fund.setClickable(true);
+                } else if (paymode.isEmpty()) {
+                    Toast.makeText(getActivity(), "Please select payment mode.", Toast.LENGTH_SHORT).show();
+                    btn_fund.setClickable(true);
+                } else if (image.length() == 0) {
+                    image.setError("Please upload transcation slip");
+                    btn_fund.setClickable(true);
+                } else if (BaseCompactActivity.IS_CRIMAGE_REQUIRED != null && BaseCompactActivity.IS_CRIMAGE_REQUIRED.equalsIgnoreCase("Y") && image.getText().toString().isEmpty()) {
+                    image.setError("Please Select Image");
+                    image.requestFocus();
+                    btn_fund.setClickable(true);
+                } else if (date1_text.getText().toString().isEmpty()) {
+                    date1_text.setError("Please select date");
+                    date1_text.requestFocus();
+                    btn_fund.setClickable(true);
+                } else if (input_remark.getText().toString().isEmpty()) {
+                    input_remark.setError("Please Enter remarks");
+                    btn_fund.setClickable(true);
+                } else if (!paymode.isEmpty() && BaseCompactActivity.IS_CRIMAGE_REQUIRED == null) {
+                    if (credit_request().length() != 0) {
                         new AsyncPostMethod(WebConfig.CRNF, credit_request().toString(), headerData, CreditRequestFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
-                    else if (!paymode.isEmpty() && BaseCompactActivity.IS_CRIMAGE_REQUIRED != null && BaseCompactActivity.IS_CRIMAGE_REQUIRED.equalsIgnoreCase("Y") && !imageBase64.isEmpty())
-                        new AsyncPostMethod(WebConfig.CRNF, credit_request().toString(), headerData, CreditRequestFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
-                    else if (!paymode.isEmpty() && BaseCompactActivity.IS_CRIMAGE_REQUIRED != null && BaseCompactActivity.IS_CRIMAGE_REQUIRED.equalsIgnoreCase("N"))
-                        new AsyncPostMethod(WebConfig.CRNF, credit_request().toString(), headerData, CreditRequestFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
-                    else
+                    } else if (!paymode.isEmpty() && BaseCompactActivity.IS_CRIMAGE_REQUIRED != null && BaseCompactActivity.IS_CRIMAGE_REQUIRED.equalsIgnoreCase("Y") && !imageBase64.isEmpty()) {
+                        if (credit_request().length() != 0) {
+                            new AsyncPostMethod(WebConfig.CRNF, credit_request().toString(), headerData, CreditRequestFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
+                        }
+                    } else if (!paymode.isEmpty() && BaseCompactActivity.IS_CRIMAGE_REQUIRED != null && BaseCompactActivity.IS_CRIMAGE_REQUIRED.equalsIgnoreCase("N")) {
+                        if (credit_request().length() != 0) {
+                            new AsyncPostMethod(WebConfig.CRNF, credit_request().toString(), headerData, CreditRequestFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
+                        }
+                    } else {
+                        btn_fund.setClickable(true);
                         Toast.makeText(getActivity(), "Please select mandatory fields", Toast.LENGTH_SHORT).show();
+                    }
                 }
-                handlercontrol();
                 break;
         }
     }
@@ -352,7 +422,6 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
             final Dialog dialog = new Dialog(getActivity());
             dialog.setContentView(R.layout.datepickerview);
             dialog.setTitle("");
-
             DatePicker datePicker = (DatePicker) dialog.findViewById(R.id.datePicker1);
             Calendar calendar = Calendar.getInstance();
             calendar.setTimeInMillis(System.currentTimeMillis());
@@ -439,15 +508,57 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
         }
     }
 
+    String remark = "";
+
+    private boolean remarksList() {
+        if (input_remark.getText().toString().isEmpty()) {
+            remark = "";
+            return true;
+        } else if (!input_remark.getText().toString().isEmpty()) {
+            if (input_remark.getText().toString().matches("^[a-zA-Z0-9 ]{1,250}$")) {
+                remark = input_remark.getText().toString();
+                return true;
+            } else {
+                Toast.makeText(getActivity(), "Please enter remarks without special character", Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        } else
+            return false;
+    }
+
+
+    public JSONObject credit_requestBank() {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("serviceType", "GET_MY_CREDIT_BANKS");
+            jsonObject.put("transactionID", ImageUtils.miliSeconds());
+            jsonObject.put("agentID", list.get(0).getMobilno());
+            jsonObject.put("typeMobileWeb", "mobile");
+            jsonObject.put("requestType", "CRNF_CHANNEL");
+            jsonObject.put("nodeAgentId", list.get(0).getMobilno());
+            jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
+            jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
+            Log.e("sessionRefNo", list.get(0).getAftersessionRefNo());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return jsonObject;
+    }
+/*
+serviceType : GET_MY_CREDIT_BANKS
+transactionID
+agentID
+typeMobileWeb
+requestType ==>CRNF_CHANNEL
+nodeAgentId
+sessionRefNo
+checkSum
+
+*/
 
     public JSONObject credit_request() {
         JSONObject jsonObject = new JSONObject();
         try {
-            String remark = "";
-            if (input_remark.getText().toString().isEmpty())
-                remark = "";
-            else if (!ImageUtils.commonRegex(input_remark.getText().toString(), 250, "0-9 ?."))
-                remark = input_remark.getText().toString();
             jsonObject.put("serviceType", "CREDIT_FUND_REQUEST");
             jsonObject.put("requestType", "BC_CHANNEL");
             jsonObject.put("typeMobileWeb", "mobile");
@@ -466,7 +577,7 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
             jsonObject.put("branchName", input_account.getText().toString());
             jsonObject.put("branchCode", input_code.getText().toString());
             jsonObject.put("banktransactionID", input_transid.getText().toString());
-            jsonObject.put("remark", remark);
+            jsonObject.put("remark", input_remark.getText().toString());
             jsonObject.put("payMode", paymode);
             jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
 
@@ -488,7 +599,7 @@ public class CreditRequestFragment extends BaseFragment implements RequestHandle
 
     @Override
     public void chechStat(String object) {
-
+        btn_fund.setClickable(true);
     }
 
 }

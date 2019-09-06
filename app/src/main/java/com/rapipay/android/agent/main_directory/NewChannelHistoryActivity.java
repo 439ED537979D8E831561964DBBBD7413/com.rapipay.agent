@@ -124,23 +124,23 @@ public class NewChannelHistoryActivity extends BaseCompactActivity implements Vi
                 finish();
                 break;
             case R.id.btn_fund:
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    if (date2_text.getText().toString().isEmpty()) {
-                        date2_text.setError("Please enter mandatory field");
-                        Toast.makeText(this, "Please enter mandatory field", Toast.LENGTH_SHORT).show();
-                    } else if (date1_text.getText().toString().isEmpty()) {
-                        date1_text.setError("Please enter mandatory field");
-                        Toast.makeText(this, "Please enter mandatory field", Toast.LENGTH_SHORT).show();
-                    } else if (printDifference(mainDate(date2_text.getText().toString()), mainDate(date1_text.getText().toString()))) {
-                        trans_details.setVisibility(View.VISIBLE);
-                        new AsyncPostMethod(WebConfig.CommonReport, channel_request().toString(), headerData, NewChannelHistoryActivity.this, getString(R.string.responseTimeOut), "TRANSACTIONHISTORY").execute();
-                    } else {
-                        customDialog_Common("Statement can only view from one month");
-                        trans_details.setVisibility(View.GONE);
-                    }
+                btn_fund.setClickable(false);
+                if (date2_text.getText().toString().isEmpty()) {
+                    date2_text.setError("Please enter mandatory field");
+                    Toast.makeText(this, "Please enter mandatory field", Toast.LENGTH_SHORT).show();
+                    btn_fund.setClickable(true);
+                } else if (date1_text.getText().toString().isEmpty()) {
+                    date1_text.setError("Please enter mandatory field");
+                    Toast.makeText(this, "Please enter mandatory field", Toast.LENGTH_SHORT).show();
+                    btn_fund.setClickable(true);
+                } else if (printDifference(mainDate(date2_text.getText().toString()), mainDate(date1_text.getText().toString()))) {
+                    trans_details.setVisibility(View.VISIBLE);
+                    new AsyncPostMethod(WebConfig.CommonReport, channel_request().toString(), headerData, NewChannelHistoryActivity.this, getString(R.string.responseTimeOut), "TRANSACTIONHISTORY").execute();
+                } else {
+                    customDialog_Common("Statement can only view from one month");
+                    trans_details.setVisibility(View.GONE);
+                    btn_fund.setClickable(true);
                 }
-                handlercontrol();
                 break;
         }
     }
@@ -183,9 +183,13 @@ public class NewChannelHistoryActivity extends BaseCompactActivity implements Vi
                             customDialog_Common("KYCLAYOUTS", null, null, "Transaction Receipt", "", "Cannot generate receipt now please try later!", NewChannelHistoryActivity.this);
                         }
                 }
+            } else if (object.getString("responseCode").equalsIgnoreCase("60147")) {
+                Toast.makeText(this,object.getString("responseCode"),Toast.LENGTH_LONG).show();
+                setBack_click1(this);
             } else {
                 responseMSg(object);
             }
+            btn_fund.setClickable(true);
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -1,4 +1,4 @@
-package com.rapipay.android.agent.fragments;
+package com.rapipay.android.agent.main_directory;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -17,12 +17,8 @@ import android.view.Window;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.rapipay.android.agent.Database.RapipayDB;
 import com.rapipay.android.agent.Model.BankDetailsPozo;
 import com.rapipay.android.agent.Model.BeneficiaryDetailsPozo;
 import com.rapipay.android.agent.Model.LastTransactionPozo;
@@ -31,16 +27,13 @@ import com.rapipay.android.agent.adapter.BCBeneficiaryAdapter;
 import com.rapipay.android.agent.adapter.LastTransAdapter;
 import com.rapipay.android.agent.interfaces.ClickListener;
 import com.rapipay.android.agent.interfaces.CustomInterface;
-import com.rapipay.android.agent.interfaces.RequestHandler;
 import com.rapipay.android.agent.interfaces.WalletRequestHandler;
-import com.rapipay.android.agent.main_directory.MainActivity;
-import com.rapipay.android.agent.utils.WalletAsyncMethod;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
-import com.rapipay.android.agent.utils.BaseFragment;
 import com.rapipay.android.agent.utils.GenerateChecksum;
 import com.rapipay.android.agent.utils.ImageUtils;
 import com.rapipay.android.agent.utils.LocalStorage;
 import com.rapipay.android.agent.utils.RecyclerTouchListener;
+import com.rapipay.android.agent.utils.WalletAsyncMethod;
 import com.rapipay.android.agent.utils.WebConfig;
 
 import org.json.JSONArray;
@@ -50,7 +43,8 @@ import java.util.ArrayList;
 
 import static android.app.Activity.RESULT_OK;
 
-public class BCTransferFragment extends BaseFragment implements View.OnClickListener, WalletRequestHandler, CustomInterface {
+
+public class BC2TransferActivity extends BaseCompactActivity implements View.OnClickListener, WalletRequestHandler, CustomInterface {
     EditText input_amount, input_account, input_name, input_mobile, input_otp, searchfield;
     AppCompatButton btn_otpsubmit, btn_fund, btn_verify;
     LinearLayout sender_layout, otp_layout, fundlayout, beneficiary_layout, last_tran_layout, ln_bc1, ln_bc2;
@@ -67,31 +61,24 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
     TextView limit_title;
     BCBeneficiaryAdapter adapter;
     boolean receipt_clicked = false;
-    String headerData;
-    View rv;
+   // String headerData;
     private long mLastClickTime = System.currentTimeMillis();
     private static final long CLICK_TIME_INTERVAL = 1000;
-   /* RadioGroup radioGroup;
+    /*RadioGroup radioGroup;
     RadioButton bc1id, bc2id;
     boolean radioflag = false;
     int flagdevicetype = 0;*/
 
-    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        rv = (View) inflater.inflate(R.layout.fundtransfer_layout, container, false);
-        localStorage = LocalStorage.getInstance(getActivity());
-        heading = (TextView) getActivity().findViewById(R.id.toolbar_title);
-
-        if (balance != null)
-            heading.setText("BC1 Fund Transfer (Balance : Rs." + balance + ")");
-        else
-            heading.setText("BC1 Fund Transfer");
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.fragment_bc2_transfer);
+        localStorage = LocalStorage.getInstance(this);
         headerData = (WebConfig.BASIC_USERID + ":" + WebConfig.BASIC_PASSWORD);
         if (BaseCompactActivity.dbRealm != null && BaseCompactActivity.dbRealm.getDetails_Rapi())
             list = BaseCompactActivity.dbRealm.getDetails();
-        initialize(rv);
-        return rv;
+        initialize();
+       // return rv;
     }
 
     private void clear() {
@@ -112,22 +99,27 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
         }
     }*/
 
-    private void initialize(View rv) {
-        text_ben = (TextView) rv.findViewById(R.id.text_ben);
-        limit_title = (TextView) rv.findViewById(R.id.limit);
-        input_amount = (EditText) rv.findViewById(R.id.input_amount);
-        input_account = (EditText) rv.findViewById(R.id.input_account);
-        input_name = (EditText) rv.findViewById(R.id.input_name);
-        input_mobile = (EditText) rv.findViewById(R.id.input_mobile);
-        input_otp = (EditText) rv.findViewById(R.id.input_otp);
-        btn_fund = (AppCompatButton) rv.findViewById(R.id.btn_fund);
-        /*ln_bc1 = (LinearLayout) rv.findViewById(R.id.ln_bc1);
-        ln_bc2 = (LinearLayout) rv.findViewById(R.id.ln_bc2);*/
-       /* img_bc1_check = (ImageView) rv.findViewById(R.id.img_bc1_check);
-        img_bc2_check = (ImageView) rv.findViewById(R.id.img_bc2_check);*/
-        /*radioGroup = (RadioGroup) rv.findViewById(R.id.myRadioGroup);
-        bc1id = (RadioButton) rv.findViewById(R.id.bc1id);
-        bc2id = (RadioButton) rv.findViewById(R.id.bc2id);
+    private void initialize() {
+        text_ben = (TextView) findViewById(R.id.text_ben);
+        limit_title = (TextView) findViewById(R.id.limit);
+        input_amount = (EditText) findViewById(R.id.input_amount);
+        input_account = (EditText) findViewById(R.id.input_account);
+        input_name = (EditText) findViewById(R.id.input_name);
+        input_mobile = (EditText) findViewById(R.id.input_mobile);
+        input_otp = (EditText) findViewById(R.id.input_otp);
+        btn_fund = (AppCompatButton) findViewById(R.id.btn_fund);
+        heading = (TextView) findViewById(R.id.toolbar_title);
+        if (balance != null)
+            heading.setText("BC2 Fund Transfer (Balance : Rs." + balance + ")");
+        else
+            heading.setText("BC2 Fund Transfer");
+       /* ln_bc1 = (LinearLayout) findViewById(R.id.ln_bc1);
+        ln_bc2 = (LinearLayout) findViewById(R.id.ln_bc2);
+        img_bc1_check = (ImageView) findViewById(R.id.img_bc1_check);
+        img_bc2_check = (ImageView) findViewById(R.id.img_bc2_check);*/
+        /*radioGroup = (RadioGroup) findViewById(R.id.myRadioGroup);
+        bc1id = (RadioButton) findViewById(R.id.bc1id);
+        bc2id = (RadioButton) findViewById(R.id.bc2id);
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
@@ -163,22 +155,22 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
             img_bc2_check.setVisibility(View.VISIBLE);
         }*/
         btn_fund.setOnClickListener(this);
-        btn_verify = (AppCompatButton) rv.findViewById(R.id.btn_verify);
+        btn_verify = (AppCompatButton) findViewById(R.id.btn_verify);
         btn_verify.setOnClickListener(this);
-        btn_sender = (ImageView) rv.findViewById(R.id.btn_sender);
+        btn_sender = (ImageView) findViewById(R.id.btn_sender);
         btn_sender.setOnClickListener(this);
         btn_sender.setColorFilter(getResources().getColor(R.color.colorPrimaryDark));
-        sender_layout = (LinearLayout) rv.findViewById(R.id.sender_layout);
-        otp_layout = (LinearLayout) rv.findViewById(R.id.otp_layout);
-        btn_otpsubmit = (AppCompatButton) rv.findViewById(R.id.btn_otpsubmit);
+        sender_layout = (LinearLayout) findViewById(R.id.sender_layout);
+        otp_layout = (LinearLayout) findViewById(R.id.otp_layout);
+        btn_otpsubmit = (AppCompatButton) findViewById(R.id.btn_otpsubmit);
         btn_otpsubmit.setOnClickListener(this);
-        fundlayout = (LinearLayout) rv.findViewById(R.id.fundlayout);
-        searchfield = (EditText) rv.findViewById(R.id.searchfield);
-        beneficiary_layout = (LinearLayout) rv.findViewById(R.id.beneficiary_layout);
-        beneficiary_details = (RecyclerView) rv.findViewById(R.id.beneficiary_details);
-        last_tran_layout = (LinearLayout) rv.findViewById(R.id.last_tran_layout);
-        trans_details = (RecyclerView) rv.findViewById(R.id.trans_details);
-        bank_select = (TextView) rv.findViewById(R.id.bank_select);
+        fundlayout = (LinearLayout) findViewById(R.id.fundlayout);
+        searchfield = (EditText) findViewById(R.id.searchfield);
+        beneficiary_layout = (LinearLayout) findViewById(R.id.beneficiary_layout);
+        beneficiary_details = (RecyclerView) findViewById(R.id.beneficiary_details);
+        last_tran_layout = (LinearLayout) findViewById(R.id.last_tran_layout);
+        trans_details = (RecyclerView) findViewById(R.id.trans_details);
+        bank_select = (TextView) findViewById(R.id.bank_select);
         bank_select.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -190,7 +182,7 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
                 customSpinner(bank_select, "Select Bank", list_bank, null);
             }
         });
-        beneficiary_details.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), beneficiary_details, new ClickListener() {
+        beneficiary_details.addOnItemTouchListener(new RecyclerTouchListener(this, beneficiary_details, new ClickListener() {
             @Override
             public void onClick(View view, int position) {
                 beneficiary_details.setClickable(false);
@@ -214,7 +206,7 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
                 }
             }
         }));
-        trans_details.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), trans_details, new ClickListener() {
+        trans_details.addOnItemTouchListener(new RecyclerTouchListener(this, trans_details, new ClickListener() {
             @Override
             public void onClick(View view, int position) {
                 long now = System.currentTimeMillis();
@@ -225,7 +217,7 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
                 if (transactionPozoArrayList.size() != 0 && !receipt_clicked) {
                     receipt_clicked = true;
                     LastTransactionPozo pozo = transactionPozoArrayList.get(position);
-                    new WalletAsyncMethod(WebConfig.WALLETRECEIPTURL, receipt_request(pozo).toString(), headerData, BCTransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+                    new WalletAsyncMethod(WebConfig.WALLETRECEIPTURL, receipt_request(pozo).toString(), headerData, BC2TransferActivity.this, getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
                 }
             }
 
@@ -248,14 +240,14 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
 
             @Override
             public void afterTextChanged(Editable s) {
-                // if (flagdevicetype > 0) {
+                //  if (flagdevicetype > 0) {
                 if (s.length() == 10)
-                    new WalletAsyncMethod(WebConfig.BCRemittanceApp, getSender_Validate().toString(), headerData, BCTransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+                    new WalletAsyncMethod(WebConfig.BCRemittanceApp, getSender_Validate().toString(), headerData, BC2TransferActivity.this,  getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
                 else
                     reset();
                /* } else {
                     input_mobile.setEnabled(false);
-                    Toast.makeText(getActivity(), "Please select BC fund transfer type", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "Please select BC fund transfer type", Toast.LENGTH_LONG).show();
                 }*/
             }
         });
@@ -345,7 +337,7 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
                 e.printStackTrace();
             }
         } else {
-            Toast.makeText(getActivity(), "Enter Text", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Enter Text", Toast.LENGTH_SHORT).show();
         }
         return jsonObject;
     }
@@ -368,7 +360,7 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
                 e.printStackTrace();
             }
         } else {
-            Toast.makeText(getActivity(), "Enter Mobile Number", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Enter Mobile Number", Toast.LENGTH_SHORT).show();
         }
         return jsonObject;
     }
@@ -418,7 +410,7 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
                 e.printStackTrace();
             }
         } else {
-            Toast.makeText(getActivity(), "Enter Text", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Enter Text", Toast.LENGTH_SHORT).show();
         }
         return jsonObject;
     }
@@ -444,42 +436,54 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
                 e.printStackTrace();
             }
         } else {
-            Toast.makeText(getActivity(), "Enter Text", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Enter Text", Toast.LENGTH_SHORT).show();
         }
         return jsonObject;
     }
 
     @Override
     public void chechStatus(JSONObject object, String hitfrom) {
+
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        setBack_click(this);
+        finish();
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+            case R.id.back_click:
+                setBack_click(this);
+                finish();
+                break;
             case R.id.btn_search:
                 v.findViewById(R.id.btn_search).setClickable(false);
-                hideKeyboard(getActivity());
+                hideKeyboard(this);
                 loadIMEI();
                 break;
             case R.id.btn_fund:
                 v.findViewById(R.id.btn_fund).setClickable(false);
-                hideKeyboard(getActivity());
+                hideKeyboard(this);
                 addBeneDetails("FUNDTRANSFER", "Add Beneficiary Detail");
                 break;
             case R.id.btn_sender:
-                hideKeyboard(getActivity());
+                hideKeyboard(this);
                 if (!input_name.getText().toString().isEmpty())
-                    new WalletAsyncMethod(WebConfig.BCRemittanceApp, addSender().toString(), headerData, BCTransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+                    new WalletAsyncMethod(WebConfig.BC2RemittanceApp, addSender().toString(), headerData, BC2TransferActivity.this, this, getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
                 else
-                    Toast.makeText(getActivity(), "Please enter correct text", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Please enter correct text", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.btn_otpsubmit:
                 v.findViewById(R.id.btn_otpsubmit).setClickable(false);
                 if (!otpRefId.isEmpty() && !fund_transferId.isEmpty() && !input_otp.getText().toString().isEmpty()) {
-                    hideKeyboard(getActivity());
-                    new WalletAsyncMethod(WebConfig.BCRemittanceApp, add_OtpDetails(otpRefId, fund_transferId).toString(), headerData, BCTransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+                    hideKeyboard(this);
+                    new WalletAsyncMethod(WebConfig.BC2RemittanceApp, add_OtpDetails(otpRefId, fund_transferId).toString(), headerData, BC2TransferActivity.this, this, getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
                 } else
-                    Toast.makeText(getActivity(), "Please enter OTP", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Please enter OTP", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.reset:
                 v.findViewById(R.id.reset).setClickable(false);
@@ -496,13 +500,13 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
     public void clickable() {
         try {
             beneficiary_details.setClickable(true);
-            rv.findViewById(R.id.trans_details).setClickable(true);
-            rv.findViewById(R.id.btn_search).setClickable(true);
-            rv.findViewById(R.id.delete_all).setClickable(true);
-            rv.findViewById(R.id.reset).setClickable(true);
-            rv.findViewById(R.id.btn_otpsubmit).setClickable(true);
-            rv.findViewById(R.id.btn_sender).setClickable(true);
-            rv.findViewById(R.id.btn_fund).setClickable(true);
+            findViewById(R.id.trans_details).setClickable(true);
+            findViewById(R.id.btn_search).setClickable(true);
+            findViewById(R.id.delete_all).setClickable(true);
+            findViewById(R.id.reset).setClickable(true);
+            findViewById(R.id.btn_otpsubmit).setClickable(true);
+            findViewById(R.id.btn_sender).setClickable(true);
+            findViewById(R.id.btn_fund).setClickable(true);
             btn_cancel.setClickable(true);
             btn_ok.setClickable(true);
             btn_regenerate.setClickable(true);
@@ -518,7 +522,7 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
     }
 
     private void addBeneDetails(final String type, String msg) {
-        final Dialog dialognew = new Dialog(getActivity());
+        final Dialog dialognew = new Dialog(this);
         LayoutInflater inflater = getLayoutInflater();
         final View alertLayout = inflater.inflate(R.layout.custom_layout_common, null);
         alertLayout.setKeepScreenOn(true);
@@ -564,7 +568,7 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
             @Override
             public void onClick(View v) {
                 btn_cancel.setClickable(false);
-                rv.findViewById(R.id.btn_fund).setClickable(true);
+                findViewById(R.id.btn_fund).setClickable(true);
                 if (bank_select_bene.getText().toString().equalsIgnoreCase("Select Bank")) {
                     bank_select_bene.setError("Please enter mandatory field");
                     bank_select_bene.requestFocus();
@@ -584,12 +588,12 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
                 } else {
                     dialognew.dismiss();
                     if (isNEFT && con_ifsc.getText().toString().matches("^[a-zA-Z0-9]{1,50}$"))
-                        new WalletAsyncMethod(WebConfig.BCRemittanceApp, addBeneAccount(bene_number.getText().toString(), con_ifsc.getText().toString(), bene_name.getText().toString(), "D", "NEFT").toString(), headerData, BCTransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+                        new WalletAsyncMethod(WebConfig.BC2RemittanceApp, addBeneAccount(bene_number.getText().toString(), con_ifsc.getText().toString(), bene_name.getText().toString(), "D", "NEFT").toString(), headerData, BC2TransferActivity.this,  getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
                     else if (!isNEFT) {
                         // String condition = "where " + RapipayDB.COLOMN__BANK_NAME + "='" + bank_select_bene.getText().toString() + "'";
                         String condition = bank_select_bene.getText().toString();
                         ifsc_code = BaseCompactActivity.dbRealm.geBankIFSC(condition).get(0);
-                        new WalletAsyncMethod(WebConfig.BCRemittanceApp, addBeneAccount(bene_number.getText().toString(), con_ifsc.getText().toString(), bene_name.getText().toString(), "D", "IMPS").toString(), headerData, BCTransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+                        new WalletAsyncMethod(WebConfig.BC2RemittanceApp, addBeneAccount(bene_number.getText().toString(), con_ifsc.getText().toString(), bene_name.getText().toString(), "D", "IMPS").toString(), headerData, BC2TransferActivity.this, getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
                     }
                 }
             }
@@ -598,7 +602,7 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
             @Override
             public void onClick(View v) {
                 btn_regenerate.setClickable(false);
-                rv.findViewById(R.id.btn_fund).setClickable(true);
+                findViewById(R.id.btn_fund).setClickable(true);
                 if (bank_select_bene.getText().toString().equalsIgnoreCase("Select Bank")) {
                     bank_select_bene.setError("Please enter mandatory field");
                     bank_select_bene.requestFocus();
@@ -614,13 +618,13 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
                 } else {
                     dialognew.dismiss();
                     if (isNEFT && con_ifsc.getText().toString().matches("^[a-zA-Z0-9]{1,50}$"))
-                        new WalletAsyncMethod(WebConfig.BCRemittanceApp, verify_Account(con_ifsc.getText().toString(), bene_number.getText().toString()).toString(), headerData, BCTransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+                        new WalletAsyncMethod(WebConfig.BC2RemittanceApp, verify_Account(con_ifsc.getText().toString(), bene_number.getText().toString()).toString(), headerData, BC2TransferActivity.this, getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
                     else if (!isNEFT) {
                         //  String condition = "where " + RapipayDB.COLOMN__BANK_NAME + "='" + bank_select_bene.getText().toString() + "'";
                         String condition = bank_select_bene.getText().toString();
                         ifsc_code = BaseCompactActivity.dbRealm.geBankIFSC(condition).get(0);
 //                    if (newtin.getText().toString().isEmpty())
-                        new WalletAsyncMethod(WebConfig.BCRemittanceApp, verify_Account(ifsc_code, bene_number.getText().toString()).toString(), headerData, BCTransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+                        new WalletAsyncMethod(WebConfig.BC2RemittanceApp, verify_Account(ifsc_code, bene_number.getText().toString()).toString(), headerData, BC2TransferActivity.this,  getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
                     }
                 }
             }
@@ -629,7 +633,7 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
             @Override
             public void onClick(View v) {
                 dialognew.dismiss();
-                rv.findViewById(R.id.btn_fund).setClickable(true);
+                findViewById(R.id.btn_fund).setClickable(true);
             }
         });
         dialognew.show();
@@ -670,7 +674,7 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
             jsonObject.put("senderName", input_name.getText().toString().trim());
             jsonObject.put("IFSC", ifsc);
             jsonObject.put("accountNo", accountno);
-            jsonObject.put("txnIP", shieldsquare_IP2Hex(ImageUtils.ipAddress(getActivity())));
+            jsonObject.put("txnIP", shieldsquare_IP2Hex(ImageUtils.ipAddress(this)));
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
             jsonObject.put("mobileNumber", input_mobile.getText().toString());
             jsonObject.put("txnAmmount", "1");
@@ -733,35 +737,41 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
     }
 
     private void initializeBenAdapter(ArrayList<BeneficiaryDetailsPozo> list) {
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         beneficiary_details.setLayoutManager(layoutManager);
-        adapter = new BCBeneficiaryAdapter(getActivity(), list);
+        adapter = new BCBeneficiaryAdapter(this, list);
         beneficiary_details.setAdapter(adapter);
     }
 
     private void initializeTransAdapter(ArrayList<LastTransactionPozo> list) {
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         trans_details.setLayoutManager(layoutManager);
-        trans_details.setAdapter(new LastTransAdapter(getActivity(), trans_details, list));
+        trans_details.setAdapter(new LastTransAdapter(this, trans_details, list));
     }
 
-    public JSONObject getMoney_Validate(String amount, String beneficiaryId) {
+
+ /*   {"serviceType":"DMT_BC_AC_TRANSFER","transactionID":"1567589635646","mobileNumber":"8743999103","senderName":"chetanya","txnAmmount":"10","beneficiaryId":"7FN9EDTFKH","nodeAgentId":"1000000014",
+            "requestType":"BC_CHANNEL","typeMobileWeb":"WEB","reqFor":"BC2","tPin":"03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4","transferType":"IMPS","txnIP":"172.16.50.95","sessionRefNo":"JA3KXBAAMR"}
+*/
+    // change for bc2
+    public JSONObject getMoney_Validate(String amount,JSONObject object, String beneficiaryId) {
         JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put("serviceType", "Money_Transfer_Bene");
+            jsonObject.put("serviceType", "DMT_BC_AC_TRANSFER");
+           // jsonObject.put("transactionID", ImageUtils.miliSeconds());
+            jsonObject.put("transactionID", object.getString("bcTransactionID"));
+            jsonObject.put("mobileNumber", input_mobile.getText().toString());
+            jsonObject.put("senderName", input_name.getText().toString().trim());
+            jsonObject.put("txnAmmount", amount);
+            jsonObject.put("beneficiaryId", beneficiaryId);
+            jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("requestType", "BC_Channel");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("transactionID", ImageUtils.miliSeconds());
-            jsonObject.put("txnAmmount", amount);
-            jsonObject.put("nodeAgentId", list.get(0).getMobilno());
-            jsonObject.put("senderName", input_name.getText().toString().trim());
-            jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
-            jsonObject.put("mobileNumber", input_mobile.getText().toString());
-            jsonObject.put("beneficiaryId", beneficiaryId);
-            jsonObject.put("reqFor", "BC1");
+            jsonObject.put("reqFor", "BC2");
             jsonObject.put("transferType", transfer_type);
-            jsonObject.put("txnIP", shieldsquare_IP2Hex(ImageUtils.ipAddress(getActivity())));
-            jsonObject.put("IFSC", pozo.getIfsc());
+            jsonObject.put("txnIP", shieldsquare_IP2Hex(ImageUtils.ipAddress(this)));
+            jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
+          //  jsonObject.put("IFSC", pozo.getIfsc());
             if (newtpin.getText().toString().isEmpty())
                 jsonObject.put("tPin", "");
             else
@@ -808,7 +818,7 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
                         btn_sender.setVisibility(View.VISIBLE);
                         clear();
                         input_name.setText("");
-                        rv.findViewById(R.id.warning).setVisibility(View.VISIBLE);
+                        findViewById(R.id.warning).setVisibility(View.VISIBLE);
                     }
                 } else if (object.getString("responseCode").equalsIgnoreCase("200")) {
                     if (object.getString("serviceType").equalsIgnoreCase("ADD_SENDER_DETAILS") && object.has("otpRefId")) {
@@ -820,35 +830,35 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
                             reqFor = object.getString("reqFor");
                         fund_transferId = object.getString("transactionId");
                     } else if (object.getString("serviceType").equalsIgnoreCase("ADD_SENDER_DETAILS")) {
-                        new WalletAsyncMethod(WebConfig.BCRemittanceApp, getSender_Validate().toString(), headerData, BCTransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+                        new WalletAsyncMethod(WebConfig.BC2RemittanceApp, getSender_Validate().toString(), headerData, BC2TransferActivity.this, this, getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
                     } else if (object.getString("serviceType").equalsIgnoreCase("DELETE_BENEFICIARY")) {
                         customDialog_Common("KYCLAYOUTLAY", object, null, "Payee Detail", object.getString("responseMessage"));
                     } else if (object.getString("serviceType").equalsIgnoreCase("GET_SERVICE_FEE")) {
                         customDialog_Common("Fund Transfer Confirmation", object, pozo, "Sure you want to Transfer?", input_mobile.getText().toString());
                     } else if (object.getString("serviceType").equalsIgnoreCase("Verify_Account")) {
                         customDialog_Common("Account Verify Details", object, pozo, "VerifyLayout", object.getString("senderName").trim());
-                    } else if (object.getString("serviceType").equalsIgnoreCase("Money_Transfer_Bene")) {
+                    } else if (object.getString("serviceType").equalsIgnoreCase("DMT_BC_AC_TRANSFER")) {
                         dialog.dismiss();
                         customDialog_Common("Fund Transfer Details", object, pozo, "VerifyLayout", input_name.getText().toString().trim());
                     } else if (object.getString("serviceType").equalsIgnoreCase("Money_Transfer")) {
                         if (object.has("getTxnReceiptDataList")) {
                             try {
                                 JSONArray array = object.getJSONArray("getTxnReceiptDataList");
-                                customReceiptNew("Money Transfer", object, BCTransferFragment.this);
+                                customReceiptNew("Money Transfer", object, BC2TransferActivity.this);
                             } catch (Exception e) {
                                 e.printStackTrace();
                                 customDialog_Common("Cannot generate receipt now please try later!", object, pozo, "VerifyLayout", input_name.getText().toString().trim());
                             }
                         }
                     } else if (object.getString("serviceType").equalsIgnoreCase("SENDER_COMPLETE_DETAILS")) {
-                        hideKeyboard(getActivity());
+                        hideKeyboard(this);
                         otp_layout.setVisibility(View.GONE);
                         btn_sender.setVisibility(View.GONE);
                         sender_layout.setVisibility(View.VISIBLE);
                         fundlayout.setVisibility(View.VISIBLE);
                         clear();
                         input_name.setText(object.getString("senderName"));
-                        rv.findViewById(R.id.warning).setVisibility(View.GONE);
+                        findViewById(R.id.warning).setVisibility(View.GONE);
 //                    reset.setVisibility(View.VISIBLE);
                         input_name.setEnabled(false);
                         if (object.has("remainingLimit") && !object.getString("remainingLimit").equalsIgnoreCase("null")) {
@@ -871,23 +881,20 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
                         if (object.has("getTxnReceiptDataList")) {
                             try {
                                 JSONArray array = object.getJSONArray("getTxnReceiptDataList");
-                                customReceiptNew("Transaction Receipt", object, BCTransferFragment.this);
+                                customReceiptNew("Transaction Receipt", object, BC2TransferActivity.this);
                             } catch (Exception e) {
                                 e.printStackTrace();
                                 customDialog_Common("Cannot generate receipt now please try later!", object, pozo, "VerifyLayout", input_name.getText().toString().trim());
                             }
                         }
                     } else if (object.getString("serviceType").equalsIgnoreCase("ADD_BENEFICIARY_DETAILS")) {
-                        customDialog_Common("KYCLAYOUTS", null, null, null, null, object.getString("responseMessage"), BCTransferFragment.this);
+                        customDialog_Common("KYCLAYOUTS", null, null, null, null, object.getString("responseMessage"), BC2TransferActivity.this);
                     }
                 } else if (object.getString("responseCode").equalsIgnoreCase("101")) {
                     customDialog_Common("Money Transfer", null, null, "KYCLAYOUT", object.getString("responseMessage"));
-                } else if (object.getString("responseCode").equalsIgnoreCase("60147")) {
-                    Toast.makeText(getActivity(), object.getString("responseCode"), Toast.LENGTH_LONG).show();
-                    setBack_click1(getActivity());
-                } else if (object.getString("responseCode").equalsIgnoreCase("60147")) {
-                    Toast.makeText(getActivity(),object.getString("responseCode"),Toast.LENGTH_LONG).show();
-                    setBack_click1(getActivity());
+                }else if (object.getString("responseCode").equalsIgnoreCase("60147")) {
+                    Toast.makeText(this,object.getString("responseCode"),Toast.LENGTH_LONG).show();
+                    setBack_click1(this);
                 } else {
                     if (object.has("responseMessage"))
                         customDialog_Common(object.getString("responseMessage"));
@@ -908,11 +915,11 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
 
     protected void customDialog_Common(String msg) {
         try {
-            final Dialog dialog = new Dialog(getActivity());
-            LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            final Dialog dialog = new Dialog(this);
+            LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View alertLayout = inflater.inflate(R.layout.custom_layout_common, null);
             TextView text = (TextView) alertLayout.findViewById(R.id.dialog_title);
-            text.setText(getActivity().getResources().getString(R.string.Alert));
+            text.setText(this.getResources().getString(R.string.Alert));
             TextView dialog_msg = (TextView) alertLayout.findViewById(R.id.dialog_msg);
             dialog_msg.setText(msg);
             dialog_msg.setVisibility(View.VISIBLE);
@@ -939,7 +946,7 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
     }
 
     protected void customAddneft(final String type, String ifsc, final String accountNo, String msg, final String beneName, String beneBank) {
-        final Dialog dialog = new Dialog(getActivity());
+        final Dialog dialog = new Dialog(this);
         LayoutInflater inflater = getLayoutInflater();
         View alertLayout = inflater.inflate(R.layout.custom_layout_common, null);
         alertLayout.setKeepScreenOn(true);
@@ -956,14 +963,14 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
         btn_ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                hideKeyboard(getActivity());
+                hideKeyboard(BC2TransferActivity.this);
                 if (type.equalsIgnoreCase("Fund Transfer")) {
                     if (btn_ifsc.getText().toString().isEmpty()) {
                         btn_ifsc.setError("Please enter valid IFSC Code.");
                         btn_ifsc.requestFocus();
                     } else {
 //                        transfer_type=input;
-                        new WalletAsyncMethod(WebConfig.BCRemittanceApp, addBeneAccount(accountNo, btn_ifsc.getText().toString(), beneName, "D", "NEFT").toString(), headerData, BCTransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+                        new WalletAsyncMethod(WebConfig.BC2RemittanceApp, addBeneAccount(accountNo, btn_ifsc.getText().toString(), beneName, "D", "NEFT").toString(), headerData, BC2TransferActivity.this,  getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
                         dialog.dismiss();
                     }
                 }
@@ -986,7 +993,7 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
     String transfer_type;
 
     protected void customFundTransfer(final String type, final JSONObject object, Object ob, String msg, final String input) {
-        final Dialog dialog = new Dialog(getActivity());
+        final Dialog dialog = new Dialog(this);
         LayoutInflater inflater = getLayoutInflater();
         View alertLayout = inflater.inflate(R.layout.custom_layout_common, null);
         alertLayout.setKeepScreenOn(true);
@@ -1004,7 +1011,7 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
             @Override
             public void onClick(View v) {
                 btn_ok.setClickable(false);
-                hideKeyboard(getActivity());
+                hideKeyboard(BC2TransferActivity.this);
                 if (type.equalsIgnoreCase("Fund Transfer")) {
                     if (!ImageUtils.commonAmount(ben_amount.getText().toString())) {
                         ben_amount.setError("Please enter valid amount.");
@@ -1020,7 +1027,7 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
                         btn_ok.setClickable(true);
                     } else {
                         transfer_type = input;
-                        new WalletAsyncMethod(WebConfig.BCRemittanceApp, service_fee(ben_amount.getText().toString(), "Money_Transfer_Bene").toString(), headerData, BCTransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+                        new WalletAsyncMethod(WebConfig.BC2RemittanceApp, service_fee(ben_amount.getText().toString(), "DMT_BC_AC_TRANSFER").toString(), headerData, BC2TransferActivity.this,  getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
                         dialog.dismiss();
                     }
                 }
@@ -1044,7 +1051,7 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
     AppCompatButton btn_cancel, btn_ok, btn_regenerate;
 
     protected void customDialog_Common(final String type, final JSONObject object, Object ob, String msg, String input) {
-        dialog = new Dialog(getActivity());
+        dialog = new Dialog(this);
         LayoutInflater inflater = getLayoutInflater();
         View alertLayout = inflater.inflate(R.layout.custom_layout_common, null);
         alertLayout.setKeepScreenOn(true);
@@ -1090,7 +1097,7 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
                 customView(alertLayout, msg, dialog);
             } else if (msg.equalsIgnoreCase("VerifyLayout")) {
                 if (type.equalsIgnoreCase("Fund Transfer Details"))
-                    customReceiptNew(type, object, BCTransferFragment.this);
+                    customReceiptNew(type, object, BC2TransferActivity.this);
                 else {
                     btn_ok.setText("Add Beneficiary");
                     alertLayout.findViewById(R.id.verifytransferlayout).setVisibility(View.VISIBLE);
@@ -1112,7 +1119,7 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
         btn_ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                hideKeyboard(getActivity());
+                hideKeyboard(BC2TransferActivity.this);
                 if (type.equalsIgnoreCase("BENLAYOUT")) {
                     customFundTransfer("Fund Transfer", null, pozo, "Sure you want to Transfer?", btn_ok.getText().toString());
                     dialog.dismiss();
@@ -1120,17 +1127,19 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
                     try {
                         if (!object.getString("subType").equalsIgnoreCase("Money_Transfer")) {
                             if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && newtpin.getText().toString().length() == 4) {
-                                new WalletAsyncMethod(WebConfig.BCRemittanceApp, getMoney_Validate(ben_amount.getText().toString(), pozo.getBeneficiaryId()).toString(), headerData, BCTransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+                                //need to change for bc2
+                                new WalletAsyncMethod(WebConfig.BC2DMTBC2Service, getMoney_Validate(ben_amount.getText().toString(),object, pozo.getBeneficiaryId()).toString(), headerData, BC2TransferActivity.this,  getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
 
                             } else if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && (newtpin.getText().toString().isEmpty() || newtpin.getText().toString().length() != 4)) {
                                 newtpin.setError("Please enter TPIN");
                                 newtpin.requestFocus();
                             } else if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("N")) {
-                                new WalletAsyncMethod(WebConfig.BCRemittanceApp, getMoney_Validate(ben_amount.getText().toString(), pozo.getBeneficiaryId()).toString(), headerData, BCTransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+                                //need to change for bc2
+                                new WalletAsyncMethod(WebConfig.BC2DMTBC2Service, getMoney_Validate(ben_amount.getText().toString(),object, pozo.getBeneficiaryId()).toString(), headerData, BC2TransferActivity.this, getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
 
                             }
                         } else {
-                            new WalletAsyncMethod(WebConfig.FUNDTRANSFER_URL, getJson_Validate().toString(), headerData, BCTransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+                            new WalletAsyncMethod(WebConfig.FUNDTRANSFER_URL, getJson_Validate().toString(), headerData, BC2TransferActivity.this, getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
                             dialog.dismiss();
                         }
                     } catch (Exception e) {
@@ -1147,14 +1156,14 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
                         ben_amount.setError("Maximum transfer amount would be " + limit + ".");
                         ben_amount.requestFocus();
                     } else {
-                        new WalletAsyncMethod(WebConfig.BCRemittanceApp, service_fee(ben_amount.getText().toString(), "Money_Transfer_Bene").toString(), headerData, BCTransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+                        new WalletAsyncMethod(WebConfig.BC2RemittanceApp, service_fee(ben_amount.getText().toString(), "Money_Transfer_Bene").toString(), headerData, BC2TransferActivity.this,  getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
                         dialog.dismiss();
                     }
                 } else if (type.equalsIgnoreCase("KYCLAYOUTLAY")) {
-                    new WalletAsyncMethod(WebConfig.BCRemittanceApp, getSender_Validate().toString(), headerData, BCTransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+                    new WalletAsyncMethod(WebConfig.BC2RemittanceApp, getSender_Validate().toString(), headerData, BC2TransferActivity.this, getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
                     dialog.dismiss();
                 } else if (type.equalsIgnoreCase("Beneficiary Details")) {
-                    new WalletAsyncMethod(WebConfig.BCRemittanceApp, delete_Benef((BeneficiaryDetailsPozo) pozo).toString(), headerData, BCTransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+                    new WalletAsyncMethod(WebConfig.BC2RemittanceApp, delete_Benef((BeneficiaryDetailsPozo) pozo).toString(), headerData, BC2TransferActivity.this, getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
                     dialog.dismiss();
                 } else if (type.equalsIgnoreCase("Money Transfer") || type.equalsIgnoreCase("Account Verify Details") || type.equalsIgnoreCase("Cannot generate receipt now please try later!")) {
                     input_account.setText("");
@@ -1163,7 +1172,7 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
                     dialog.dismiss();
                     if (type.equalsIgnoreCase("Account Verify Details")) {
                         try {
-                            new WalletAsyncMethod(WebConfig.BCRemittanceApp, addBeneAccount(object.getString("accountNo"), object.getString("ifscCode"), object.getString("bankAccountName"), "C", "IMPS").toString(), headerData, BCTransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+                            new WalletAsyncMethod(WebConfig.BC2RemittanceApp, addBeneAccount(object.getString("accountNo"), object.getString("ifscCode"), object.getString("bankAccountName"), "C", "IMPS").toString(), headerData, BC2TransferActivity.this,  getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
 //                            alertDialog.dismiss();
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -1202,10 +1211,10 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
             clear();
             receipt_clicked = false;
         } else if (type.equalsIgnoreCase("KYCLAYOUTS"))
-            new WalletAsyncMethod(WebConfig.BCRemittanceApp, getSender_Validate().toString(), headerData, BCTransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+            new WalletAsyncMethod(WebConfig.BC2RemittanceApp, getSender_Validate().toString(), headerData, BC2TransferActivity.this, this, getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
         else if (type.equalsIgnoreCase("Fund Transfer Details")) {
 //            localStorage.setActivityState(LocalStorage.ROUTESTATE, "UPDATE");
-            new WalletAsyncMethod(WebConfig.BCRemittanceApp, getSender_Validate().toString(), headerData, BCTransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+            new WalletAsyncMethod(WebConfig.BC2RemittanceApp, getSender_Validate().toString(), headerData, BC2TransferActivity.this, this, getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
         }
     }
 
@@ -1213,6 +1222,5 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
     public void cancelClicked(String type, Object ob) {
 
     }
-
 }
 

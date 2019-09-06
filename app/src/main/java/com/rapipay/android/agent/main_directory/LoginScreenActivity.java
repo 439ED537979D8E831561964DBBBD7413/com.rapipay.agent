@@ -38,7 +38,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 public class LoginScreenActivity extends BaseCompactActivity implements View.OnClickListener, RequestHandler, CustomInterface, VersionListener {
-
     final private static int PERMISSIONS_REQUEST_READ_PHONE_STATE = 0;
     EditText input_user;
     TextInputEditText input_password;
@@ -152,29 +151,33 @@ public class LoginScreenActivity extends BaseCompactActivity implements View.OnC
         }
     }
 
+    public boolean clickables() {
+        if (input_user.getText().toString().length() != 10) {
+            input_user.setError("Please enter mandatory field");
+            return false;
+        } else if (input_password.getText().toString().isEmpty()) {
+            input_password.setError("Please enter mandatory field");
+            return false;
+        } else
+            return true;
+    }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_login:
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    if (input_user.getText().toString().length() != 10)
-                        input_user.setError("Please enter mandatory field");
-                    else if (input_password.getText().toString().isEmpty())
-                        input_password.setError("Please enter mandatory field");
-                    else
-                        loadVersion(imei);
+                deleteHandsetRegistrationTables();
+                if(clickables()){
+                    loadVersion(imei);
+                } else {
+                    btn_login.setClickable(true);
                 }
-                handlercontrol();
                 break;
             case R.id.btn_fosuser:
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    Intent intent = new Intent(LoginScreenActivity.this, FOSLoginActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    startActivity(intent);
-                }
-                handlercontrol();
+                findViewById(R.id.btn_fosuser).setClickable(false);
+                Intent intent = new Intent(LoginScreenActivity.this, FOSLoginActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
                 break;
         }
     }
@@ -195,11 +198,12 @@ public class LoginScreenActivity extends BaseCompactActivity implements View.OnC
                 customDialog_Common("KYCLAYOUTS", null, null, "RapiPay Login Failed", null, object.getString("responseMessage"), LoginScreenActivity.this);
             } else if (object.getString("responseCode").equalsIgnoreCase("75077")) {
                 customDialog_Common("KYCLAYOUTS", null, null, "RapiPay Login Failed", null, object.getString("responseMessage"), LoginScreenActivity.this);
-            }else {
+            } else {
                 responseMSg(object);
                 input_user.setText("");
                 input_password.setText("");
             }
+         //   btn_login.setClickable(true);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -215,6 +219,7 @@ public class LoginScreenActivity extends BaseCompactActivity implements View.OnC
         if (type.equalsIgnoreCase("KYCLAYOUTS")) {
             input_user.setText("");
             input_password.setText("");
+         //   btn_login.setClickable(true);
         } else if (type.equalsIgnoreCase("KYCLAYOUTSS")) {
             Intent webIntent = new Intent(Intent.ACTION_VIEW,
                     Uri.parse("https://play.google.com/store/apps/details?id=" + getPackageName()));

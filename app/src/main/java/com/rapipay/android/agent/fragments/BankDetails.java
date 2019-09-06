@@ -35,8 +35,9 @@ public class BankDetails extends BaseFragment implements RequestHandler {
 
     ArrayList<BankDetailPozo> detailPozoArrayList;
     RecyclerView recycler_view;
-    TextView note1, note2,heading;
+    TextView note1, note2, heading;
     protected String headerData = (WebConfig.BASIC_USERID + ":" + WebConfig.BASIC_PASSWORD);
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
@@ -48,6 +49,7 @@ public class BankDetails extends BaseFragment implements RequestHandler {
         url();
         return rv;
     }
+
     private void initialize(View view) {
         heading = (TextView) view.findViewById(R.id.toolbar_title);
         heading.setText("Bank Details for Deposit");
@@ -57,7 +59,7 @@ public class BankDetails extends BaseFragment implements RequestHandler {
     }
 
     private void url() {
-        new AsyncPostMethod(WebConfig.LOGIN_URL, getWLDetails().toString(), headerData, BankDetails.this,getActivity(), getString(R.string.responseTimeOut)).execute();
+        new AsyncPostMethod(WebConfig.LOGIN_URL, getWLDetails().toString(), headerData, BankDetails.this, getActivity(), getString(R.string.responseTimeOut)).execute();
     }
 
 
@@ -79,7 +81,7 @@ public class BankDetails extends BaseFragment implements RequestHandler {
                 e.printStackTrace();
             }
         } else {
-            Toast.makeText(getActivity(),"Blank Value", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "Blank Value", Toast.LENGTH_SHORT).show();
         }
         return jsonObject;
     }
@@ -100,7 +102,10 @@ public class BankDetails extends BaseFragment implements RequestHandler {
                     parseBankDetails(new JSONObject(text));
 
                 }
-            }else{
+            } else if (object.getString("responseCode").equalsIgnoreCase("60147")) {
+                Toast.makeText(getActivity(), object.getString("responseCode"), Toast.LENGTH_LONG).show();
+                setBack_click1(getActivity());
+            } else {
                 responseMSg(object);
             }
         } catch (Exception e) {
@@ -119,7 +124,7 @@ public class BankDetails extends BaseFragment implements RequestHandler {
             for (int i = 0; i < array.length(); i++) {
                 JSONObject object = array.getJSONObject(i);
                 if (object.getString("ECOL").equalsIgnoreCase("Y"))
-                    detailPozoArrayList.add(new BankDetailPozo(object.getString("BANK"), object.getString("NAME"), object.getString("AC NO.")+list.get(0).getMobilno(), object.getString("BRANCH"), object.getString("IFSC"), object.getString("DEPOSIT"), object.getString("ECOL")));
+                    detailPozoArrayList.add(new BankDetailPozo(object.getString("BANK"), object.getString("NAME"), object.getString("AC NO.") + list.get(0).getMobilno(), object.getString("BRANCH"), object.getString("IFSC"), object.getString("DEPOSIT"), object.getString("ECOL")));
                 else
                     detailPozoArrayList.add(new BankDetailPozo(object.getString("BANK"), object.getString("NAME"), object.getString("AC NO."), object.getString("BRANCH"), object.getString("IFSC"), object.getString("DEPOSIT"), object.getString("ECOL")));
             }

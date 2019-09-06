@@ -2,14 +2,17 @@ package com.rapipay.android.agent.main_directory;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.support.annotation.Nullable;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.rapipay.android.agent.Model.NetworkManagePozo;
 import com.rapipay.android.agent.Model.NetworkTransferPozo;
@@ -58,6 +61,12 @@ public class NetworkTransferActivity extends BaseCompactActivity implements Requ
         new AsyncPostMethod(WebConfig.CommonReport, getNetwork_Validate("GET_MY_NODE_DETAILS", list.get(0).getMobilno(), first, last).toString(), headerData, NetworkTransferActivity.this, getString(R.string.responseTimeOut), "GETNODEDETAILS").execute();
     }
 
+    @Override
+    protected void onPause() {
+        trans_details.setEnabled(true);
+        super.onPause();
+    }
+
     private void initialize() {
         header = (TextView) findViewById(R.id.header);
         back_click = (ImageView) findViewById(R.id.back_clicked);
@@ -68,18 +77,16 @@ public class NetworkTransferActivity extends BaseCompactActivity implements Requ
         trans_details.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    if (clickedId.equalsIgnoreCase("2")) {
-                        NetworkTransferPozo pozo = transactionPozoArrayList.get(position);
-                        if (!pozo.getAgentCategory().equalsIgnoreCase("Retailer")) {
-                            logList.add(new NetworkManagePozo(pozo.getMobileNo(), pozo.getMobileNo()));
-                            mobileNo = pozo.getMobileNo();
-                            customDialog_Common("NETWORKLAYOUT", null, pozo, "Network Option", null, null, NetworkTransferActivity.this);
-                        } else
-                            reDirect_Activity(pozo);
-                    }
-                }handlercontrol();
+                if (clickedId.equalsIgnoreCase("2")) {
+                    NetworkTransferPozo pozo = transactionPozoArrayList.get(position);
+                    if (!pozo.getAgentCategory().equalsIgnoreCase("Retailer")) {
+                        logList.add(new NetworkManagePozo(pozo.getMobileNo(), pozo.getMobileNo()));
+                        mobileNo = pozo.getMobileNo();
+                        trans_details.setEnabled(false);
+                        customDialog_Common("NETWORKLAYOUT", null, pozo, "Network Option", null, null, NetworkTransferActivity.this);
+                    } else
+                        reDirect_Activity(pozo);
+                }
             }
         });
         trans_details.setOnScrollListener(new AbsListView.OnScrollListener() {
@@ -101,6 +108,7 @@ public class NetworkTransferActivity extends BaseCompactActivity implements Requ
         });
     }
 
+
     @Override
     public void chechStatus(JSONObject object) {
         try {
@@ -114,9 +122,13 @@ public class NetworkTransferActivity extends BaseCompactActivity implements Requ
                 } else if (object.getString("serviceType").equalsIgnoreCase("C2C_NETWORK_CREDIT")) {
                     customDialog_Common("KYCLAYOUT", null, null, "Network Detail", null, object.getString("responseMessage"), NetworkTransferActivity.this);
                 }
-            }else {
+            } else if (object.getString("responseCode").equalsIgnoreCase("60147")) {
+                Toast.makeText(this,object.getString("responseCode"),Toast.LENGTH_LONG).show();
+                setBack_click1(this);
+            } else {
                 responseMSg(object);
             }
+            trans_details.setEnabled(true);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -204,16 +216,13 @@ public class NetworkTransferActivity extends BaseCompactActivity implements Requ
                 finish();
                 break;
             case R.id.back_clicked:
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    if (logList.size() != 0) {
-                        new AsyncPostMethod(WebConfig.CommonReport, getNetwork_Validate("GET_MY_NODE_DETAILS", logList.get(logList.size() - 2).getBackMaintain(), first, last).toString(), headerData, NetworkTransferActivity.this, getString(R.string.responseTimeOut), "GETNODEDETAILS").execute();
-                        logList.remove(logList.size() - 1);
-                        if (logList.size() == 1)
-                            back_click.setVisibility(View.GONE);
-                    }
+                v.findViewById(R.id.back_clicked).setClickable(false);
+                if (logList.size() != 0) {
+                    new AsyncPostMethod(WebConfig.CommonReport, getNetwork_Validate("GET_MY_NODE_DETAILS", logList.get(logList.size() - 2).getBackMaintain(), first, last).toString(), headerData, NetworkTransferActivity.this, getString(R.string.responseTimeOut), "GETNODEDETAILS").execute();
+                    logList.remove(logList.size() - 1);
+                    if (logList.size() == 1)
+                        back_click.setVisibility(View.GONE);
                 }
-                handlercontrol();
                 break;
         }
     }

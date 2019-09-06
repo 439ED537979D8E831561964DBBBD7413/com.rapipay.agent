@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class BarcodeActivity extends BaseCompactActivity implements VersionListener {
-
     SurfaceView surfaceView;
     TextView txtBarcodeValue;
     private BarcodeDetector barcodeDetector;

@@ -31,6 +31,12 @@ public class MyCommission extends BaseCompactActivity implements View.OnClickLis
         tabLayout = (TabLayout) findViewById(R.id.bottomNavigation);
         toolbar_title = (TextView) findViewById(R.id.toolbar_title);
         toolbar_title.setText(list.get(0).getAgentName());
+        heading = (TextView) findViewById(R.id.toolbar_title);
+        if (balance != null) {
+            heading.setText("My Commission" + " (Balance : Rs." + balance + ")");
+        } else {
+            heading.setText("My Commission");
+        }
         bindWidgetsWithAnEvent();
         setupTabLayout();
     }

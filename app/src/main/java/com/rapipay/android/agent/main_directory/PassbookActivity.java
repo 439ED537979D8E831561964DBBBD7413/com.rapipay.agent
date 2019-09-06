@@ -30,7 +30,6 @@ import java.util.Locale;
 import me.grantland.widget.AutofitTextView;
 
 public class PassbookActivity extends BaseCompactActivity implements View.OnClickListener, RequestHandler {
-
     ListView trans_details;
     private boolean isLoading;
     TextView heading;
@@ -102,23 +101,23 @@ public class PassbookActivity extends BaseCompactActivity implements View.OnClic
                 finish();
                 break;
             case R.id.btn_fund:
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    if (date2_text.getText().toString().isEmpty()) {
-                        date2_text.setError("Please enter mandatory field");
-                        date2_text.requestFocus();
-                    } else if (date1_text.getText().toString().isEmpty()) {
-                        date1_text.setError("Please enter mandatory field");
-                        date1_text.requestFocus();
-                    } else if (printDifference(mainDate(date2_text.getText().toString()), mainDate(date1_text.getText().toString()))) {
-                        trans_details.setVisibility(View.VISIBLE);
-                        new AsyncPostMethod(WebConfig.CommonReport, channel_request(first, last).toString(), headerData, PassbookActivity.this, getString(R.string.responseTimeOut)).execute();
-                    } else {
-                        customDialog_Common("Statement can only view from one month");
-                        trans_details.setVisibility(View.GONE);
-                    }
+                findViewById(R.id.btn_fund).setClickable(false);
+                if (date2_text.getText().toString().isEmpty()) {
+                    date2_text.setError("Please enter mandatory field");
+                    date2_text.requestFocus();
+                    findViewById(R.id.btn_fund).setClickable(true);
+                } else if (date1_text.getText().toString().isEmpty()) {
+                    date1_text.setError("Please enter mandatory field");
+                    date1_text.requestFocus();
+                    findViewById(R.id.btn_fund).setClickable(true);
+                } else if (printDifference(mainDate(date2_text.getText().toString()), mainDate(date1_text.getText().toString()))) {
+                    trans_details.setVisibility(View.VISIBLE);
+                    new AsyncPostMethod(WebConfig.CommonReport, channel_request(first, last).toString(), headerData, PassbookActivity.this, getString(R.string.responseTimeOut)).execute();
+                } else {
+                    customDialog_Common("Statement can only view from one month");
+                    trans_details.setVisibility(View.GONE);
+                    findViewById(R.id.btn_fund).setClickable(true);
                 }
-                handlercontrol();
                 break;
         }
     }
@@ -156,10 +155,14 @@ public class PassbookActivity extends BaseCompactActivity implements View.OnClic
                             trans_details.setVisibility(View.VISIBLE);
                         }
                 }
+            } else if (object.getString("responseCode").equalsIgnoreCase("60147")) {
+                Toast.makeText(this,object.getString("responseCode"),Toast.LENGTH_LONG).show();
+                setBack_click(this);
             } else {
                 responseMSg(object);
                 trans_details.setVisibility(View.GONE);
             }
+            findViewById(R.id.btn_fund).setClickable(true);
         } catch (Exception e) {
             e.printStackTrace();
         }

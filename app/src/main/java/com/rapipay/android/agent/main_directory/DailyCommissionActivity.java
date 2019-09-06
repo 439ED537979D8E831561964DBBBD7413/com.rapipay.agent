@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.AbsListView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.rapipay.android.agent.Model.CommissionPozo;
 import com.rapipay.android.agent.R;
@@ -22,7 +23,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class DailyCommissionActivity extends BaseCompactActivity implements RequestHandler,View.OnClickListener {
+public class DailyCommissionActivity extends BaseCompactActivity implements RequestHandler, View.OnClickListener {
 
     String type;
     TextView header;
@@ -42,7 +43,7 @@ public class DailyCommissionActivity extends BaseCompactActivity implements Requ
     }
 
     private void loadApi() {
-        new AsyncPostMethod(WebConfig.CommonReport, getNetwork_Validate(first, last).toString(), headerData, DailyCommissionActivity.this,getString(R.string.responseTimeOut),type).execute();
+        new AsyncPostMethod(WebConfig.CommonReport, getNetwork_Validate(first, last).toString(), headerData, DailyCommissionActivity.this, getString(R.string.responseTimeOut), type).execute();
     }
 
     private void initialize() {
@@ -68,7 +69,7 @@ public class DailyCommissionActivity extends BaseCompactActivity implements Requ
                 if (totalItemCount != 0 && totalItemCount == last && lastInScreen == totalItemCount && !isLoading) {
                     first = last + 1;
                     last += 25;
-                    new AsyncPostMethod(WebConfig.CommonReport, getNetwork_Validate(first, last).toString(), headerData, DailyCommissionActivity.this,getString(R.string.responseTimeOut),type).execute();
+                    new AsyncPostMethod(WebConfig.CommonReport, getNetwork_Validate(first, last).toString(), headerData, DailyCommissionActivity.this, getString(R.string.responseTimeOut), type).execute();
                     isLoading = true;
                 }
             }
@@ -113,7 +114,10 @@ public class DailyCommissionActivity extends BaseCompactActivity implements Requ
                         }
                     }
                 }
-            }else {
+            } else if (object.getString("responseCode").equalsIgnoreCase("60147")) {
+                Toast.makeText(this,object.getString("responseCode"),Toast.LENGTH_LONG).show();
+                setBack_click1(this);
+            } else {
                 responseMSg(object);
             }
         } catch (Exception e) {
@@ -126,7 +130,7 @@ public class DailyCommissionActivity extends BaseCompactActivity implements Requ
         try {
             for (int i = 0; i < array.length(); i++) {
                 JSONObject object = array.getJSONObject(i);
-                transactionPozoArrayList.add(new CommissionPozo(object.getString("transactionType"), object.getString("transactionAmount")+ " / " + object.getString("crDrAmount") + " "+ object.getString("crDrType"),object.getString("transactionID") + " / "+ object.getString("transactionDate"), object.getString("transactionStatus")+ " / " + object.getString("settleStatus")));
+                transactionPozoArrayList.add(new CommissionPozo(object.getString("transactionType"), object.getString("transactionAmount") + " / " + object.getString("crDrAmount") + " " + object.getString("crDrType"), object.getString("transactionID") + " / " + object.getString("transactionDate"), object.getString("transactionStatus") + " / " + object.getString("settleStatus")));
             }
         } catch (Exception e) {
             e.printStackTrace();

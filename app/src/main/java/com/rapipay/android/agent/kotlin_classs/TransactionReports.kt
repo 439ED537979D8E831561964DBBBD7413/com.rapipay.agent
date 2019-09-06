@@ -31,7 +31,8 @@ class TransactionReports : BaseFragment(), RequestHandler, View.OnClickListener,
     protected var date1_text: AutofitTextView? = null
     protected var toimage: ImageView? = null
     protected var fromimage: ImageView? = null
-
+    private var mLastClickTime = System.currentTimeMillis()
+    private val CLICK_TIME_INTERVAL: Long = 1000
     protected var selectedDate: Int = 0
     protected var selectedMonth: Int = 0
     protected var selectedYear: Int = 0
@@ -57,6 +58,8 @@ class TransactionReports : BaseFragment(), RequestHandler, View.OnClickListener,
         selectedYear = calendar.get(Calendar.YEAR)
         date2_text = v.findViewById<View>(R.id.date2) as AutofitTextView
         date1_text = v.findViewById<View>(R.id.date1) as AutofitTextView
+        date2_text!!.setText("$selectedYear-$selectedMonth-$selectedDate")
+        date1_text!!.setText("$selectedYear-$selectedMonth-$selectedDate")
         v.findViewById<View>(R.id.todate).setOnClickListener(toDateClicked)
         v.findViewById<View>(R.id.btn_fund).setOnClickListener(this)
         v.findViewById<View>(R.id.date1).setOnClickListener(toDateClicked)
@@ -66,13 +69,16 @@ class TransactionReports : BaseFragment(), RequestHandler, View.OnClickListener,
         toimage!!.setOnClickListener(toDateClicked)
         fromimage = v.findViewById<View>(R.id.fromimage) as ImageView
         fromimage!!.setOnClickListener(fromDateClicked)
+        loadUrl()
         trans_details!!.setOnItemClickListener(AdapterView.OnItemClickListener { parent, view, position, id ->
-            if (btnstatus == false) {
-                btnstatus = true
-                val pozo = transactionPozoArrayList!!.get(position)
-                AsyncPostMethod(WebConfig.WALLETRECEIPTURL, receipt_request(pozo).toString(), headerData, this@TransactionReports, activity, getString(R.string.responseTimeOut), "RECEIPTREQUEST").execute()
+            val now = System.currentTimeMillis()
+            if (now - mLastClickTime < CLICK_TIME_INTERVAL) {
+                return@OnItemClickListener
             }
-            handlercontrol()
+            mLastClickTime = now
+            val pozo = transactionPozoArrayList!!.get(position)
+            AsyncPostMethod(WebConfig.WALLETRECEIPTURL, receipt_request(pozo).toString(), headerData, this@TransactionReports, activity, getString(R.string.responseTimeOut), "RECEIPTREQUEST").execute()
+
         })
         trans_details!!.setOnScrollListener(object : AbsListView.OnScrollListener {
             override fun onScrollStateChanged(view: AbsListView, scrollState: Int) {
@@ -89,6 +95,11 @@ class TransactionReports : BaseFragment(), RequestHandler, View.OnClickListener,
                 }
             }
         })
+    }
+
+    override fun onPause() {
+        trans_details!!.setClickable(true)
+        super.onPause()
     }
 
     override fun okClicked(type: String?, ob: Any?) {
@@ -232,6 +243,28 @@ class TransactionReports : BaseFragment(), RequestHandler, View.OnClickListener,
         return jsonObject
     }
 
+    /* fun lienHistory(date2_text: String, date1_text: String): JSONObject {
+         val jsonObject = JSONObject()
+         try {
+             jsonObject.put("serviceType", "GET_AGENT_LIEN_DETAILS")
+             jsonObject.put("requestType", "REPORT_CHANNEL")
+             jsonObject.put("typeMobileWeb", "mobile")
+             jsonObject.put("transactionID", ImageUtils.miliSeconds())
+             jsonObject.put("nodeAgentId", list[0].mobilno)
+             jsonObject.put("agentMobile", list[0].mobilno)
+             jsonObject.put("sessionRefNo", list[0].aftersessionRefNo)
+             jsonObject.put("txnIP", ImageUtils.ipAddress(activity!!))
+             jsonObject.put("fromTxnDate", date2_text)
+             jsonObject.put("toTxnDate", date1_text)
+             jsonObject.put("checkSum", GenerateChecksum.checkSum(list[0].pinsession, jsonObject.toString()))
+
+         } catch (e: Exception) {
+             e.printStackTrace()
+         }
+
+         return jsonObject
+     }*/
+
     override fun onClick(v: View?) {
         when (v!!.getId()) {
             R.id.btn_fund -> if (date2_text!!.getText().toString().isEmpty()) {
@@ -281,7 +314,10 @@ class TransactionReports : BaseFragment(), RequestHandler, View.OnClickListener,
                         }
 
                 }
-            }else
+            } else if (`object`.getString("responseCode").equals("60147", ignoreCase = true)) run {
+                Toast.makeText(context, `object`.getString("responseCode"), Toast.LENGTH_LONG).show()
+                setBack_click1(context)
+            } else
                 responseMSg(`object`)
         } catch (e: Exception) {
             e.printStackTrace()

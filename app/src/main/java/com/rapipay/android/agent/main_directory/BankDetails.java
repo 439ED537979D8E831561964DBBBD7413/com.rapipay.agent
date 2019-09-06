@@ -107,7 +107,10 @@ public class BankDetails extends BaseCompactActivity implements RequestHandler, 
                     parseBankDetails(new JSONObject(text));
 
                 }
-            }else {
+            } else if (object.getString("responseCode").equalsIgnoreCase("60147")) {
+                Toast.makeText(this,object.getString("responseCode"),Toast.LENGTH_LONG).show();
+                setBack_click1(this);
+            } else {
                 responseMSg(object);
             }
         } catch (Exception e) {
@@ -126,7 +129,7 @@ public class BankDetails extends BaseCompactActivity implements RequestHandler, 
             for (int i = 0; i < array.length(); i++) {
                 JSONObject object = array.getJSONObject(i);
                 if (object.getString("ECOL").equalsIgnoreCase("Y"))
-                    detailPozoArrayList.add(new BankDetailPozo(object.getString("BANK"), object.getString("NAME"), object.getString("AC NO.")+list.get(0).getMobilno(), object.getString("BRANCH"), object.getString("IFSC"), object.getString("DEPOSIT"), object.getString("ECOL")));
+                    detailPozoArrayList.add(new BankDetailPozo(object.getString("BANK"), object.getString("NAME"), object.getString("AC NO.") + list.get(0).getMobilno(), object.getString("BRANCH"), object.getString("IFSC"), object.getString("DEPOSIT"), object.getString("ECOL")));
                 else
                     detailPozoArrayList.add(new BankDetailPozo(object.getString("BANK"), object.getString("NAME"), object.getString("AC NO."), object.getString("BRANCH"), object.getString("IFSC"), object.getString("DEPOSIT"), object.getString("ECOL")));
             }

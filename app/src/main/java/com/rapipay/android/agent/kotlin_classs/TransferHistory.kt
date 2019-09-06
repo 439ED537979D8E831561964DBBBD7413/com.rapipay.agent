@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.DatePicker
 import android.widget.ImageView
 import android.widget.ListView
+import android.widget.Toast
 import com.rapipay.android.agent.Model.ChannelHistoryPozo
 import com.rapipay.android.agent.R
 import com.rapipay.android.agent.adapter.ChannelListAdapter
@@ -20,9 +21,9 @@ import org.json.JSONObject
 import java.lang.Exception
 import java.util.*
 
-class TransferHistory : BaseFragment(), RequestHandler,View.OnClickListener {
+class TransferHistory : BaseFragment(), RequestHandler, View.OnClickListener {
     protected var headerData = WebConfig.BASIC_USERID + ":" + WebConfig.BASIC_PASSWORD
-    var transactionPozoArrayList : ArrayList<ChannelHistoryPozo>? = null
+    var transactionPozoArrayList: ArrayList<ChannelHistoryPozo>? = null
     var reqFor: String? = null
     var adapters: ChannelListAdapter? = null
     var trans_details: ListView? = null
@@ -49,16 +50,23 @@ class TransferHistory : BaseFragment(), RequestHandler,View.OnClickListener {
         v.findViewById<View>(R.id.date2).setOnClickListener(fromDateClicked)
         toimage = v.findViewById<View>(R.id.toimage) as ImageView
         v.findViewById<View>(R.id.btn_fund).setOnClickListener(this)
+        val calendar = Calendar.getInstance()
+        selectedDate = calendar.get(Calendar.DAY_OF_MONTH)
+        selectedMonth = calendar.get(Calendar.MONTH) + 1
+        selectedYear = calendar.get(Calendar.YEAR)
+        date2_text!!.setText("$selectedYear-$selectedMonth-$selectedDate")
+        date1_text!!.setText("$selectedYear-$selectedMonth-$selectedDate")
+        loadUrl()
         toimage!!.setOnClickListener(toDateClicked)
         fromimage = v.findViewById<View>(R.id.fromimage) as ImageView
         fromimage!!.setOnClickListener(fromDateClicked)
         return v
     }
+
     protected var toDateClicked: View.OnClickListener = View.OnClickListener {
         val dialog = Dialog(activity)
         dialog.setContentView(R.layout.datepickerview)
         dialog.setTitle("")
-
         val datePicker = dialog.findViewById<DatePicker>(R.id.datePicker1)
         val calendar = Calendar.getInstance()
         calendar.timeInMillis = System.currentTimeMillis()
@@ -140,6 +148,7 @@ class TransferHistory : BaseFragment(), RequestHandler,View.OnClickListener {
         }
         dialog.show()
     }
+
     override fun onClick(v: View?) {
         when (v!!.getId()) {
             R.id.btn_fund -> if (date2_text!!.getText().toString().isEmpty()) {
@@ -157,6 +166,7 @@ class TransferHistory : BaseFragment(), RequestHandler,View.OnClickListener {
             }
         }
     }
+
     fun loadUrl() {
         AsyncPostMethod(WebConfig.CommonReport, getSubAgent().toString(), headerData, this, activity, getString(R.string.responseTimeOut)).execute()
     }
@@ -194,7 +204,10 @@ class TransferHistory : BaseFragment(), RequestHandler,View.OnClickListener {
                         insertLastTransDetails(`object`.getJSONArray("getTxnHistory"))
                     }
                 }
-            }else {
+            } else if (`object`.getString("responseCode").equals("60147", ignoreCase = true)) run {
+                Toast.makeText(context, `object`.getString("responseCode"), Toast.LENGTH_LONG).show()
+                setBack_click1(context)
+            } else {
                 responseMSg(`object`)
                 trans_details!!.setVisibility(View.GONE)
             }

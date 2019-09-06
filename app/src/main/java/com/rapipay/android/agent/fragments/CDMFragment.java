@@ -38,6 +38,7 @@ public class CDMFragment extends BaseFragment implements RequestHandler {
     CdmAdapter adapter;
     EditText heading;
     protected String headerData = (WebConfig.BASIC_USERID + ":" + WebConfig.BASIC_PASSWORD);
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
@@ -49,6 +50,7 @@ public class CDMFragment extends BaseFragment implements RequestHandler {
         url();
         return rv;
     }
+
     private void initialize(View view) {
         heading = (EditText) view.findViewById(R.id.heading);
         trans_details = (ListView) view.findViewById(R.id.trans_details);
@@ -57,13 +59,14 @@ public class CDMFragment extends BaseFragment implements RequestHandler {
             public void onScrollStateChanged(AbsListView view, int scrollState) {
 
             }
+
             @Override
             public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
                 int lastInScreen = firstVisibleItem + visibleItemCount;
                 if (totalItemCount != 0 && totalItemCount == last && lastInScreen == totalItemCount && !isLoading) {
                     first = last + 1;
                     last += 25;
-                    new AsyncPostMethod(WebConfig.CommonReport, getCDMDetails(first, last).toString(), headerData, CDMFragment.this,getActivity(), getString(R.string.responseTimeOut)).execute();
+                    new AsyncPostMethod(WebConfig.CommonReport, getCDMDetails(first, last).toString(), headerData, CDMFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
                     isLoading = true;
                 }
             }
@@ -88,10 +91,10 @@ public class CDMFragment extends BaseFragment implements RequestHandler {
     }
 
     private void url() {
-        new AsyncPostMethod(WebConfig.CommonReport, getCDMDetails(first, last).toString(), headerData, CDMFragment.this,getActivity(), getString(R.string.responseTimeOut)).execute();
+        new AsyncPostMethod(WebConfig.CommonReport, getCDMDetails(first, last).toString(), headerData, CDMFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
     }
 
-    public JSONObject getCDMDetails(int first,int last) {
+    public JSONObject getCDMDetails(int first, int last) {
         JSONObject jsonObject = new JSONObject();
         if (list.size() != 0) {
             try {
@@ -108,10 +111,11 @@ public class CDMFragment extends BaseFragment implements RequestHandler {
                 e.printStackTrace();
             }
         } else {
-            Toast.makeText(getActivity(),"Blank Value", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "Blank Value", Toast.LENGTH_SHORT).show();
         }
         return jsonObject;
     }
+
     @Override
     public void chechStat(String object) {
 
@@ -127,18 +131,22 @@ public class CDMFragment extends BaseFragment implements RequestHandler {
                     }
 
                 }
-            }else
+            } else if (object.getString("responseCode").equalsIgnoreCase("60147")) {
+                Toast.makeText(getActivity(), object.getString("responseCode"), Toast.LENGTH_LONG).show();
+                setBack_click1(getActivity());
+            } else
                 responseMSg(object);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
     private void insertLastTransDetails(JSONArray array) {
         transactionPozoArrayList = new ArrayList<>();
         try {
             for (int i = 0; i < array.length(); i++) {
                 JSONObject object = array.getJSONObject(i);
-                transactionPozoArrayList.add(new CDMPozo(object.getString("branchName") , object.getString("state") , object.getString("city"), object.getString("address"), object.getString("locateAt"), object.getString("pinCode")));
+                transactionPozoArrayList.add(new CDMPozo(object.getString("branchName"), object.getString("state"), object.getString("city"), object.getString("address"), object.getString("locateAt"), object.getString("pinCode")));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -146,6 +154,7 @@ public class CDMFragment extends BaseFragment implements RequestHandler {
         if (transactionPozoArrayList.size() != 0)
             initializeTransAdapter(transactionPozoArrayList);
     }
+
     private void initializeTransAdapter(ArrayList<CDMPozo> list) {
         if (first == 1) {
             adapter = new CdmAdapter(list, getActivity());

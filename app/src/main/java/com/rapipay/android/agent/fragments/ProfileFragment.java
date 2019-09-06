@@ -18,6 +18,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.rapipay.android.agent.Model.HeaderePozo;
 import com.rapipay.android.agent.Model.RapiPayPozo;
@@ -103,25 +104,46 @@ public class ProfileFragment extends BaseFragment implements RequestHandler, Vie
                 if (object.getString("serviceType").equalsIgnoreCase("GET_USER_PROFILE_DETAILS")) {
                     JSONArray array = object.getJSONArray("listUserProfileData");
                     insertLastTransDetails(array);
+                    btn_login.setClickable(true);
                 } else if (object.getString("serviceType").equalsIgnoreCase("UPDATE_USER_PROFILE_DETAILS")) {
                     customDialog_Ben(object.getString("responseMessage"), "Profile Updated Successfully");
                 }
-            }else
+            } else if (object.getString("responseCode").equalsIgnoreCase("60147")) {
+                Toast.makeText(getActivity(),object.getString("responseCode"),Toast.LENGTH_LONG).show();
+                setBack_click1(getActivity());
+            } else
                 responseMSg(object);
+            btn_login.setClickable(true);
+            btn_ok.setClickable(true);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    AlertDialog alertDialog;
+    public void clickable(){
+        try {
+            btn_ok.setClickable(true);
+            btn_login.setClickable(true);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 
+    @Override
+    public void onPause() {
+        clickable();
+        super.onPause();
+    }
+
+    AlertDialog alertDialog;
+    AppCompatButton btn_ok;
     private void customDialog_Ben(String msg, String title) {
         AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getLayoutInflater();
         View alertLayout = inflater.inflate(R.layout.custom_layout_common, null);
         AppCompatButton btn_cancel = (AppCompatButton) alertLayout.findViewById(R.id.btn_cancel);
         btn_cancel.setVisibility(View.GONE);
-        AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
+        btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
         TextView otpView = (TextView) alertLayout.findViewById(R.id.dialog_msg);
         otpView.setText(msg);
         otpView.setVisibility(View.VISIBLE);
@@ -132,18 +154,16 @@ public class ProfileFragment extends BaseFragment implements RequestHandler, Vie
         btn_ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (btnstatus == false) {
-                    btnstatus = true;
+                btn_ok.setClickable(false);
                     loadApi();
                     alertDialog.dismiss();
-                }
-                handlercontrol();
             }
         });
         btn_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 alertDialog.dismiss();
+                btn_login.setClickable(true);
             }
         });
         alertDialog = dialog.show();
@@ -233,12 +253,8 @@ public class ProfileFragment extends BaseFragment implements RequestHandler, Vie
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_login:
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    HashMap<String, String> list = headerePozoArrayList;
-                    new AsyncPostMethod(WebConfig.LOGIN_URL, updateJson_Validate(list).toString(), "", ProfileFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
-                }
-                handlercontrol();
+                HashMap<String, String> list = headerePozoArrayList;
+                new AsyncPostMethod(WebConfig.LOGIN_URL, updateJson_Validate(list).toString(), "", ProfileFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
                 break;
         }
     }

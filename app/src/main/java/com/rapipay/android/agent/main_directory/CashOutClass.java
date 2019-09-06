@@ -25,6 +25,8 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -64,11 +66,21 @@ import com.rapipay.android.agent.view.EnglishNumberToWords;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import static com.example.rfplmantra.MantraActivity.display;
 import static com.pnsol.sdk.interfaces.PaymentTransactionConstants.CHIP_TRANSACTION_APPROVED;
 import static com.pnsol.sdk.interfaces.PaymentTransactionConstants.CHIP_TRANSACTION_DECLINED;
 import static com.pnsol.sdk.interfaces.PaymentTransactionConstants.DISPLAY_STATUS;
@@ -97,28 +109,45 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
     HostResponse type = null;
     String sign;
     private PaymentInitialization initialization;
-    private String check = "", mobileNo, amount;
+    private String check = "";
     ArrayList<AcquirerEmiDetailsVO> acquirerBanksList;
     private Spinner select_bank;
     private LinearLayout inflate_tenureee;
     private CustomProgessDialog progessDialog;
     private ListView lv_imflate;
     private AcquirerEmiDetailsVO vo = null;
+    RadioGroup radioGroup;
+    RadioButton cashid, saleid, emiid;
+    boolean radioflag = false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.cashout_layout);
-        mobileNo = getIntent().getStringExtra("mobileNo");
-        amount = getIntent().getStringExtra("amount");
-        typeput = getIntent().getStringExtra("typeput");
-        serviceType = getIntent().getStringExtra("serviceType");
-        requestChannel = getIntent().getStringExtra("requestChannel");
-        requestType = getIntent().getStringExtra("requestType");
-        reqFor = getIntent().getStringExtra("reqFor");
+        initialize();
         setUpGClient();
         initialize_hanlder();
-        initialize();
+    }
+
+    public void assignBundleValue(int position) {
+        if (position == 0) {
+            radioflag = true;
+            typeput = "CASHOUT";
+            serviceType = "MPOS_CASHOUT";
+            requestType = "MPOS-CASHOUT";
+            select_bank.setVisibility(View.GONE);
+        } else if (position == 1) {
+            radioflag = true;
+            typeput = "SALE";
+            serviceType = "MPOS_SALE";
+            requestType = "MPOS-SALE";
+            select_bank.setVisibility(View.GONE);
+        } else if (position == 2) {
+            radioflag = true;
+            typeput = "EMI";
+            serviceType = "MPOS_EMI";
+            requestType = "MPOS-EMI";
+        }
     }
 
     private void bankList() {
@@ -215,9 +244,7 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                     } catch (Exception e) {
                     }
                 }
-                if (msg.what == SOCKET_NOT_CONNECTED)
-
-                {
+                if (msg.what == SOCKET_NOT_CONNECTED) {
                     try {
                         progessDialog.hide_progress();
                         transactionFlag = false;
@@ -234,9 +261,7 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                     } catch (Exception e) {
                     }
                 }
-                if (msg.what == CHIP_TRANSACTION_APPROVED || msg.what == SWIP_TRANSACTION_APPROVED)
-
-                {
+                if (msg.what == CHIP_TRANSACTION_APPROVED || msg.what == SWIP_TRANSACTION_APPROVED) {
                     try {
                         TransactionVO vo = (TransactionVO) msg.obj;
                         PaymentInitialization initialization = new PaymentInitialization(CashOutClass.this);
@@ -250,12 +275,8 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                         e.printStackTrace();
                     }
                 }
-                if (msg.what == QPOS_DEVICE)
-
-                {
-                } else if (msg.what == TRANSACTION_FAILED || msg.what == CHIP_TRANSACTION_DECLINED || msg.what == SWIP_TRANSACTION_DECLINED)
-
-                {
+                if (msg.what == QPOS_DEVICE) {
+                } else if (msg.what == TRANSACTION_FAILED || msg.what == CHIP_TRANSACTION_DECLINED || msg.what == SWIP_TRANSACTION_DECLINED) {
                     try {
                         progessDialog.hide_progress();
                         transactionFlag = false;
@@ -276,9 +297,7 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                } else if (msg.what == ERROR_MESSAGE)
-
-                {
+                } else if (msg.what == ERROR_MESSAGE) {
                     try {
                         progessDialog.hide_progress();
                         transactionFlag = false;
@@ -294,9 +313,7 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                             Toast.makeText(CashOutClass.this, "Please pair device through bluetooth", Toast.LENGTH_SHORT).show();
                     } catch (Exception e) {
                     }
-                } else if (msg.what == TRANSACTION_PENDING)
-
-                {
+                } else if (msg.what == TRANSACTION_PENDING) {
                     try {
                         progessDialog.hide_progress();
                         transactionFlag = false;
@@ -312,40 +329,60 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                             Toast.makeText(CashOutClass.this, "Please pair device through bluetooth", Toast.LENGTH_SHORT).show();
                     } catch (Exception e) {
                     }
-                } else if (msg.what == DISPLAY_STATUS)
-
-                {
+                } else if (msg.what == DISPLAY_STATUS) {
 //                    customDialog_Common("KYCLAYOUTS", null, null, "Alert", "", (String) msg.obj, CashOutClass.this);
                     Toast.makeText(CashOutClass.this,
                             (String) msg.obj, Toast.LENGTH_SHORT).show();
-                } else if (msg.what == QPOS_EMV_MULITPLE_APPLICATION)
-
-                {
+                } else if (msg.what == QPOS_EMV_MULITPLE_APPLICATION) {
                 }
             }
         };
     }
 
     private void clear() {
-        input_amount.setText("");
-        input_mobile.setText("");
         findViewById(R.id.inflate_main).setVisibility(View.GONE);
         findViewById(R.id.getdetails).setVisibility(View.GONE);
         findViewById(R.id.getEmidetails).setVisibility(View.GONE);
         findViewById(R.id.btn_fund_mpos).setVisibility(View.VISIBLE);
+        cashid.setChecked(false);
+        saleid.setChecked(false);
+        emiid.setChecked(false);
     }
 
     AcquirerEmiDetailsVO acquirerEmiDetailsVO = null;
 
     private void initialize() {
+        if (typeput == null) {
+            typeput = "CASHOUT";
+        }
+        reqFor = "MPOS";
+        requestChannel = "MPOS_CHANNEL";
+        input_amount = (EditText) findViewById(R.id.input_amount);
+        radioGroup = (RadioGroup) findViewById(R.id.myRadioGroup);
+        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                if (checkedId == R.id.cashid) {
+                    assignBundleValue(0);
+                } else if (checkedId == R.id.saleid) {
+                    assignBundleValue(1);
+                } else if (checkedId == R.id.emiid) {
+                    assignBundleValue(2);
+                }
+            }
+        });
+        cashid = (RadioButton) findViewById(R.id.cashid);
+        saleid = (RadioButton) findViewById(R.id.saleid);
+        emiid = (RadioButton) findViewById(R.id.emiid);
+
         validator = new AccountValidator(getApplicationContext());
         heading = (TextView) findViewById(R.id.toolbar_title);
-        if (balance != null)
-            heading.setText(typeput + " (Balance : Rs." + balance + ")");
-        else
-            heading.setText(typeput);
+        if (balance != null) {
+            heading.setText("MPOS" + " (Balance : Rs." + balance + ")");
+        } else {
+            heading.setText("MPOS");
+        }
         input_mobile = (EditText) findViewById(R.id.input_mobile);
-        input_amount = (EditText) findViewById(R.id.input_amount);
 //        if (!mobileNo.isEmpty()&& !amount.isEmpty()) {
 //            input_mobile.setText(mobileNo);
 //            input_mobile.setEnabled(false);
@@ -394,11 +431,11 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
 
             @Override
             public void afterTextChanged(Editable s) {
-                if (s.length()!=0 && s.length()<10) {
+                if (s.length() != 0 && s.length() < 10) {
                     input_text.setText("");
-                    input_text.setText(EnglishNumberToWords.convert(Integer.parseInt(s.toString()))+" rupee");
+                    input_text.setText(EnglishNumberToWords.convert(Integer.parseInt(s.toString())) + " rupee");
                     input_text.setVisibility(View.VISIBLE);
-                }else
+                } else
                     input_text.setVisibility(View.GONE);
             }
         });
@@ -416,62 +453,69 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_fund_mpos:
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    hideKeyboard(CashOutClass.this);
-                    type = null;
-                    if (!ImageUtils.commonAmount(input_mobile.getText().toString())) {
-                        input_mobile.setError("Please enter mobile number");
-                        input_mobile.requestFocus();
-                    } else if (!ImageUtils.commonAmount(input_amount.getText().toString())) {
-                        input_amount.setError("Please enter amount");
-                        input_amount.requestFocus();
-                    } else {
-                        if (accessBluetoothDetails() != null)
-                            new WalletAsyncMethod(WebConfig.CASHOUT_URL, getCashOutDetails(input_mobile.getText().toString(), input_amount.getText().toString(), serviceType, requestChannel, reqFor, requestType, accessBluetoothDetails()).toString(), headerData, CashOutClass.this, getString(R.string.responseTimeOut), typeput).execute();
-                        else
-                            Toast.makeText(CashOutClass.this, "Please pair device through bluetooth", Toast.LENGTH_SHORT).show();
+                btn_fund_mpos.setClickable(false);
+                hideKeyboard(CashOutClass.this);
+                type = null;
+                if (!radioflag) {
+                    btn_fund_mpos.setClickable(true);
+                    Toast.makeText(CashOutClass.this, "Please select transaction mode", Toast.LENGTH_SHORT).show();
+                } else if (!ImageUtils.commonAmount(input_mobile.getText().toString())) {
+                    input_mobile.setError("Please enter mobile number");
+                    input_mobile.requestFocus();
+                    btn_fund_mpos.setClickable(true);
+                } else if (!ImageUtils.commonAmount(input_amount.getText().toString())) {
+                    input_amount.setError("Please enter amount");
+                    input_amount.requestFocus();
+                    btn_fund_mpos.setClickable(true);
+                } else {
+                    if (accessBluetoothDetails() != null)
+                        new WalletAsyncMethod(WebConfig.CASHOUT_URL, getCashOutDetails2(input_mobile.getText().toString(), input_amount.getText().toString(), serviceType, requestChannel, reqFor, requestType, accessBluetoothDetails()).toString(), headerData, CashOutClass.this, getString(R.string.responseTimeOut), typeput).execute();
+                    else {
+                        btn_fund_mpos.setClickable(true);
+                        Toast.makeText(CashOutClass.this, "Please pair device through bluetooth", Toast.LENGTH_SHORT).show();
                     }
                 }
-                handlercontrol();
                 break;
             case R.id.back_click:
                 setBack_click(this);
                 finish();
                 break;
             case R.id.getEmidetails:
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    if (!ImageUtils.commonAmount(input_amount.getText().toString())) {
-                        input_amount.setError("Please enter amount");
-                        input_amount.requestFocus();
-                    } else if (acquirerEmiDetailsVO == null) {
-                        select_bank.requestFocus();
-                    } else {
-                        progessDialog = new CustomProgessDialog(CashOutClass.this);
-                        initialization.getSelectedBankEMITenureList(handler, input_amount.getText().toString(), acquirerEmiDetailsVO);
-                        check = "EMIDETAILS";
-                    }
+                if (!ImageUtils.commonAmount(input_amount.getText().toString())) {
+                    input_amount.setError("Please enter amount");
+                    input_amount.requestFocus();
+                } else if (acquirerEmiDetailsVO == null) {
+                    select_bank.requestFocus();
+                } else {
+                    progessDialog = new CustomProgessDialog(CashOutClass.this);
+                    initialization.getSelectedBankEMITenureList(handler, input_amount.getText().toString(), acquirerEmiDetailsVO);
+                    check = "EMIDETAILS";
                 }
-                handlercontrol();
                 break;
             case R.id.getdetails:
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    if (vo != null) {
-                        progessDialog = new CustomProgessDialog(CashOutClass.this);
-                        initialization = new PaymentInitialization(getApplicationContext());
-                        initialization.initiateTransaction(handler, DeviceType.ME30S, accessBluetoothDetails(),
-                                input_amount.getText().toString() + ".00", PaymentTransactionConstants.EMI,
-                                PaymentTransactionConstants.CREDIT, input_mobile.getText().toString(),
-                                mylocation.getLatitude(), mylocation.getLongitude(),
-                                orderID, null, vo, 1);
-                        check = "lastvalidate";
-                    }
+                findViewById(R.id.getdetails).setClickable(false);
+                if (vo != null) {
+                    progessDialog = new CustomProgessDialog(CashOutClass.this);
+                    initialization = new PaymentInitialization(getApplicationContext());
+                    initialization.initiateTransaction(handler, DeviceType.ME30S, accessBluetoothDetails(),
+                            input_amount.getText().toString() + ".00", PaymentTransactionConstants.EMI,
+                            PaymentTransactionConstants.CREDIT, input_mobile.getText().toString(),
+                            mylocation.getLatitude(), mylocation.getLongitude(),
+                            orderID, null, vo, 1);
+                    check = "lastvalidate";
                 }
-                handlercontrol();
                 break;
         }
+    }
+
+    public void clickable() {
+        findViewById(R.id.getdetails).setClickable(false);
+    }
+
+    @Override
+    protected void onPause() {
+        clickable();
+        super.onPause();
     }
 
     boolean transactionFlag = false;
@@ -535,7 +579,7 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                 medium.add(typeput);
                 medium.add(type.getCardBrand());
                 transactionFlag = false;
-                customReceiptCastSaleOut(list.get(0).getAgentName(), left, right, bottom, medium, String.valueOf(type.getAmount()), type.getCardHolderName(), CashOutClass.this);
+                customReceiptCastSaleOut(list.get(0).getAgentName(), left, right, bottom, medium, String.valueOf(type.getAmount()), type.getCardHolderName(), CashOutClass.this, "");
             }
 //            else
 //                Toast.makeText(CashOutClass.this, new JSONObject(object).getJSONObject("responseData").getString("responseValue"), Toast.LENGTH_SHORT).show();
@@ -569,11 +613,15 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                     clear();
                     if (array.length() != 0)
                         generateReceipt(array);
-
                 }
-            }else {
+                clear();
+            } else if (object.getString("responseCode").equalsIgnoreCase("60147")) {
+                Toast.makeText(this,object.getString("responseCode"),Toast.LENGTH_LONG).show();
+                setBack_click1(this);
+            } else {
                 responseMSg(object);
             }
+            btn_fund_mpos.setClickable(true);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -640,7 +688,7 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
             }
             transactionFlag = false;
             if (left.size() != 0 && right.size() != 0 && bottom.size() != 0 && medium.size() != 0 && custName != null && amount != null)
-                customReceiptCastSaleOut(list.get(0).getAgentName(), left, right, bottom, medium, amount, custName, CashOutClass.this);
+                customReceiptCastSaleOut(list.get(0).getAgentName(), left, right, bottom, medium, amount, custName, CashOutClass.this, "");
         } catch (Exception e) {
         }
     }

@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import com.rapipay.android.agent.Model.SubAgentList
 import com.rapipay.android.agent.R
 import com.rapipay.android.agent.adapter.SubAgentAdapter
@@ -21,18 +22,20 @@ import java.lang.Exception
 
 class SubAgentFrag : BaseFragment(), RequestHandler, CustomInterface, View.OnClickListener {
     protected var headerData = WebConfig.BASIC_USERID + ":" + WebConfig.BASIC_PASSWORD
-    var createagent:TextView?=null
+    var createagent: TextView? = null
     var trans_details: RecyclerView? = null
     lateinit var listsubAgent: ArrayList<SubAgentList>
-    var pozo:SubAgentList?=null
+    var pozo: SubAgentList? = null
+
     companion object {
         var mBroadcastStringAction: String = "com.rapipay.android.agent.fragments"
         fun getCount(): String {
             return mBroadcastStringAction
         }
     }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        var view = inflater.inflate(R.layout.subagent_layout, container, false)
+        var view = inflater.inflate(R.layout.subagent_layout, container, false) as View
         if (BaseCompactActivity.dbRealm != null && BaseCompactActivity.dbRealm.details_Rapi)
             list = BaseCompactActivity.dbRealm.details
         init(view)
@@ -45,23 +48,40 @@ class SubAgentFrag : BaseFragment(), RequestHandler, CustomInterface, View.OnCli
     }
 
     fun init(v: View) {
-        createagent= v.findViewById<TextView>(R.id.createagen)
+        createagent = v.findViewById<TextView>(R.id.createagen)
         createagent!!.setOnClickListener(this);
         trans_details = v.findViewById<RecyclerView>(R.id.trans_details)
         trans_details!!.addOnItemTouchListener(RecyclerTouchListener(activity, trans_details, object : ClickListener {
             override fun onClick(view: View?, position: Int) {
-                if (btnstatus == false) {
-                    btnstatus = true
+                if (setClickable(view, isClickable) == false) {
+                    isClickable = true
+                } else {
+                    isClickable = false
+                    setClickable(view, isClickable)
                     pozo = listsubAgent[position]
                     customDialog_Common("SUBAGENTSERVICE", null, pozo, "Select Action", "", "", this@SubAgentFrag)
                 }
-                handlercontrol()
             }
 
             override fun onLongClick(view: View?, position: Int) {
             }
         }))
     }
+
+    var isClickable = true
+    fun setClickable(view: View?, clickable: Boolean): Boolean {
+        if (view != null) {
+            if (view is ViewGroup) {
+                val viewGroup = view as ViewGroup?
+                for (i in 0 until viewGroup!!.childCount) {
+                    setClickable(viewGroup.getChildAt(i), clickable)
+                }
+            }
+            view.isClickable = clickable
+        }
+        return clickable
+    }
+
 
     fun getSubAgent(): JSONObject {
         var jsonObject = JSONObject()
@@ -102,6 +122,7 @@ class SubAgentFrag : BaseFragment(), RequestHandler, CustomInterface, View.OnCli
         }
         return jsonObject
     }
+
     fun getUpdateAgentService(pozo: SubAgentList): JSONObject {
         var jsonObject = JSONObject()
         try {
@@ -119,6 +140,7 @@ class SubAgentFrag : BaseFragment(), RequestHandler, CustomInterface, View.OnCli
         }
         return jsonObject
     }
+
     fun getAgentService(pozo: SubAgentList): JSONObject {
         var activeIdList = ""
         for (i in arrayList.indices) {
@@ -135,9 +157,8 @@ class SubAgentFrag : BaseFragment(), RequestHandler, CustomInterface, View.OnCli
             jsonObject.put("sessionRefNo", list.get(0).aftersessionRefNo)
             jsonObject.put("subAgentSrvList", activeIdList)
             var increaselimit = increaselimit.text.toString()
-            jsonObject.put("increaseLimit",increaselimit)
+            jsonObject.put("increaseLimit", increaselimit)
             jsonObject.put("checkSum", GenerateChecksum.checkSum(list[0].pinsession, jsonObject.toString()))
-
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -148,8 +169,21 @@ class SubAgentFrag : BaseFragment(), RequestHandler, CustomInterface, View.OnCli
     override fun onClick(v: View?) {
         var id: Int = v!!.id
         when (id) {
-            R.id.createagen -> customDialog_Common("CREATEAGENT", null, null, "Create Sub-Agent", null, null, this@SubAgentFrag)
+            R.id.createagen -> {
+                createagent!!.setClickable(false)
+                customDialog_Common("CREATEAGENT", null, null, "Create Sub-Agent", null, null, this@SubAgentFrag)
+                createagent!!.setClickable(true)
+            }
         }
+    }
+
+    public override fun clickable() {
+        createagent!!.setClickable(true)
+    }
+
+    override fun onPause() {
+        clickable()
+        super.onPause()
     }
 
     override fun chechStat(`object`: String?) {
@@ -164,13 +198,17 @@ class SubAgentFrag : BaseFragment(), RequestHandler, CustomInterface, View.OnCli
                     customDialog_Common("KYCLAYOUTS", null, null, "Alert", "", `object`.getString("responseMessage"), this@SubAgentFrag)
                 } else if (`object`.getString("serviceType").equals("CREATE_SUB_AGENTS", ignoreCase = true)) {
                     customDialog_Common("KYCLAYOUTSS", null, null, "Alert", null, `object`.getString("responseMessage"), this@SubAgentFrag)
-                }else if (`object`.getString("serviceType").equals("GET_SUB_AGENTS_SERVICES", ignoreCase = true)) {
+                } else if (`object`.getString("serviceType").equals("GET_SUB_AGENTS_SERVICES", ignoreCase = true)) {
                     customDialog_List("UPDATESERVICE", `object`, null, "Permissions", null, null, this@SubAgentFrag)
-                }else if (`object`.getString("serviceType").equals("UPDATE_SUB_AGENT_SERVICES", ignoreCase = true)) {
+                } else if (`object`.getString("serviceType").equals("UPDATE_SUB_AGENT_SERVICES", ignoreCase = true)) {
                     customDialog_Common("KYCLAYOUTSS", null, null, "Alert", null, `object`.getString("responseMessage"), this@SubAgentFrag)
                 }
-            }else
+            } else if (`object`.getString("responseCode").equals("60147", ignoreCase = true)) run {
+                Toast.makeText(context, `object`.getString("responseCode"), Toast.LENGTH_LONG).show()
+                setBack_click1(context)
+            } else
                 responseMSg(`object`)
+            createagent!!.setClickable(true)
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -181,7 +219,7 @@ class SubAgentFrag : BaseFragment(), RequestHandler, CustomInterface, View.OnCli
         try {
             for (i in 0 until array.length()) {
                 var jsonObject = array.getJSONObject(i)
-                listsubAgent.add(SubAgentList(jsonObject.getString("subAgentMobNo"), jsonObject.getString("status"), jsonObject.getString("subAgentName"),jsonObject.getString("currentLimit")))
+                listsubAgent.add(SubAgentList(jsonObject.getString("subAgentMobNo"), jsonObject.getString("status"), jsonObject.getString("subAgentName"), jsonObject.getString("currentLimit")))
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -201,13 +239,13 @@ class SubAgentFrag : BaseFragment(), RequestHandler, CustomInterface, View.OnCli
         if (type.equals("ACTIVATELAYOUT", true)) {
             var pozo = ob as SubAgentList
             AsyncPostMethod(WebConfig.COMMONAPIS, getUpdateSubAgent(pozo).toString(), headerData, this, activity, getString(R.string.responseTimeOut)).execute();
-        } else if (type.equals("KYCLAYOUTS", true) || type.equals("KYCLAYOUTSS",true)) {
+        } else if (type.equals("KYCLAYOUTS", true) || type.equals("KYCLAYOUTSS", true)) {
             loadUrl()
         } else if (type.equals("CREATEAGENT", ignoreCase = true)) {
             AsyncPostMethod(WebConfig.SUBAGENT, createAgent().toString(), headerData, this@SubAgentFrag, activity, getString(R.string.responseTimeOut)).execute()
-        }else if(type.equals("SUBAGENTSERVICE",true)){
+        } else if (type.equals("SUBAGENTSERVICE", true)) {
             AsyncPostMethod(WebConfig.COMMONAPIS, getUpdateAgentService(ob as SubAgentList).toString(), headerData, this@SubAgentFrag, activity, getString(R.string.responseTimeOut)).execute()
-        }else if(type.equals("UPDATESERVICE",true)){
+        } else if (type.equals("UPDATESERVICE", true)) {
             AsyncPostMethod(WebConfig.COMMONAPIS, getAgentService(pozo!!).toString(), headerData, this@SubAgentFrag, activity, getString(R.string.responseTimeOut)).execute()
         }
     }
@@ -234,7 +272,6 @@ class SubAgentFrag : BaseFragment(), RequestHandler, CustomInterface, View.OnCli
         }
         return jsonObject
     }
-
 
 
     override fun cancelClicked(type: String?, ob: Any?) {

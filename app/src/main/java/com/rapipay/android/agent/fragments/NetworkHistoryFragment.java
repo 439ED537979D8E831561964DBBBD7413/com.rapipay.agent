@@ -14,6 +14,7 @@ import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.rapipay.android.agent.Model.NetworkHistoryPozo;
 import com.rapipay.android.agent.Model.RapiPayPozo;
@@ -53,6 +54,7 @@ public class NetworkHistoryFragment extends BaseFragment implements RequestHandl
     String months = null, dayss = null;
     NetworkHistoryAdapter adapter;
     ArrayList<TbOperatorPozo> list_state1;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
@@ -81,7 +83,7 @@ public class NetworkHistoryFragment extends BaseFragment implements RequestHandl
         select_state = (Spinner) view.findViewById(R.id.select_state);
         list_state = new ArrayList<>();
         list_state1 = BaseCompactActivity.dbRealm.getPayee_Details();
-        for (int i=0; i< list_state1.size();i++){
+        for (int i = 0; i < list_state1.size(); i++) {
             list_state.add(list_state1.get(i).getOperatorsValue());
         }
         if (list_state.size() != 0) {
@@ -138,19 +140,25 @@ public class NetworkHistoryFragment extends BaseFragment implements RequestHandl
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_fund:
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    if (date2_text.getText().toString().isEmpty()) {
-                        date2_text.setError("Please enter valid data");
-                        date2_text.requestFocus();
-                    } else if (date1_text.getText().toString().isEmpty()) {
-                        date1_text.setError("Please enter valid data");
-                        date1_text.requestFocus();
-                    } else if (printDifference(mainDate(date2_text.getText().toString()), mainDate(date1_text.getText().toString())))
-                        new AsyncPostMethod(WebConfig.CommonReport, channel_request(first, last).toString(), headerData, NetworkHistoryFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
-                else
-                        customDialog_Common("Statement Can Only View For One Month");}
-                handlercontrol();
+                rv.findViewById(R.id.btn_fund).setClickable(false);
+                if (date2_text.getText().toString().isEmpty()) {
+                    date2_text.setError("Please enter valid data");
+                    date2_text.requestFocus();
+                    rv.findViewById(R.id.btn_fund).setClickable(true);
+                } else if (date1_text.getText().toString().isEmpty()) {
+                    date1_text.setError("Please enter valid data");
+                    date1_text.requestFocus();
+                    rv.findViewById(R.id.btn_fund).setClickable(true);
+                } else if (printDifference(mainDate(date2_text.getText().toString()), mainDate(date1_text.getText().toString())))
+                    new AsyncPostMethod(WebConfig.CommonReport, channel_request(first, last).toString(), headerData, NetworkHistoryFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
+                else {
+                    customDialog_Common("Statement Can Only View For One Month");
+                    rv.findViewById(R.id.btn_fund).setClickable(true);
+                    if(adapter!=null) {
+                        adapter.clear();
+                        adapter.notifyDataSetChanged();
+                    }
+                }
                 break;
         }
     }
@@ -204,13 +212,13 @@ public class NetworkHistoryFragment extends BaseFragment implements RequestHandl
             dialog.show();
         }
     };
+
     View.OnClickListener fromDateClicked = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             final Dialog dialog = new Dialog(getActivity());
             dialog.setContentView(R.layout.datepickerview);
             dialog.setTitle("");
-
             DatePicker datePicker = (DatePicker) dialog.findViewById(R.id.datePicker1);
             Calendar calendar = Calendar.getInstance();
             calendar.setTimeInMillis(System.currentTimeMillis());
@@ -290,10 +298,14 @@ public class NetworkHistoryFragment extends BaseFragment implements RequestHandl
                     if (object.isNull("objC2CCreditRPTList") && object.getJSONArray("objC2CCreditRPTList").length() == 0)
                         customDialog_Common("No Record Found");
                     else
-                    insertLastTransDetails(object.getJSONArray("objC2CCreditRPTList"));
+                        insertLastTransDetails(object.getJSONArray("objC2CCreditRPTList"));
                 }
-            }else
+            } else if (object.getString("responseCode").equalsIgnoreCase("60147")) {
+                Toast.makeText(getActivity(),object.getString("responseCode"),Toast.LENGTH_LONG).show();
+                setBack_click1(getActivity());
+            } else
                 responseMSg(object);
+            rv.findViewById(R.id.btn_fund).setClickable(true);
         } catch (Exception e) {
             e.printStackTrace();
         }

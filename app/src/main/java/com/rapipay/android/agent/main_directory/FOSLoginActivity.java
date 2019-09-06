@@ -17,6 +17,7 @@ import android.telephony.TelephonyManager;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.rapipay.android.agent.BuildConfig;
 import com.rapipay.android.agent.Model.VersionPozo;
@@ -157,20 +158,23 @@ public class FOSLoginActivity extends BaseCompactActivity implements View.OnClic
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_login:
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    if (input_subuser.getText().toString().length() != 10)
-                        input_subuser.setError("Please enter mandatory field");
-                    else if (input_user.getText().toString().length() != 10)
-                        input_user.setError("Please enter mandatory field");
-                    else if (input_password.getText().toString().isEmpty())
-                        input_password.setError("Please enter mandatory field");
-                    else
-                        loadVersion(imei);
-                }
-                handlercontrol();
+                btn_login.setClickable(false);
+                if (input_subuser.getText().toString().length() != 10)
+                    input_subuser.setError("Please enter mandatory field");
+                else if (input_user.getText().toString().length() != 10)
+                    input_user.setError("Please enter mandatory field");
+                else if (input_password.getText().toString().isEmpty())
+                    input_password.setError("Please enter mandatory field");
+                else
+                    loadVersion(imei);
                 break;
         }
+    }
+
+    @Override
+    protected void onPause() {
+        btn_login.setClickable(true);
+        super.onPause();
     }
 
     @Override
@@ -197,7 +201,10 @@ public class FOSLoginActivity extends BaseCompactActivity implements View.OnClic
                 customDialog_Common("KYCLAYOUTS", null, null, "RapiPay Login Failed", null, object.getString("responseMessage"), FOSLoginActivity.this);
             } else if (object.getString("responseCode").equalsIgnoreCase("75077")) {
                 customDialog_Common("KYCLAYOUTS", null, null, "RapiPay Login Failed", null, object.getString("responseMessage"), FOSLoginActivity.this);
-            }else {
+            } else if (object.getString("responseCode").equalsIgnoreCase("60147")) {
+                Toast.makeText(this,object.getString("responseCode"),Toast.LENGTH_LONG).show();
+                setBack_click1(this);
+            } else {
                 responseMSg(object);
             }
         } catch (Exception e) {

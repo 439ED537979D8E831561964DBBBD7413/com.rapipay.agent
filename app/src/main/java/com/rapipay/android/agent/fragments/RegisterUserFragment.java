@@ -62,11 +62,11 @@ public class RegisterUserFragment extends BaseFragment implements RequestHandler
     protected ArrayList<RapiPayPozo> list;
     ArrayList<String> spinner_list;
     protected String headerData = (WebConfig.BASIC_USERID + ":" + WebConfig.BASIC_PASSWORD);
-
+    View rv;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        View rv = (View) inflater.inflate(R.layout.register_kyc_frag, container, false);
+        rv = (View) inflater.inflate(R.layout.register_kyc_frag, container, false);
         if (BaseCompactActivity.dbRealm != null && BaseCompactActivity.dbRealm.getDetails_Rapi())
             list = BaseCompactActivity.dbRealm.getDetails();
         TYPE = getActivity().getIntent().getStringExtra("type");
@@ -106,8 +106,7 @@ public class RegisterUserFragment extends BaseFragment implements RequestHandler
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_fund:
-                if (btnstatus == false) {
-                    btnstatus = true;
+                v.findViewById(R.id.btn_fund).setClickable(false);
                     if (!ImageUtils.commonRegex(input_name.getText().toString(), 150, " ")) {
                         input_name.setError("Please enter valid data");
                         input_name.requestFocus();
@@ -147,21 +146,27 @@ public class RegisterUserFragment extends BaseFragment implements RequestHandler
                         } else
                             new AsyncPostMethod(WebConfig.LOGIN_URL, request_user().toString(), headerData, RegisterUserFragment.this, getActivity(), getString(R.string.responseTimeOut)).execute();
                     }
-                }
-                handlercontrol();
                 break;
             case R.id.btn_scan_submit:
-                if (btnstatus == false) {
-                    btnstatus = true;
+                v.findViewById(R.id.btn_scan_submit).setClickable(false);
                     bitmap_trans = null;
                     byteBase64 = "";
                     Intent intent = new Intent(getActivity(), BarcodeActivity.class);
                     intent.putExtra("type", "Outside");
                     startActivityForResult(intent, 1);
-                }
-                handlercontrol();
                 break;
         }
+    }
+
+    public void clickable(){
+        rv.findViewById(R.id.btn_scan_submit).setClickable(false);
+        rv.findViewById(R.id.btn_fund).setClickable(false);
+    }
+
+    @Override
+    public void onPause() {
+        clickable();
+        super.onPause();
     }
 
     @Override
@@ -261,7 +266,10 @@ public class RegisterUserFragment extends BaseFragment implements RequestHandler
                     startActivity(intent);
                     clear();
                 }
-            }else
+            } else if (object.getString("responseCode").equalsIgnoreCase("60147")) {
+                Toast.makeText(getActivity(),object.getString("responseCode"),Toast.LENGTH_LONG).show();
+                setBack_click1(getActivity());
+            } else
                 responseMSg(object);
         } catch (Exception e) {
             e.printStackTrace();

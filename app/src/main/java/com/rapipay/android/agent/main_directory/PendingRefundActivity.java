@@ -51,6 +51,8 @@ public class PendingRefundActivity extends BaseCompactActivity implements Wallet
     int refundPosition;
     LastTransAdapter adapter;
     LastTransactionPozo pozo;
+    private long mLastClickTime = System.currentTimeMillis();
+    private static final long CLICK_TIME_INTERVAL = 300;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -67,12 +69,9 @@ public class PendingRefundActivity extends BaseCompactActivity implements Wallet
         btn_search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    hideKeyboard(PendingRefundActivity.this);
-                    loadIMEI();
-                }
-                handlercontrol();
+                btn_search.setClickable(false);
+                hideKeyboard(PendingRefundActivity.this);
+                loadIMEI();
             }
         });
         input_mobile = (EditText) findViewById(R.id.input_mobile);
@@ -85,16 +84,17 @@ public class PendingRefundActivity extends BaseCompactActivity implements Wallet
         refund_details.addOnItemTouchListener(new RecyclerTouchListener(this, refund_details, new ClickListener() {
             @Override
             public void onClick(View view, int position) {
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    refundPosition = position;
-                    pozo = refundPozoArrayList.get(position);
-                    if (!pozo.getServiceProviderTXNID().equalsIgnoreCase("DMT"))
-                        new WalletAsyncMethod(WebConfig.BCRemittanceApp, getrefund_Validate(pozo).toString(), headerData, PendingRefundActivity.this, getString(R.string.responseTimeOut), "BC_Refund").execute();
-                    else
-                        new WalletAsyncMethod(WebConfig.WALLETTRANSFER_URL, getrefundDmt(pozo).toString(), headerData, PendingRefundActivity.this, getString(R.string.responseTimeOut), "WALLET_REFUND").execute();
+                long now = System.currentTimeMillis();
+                if (now - mLastClickTime < CLICK_TIME_INTERVAL) {
+                    return;
                 }
-                handlercontrol();
+                mLastClickTime = now;
+                refundPosition = position;
+                pozo = refundPozoArrayList.get(position);
+                if (!pozo.getServiceProviderTXNID().equalsIgnoreCase("DMT"))
+                    new WalletAsyncMethod(WebConfig.BCRemittanceApp, getrefund_Validate(pozo).toString(), headerData, PendingRefundActivity.this, getString(R.string.responseTimeOut), "BC_Refund").execute();
+                else
+                    new WalletAsyncMethod(WebConfig.WALLETTRANSFER_URL, getrefundDmt(pozo).toString(), headerData, PendingRefundActivity.this, getString(R.string.responseTimeOut), "WALLET_REFUND").execute();
             }
 
             @Override
@@ -107,12 +107,14 @@ public class PendingRefundActivity extends BaseCompactActivity implements Wallet
         pending_details.addOnItemTouchListener(new RecyclerTouchListener(this, pending_details, new ClickListener() {
             @Override
             public void onClick(View view, int position) {
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    LastTransactionPozo pozo = pendingPozoArrayList.get(position);
-                    new WalletAsyncMethod(WebConfig.BCRemittanceApp, getpending_Validate(pozo.getRefundTxnId()).toString(), headerData, PendingRefundActivity.this, getString(R.string.responseTimeOut), "GET_TXN_STATUS").execute();
+                long now = System.currentTimeMillis();
+                if (now - mLastClickTime < CLICK_TIME_INTERVAL) {
+                    return;
                 }
-                handlercontrol();
+                mLastClickTime = now;
+                LastTransactionPozo pozo = pendingPozoArrayList.get(position);
+                new WalletAsyncMethod(WebConfig.BCRemittanceApp, getpending_Validate(pozo.getRefundTxnId()).toString(), headerData, PendingRefundActivity.this, getString(R.string.responseTimeOut), "GET_TXN_STATUS").execute();
+
             }
 
             @Override
@@ -147,6 +149,21 @@ public class PendingRefundActivity extends BaseCompactActivity implements Wallet
                 finish();
             }
         });
+    }
+
+    public boolean isClickable = false;
+
+    public static boolean setClickable(View view, boolean clickable) {
+        if (view != null) {
+            if (view instanceof ViewGroup) {
+                ViewGroup viewGroup = (ViewGroup) view;
+                for (int i = 0; i < viewGroup.getChildCount(); i++) {
+                    setClickable(viewGroup.getChildAt(i), clickable);
+                }
+            }
+            view.setClickable(clickable);
+        }
+        return clickable;
     }
 
     private void change_View(JSONObject object, String hitfrom) {
@@ -199,22 +216,32 @@ public class PendingRefundActivity extends BaseCompactActivity implements Wallet
                     if (hitfrom.equalsIgnoreCase("SENDER_COMPLETE_DETAILS")) {
                         customDialog_Common("KYCLAYOUTS", object, null, getResources().getString(R.string.Alert), null, object.getString("responseMsg"), PendingRefundActivity.this);
                     }
+                } else if (object.getString("responseCode").equalsIgnoreCase("60147")) {
+                    Toast.makeText(this,object.getString("responseCode"),Toast.LENGTH_LONG).show();
+                    setBack_click1(this);
                 } else if (object.getString("responseCode").equalsIgnoreCase("200") || object.getString("responseCode").equalsIgnoreCase("300")) {
                     if (hitfrom.equalsIgnoreCase("BC_Refund") && object.has("otpRefId") && object.getString("otpRefId").equalsIgnoreCase("null"))
                         customDialog_Common("KYCEWLAYOUT", null, null, "Alert", "", object.getString("responseMessage"), PendingRefundActivity.this);
                     else if (hitfrom.equalsIgnoreCase("BC_Refund"))
                         customDialog_Common("PENDINGREFUND", object, null, "BC Refund", input_mobile.getText().toString(), object.getString("responseMessage"), PendingRefundActivity.this);
-                    else if (hitfrom.equalsIgnoreCase("WALLET_REFUND") && object.has("otpRefId"))
+                    else if (hitfrom.equalsIgnoreCase("WALLET_REFUND") && object.has("otpRefId")) {
+                        pending_details.setClickable(false);
                         customDialog_Ben("Initiate Refund", object.getString("otpRefId"), "", hitfrom);
-                    else if (hitfrom.equalsIgnoreCase("PROCESS_OTP")) {
+                    } else if (hitfrom.equalsIgnoreCase("PROCESS_OTP")) {
+                        dialog.dismiss();
                         customDialog_Common("REFUNDTXN", object, null, "REFUND TXN", null, object.getString("responseMessage"), PendingRefundActivity.this);
                     } else if (hitfrom.equalsIgnoreCase("Verify_Mobile")) {
+                        dialog.dismiss();
                         customDialog_Common("KYCLAYOUTSS", object, null, getResources().getString(R.string.Alert), null, object.getString("responseMessage"), PendingRefundActivity.this);
                     } else
                         change_View(object, hitfrom);
                 } else if (object.getString("responseCode").equalsIgnoreCase("201")) {
-                    if (hitfrom.equalsIgnoreCase("BC_Refund") && object.has("otpRefId"))
-                        customDialog_Ben(object.getString("responseMessage"), object.getString("otpRefId"), object.getString("transactionId"), hitfrom);
+                    if (hitfrom.equalsIgnoreCase("BC_Refund") && object.has("otpRefId")) {
+                        customDialog_Ben("Initiate Refund", object.getString("otpRefId"), object.getString("transactionId"), hitfrom);
+                        pending_details.setClickable(false);
+                    }
+                } else {
+                    responseMSg(object);
                 }
             } else if (object.has("responsecode")) {
                 if (object.getString("responsecode").equalsIgnoreCase("75077")) {
@@ -227,10 +254,10 @@ public class PendingRefundActivity extends BaseCompactActivity implements Wallet
                     customDialog_Common("KYCLAYOUTSS", object, null, "Transaction Pending", null, object.getString("responseMessage"), PendingRefundActivity.this);
                 } else if (object.getString("responsecode").equalsIgnoreCase("200")) {
                     customDialog_Common("KYCLAYOUTSS", object, null, "Transaction Status", null, object.getString("responseMessage"), PendingRefundActivity.this);
-                }else {
+                } else {
                     responseMSg(object);
                 }
-            }else {
+            } else {
                 responseMSg(object);
             }
         } catch (Exception e) {
@@ -249,6 +276,30 @@ public class PendingRefundActivity extends BaseCompactActivity implements Wallet
         }
     }
 
+
+    public void clickable() {
+        try {
+            refund_details.setClickable(true);
+            refund_details.setClickable(true);
+            btn_search.setClickable(true);
+            btn_ok.setClickable(true);
+            btn_cancel.setClickable(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        clickable();
+        super.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        clickable();
+        super.onResume();
+    }
 
     public JSONObject getSender_Validate(String number) {
         JSONObject jsonObject = new JSONObject();
@@ -418,6 +469,7 @@ public class PendingRefundActivity extends BaseCompactActivity implements Wallet
     }
 
     int maxLength = 0;
+    AppCompatButton btn_cancel, btn_ok;
 
     private void customDialog_Ben(String msg, final String otpRefId, final String transactionId, final String serviceType) {
         dialog = new Dialog(this);
@@ -438,26 +490,25 @@ public class PendingRefundActivity extends BaseCompactActivity implements Wallet
         text.setFilters(FilterArray);
         dialog.setContentView(alertLayout);
         dialog.setCancelable(false);
-        AppCompatButton btn_cancel = (AppCompatButton) alertLayout.findViewById(R.id.btn_cancel);
+        btn_cancel = (AppCompatButton) alertLayout.findViewById(R.id.btn_cancel);
         btn_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dialog.dismiss();
             }
         });
-        AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
+        btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
         btn_ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (!text.getText().toString().isEmpty() && text.length() == 6 && !transactionId.equalsIgnoreCase("") && serviceType.equalsIgnoreCase("BC_Refund")) {
                     new WalletAsyncMethod(WebConfig.BCRemittanceApp, add_OtpDetails(otpRefId, transactionId, text.getText().toString()).toString(), headerData, PendingRefundActivity.this, getString(R.string.responseTimeOut), "Verify_Mobile").execute();
-                    dialog.dismiss();
                 } else if (!text.getText().toString().isEmpty() && text.length() == 6 && transactionId.equalsIgnoreCase("") && serviceType.equalsIgnoreCase("WALLET_REFUND")) {
                     new WalletAsyncMethod(WebConfig.WALLETTRANSFER_URL, processOtp(text.getText().toString(), otpRefId).toString(), headerData, PendingRefundActivity.this, getString(R.string.responseTimeOut), "PROCESS_OTP").execute();
-                    dialog.dismiss();
                 } else {
                     text.setError("Please Enter Otp");
                     text.requestFocus();
+                    btn_cancel.setClickable(true);
                     Toast.makeText(PendingRefundActivity.this, "Enter OTP", Toast.LENGTH_SHORT).show();
                 }
 

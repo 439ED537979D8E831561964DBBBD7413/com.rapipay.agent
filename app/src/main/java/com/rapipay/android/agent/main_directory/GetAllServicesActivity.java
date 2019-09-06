@@ -8,6 +8,7 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.rapipay.android.agent.Model.NetworkTransferPozo;
 import com.rapipay.android.agent.Model.Servicespozo;
@@ -24,7 +25,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class GetAllServicesActivity extends BaseCompactActivity implements RequestHandler, View.OnClickListener,CustomInterface {
+public class GetAllServicesActivity extends BaseCompactActivity implements RequestHandler, View.OnClickListener, CustomInterface {
     NetworkTransferPozo pozo;
     ListView listViewWithCheckbox;
     ArrayList<Servicespozo> servicespozoArrayList;
@@ -52,7 +53,7 @@ public class GetAllServicesActivity extends BaseCompactActivity implements Reque
                 break;
             case R.id.reset:
                 arrayList = new ArrayList<>();
-                if(servicespozoArrayList!=null && servicespozoArrayList.size()!=0) {
+                if (servicespozoArrayList != null && servicespozoArrayList.size() != 0) {
                     int size = servicespozoArrayList.size();
                     for (int i = 0; i < size; i++) {
                         Servicespozo dto = servicespozoArrayList.get(i);
@@ -61,9 +62,9 @@ public class GetAllServicesActivity extends BaseCompactActivity implements Reque
                         }
                     }
                 }
-                if(arrayList.size()!=0)
+                if (arrayList.size() != 0)
 //                    new AsyncPostMethod(WebConfig.CommonReportS, updateAgentServices(pozo,arrayList).toString(), headerData, GetAllServicesActivity.this, getString(R.string.responseTimeOut), "GETALLSERVICES").execute();
-                break;
+                    break;
         }
     }
 
@@ -112,16 +113,20 @@ public class GetAllServicesActivity extends BaseCompactActivity implements Reque
                             insertLastTransDetails(object.getJSONArray("operatorDtoList"));
                         }
                     }
-                }else if(object.getString("serviceType").equalsIgnoreCase("UPDATE_AGENT_SERVICE_STATUS")){
+                } else if (object.getString("serviceType").equalsIgnoreCase("UPDATE_AGENT_SERVICE_STATUS")) {
                     customDialog_Common("KYCLAYOUTS", null, null, "Alert", "", object.getString("responseMessage"), GetAllServicesActivity.this);
                 }
-            }else {
+            } else if (object.getString("responseCode").equalsIgnoreCase("60147")) {
+                Toast.makeText(this,object.getString("responseCode"),Toast.LENGTH_LONG).show();
+                setBack_click1(this);
+            } else {
                 responseMSg(object);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
     @Override
     public void okClicked(String type, Object ob) {
         finish();
@@ -130,6 +135,7 @@ public class GetAllServicesActivity extends BaseCompactActivity implements Reque
     @Override
     public void cancelClicked(String type, Object ob) {
     }
+
     private void insertLastTransDetails(JSONArray array) {
         servicespozoArrayList = new ArrayList<Servicespozo>();
         try {
@@ -174,10 +180,11 @@ public class GetAllServicesActivity extends BaseCompactActivity implements Reque
         }
         return jsonObject;
     }
+
     public JSONObject updateAgentServices(NetworkTransferPozo pozo, ArrayList<String> lists) {
-        String activeIdList="";
-        for(int i=0;i<lists.size();i++){
-            activeIdList=activeIdList+lists.get(i).concat("|");
+        String activeIdList = "";
+        for (int i = 0; i < lists.size(); i++) {
+            activeIdList = activeIdList + lists.get(i).concat("|");
         }
         JSONObject jsonObject = new JSONObject();
         try {

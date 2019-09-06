@@ -28,7 +28,6 @@ class ActivationHistory : BaseFragment(), RequestHandler, View.OnClickListener {
     protected var date1_text: AutofitTextView? = null
     protected var toimage: ImageView? = null
     protected var fromimage: ImageView? = null
-
     protected var selectedDate: Int = 0
     protected var selectedMonth: Int = 0
     protected var selectedYear: Int = 0
@@ -36,7 +35,6 @@ class ActivationHistory : BaseFragment(), RequestHandler, View.OnClickListener {
     var last = 25
     internal var months: String? = null
     internal var dayss: String? = null
-
     var enterpin: EditText? = null
     var confirmpin: EditText? = null
     var btn_login: AppCompatButton? = null
@@ -193,6 +191,11 @@ class ActivationHistory : BaseFragment(), RequestHandler, View.OnClickListener {
         return jsonObject
     }
 
+    override fun onPause() {
+        btn_login!!.setClickable(true)
+        super.onPause()
+    }
+
     override fun onClick(v: View?) {
         when (v!!.getId()) {
             R.id.btn_fund -> if (date2_text!!.getText().toString().isEmpty()) {
@@ -207,18 +210,17 @@ class ActivationHistory : BaseFragment(), RequestHandler, View.OnClickListener {
                 customDialog_Common("Statement can only view from one month")
             }
             R.id.btn_login -> {
-                if (btnstatus == false) {
-                    btnstatus = true
+                btn_login!!.setClickable(false)
                     if (enterpin!!.text.toString().isEmpty()) {
                         enterpin?.error = "Please enter serial number"
                         enterpin?.requestFocus()
+                        btn_login!!.setClickable(true)
                     } else if (confirmpin!!.text.toString().isEmpty()) {
                         confirmpin?.error = "Please enter coupon number"
                         confirmpin?.requestFocus()
+                        btn_login!!.setClickable(true)
                     } else
                         AsyncPostMethod(WebConfig.SCRATCH_URL, getJson_Validate().toString(), headerData, this@ActivationHistory, getActivity(), getString(R.string.responseTimeOut), "ACTIVATIONSERVICE").execute()
-                }
-                handlercontrol()
             }
         }
     }
@@ -237,11 +239,9 @@ class ActivationHistory : BaseFragment(), RequestHandler, View.OnClickListener {
                 jsonObject.put("couponNumber", confirmpin?.text.toString())
                 jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo())
                 jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()))
-
             } catch (e: Exception) {
                 e.printStackTrace()
             }
-
         }
         return jsonObject
     }
@@ -267,6 +267,9 @@ class ActivationHistory : BaseFragment(), RequestHandler, View.OnClickListener {
                             customDialog_Ben("Alert", `object`.getString("responseMessage"))
                         }
                     }
+                } else if (`object`.getString("responseCode").equals("60147", ignoreCase = true)) run {
+                    Toast.makeText(context, `object`.getString("responseCode"), Toast.LENGTH_LONG).show()
+                    setBack_click1(context)
                 } else {
                     calendersss?.visibility = View.GONE
                     belowlay?.visibility = View.VISIBLE
@@ -279,6 +282,7 @@ class ActivationHistory : BaseFragment(), RequestHandler, View.OnClickListener {
             calendersss?.visibility = View.GONE
             belowlay?.visibility = View.VISIBLE
         }
+        btn_login!!.setClickable(true)
     }
 
     private fun insertLastTransDetails(array: JSONArray) {
