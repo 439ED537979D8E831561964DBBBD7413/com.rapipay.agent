@@ -18,12 +18,12 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.location.Location;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Environment;
-import android.os.Handler;
 import android.os.PowerManager;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
@@ -55,6 +55,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RadioGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -65,6 +66,7 @@ import com.rapipay.android.agent.Database.RapipayRealmDB;
 import com.rapipay.android.agent.Model.BankDetailsPozo;
 import com.rapipay.android.agent.Model.BeneficiaryDetailsPozo;
 import com.rapipay.android.agent.Model.CreaditPaymentModePozo;
+import com.rapipay.android.agent.Model.HandsetRegistration;
 import com.rapipay.android.agent.Model.HeaderePozo;
 import com.rapipay.android.agent.Model.ImagePozo;
 import com.rapipay.android.agent.Model.MasterPozo;
@@ -82,6 +84,8 @@ import com.rapipay.android.agent.Model.TbOperatorPozo;
 import com.rapipay.android.agent.Model.TbRechargePozo;
 import com.rapipay.android.agent.Model.TbTransitionPojo;
 import com.rapipay.android.agent.Model.VersionPozo;
+import com.rapipay.android.agent.Model.microaeps.Microdata;
+import com.rapipay.android.agent.Model.microaeps.Microdata1;
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.adapter.BottomAdapter;
 import com.rapipay.android.agent.adapter.CustomSpinnerAdapter;
@@ -92,6 +96,7 @@ import com.rapipay.android.agent.main_directory.FOSLoginActivity;
 import com.rapipay.android.agent.main_directory.LoginScreenActivity;
 import com.rapipay.android.agent.main_directory.MainActivity;
 import com.rapipay.android.agent.main_directory.PinVerification;
+import com.rapipay.android.agent.view.EnglishNumberToWords;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -106,6 +111,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -114,8 +120,12 @@ import java.util.Date;
 import java.util.Locale;
 
 import io.realm.Realm;
+import io.realm.RealmConfiguration;
 import io.realm.RealmResults;
+import io.realm.exceptions.RealmMigrationNeededException;
 import me.grantland.widget.AutofitTextView;
+
+import static com.example.rfplmantra.MantraActivity.display;
 
 public class BaseCompactActivity extends AppCompatActivity {
     protected GoogleApiClient googleApiClient;
@@ -134,6 +144,7 @@ public class BaseCompactActivity extends AppCompatActivity {
     protected BluetoothAdapter btAdapter;
     protected static int REQUEST_BLUETOOTH = 101;
     protected ArrayList<RapiPayPozo> list, listOld;
+    protected ArrayList<HandsetRegistration> listHandsetRegistration;
     final protected static int PERMISSIONS_REQUEST_READ_PHONE_STATE = 0;
     final protected static int PERMISSIONS_REQUEST_CAMERA_STATE = 1;
     protected LocalStorage localStorage;
@@ -157,6 +168,8 @@ public class BaseCompactActivity extends AppCompatActivity {
     public static String IS_CRIMAGE_REQUIRED = null;
     public static Realm realm;
     public static RapipayRealmDB dbRealm;
+    protected TextView ben_amount, con_ifsc;
+    protected boolean isNEFT = false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -164,23 +177,175 @@ public class BaseCompactActivity extends AppCompatActivity {
         dbRealm = new RapipayRealmDB();
         db = new RapipayDB(this);
         Realm.init(this);
-        realm = Realm.getDefaultInstance();
+        getRealmUpdate();
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         localStorage = LocalStorage.getInstance(this);
         hideKeyboard(this);
         if (dbRealm != null && dbRealm.getDetails_Rapi())
             list = dbRealm.getDetails();
+        if (dbRealm != null && dbRealm.getDetails_Rapi_Handset())
+            listHandsetRegistration = dbRealm.getDetailsHandset();
     }
 
-    protected boolean btnstatus = false;
 
-    protected void handlercontrol() {
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            public void run() {
-                btnstatus = false;
+    protected boolean checkInternetConenction() {
+        // get Connectivity Manager object to check connection
+        ConnectivityManager connec
+                = (ConnectivityManager) getSystemService(getBaseContext().CONNECTIVITY_SERVICE);
+
+        // Check for network connections
+        if (connec.getNetworkInfo(0).getState() ==
+                android.net.NetworkInfo.State.CONNECTED ||
+                connec.getNetworkInfo(0).getState() ==
+                        android.net.NetworkInfo.State.CONNECTING ||
+                connec.getNetworkInfo(1).getState() ==
+                        android.net.NetworkInfo.State.CONNECTING ||
+                connec.getNetworkInfo(1).getState() == android.net.NetworkInfo.State.CONNECTED) {
+            //  Toast.makeText(this, " Connected ", Toast.LENGTH_LONG).show();
+            return true;
+        } else if (
+                connec.getNetworkInfo(0).getState() ==
+                        android.net.NetworkInfo.State.DISCONNECTED ||
+                        connec.getNetworkInfo(1).getState() ==
+                                android.net.NetworkInfo.State.DISCONNECTED) {
+            // Toast.makeText(this, " Not Connected ", Toast.LENGTH_LONG).show();
+            return false;
+        }
+        return false;
+    }
+
+    protected String getCurrentDate() {
+        Date c = Calendar.getInstance().getTime();
+        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+        String formattedDate = df.format(c);
+        return formattedDate;
+    }
+
+    protected EditText btn_ifsc;
+
+    protected void customAddBeneneft(View alertLayout, String ifsc, String accountNo, String beneName, String beneBank, Dialog dialog, String transType) {
+        TextView btn_name = (TextView) alertLayout.findViewById(R.id.neftbtn_name);
+        TextView btn_account = (TextView) alertLayout.findViewById(R.id.neftbtn_account);
+        TextView btn_bank = (TextView) alertLayout.findViewById(R.id.neftbtn_bank);
+        btn_ifsc = (EditText) alertLayout.findViewById(R.id.edit_ifsc);
+        btn_ifsc.setText(ifsc);
+        btn_account.setText(accountNo);
+        btn_bank.setText(beneBank);
+        btn_name.setText(beneName);
+        dialog.setContentView(alertLayout);
+    }
+
+    protected void customView(View alertLayout, String output, Dialog dialog) throws Exception {
+        TextView otpView = (TextView) alertLayout.findViewById(R.id.dialog_msg);
+        otpView.setText(output);
+        otpView.setVisibility(View.VISIBLE);
+        dialog.setContentView(alertLayout);
+    }
+
+    protected void customDialog_Ben(View alertLayout, BeneficiaryDetailsPozo pozo, Dialog dialog, String transType) {
+        TextView btn_name = (TextView) alertLayout.findViewById(R.id.btn_name);
+        TextView btn_account = (TextView) alertLayout.findViewById(R.id.btn_account);
+        TextView btn_bank = (TextView) alertLayout.findViewById(R.id.btn_bank);
+        TextView notverified = (TextView) alertLayout.findViewById(R.id.notverified);
+        TextView btn_trantype = (TextView) alertLayout.findViewById(R.id.btn_trantype);
+        TextView btn_ifsc = (TextView) alertLayout.findViewById(R.id.btn_ifsc);
+        final TextView input_text = (TextView) alertLayout.findViewById(R.id.input_texts);
+        btn_trantype.setText(transType);
+        btn_ifsc.setText(pozo.getIfsc());
+        if (!pozo.getAccountno().equalsIgnoreCase("null"))
+            btn_account.setText(pozo.getAccountno());
+        else
+            btn_account.setText("NA");
+        if (!pozo.getBank().equalsIgnoreCase("null"))
+            btn_bank.setText(pozo.getBank());
+        else
+            btn_bank.setText("NA");
+        if (!pozo.getName().equalsIgnoreCase("null"))
+            btn_name.setText(pozo.getName());
+        else
+            btn_name.setText("NA");
+        if (pozo.getIfsc().equalsIgnoreCase("NOT-VEREFIED"))
+            notverified.setVisibility(View.VISIBLE);
+        else
+            notverified.setVisibility(View.GONE);
+        ben_amount = (TextView) alertLayout.findViewById(R.id.input_amount_ben);
+        ben_amount.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
             }
-        }, 1000);
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s.length() != 0 && s.length() < 10) {
+                    input_text.setText("");
+                    input_text.setText(EnglishNumberToWords.convert(Integer.parseInt(s.toString())) + " rupee");
+                    input_text.setVisibility(View.VISIBLE);
+                } else
+                    input_text.setVisibility(View.GONE);
+            }
+        });
+        dialog.setContentView(alertLayout);
+    }
+
+
+    protected void serviceFee(View alertLayout, JSONObject object, BeneficiaryDetailsPozo pozo, String msg, String input) throws Exception {
+        TextView btn_name = (TextView) alertLayout.findViewById(R.id.btn_name_service);
+        TextView btn_servicefee = (TextView) alertLayout.findViewById(R.id.btn_servicefee);
+        btn_servicefee.setText(String.valueOf(Math.round(Double.parseDouble(object.getString("chargeServiceFee")) * 100.0) / 100.0));
+        TextView btn_igst = (TextView) alertLayout.findViewById(R.id.btn_igst);
+        btn_igst.setText(String.valueOf(Math.round(Double.parseDouble(object.getString("igst")) * 100.0) / 100.0));
+        TextView btn_cgst = (TextView) alertLayout.findViewById(R.id.btn_cgst);
+        btn_cgst.setText(String.valueOf(Math.round(Double.parseDouble(object.getString("cgst")) * 100.0) / 100.0));
+        TextView btn_sgst = (TextView) alertLayout.findViewById(R.id.btn_sgst);
+        btn_sgst.setText(String.valueOf(Math.round(Double.parseDouble(object.getString("sgst")) * 100.0) / 100.0));
+        TextView btn_sendname = (TextView) alertLayout.findViewById(R.id.btn_sendname);
+        TextView btn_account = (TextView) alertLayout.findViewById(R.id.btn_account_service);
+        TextView btn_bank = (TextView) alertLayout.findViewById(R.id.btn_bank_service);
+        TextView btn_amount_servide = (TextView) alertLayout.findViewById(R.id.btn_amount_servide);
+        TextView change = (TextView) alertLayout.findViewById(R.id.change);
+        change.setText(object.getString("sForComm"));
+        btn_amount_servide.setText(object.getString("txnAmount"));
+        if (!pozo.getAccountno().equalsIgnoreCase("null"))
+            btn_account.setText(pozo.getAccountno());
+        else
+            btn_account.setText("NA");
+        btn_sendname.setText(input);
+        if (msg.equalsIgnoreCase("Confirm Money Transfer?")) {
+            //String condition = "where " + RapipayDB.COLOMN_IFSC + "='" + pozo.getIfsc() + "'";
+            String condition = pozo.getIfsc();
+            if (BaseCompactActivity.dbRealm.geBank(condition).size() != 0)
+                btn_bank.setText(BaseCompactActivity.dbRealm.geBank(condition).get(0));
+            else
+                btn_bank.setVisibility(View.GONE);
+        } else
+            btn_bank.setText(pozo.getBank());
+        if (!pozo.getName().equalsIgnoreCase("null"))
+            btn_name.setText(pozo.getName());
+        else
+            btn_name.setText("NA");
+        newtpin = (EditText) alertLayout.findViewById(R.id.newtpin);
+        if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y"))
+            newtpin.setVisibility(View.VISIBLE);
+        dialog.setContentView(alertLayout);
+    }
+
+    private void getRealmUpdate() {
+        try {
+            RealmConfiguration config = new RealmConfiguration
+                    .Builder()
+                    .deleteRealmIfMigrationNeeded()
+                    .build();
+            realm = Realm.getInstance(config);
+        } catch (Exception e) {
+            e.printStackTrace();
+            realm = Realm.getDefaultInstance();
+        }
     }
 
     public boolean printDifference(Date startDate, Date endDate) {
@@ -306,6 +471,13 @@ public class BaseCompactActivity extends AppCompatActivity {
         }
         return jsonObject;
     }
+
+    //    public void turnOnScreen(){
+//        // turn on screen
+//        Log.v("ProximityActivity", "ON!");
+//        mWakeLock = mPowerManager.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "tag");
+//        mWakeLock.acquire();
+//    }
     public void hideKeyboard(Activity activity) {
         InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
         View view = activity.getCurrentFocus();
@@ -321,6 +493,12 @@ public class BaseCompactActivity extends AppCompatActivity {
         context.startActivity(intent);
     }
 
+    protected void setBack_click1(Context context) {
+        Intent intent = new Intent(this, PinVerification.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        context.startActivity(intent);
+    }
+
     protected String format(String amount) {
         try {
             NumberFormat formatter = NumberFormat.getInstance(new Locale("en", "IN"));
@@ -330,6 +508,29 @@ public class BaseCompactActivity extends AppCompatActivity {
         }
         return null;
     }
+
+    protected void deletebankTables() {
+        final RealmResults<Microdata1> microdata = realm.where(Microdata1.class).findAll();
+        //    SQLiteDatabase dba = db.getWritableDatabase();
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                microdata.deleteAllFromRealm();
+            }
+        });
+    }
+
+    protected void deleteHandsetRegistrationTables() {
+        final RealmResults<HandsetRegistration> handsetRegistrations = realm.where(HandsetRegistration.class).findAll();
+        //    SQLiteDatabase dba = db.getWritableDatabase();
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                handsetRegistrations.deleteAllFromRealm();
+            }
+        });
+    }
+
     protected void deleteTables(final String type) {
         localStorage.setActivityState(LocalStorage.ROUTESTATE, "0");
         localStorage.setActivityState(LocalStorage.EMI, "0");
@@ -378,6 +579,7 @@ public class BaseCompactActivity extends AppCompatActivity {
             }
         });
     }
+
     protected void jumpPage() {
         Intent intent = new Intent(BaseCompactActivity.this, LoginScreenActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -408,9 +610,9 @@ public class BaseCompactActivity extends AppCompatActivity {
         TextView text = (TextView) alertLayout.findViewById(R.id.dialog_title);
         TextView dialog_cancel = (TextView) alertLayout.findViewById(R.id.dialog_cancel);
         text.setText(msg);
-        AppCompatButton btn_regenerate = (AppCompatButton) alertLayout.findViewById(R.id.btn_regenerate);
-        AppCompatButton btn_cancel = (AppCompatButton) alertLayout.findViewById(R.id.btn_cancel);
-        AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
+        btn_regenerate = (AppCompatButton) alertLayout.findViewById(R.id.btn_regenerate);
+        btn_cancel = (AppCompatButton) alertLayout.findViewById(R.id.btn_cancel);
+        btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
         final CheckBox checkBox = (CheckBox) alertLayout.findViewById(R.id.consent_checked);
         if (type.equalsIgnoreCase("NETWORKLAYOUT")) {
             btn_cancel.setText("Network User");
@@ -432,7 +634,8 @@ public class BaseCompactActivity extends AppCompatActivity {
             dialog.setContentView(alertLayout);
         }
         try {
-            if (type.equalsIgnoreCase("KYCLAYOUTFOS") || type.equalsIgnoreCase("KYCLAYOUT") || type.equalsIgnoreCase("PENDINGREFUND") || type.equalsIgnoreCase("REFUNDTXN") || type.equalsIgnoreCase("SESSIONEXPIRRED") || type.equalsIgnoreCase("PENDINGLAYOUT")) {
+            if (type.equalsIgnoreCase("KYCLAYOUTFOS") || type.equalsIgnoreCase("KYCLAYOUT") || type.equalsIgnoreCase("PENDINGREFUND") || type.equalsIgnoreCase("REFUNDTXN")
+                    || type.equalsIgnoreCase("SESSIONEXPIRRED") || type.equalsIgnoreCase("PENDINGLAYOUT")) {
                 customView(alertLayout, output);
             } else if (type.equalsIgnoreCase("OTPLAYOUTS")) {
                 alertLayout.findViewById(R.id.otp_layout).setVisibility(View.VISIBLE);
@@ -488,96 +691,89 @@ public class BaseCompactActivity extends AppCompatActivity {
         btn_ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    if (type.equalsIgnoreCase("PENDINGREFUND")) {
-                        anInterface.okClicked(input, ob);
-                        dialog.dismiss();
-                    } else if (type.equalsIgnoreCase("LOGOUT")) {
-                        return_Page();
-                        dialog.dismiss();
-                    } else if (type.equalsIgnoreCase("OTPLAYOUT")) {
-                        anInterface.okClicked(type, ob);
-                    } else if (type.equalsIgnoreCase("OTPLAYOUTS")) {
-                        if (otpView.getText().toString().isEmpty()) {
-                            otpView.setError("Please enter OTP");
-                            otpView.requestFocus();
-                        } else if (otpView.getText().toString().length() != 6) {
-                            otpView.setError("Please enter OTP");
-                            otpView.requestFocus();
-                        } else {
-                            anInterface.okClicked(type, object);
-                            dialog.dismiss();
-                        }
-                    } else if (type.equalsIgnoreCase("CONSENTLAYOUT")) {
-                        if (checkBox.isChecked()) {
-                            anInterface.okClicked(type, object);
-                            dialog.dismiss();
-                        } else
-                            Toast.makeText(BaseCompactActivity.this, "Please check then proceed", Toast.LENGTH_SHORT).show();
-                    } else if (type.equalsIgnoreCase("Fund Transfer Confirmation")) {
-                        if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && (newtpin.getText().toString().isEmpty() || newtpin.getText().toString().length() != 4)) {
-                            newtpin.setError("Please enter TPIN");
-                            newtpin.requestFocus();
-                        } else {
-                            anInterface.okClicked(type, ob);
-//                        dialog.dismiss();
-                        }
-                    } else if (type.equalsIgnoreCase("CREATEAGENT")) {
-                        if (first_name.getText().toString().isEmpty()) {
-                            first_name.setError("Please enter first name");
-                            first_name.requestFocus();
-                        } else if (last_name.getText().toString().isEmpty()) {
-                            last_name.setError("Please enter last name");
-                            last_name.requestFocus();
-                        } else if (mobile_num.getText().toString().length() != 10) {
-                            mobile_num.setError("Please enter mobile number");
-                            mobile_num.requestFocus();
-                        } else if (cree_address.getText().toString().isEmpty()) {
-                            cree_address.setError("Please enter address");
-                            cree_address.requestFocus();
-                        } else if (bank_select.getText().toString().isEmpty()) {
-                            bank_select.setError("Please enter bank");
-                            bank_select.requestFocus();
-                        } else if (pincode.getText().toString().length() != 6) {
-                            pincode.setError("Please enter pincode");
-                            pincode.requestFocus();
-                        } else {
-                            anInterface.okClicked(type, object);
-                            dialog.dismiss();
-                        }
+                //  btn_ok.setClickable(false);
+                if (type.equalsIgnoreCase("PENDINGREFUND")) {
+                    anInterface.okClicked(input, ob);
+                    dialog.dismiss();
+                } else if (type.equalsIgnoreCase("LOGOUT")) {
+                    return_Page();
+                    dialog.dismiss();
+                } else if (type.equalsIgnoreCase("OTPLAYOUT")) {
+                    anInterface.okClicked(type, ob);
+                } else if (type.equalsIgnoreCase("OTPLAYOUTS")) {
+                    if (otpView.getText().toString().isEmpty()) {
+                        otpView.setError("Please enter OTP");
+                        otpView.requestFocus();
+                    } else if (otpView.getText().toString().length() != 6) {
+                        btn_ok.setClickable(true);
+                        otpView.setError("Please enter OTP");
+                        otpView.requestFocus();
                     } else {
-                        anInterface.okClicked(type, ob);
+                        anInterface.okClicked(type, object);
                         dialog.dismiss();
                     }
+                } else if (type.equalsIgnoreCase("CONSENTLAYOUT")) {
+                    if (checkBox.isChecked()) {
+                        anInterface.okClicked(type, object);
+                        dialog.dismiss();
+                    } else
+                        Toast.makeText(BaseCompactActivity.this, "Please check then proceed", Toast.LENGTH_SHORT).show();
+                } else if (type.equalsIgnoreCase("Fund Transfer Confirmation")) {
+                    if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && (newtpin.getText().toString().isEmpty() || newtpin.getText().toString().length() != 4)) {
+                        newtpin.setError("Please enter TPIN");
+                        newtpin.requestFocus();
+                        btn_ok.setClickable(true);
+                    } else {
+                        anInterface.okClicked(type, ob);
+//                        dialog.dismiss();
+                    }
+                } else if (type.equalsIgnoreCase("CREATEAGENT")) {
+                    if (first_name.getText().toString().isEmpty()) {
+                        first_name.setError("Please enter first name");
+                        first_name.requestFocus();
+                    } else if (last_name.getText().toString().isEmpty()) {
+                        last_name.setError("Please enter last name");
+                        last_name.requestFocus();
+                    } else if (mobile_num.getText().toString().length() != 10) {
+                        mobile_num.setError("Please enter mobile number");
+                        mobile_num.requestFocus();
+                    } else if (cree_address.getText().toString().isEmpty()) {
+                        cree_address.setError("Please enter address");
+                        cree_address.requestFocus();
+                    } else if (bank_select.getText().toString().isEmpty()) {
+                        bank_select.setError("Please enter bank");
+                        bank_select.requestFocus();
+                    } else if (pincode.getText().toString().length() != 6) {
+                        pincode.setError("Please enter pincode");
+                        pincode.requestFocus();
+                    } else {
+                        anInterface.okClicked(type, object);
+                        dialog.dismiss();
+                    }
+                } else {
+                    anInterface.okClicked(type, ob);
+                    dialog.dismiss();
                 }
-                handlercontrol();
             }
         });
         btn_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    if (type.equalsIgnoreCase("TERMCONDITION"))
-                        return_Page();
-                    else
-                        anInterface.cancelClicked(type, ob);
-                    dialog.dismiss();
-                }
-                handlercontrol();
+                btn_cancel.setClickable(false);
+                if (type.equalsIgnoreCase("TERMCONDITION"))
+                    return_Page();
+                else
+                    anInterface.cancelClicked(type, ob);
+                dialog.dismiss();
             }
         });
         btn_regenerate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    if (type.equalsIgnoreCase("NETWORKLAYOUT"))
-                        anInterface.okClicked("Details", ob);
-                    dialog.dismiss();
-                }
-                handlercontrol();
+                btn_regenerate.setClickable(false);
+                if (type.equalsIgnoreCase("NETWORKLAYOUT"))
+                    anInterface.okClicked("Details", ob);
+                dialog.dismiss();
             }
         });
         dialog_cancel.setOnClickListener(new View.OnClickListener() {
@@ -728,8 +924,6 @@ public class BaseCompactActivity extends AppCompatActivity {
             newtpin.setVisibility(View.VISIBLE);
         dialog.setContentView(alertLayout);
     }
-
-    protected TextView ben_amount;
 
     protected void customDialog_Ben(View alertLayout, BeneficiaryDetailsPozo pozo) {
         TextView btn_name = (TextView) alertLayout.findViewById(R.id.btn_name);
@@ -1061,6 +1255,7 @@ public class BaseCompactActivity extends AppCompatActivity {
         }
     }
 
+    public static int intidevice = 0;
 
     public void loadIMEI() {
         if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_CONTACTS)
@@ -1201,13 +1396,13 @@ public class BaseCompactActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-
+                String text = search.getText().toString().toLowerCase(Locale.getDefault());
+                adapter.filter(text);
             }
 
             @Override
             public void afterTextChanged(Editable s) {
-                String text = search.getText().toString().toLowerCase(Locale.getDefault());
-                adapter.filter(text);
+
             }
         });
         ListView listLeft = (ListView) alertLayout.findViewById(R.id.list_view);
@@ -1237,17 +1432,102 @@ public class BaseCompactActivity extends AppCompatActivity {
         window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
     }
 
-    protected void customReceiptCastSaleOut(final String type, ArrayList<String> left, ArrayList<String> right, ArrayList<String> bottom, ArrayList<String> medium, String amount, String name, final CustomInterface anInterface) {
+    protected void customSpinner(final TextView viewText, final String type, final ArrayList<String> list_spinner, final String typeCheck) {
+        spinner_list = list_spinner;
+        dialognew = new Dialog(this);
+        LayoutInflater inflater = getLayoutInflater();
+        View alertLayout = inflater.inflate(R.layout.custom_spinner_layout, null);
+        TextView text = (TextView) alertLayout.findViewById(R.id.spinner_title);
+        final EditText search = (EditText) alertLayout.findViewById(R.id.input_search);
+        text.setText(type);
+        search.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                String text = search.getText().toString().toLowerCase(Locale.getDefault());
+                adapter.filter(text);
+            }
+        });
+        ListView listLeft = (ListView) alertLayout.findViewById(R.id.list_view);
+        AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
+        if (spinner_list.size() != 0) {
+            adapter = new CustomSpinnerAdapter(spinner_list, this);
+            listLeft.setAdapter(adapter);
+        }
+        listLeft.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (con_ifsc != null)
+                    con_ifsc.setText("");
+                viewText.setText(list_spinner.get(position));
+                viewText.setError(null);
+                if (con_ifsc != null) {
+                    // String condition = "where " + RapipayDB.COLOMN__BANK_NAME + "='" + viewText.getText().toString() + "'";
+                    String condition = viewText.getText().toString();
+                    String ifsccode = BaseCompactActivity.dbRealm.geBankIFSC(condition).get(0);
+                    if (ifsccode.equalsIgnoreCase("NA") & typeCheck.equalsIgnoreCase("BC")) {
+                        con_ifsc.setVisibility(View.VISIBLE);
+                        isNEFT = true;
+                    } else if (!ifsccode.equalsIgnoreCase("NA") & typeCheck.equalsIgnoreCase("BC")) {
+                        con_ifsc.setVisibility(View.VISIBLE);
+                        con_ifsc.setText(ifsccode);
+                        isNEFT = false;
+                    } else if (!ifsccode.equalsIgnoreCase("NA")) {
+                        con_ifsc.setVisibility(View.VISIBLE);
+                        con_ifsc.setText(BaseCompactActivity.dbRealm.geBankIFSC(condition).get(0));
+                    }
+                }
+                dialognew.dismiss();
+            }
+        });
+        dialognew.setCancelable(false);
+        dialognew.setContentView(alertLayout);
+        btn_ok.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialognew.dismiss();
+            }
+        });
+        dialognew.show();
+        Window window = dialognew.getWindow();
+        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+    }
+
+
+    protected void customReceiptCastSaleOut(final String type, ArrayList<String> left, ArrayList<String> right, ArrayList<String> bottom, ArrayList<String> medium, String amount, String name, final CustomInterface anInterface, String ss) {
         this.anInterface = anInterface;
         dialog = new Dialog(this);
         LayoutInflater inflater = getLayoutInflater();
         View alertLayout = inflater.inflate(R.layout.cashout_receipt, null);
         alertLayout.setKeepScreenOn(true);
         ImageView receipt_logo = (ImageView) alertLayout.findViewById(R.id.receipt_logo);
-        String condition = "where " + RapipayDB.IMAGE_NAME + "='invoiceLogo.jpg'";
-        ArrayList<ImagePozo> imagePozoArrayList = dbRealm.getImageDetails(condition);
-        if (imagePozoArrayList.size() != 0) {
-            byteConvert(receipt_logo, imagePozoArrayList.get(0).getImagePath());
+        LinearLayout ln_for_below = (LinearLayout) alertLayout.findViewById(R.id.ln_for_below);
+        RelativeLayout amount_layout = (RelativeLayout) alertLayout.findViewById(R.id.amount_layout);
+        TextView amounts = (TextView) alertLayout.findViewById(R.id.amount);
+        //  String condition = "where " + RapipayDB.IMAGE_NAME + "='invoiceLogo.jpg'";
+        if (!ss.equalsIgnoreCase("other") || !ss.equalsIgnoreCase("others")) {
+            ln_for_below.setVisibility(View.GONE);
+            amount_layout.setVisibility(View.GONE);
+            amounts.setVisibility(View.GONE);
+            String condition = "loginLogo.jpg";
+            ArrayList<ImagePozo> imagePozoArrayList = dbRealm.getImageDetails(condition);
+            if (imagePozoArrayList.size() != 0) {
+                byteConvert(receipt_logo, imagePozoArrayList.get(0).getImagePath());
+            }
+        }
+        if (ss.equalsIgnoreCase("other")) {
+            amount = "Cash Withdrawal";
+        } else if (ss.equalsIgnoreCase("others")) {
+            amount = "Balance Enquiry";
         }
         main_layout = (LinearLayout) alertLayout.findViewById(R.id.main_layout);
         main_layout.setDrawingCacheEnabled(true);
@@ -1255,18 +1535,17 @@ public class BaseCompactActivity extends AppCompatActivity {
                 View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
         main_layout.layout(0, 0, main_layout.getMeasuredWidth(), main_layout.getMeasuredHeight());
         main_layout.buildDrawingCache(true);
+        LinearLayout mediums = (LinearLayout) main_layout.findViewById(R.id.medium);
         TextView text = (TextView) alertLayout.findViewById(R.id.agent_name);
+        text.setText(type);
         TextView custom_name = (TextView) alertLayout.findViewById(R.id.custom_name);
-        TextView amounts = (TextView) alertLayout.findViewById(R.id.amount);
         amounts.setText("Rs  " + amount);
         custom_name.setText(name);
-        LinearLayout mediums = (LinearLayout) main_layout.findViewById(R.id.medium);
-        text.setText(type);
         LinearLayout listLeft = (LinearLayout) main_layout.findViewById(R.id.listLeft);
         LinearLayout listRight = (LinearLayout) main_layout.findViewById(R.id.listRight);
         LinearLayout listbottom = (LinearLayout) main_layout.findViewById(R.id.listbottom);
-        AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
-        ImageView share = (ImageView) alertLayout.findViewById(R.id.share);
+        btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
+        share = (ImageView) alertLayout.findViewById(R.id.share);
         share.setColorFilter(getResources().getColor(R.color.colorPrimaryDark));
         if (left.size() != 0) {
             for (int k = 0; k < left.size(); k++) {
@@ -1305,47 +1584,44 @@ public class BaseCompactActivity extends AppCompatActivity {
         btn_ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    anInterface.okClicked(type, null);
-                    dialog.dismiss();
-                }
-                handlercontrol();
+                // setBack_click(getApplicationContext());
+                btn_ok.setClickable(false);
+                anInterface.okClicked(type, null);
+                dialog.dismiss();
+                /*Intent dashboard = new Intent(getApplicationContext(), MainActivity.class);
+                startActivity(dashboard);*/
             }
         });
         share.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    Bitmap b = Bitmap.createBitmap(main_layout.getDrawingCache());
-                    main_layout.setDrawingCacheEnabled(false);
-                    ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-                    b.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+                share.setClickable(false);
+                Bitmap b = Bitmap.createBitmap(main_layout.getDrawingCache());
+                main_layout.setDrawingCacheEnabled(false);
+                ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                b.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
 
-                    File f = new File(Environment.getExternalStorageDirectory() + File.separator + "v2i.jpg");
-                    try {
-                        f.createNewFile();
-                        FileOutputStream fo = new FileOutputStream(f);
-                        fo.write(bytes.toByteArray());
-                        fo.flush();
-                        fo.close();
-                        f.setReadable(true, false);
-                        final Intent intent = new Intent(Intent.ACTION_SEND);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                File f = new File(Environment.getExternalStorageDirectory() + File.separator + "v2i.jpg");
+                try {
+                    f.createNewFile();
+                    FileOutputStream fo = new FileOutputStream(f);
+                    fo.write(bytes.toByteArray());
+                    fo.flush();
+                    fo.close();
+                    f.setReadable(true, false);
+                    final Intent intent = new Intent(Intent.ACTION_SEND);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-                        Uri apkURI = FileProvider.getUriForFile(
-                                BaseCompactActivity.this,
-                                BaseCompactActivity.this.getApplicationContext()
-                                        .getPackageName() + ".provider", f);
-                        intent.putExtra(Intent.EXTRA_STREAM, apkURI);
-                        intent.setType("image/png");
-                        startActivityForResult(Intent.createChooser(intent, "Share image via"), 2);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                    Uri apkURI = FileProvider.getUriForFile(
+                            BaseCompactActivity.this,
+                            BaseCompactActivity.this.getApplicationContext()
+                                    .getPackageName() + ".provider", f);
+                    intent.putExtra(Intent.EXTRA_STREAM, apkURI);
+                    intent.setType("image/png");
+                    startActivityForResult(Intent.createChooser(intent, "Share image via"), 2);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-                handlercontrol();
             }
         });
         dialog.show();
@@ -1396,7 +1672,8 @@ public class BaseCompactActivity extends AppCompatActivity {
         View alertLayout = inflater.inflate(R.layout.receipt_layout_new, null);
         alertLayout.setKeepScreenOn(true);
         ImageView receipt_logo = (ImageView) alertLayout.findViewById(R.id.receipt_logo);
-        String condition = "where " + RapipayDB.IMAGE_NAME + "='invoiceLogo.jpg'";
+        //  String condition = "where " + RapipayDB.IMAGE_NAME + "='invoiceLogo.jpg'";
+        String condition = "invoiceLogo.jpg";
         ArrayList<ImagePozo> imagePozoArrayList = dbRealm.getImageDetails(condition);
         if (imagePozoArrayList.size() != 0) {
             byteConvert(receipt_logo, imagePozoArrayList.get(0).getImagePath());
@@ -1508,6 +1785,20 @@ public class BaseCompactActivity extends AppCompatActivity {
         window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
     }
 
+    public void clickable() {
+        try {
+            btn_ok.setClickable(true);
+            btn_cancel.setClickable(true);
+            btn_regenerate.setClickable(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    AppCompatButton btn_ok, btn_cancel, btn_regenerate;
+    ImageView share;
+
     protected void customReceiptNewTransaction(final String type, final JSONObject object, final CustomInterface anInterface) {
         this.anInterface = anInterface;
         left = new ArrayList<>();
@@ -1557,7 +1848,8 @@ public class BaseCompactActivity extends AppCompatActivity {
         View alertLayout = inflater.inflate(R.layout.pmt_receipt_layout, null);
         alertLayout.setKeepScreenOn(true);
         ImageView receipt_logo = (ImageView) alertLayout.findViewById(R.id.receipt_logo);
-        String condition = "where " + RapipayDB.IMAGE_NAME + "='invoiceLogo.jpg'";
+        // String condition = "where " + RapipayDB.IMAGE_NAME + "='invoiceLogo.jpg'";
+        String condition = "invoiceLogo.jpg";
         ArrayList<ImagePozo> imagePozoArrayList = dbRealm.getImageDetails(condition);
         if (imagePozoArrayList.size() != 0) {
             byteConvert(receipt_logo, imagePozoArrayList.get(0).getImagePath());
@@ -1577,8 +1869,8 @@ public class BaseCompactActivity extends AppCompatActivity {
         LinearLayout listLeft = (LinearLayout) main_layout.findViewById(R.id.listLeft);
         LinearLayout listRight = (LinearLayout) main_layout.findViewById(R.id.listRight);
         LinearLayout listbottom = (LinearLayout) main_layout.findViewById(R.id.listbottom);
-        AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
-        ImageView share = (ImageView) alertLayout.findViewById(R.id.share);
+        btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
+        share = (ImageView) alertLayout.findViewById(R.id.share);
         share.setColorFilter(getResources().getColor(R.color.colorPrimaryDark));
         medium_value = "";
         if (left.size() != 0) {
@@ -1635,47 +1927,41 @@ public class BaseCompactActivity extends AppCompatActivity {
         btn_ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    anInterface.okClicked(type, object);
-                    dialog.dismiss();
-                }
-                handlercontrol();
+                btn_ok.setClickable(false);
+                anInterface.okClicked(type, object);
+                dialog.dismiss();
             }
         });
         share.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    Bitmap b = Bitmap.createBitmap(main_layout.getDrawingCache());
-                    main_layout.setDrawingCacheEnabled(false);
-                    ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-                    b.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+                share.setClickable(false);
+                Bitmap b = Bitmap.createBitmap(main_layout.getDrawingCache());
+                main_layout.setDrawingCacheEnabled(false);
+                ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                b.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
 
-                    File f = new File(Environment.getExternalStorageDirectory() + File.separator + "v2i.jpg");
-                    try {
-                        f.createNewFile();
-                        FileOutputStream fo = new FileOutputStream(f);
-                        fo.write(bytes.toByteArray());
-                        fo.flush();
-                        fo.close();
-                        f.setReadable(true, false);
-                        final Intent intent = new Intent(Intent.ACTION_SEND);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                File f = new File(Environment.getExternalStorageDirectory() + File.separator + "v2i.jpg");
+                try {
+                    f.createNewFile();
+                    FileOutputStream fo = new FileOutputStream(f);
+                    fo.write(bytes.toByteArray());
+                    fo.flush();
+                    fo.close();
+                    f.setReadable(true, false);
+                    final Intent intent = new Intent(Intent.ACTION_SEND);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-                        Uri apkURI = FileProvider.getUriForFile(
-                                BaseCompactActivity.this,
-                                BaseCompactActivity.this.getApplicationContext()
-                                        .getPackageName() + ".provider", f);
-                        intent.putExtra(Intent.EXTRA_STREAM, apkURI);
-                        intent.setType("image/png");
-                        startActivityForResult(Intent.createChooser(intent, "Share image via"), 2);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                    Uri apkURI = FileProvider.getUriForFile(
+                            BaseCompactActivity.this,
+                            BaseCompactActivity.this.getApplicationContext()
+                                    .getPackageName() + ".provider", f);
+                    intent.putExtra(Intent.EXTRA_STREAM, apkURI);
+                    intent.setType("image/png");
+                    startActivityForResult(Intent.createChooser(intent, "Share image via"), 2);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-                handlercontrol();
             }
         });
         dialog.show();
@@ -2009,7 +2295,8 @@ public class BaseCompactActivity extends AppCompatActivity {
         }
         return null;
     }
-    protected JSONObject getCashOutDetails(String mobile, String txnAmmount, String serviceType, String requestChannel, String reqFor, String requestType, String blueToothAddress) {
+
+    protected JSONObject getCashOutDetailsold(String mobile, String txnAmmount, String serviceType, String requestChannel, String reqFor, String requestType, String blueToothAddress) {
         JSONObject jsonObject = new JSONObject();
         try {
             transactionIDAEPS = ImageUtils.miliSeconds();
@@ -2037,6 +2324,343 @@ public class BaseCompactActivity extends AppCompatActivity {
         return jsonObject;
     }
 
+    protected JSONObject getCashOutDetails2(String mobile, String txnAmmount, String serviceType, String requestChannel, String reqFor, String requestType, String blueToothAddress) {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            transactionIDAEPS = ImageUtils.miliSeconds();
+            jsonObject.put("serviceType", serviceType);
+            jsonObject.put("requestChannel", requestChannel);
+            jsonObject.put("typeMobileWeb", "mobile");
+            jsonObject.put("transactionID", transactionIDAEPS);
+            jsonObject.put("agentMobile", list.get(0).getMobilno());
+            jsonObject.put("customerMobile", mobile);
+            jsonObject.put("senderName", "RapiPay");
+            jsonObject.put("txnAmount", txnAmmount);
+            if (reqFor.equalsIgnoreCase("AEPS")) {
+                jsonObject.put("bluetoothAddress", blueToothAddress);
+            } else
+                jsonObject.put("bluetoothAddress", blueToothAddress.replaceAll(":", ""));
+            jsonObject.put("reqFor", reqFor);
+            jsonObject.put("latitude", String.valueOf(mylocation.getLatitude()));
+            jsonObject.put("langitude", String.valueOf(mylocation.getLongitude()));
+            jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
+            jsonObject.put("requestType", requestType);
+            jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return jsonObject;
+    }
+
+
+    protected JSONObject getCashOutDetails(String mobile, String txnAmmount, String serviceType, String requestChannel, String reqFor, String requestType, String blueToothAddress) {
+        JSONObject jsonObject = new JSONObject();
+        try { //https://uat.rapipay.com/MposService/AEPSCashout
+            transactionIDAEPS = ImageUtils.miliSeconds();
+            jsonObject.put("serviceType", serviceType);
+            jsonObject.put("requestChannel", requestChannel);
+            jsonObject.put("typeMobileWeb", "mobile");
+            jsonObject.put("transactionID", transactionIDAEPS);
+            jsonObject.put("agentMobile", list.get(0).getMobilno());
+            jsonObject.put("customerMobile", mobile);
+            jsonObject.put("senderName", "RapiPay");
+            jsonObject.put("txnAmount", txnAmmount);
+            if (reqFor.equals("MATM"))
+                jsonObject.put("aepsType", "aeps");
+            else
+                jsonObject.put("aepsType", "aeps1");
+            if (reqFor.equalsIgnoreCase("AEPS")) {
+                jsonObject.put("bluetoothAddress", blueToothAddress);
+            } else
+                jsonObject.put("bluetoothAddress", blueToothAddress.replaceAll(":", ""));
+            jsonObject.put("reqFor", reqFor);
+            jsonObject.put("latitude", String.valueOf(mylocation.getLatitude()));
+            jsonObject.put("langitude", String.valueOf(mylocation.getLongitude()));
+            jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
+            jsonObject.put("requestType", requestType);
+            jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return jsonObject;
+    }
+
+  /*  {"serviceType":"INITIATE_AEPS_CASHOUT",
+            "aepsType":"AEPS2",
+            "reqFor":"AEPS",
+            "latitude":"",
+            "bankName":"",
+            "txnIP":"",
+            "deviceName":"",
+            "transactionID":"",
+            "senderName":"",
+            "initiatedFor":"AEPS_BALANCE_ENQ",
+            "deviceSrno":"",
+            "requestChannel":"AEPS_CHANNEL",
+            "langitude":"0",
+            "requestType":"AEPS-CASHOUT",
+            "sessionRefNo":"",
+            "aadharNo":"",
+            "bankIinNo":"",
+            "agentMobile":"",
+            "responseUrl":"",
+            "nodeAgentId":"",
+            "clientIp":"",
+            "checkSum":"",
+            "customerMobile":"",
+            "typeMobileWeb":"mobile",
+            "txnAmount":}
+*/
+
+    /* protected JSONObject getCashOutDetail1(String mobile, String txnAmmount, String serviceType, String requestChannel, String reqFor, String requestType, String blueToothAddress) {
+         JSONObject jsonObject = new JSONObject();
+         try { //https://uat.rapipay.com/MposService/AEPSCashout
+             transactionIDAEPS = ImageUtils.miliSeconds();
+             jsonObject.put("serviceType", serviceType);
+             jsonObject.put("requestChannel", requestChannel);
+             jsonObject.put("typeMobileWeb", "mobile");
+             jsonObject.put("transactionID", transactionIDAEPS);
+             jsonObject.put("agentMobile", list.get(0).getMobilno());
+             jsonObject.put("customerMobile", mobile);
+             jsonObject.put("senderName", "RapiPay");
+             jsonObject.put("txnAmount", txnAmmount);
+             jsonObject.put("aepsType", "aeps2");
+             jsonObject.put("deviceIMEI", localStorage.getActivityState(LocalStorage.EMI));
+             if (reqFor.equalsIgnoreCase("AEPS")) {
+                 jsonObject.put("bluetoothAddress", blueToothAddress);
+             } else
+                 jsonObject.put("bluetoothAddress", blueToothAddress.replaceAll(":", ""));
+             jsonObject.put("reqFor", reqFor);
+             jsonObject.put("latitude", String.valueOf(mylocation.getLatitude()));
+             jsonObject.put("langitude", String.valueOf(mylocation.getLongitude()));
+             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
+             jsonObject.put("requestType", requestType);
+             jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
+         } catch (Exception e) {
+             e.printStackTrace();
+         }
+
+         return jsonObject;
+     }
+ */
+    protected JSONObject getCashOutDetail1(String deviceName, String mobile, String txnAmmount, String adharno, String username, String serviceType, String requestChannel, String reqFor, String requestType, String blueToothAddress, String innno, String bankName) {
+        JSONObject jsonObject = new JSONObject();
+        String initiatedfor = "";
+        try { //https://uat.rapipay.com/MposService/AEPSCashout
+            transactionIDAEPS = ImageUtils.miliSeconds();
+            jsonObject.put("serviceType", "INITIATE_AEPS_CASHOUT");
+            jsonObject.put("aepsType", "AEPS2");
+            jsonObject.put("reqFor", reqFor);
+            jsonObject.put("bankName", bankName);
+            jsonObject.put("txnIP", ImageUtils.ipAddress(getApplicationContext()));
+            jsonObject.put("deviceName", deviceName);
+            jsonObject.put("transactionID", transactionIDAEPS);
+            jsonObject.put("senderName", username);
+            jsonObject.put("initiatedFor", serviceType);
+            jsonObject.put("deviceSrno", "NA");
+            jsonObject.put("requestChannel", requestChannel);
+            jsonObject.put("latitude", String.valueOf(mylocation.getLatitude()));
+            jsonObject.put("requestType", "AEPS-CASHOUT");
+            jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
+            jsonObject.put("aadharNo", adharno);
+            jsonObject.put("bankIinNo", innno);
+            jsonObject.put("agentMobile", list.get(0).getMobilno());
+            jsonObject.put("responseUrl", "");
+            jsonObject.put("nodeAgentId", list.get(0).getMobilno());
+            //  jsonObject.put("clientIp",localStorage.getActivityState(LocalStorage.EMI));
+            jsonObject.put("customerMobile", mobile);
+            jsonObject.put("typeMobileWeb", "mobile");
+            jsonObject.put("txnAmount", txnAmmount);
+            jsonObject.put("langitude", String.valueOf(mylocation.getLongitude()));
+            jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return jsonObject;
+    }
+
+    protected JSONObject getCashOutDetails2(String clientRefID, String mobile, String requestData, String headerData, String txnAmmount, String serviceType, String requestChannel, String reqFor, String requestType, String blueToothAddress, String innno, String bankName) {
+        JSONObject jsonObject = new JSONObject();
+        try { //https://uat.rapipay.com/MposService/AEPSCashout
+            transactionIDAEPS = ImageUtils.miliSeconds();
+            jsonObject.put("serviceType", "AEPS_CASH_WITHDRAW");
+            jsonObject.put("mobileNumber", mobile);
+            jsonObject.put("reqFor", reqFor);
+            jsonObject.put("latitude", String.valueOf(mylocation.getLatitude()));
+            jsonObject.put("adhaarNumber", blueToothAddress);
+            jsonObject.put("transactionID", transactionIDAEPS);
+            jsonObject.put("paymentType", "B");
+            jsonObject.put("requestRemarks", "mobile aeps");
+            jsonObject.put("merchantPin", "b027291b0af8cde6ae6e30bf6056204b");
+            jsonObject.put("deviceIMEI", localStorage.getActivityState(LocalStorage.EMI));
+            jsonObject.put("merchantTransactionId", transactionIDAEPS);
+            jsonObject.put("aepsType", "aeps2");
+            jsonObject.put("bankName", bankName);
+            if (display != null)
+                jsonObject.put("bioData", base64(display));
+            // jsonObject.put("encData", enccriptData(display));
+            jsonObject.put("longitude", String.valueOf(mylocation.getLongitude()));
+            jsonObject.put("timestamp", gettime());
+            jsonObject.put("agentId", list.get(0).getMobilno());
+            jsonObject.put("subMerchantId", "rapipaym");
+            jsonObject.put("requestType", "AEPS_CHANNEL");//nationalBankIdentificationNumber
+            jsonObject.put("nationalBankIdentificationNumber", innno); // https://fingpayap.tapits.in/fingpay/getBankDetailsMasterData
+            jsonObject.put("merchantUserName", list.get(0).getAgentName());
+            jsonObject.put("languageCode", "en");
+            jsonObject.put("indicatorforUID", "0");
+            jsonObject.put("transactionType", "CW");
+            jsonObject.put("nodeAgentId", list.get(0).getMobilno());
+            jsonObject.put("typeMobileWeb", "mobile");
+            jsonObject.put("iCount", "0");
+            jsonObject.put("pCount", "0");
+            jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
+            jsonObject.put("authentication", headerData);
+            jsonObject.put("transactionAmount", txnAmmount);
+            jsonObject.put("encData", requestData);
+            jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return jsonObject;
+    }
+
+    public String gettime() {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        String currentDateandTime = sdf.format(new Date());
+        return currentDateandTime;
+    }
+
+    protected JSONObject getGetBalance(String clientRefID, String mobile, String requestData, String headerData, String txnAmmount, String serviceType, String requestChannel, String reqFor, String requestType, String blueToothAddress, String innno, String bankName) {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            transactionIDAEPS = ImageUtils.miliSeconds();
+            jsonObject.put("serviceType", "AEPS_GET_BALANCE");
+            jsonObject.put("mobileNumber", mobile);
+            jsonObject.put("reqFor", reqFor);
+            jsonObject.put("latitude", String.valueOf(mylocation.getLatitude()));
+            if (txnAmmount == null) {
+                txnAmmount = "0";
+            }
+            jsonObject.put("adhaarNumber", txnAmmount);
+            jsonObject.put("transactionID", transactionIDAEPS);
+            jsonObject.put("paymentType", "B");
+            jsonObject.put("requestRemarks", "mobile aeps");
+            jsonObject.put("merchantPin", "b027291b0af8cde6ae6e30bf6056204b");
+            jsonObject.put("deviceIMEI", localStorage.getActivityState(LocalStorage.EMI));
+            jsonObject.put("merchantTransactionId", transactionIDAEPS);
+            jsonObject.put("bankName", bankName);
+            jsonObject.put("aepsType", "aeps2");
+            if (display != null)
+                jsonObject.put("bioData", base64(display));
+            // jsonObject.put("encData", enccriptData(display));
+            jsonObject.put("longitude", String.valueOf(mylocation.getLongitude()));
+            jsonObject.put("timestamp", gettime());
+            jsonObject.put("agentId", list.get(0).getMobilno());
+            jsonObject.put("subMerchantId", "rapipaym");
+            jsonObject.put("requestType", "AEPS_CHANNEL");
+            jsonObject.put("nationalBankIdentificationNumber", innno); // https://fingpayap.tapits.in/fingpay/getBankDetailsMasterData
+            jsonObject.put("merchantUserName", list.get(0).getAgentName());
+            jsonObject.put("languageCode", "en");
+            jsonObject.put("indicatorforUID", "0");
+            jsonObject.put("transactionType", "BE");
+            jsonObject.put("nodeAgentId", list.get(0).getMobilno());
+            jsonObject.put("typeMobileWeb", "mobile");
+            jsonObject.put("iCount", "0");
+            jsonObject.put("pCount", "0");
+            jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
+            jsonObject.put("authentication", headerData);
+            jsonObject.put("encData", requestData);
+            jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return jsonObject;
+    }
+
+    public String base64(String display) {
+        byte[] data = new byte[0];
+        try {
+            data = display.getBytes("UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        String base64 = Base64.encodeToString(data, Base64.DEFAULT);
+        return base64;
+    }
+
+  /*  @RequiresApi(api = Build.VERSION_CODES.O)
+    public String Hello(String display)
+    {
+        byte[] message;
+        try
+        {
+            PublicKey publicKey = readPublicKey("public.der");
+            PrivateKey privateKey = readPrivateKey("private.der");
+            message = display.getBytes("UTF8");
+            byte[] secret = encrypt(publicKey, message);
+           // byte[] recovered_message = decrypt(privateKey, secret);
+           // System.out.println(new String(recovered_message, "UTF8"));
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return message;
+    }
+
+    public static String PUBLIC_KEY = "2e8c1753-a1ce-46f4-8dc1-fa6e35a0e2b0";
+
+    *//*static String enccriptData(String txt)
+    {
+        String encoded = "";
+        byte[] encrypted = null;
+        try {
+            byte[] publicBytes = Base64.decode(PUBLIC_KEY, Base64.DEFAULT);
+            X509EncodedKeySpec keySpec = new X509EncodedKeySpec(publicBytes);
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            PublicKey pubKey = keyFactory.generatePublic(keySpec);
+            Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1PADDING"); //or try with "RSA"
+            cipher.init(Cipher.ENCRYPT_MODE, pubKey);
+            encrypted = cipher.doFinal(txt.getBytes());
+            encoded = Base64.encodeToString(encrypted, Base64.DEFAULT);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        return encoded;
+    }*//*
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public byte[] readFileBytes(String filename) throws IOException
+    {
+        Path path = Paths.get(filename);
+        return Files.readAllBytes(path);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public PublicKey readPublicKey(String filename) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException
+    {
+        X509EncodedKeySpec publicSpec = new X509EncodedKeySpec(readFileBytes(filename));
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        return keyFactory.generatePublic(publicSpec);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public PrivateKey readPrivateKey(String filename) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException
+    {
+        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(readFileBytes(filename));
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        return keyFactory.generatePrivate(keySpec);
+    }
+
+    public byte[] encrypt(PublicKey key, byte[] plaintext) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException
+    {
+        Cipher cipher = Cipher.getInstance("RSA/ECB/OAEPWithSHA1AndMGF1Padding");
+        cipher.init(Cipher.ENCRYPT_MODE, key);
+        return cipher.doFinal(plaintext);
+    }*/
+
+
     protected void selectImage(final int id1, final int id2, final String imageType) {
         final CharSequence[] items = {"Capture Image", "Choose from Gallery", "Cancel"};
         AlertDialog.Builder builder = new AlertDialog.Builder(BaseCompactActivity.this);
@@ -2059,8 +2683,10 @@ public class BaseCompactActivity extends AppCompatActivity {
                 }
             }
         });
+        clickable();
         builder.show();
     }
+
     protected void responseMSg(JSONObject object) {
         try {
             if (object.has("responseMessage"))
@@ -2073,6 +2699,104 @@ public class BaseCompactActivity extends AppCompatActivity {
     }
 
     protected void customDialog_Common(String msg) {
+        try {
+            final Dialog dialog = new Dialog(BaseCompactActivity.this);
+            LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View alertLayout = inflater.inflate(R.layout.custom_layout_common, null);
+            TextView text = (TextView) alertLayout.findViewById(R.id.dialog_title);
+            text.setText(getResources().getString(R.string.Alert));
+            TextView dialog_msg = (TextView) alertLayout.findViewById(R.id.dialog_msg);
+            dialog_msg.setText(msg);
+            dialog_msg.setVisibility(View.VISIBLE);
+            alertLayout.findViewById(R.id.btn_cancel).setVisibility(View.GONE);
+            AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
+            dialog.setCancelable(false);
+            btn_ok.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    try {
+                        dialog.dismiss();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            dialog.setContentView(alertLayout);
+            dialog.show();
+            Window window = dialog.getWindow();
+            window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    protected void customDialog_Common_device(String msg) {
+        try {
+            final Dialog dialog = new Dialog(BaseCompactActivity.this);
+            LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View alertLayout = inflater.inflate(R.layout.custom_layout_common, null);
+            TextView text = (TextView) alertLayout.findViewById(R.id.dialog_title);
+            text.setText(getResources().getString(R.string.Alert));
+            TextView dialog_msg = (TextView) alertLayout.findViewById(R.id.dialog_msg);
+            dialog_msg.setText(msg);
+            dialog_msg.setVisibility(View.VISIBLE);
+            alertLayout.findViewById(R.id.btn_cancel).setVisibility(View.GONE);
+            AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
+            dialog.setCancelable(false);
+            btn_ok.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    try {
+                        dialog.dismiss();
+                        Intent dashboard = new Intent(getApplicationContext(), MainActivity.class);
+                        startActivity(dashboard);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            dialog.setContentView(alertLayout);
+            dialog.show();
+            Window window = dialog.getWindow();
+            window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    protected void customDialog_Matm_device(String msg) {
+        try {
+            final Dialog dialog = new Dialog(BaseCompactActivity.this);
+            LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View alertLayout = inflater.inflate(R.layout.custom_layout_common, null);
+            TextView text = (TextView) alertLayout.findViewById(R.id.dialog_title);
+            text.setText(getResources().getString(R.string.Alert));
+            TextView dialog_msg = (TextView) alertLayout.findViewById(R.id.dialog_msg);
+            dialog_msg.setText(msg);
+            dialog_msg.setVisibility(View.VISIBLE);
+            alertLayout.findViewById(R.id.btn_cancel).setVisibility(View.GONE);
+            AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
+            dialog.setCancelable(false);
+            btn_ok.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    try {
+                        dialog.dismiss();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            dialog.setContentView(alertLayout);
+            dialog.show();
+            Window window = dialog.getWindow();
+            window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    protected void customDialog_List_info(String msg) {
         try {
             final Dialog dialog = new Dialog(BaseCompactActivity.this);
             LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);

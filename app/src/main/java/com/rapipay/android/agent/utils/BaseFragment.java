@@ -72,6 +72,8 @@ import com.rapipay.android.agent.adapter.PermissionCheckAdapter;
 import com.rapipay.android.agent.interfaces.CustomInterface;
 import com.rapipay.android.agent.main_directory.CameraKitActivity;
 import com.rapipay.android.agent.main_directory.LoginScreenActivity;
+import com.rapipay.android.agent.main_directory.MainActivity;
+import com.rapipay.android.agent.main_directory.PinVerification;
 import com.rapipay.android.agent.view.EnglishNumberToWords;
 
 import org.json.JSONArray;
@@ -111,7 +113,9 @@ public class BaseFragment extends Fragment {
     ArrayList<String> left, right, medium, spinner_list;
     ArrayList<HeaderePozo> bottom;
     LinearLayout main_layout;
+    protected TextView heading;
     protected boolean isNEFT = false;
+    protected static String balance = null;
     protected boolean btnstatus = false;
 
     @Nullable
@@ -120,14 +124,14 @@ public class BaseFragment extends Fragment {
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
-    protected void handlercontrol() {
+    /*protected void handlercontrol() {
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             public void run() {
                 btnstatus = false;
             }
         }, 1000);
-    }
+    }*/
 
     protected void contactRead(Intent data, TextView input_number) {
         if (data != null) {
@@ -306,6 +310,7 @@ public class BaseFragment extends Fragment {
                 public void onClick(View v) {
                     try {
                         dialog.dismiss();
+                        v.findViewById(R.id.btn_fund).setClickable(true);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -320,6 +325,26 @@ public class BaseFragment extends Fragment {
         }
     }
 
+    AppCompatButton btn_cancel, btn_ok, btn_regenerate;
+    ImageView share;
+
+    public void clickable() {
+        try {
+            btn_cancel.setClickable(true);
+            btn_ok.setClickable(true);
+            btn_regenerate.setClickable(true);
+            share.setClickable(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onPause() {
+        clickable();
+        super.onPause();
+    }
+
     protected void customDialog_Common(final String type, JSONObject object, final Object ob, String msg, final String input, String output, final CustomInterface anInterface) {
         this.anInterface = anInterface;
         dialog = new Dialog(getActivity());
@@ -329,9 +354,9 @@ public class BaseFragment extends Fragment {
         TextView text = (TextView) alertLayout.findViewById(R.id.dialog_title);
         final TextView dialog_cancel = (TextView) alertLayout.findViewById(R.id.dialog_cancel);
         text.setText(msg);
-        AppCompatButton btn_cancel = (AppCompatButton) alertLayout.findViewById(R.id.btn_cancel);
-        AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
-        AppCompatButton btn_regenerate = (AppCompatButton) alertLayout.findViewById(R.id.btn_regenerate);
+        btn_cancel = (AppCompatButton) alertLayout.findViewById(R.id.btn_cancel);
+        btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
+        btn_regenerate = (AppCompatButton) alertLayout.findViewById(R.id.btn_regenerate);
         if (type.equalsIgnoreCase("NETWORKLAYOUT")) {
             btn_cancel.setText("Network User");
             btn_cancel.setTextSize(10);
@@ -401,57 +426,57 @@ public class BaseFragment extends Fragment {
         btn_ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    if (type.equalsIgnoreCase("PENDINGREFUND")) {
-                        anInterface.okClicked(input, ob);
-                        dialog.dismiss();
-                    } else if (type.equalsIgnoreCase("KYCLAYOUTS")) {
-                        anInterface.okClicked(type, ob);
-                        dialog.dismiss();
-                    } else if (type.equalsIgnoreCase("TERMCONDITION")) {
-                        anInterface.okClicked(type, ob);
-                        dialog.dismiss();
-                    } else if (type.equalsIgnoreCase("KYCLAYOUTS")) {
-                        anInterface.okClicked(type, ob);
-                        dialog.dismiss();
-                    } else if (type.equalsIgnoreCase("CREATEAGENT")) {
-                        if (first_name.getText().toString().isEmpty()) {
-                            first_name.setError("Please enter first name");
-                            first_name.requestFocus();
-                        } else if (last_name.getText().toString().isEmpty()) {
-                            last_name.setError("Please enter last name");
-                            last_name.requestFocus();
-                        } else if (mobile_num.getText().toString().length() != 10) {
-                            mobile_num.setError("Please enter mobile number");
-                            mobile_num.requestFocus();
-                        } else if (cree_address.getText().toString().isEmpty()) {
-                            cree_address.setError("Please enter address");
-                            cree_address.requestFocus();
-                        } else if (pincode.getText().toString().length() != 6) {
-                            pincode.setError("Please enter pincode");
-                            pincode.requestFocus();
-                        } else {
-                            anInterface.okClicked(type, ob);
-                            dialog.dismiss();
-                        }
+                btn_ok.setClickable(false);
+                if (type.equalsIgnoreCase("PENDINGREFUND")) {
+                    anInterface.okClicked(input, ob);
+                    dialog.dismiss();
+                } else if (type.equalsIgnoreCase("KYCLAYOUTS")) {
+                    anInterface.okClicked(type, ob);
+                    dialog.dismiss();
+                } else if (type.equalsIgnoreCase("TERMCONDITION")) {
+                    anInterface.okClicked(type, ob);
+                    dialog.dismiss();
+                } else if (type.equalsIgnoreCase("KYCLAYOUTS")) {
+                    anInterface.okClicked(type, ob);
+                    dialog.dismiss();
+                } else if (type.equalsIgnoreCase("CREATEAGENT")) {
+                    if (first_name.getText().toString().isEmpty()) {
+                        first_name.setError("Please enter first name");
+                        first_name.requestFocus();
+                        btn_ok.setClickable(true);
+                    } else if (last_name.getText().toString().isEmpty()) {
+                        last_name.setError("Please enter last name");
+                        last_name.requestFocus();
+                        btn_ok.setClickable(true);
+                    } else if (mobile_num.getText().toString().length() != 10) {
+                        mobile_num.setError("Please enter mobile number");
+                        mobile_num.requestFocus();
+                        btn_ok.setClickable(true);
+                    } else if (cree_address.getText().toString().isEmpty()) {
+                        cree_address.setError("Please enter address");
+                        cree_address.requestFocus();
+                        btn_ok.setClickable(true);
+                    } else if (pincode.getText().toString().length() != 6) {
+                        pincode.setError("Please enter pincode");
+                        pincode.requestFocus();
+                        btn_ok.setClickable(true);
                     } else {
                         anInterface.okClicked(type, ob);
                         dialog.dismiss();
                     }
+                } else {
+                    anInterface.okClicked(type, ob);
+                    dialog.dismiss();
                 }
-                handlercontrol();
+
             }
         });
         btn_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    anInterface.cancelClicked(type, ob);
-                    dialog.dismiss();
-                }
-                handlercontrol();
+                btn_cancel.setClickable(false);
+                anInterface.cancelClicked(type, ob);
+                dialog.dismiss();
             }
         });
         btn_regenerate.setOnClickListener(new View.OnClickListener() {
@@ -480,9 +505,9 @@ public class BaseFragment extends Fragment {
         TextView text = (TextView) alertLayout.findViewById(R.id.dialog_title);
         final TextView dialog_cancel = (TextView) alertLayout.findViewById(R.id.dialog_cancel);
         text.setText(msg);
-        AppCompatButton btn_cancel = (AppCompatButton) alertLayout.findViewById(R.id.btn_cancel);
-        AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
-        AppCompatButton btn_regenerate = (AppCompatButton) alertLayout.findViewById(R.id.btn_regenerate);
+        btn_cancel = (AppCompatButton) alertLayout.findViewById(R.id.btn_cancel);
+        btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
+        btn_regenerate = (AppCompatButton) alertLayout.findViewById(R.id.btn_regenerate);
         ListView list_view_with_checkbox = (ListView) alertLayout.findViewById(R.id.list_view_with_checkbox);
         if (type.equalsIgnoreCase("ACTIVATELAYOUT")) {
             btn_ok.setText(input);
@@ -511,23 +536,17 @@ public class BaseFragment extends Fragment {
         btn_ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    anInterface.okClicked(type, ob);
-                    dialognew.dismiss();
-                }
-                handlercontrol();
+                btn_ok.setClickable(false);
+                anInterface.okClicked(type, ob);
+                dialognew.dismiss();
             }
         });
         btn_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    anInterface.cancelClicked(type, ob);
-                    dialognew.dismiss();
-                }
-                handlercontrol();
+                btn_cancel.setClickable(false);
+                anInterface.cancelClicked(type, ob);
+                dialognew.dismiss();
             }
         });
         btn_regenerate.setOnClickListener(new View.OnClickListener() {
@@ -560,8 +579,8 @@ public class BaseFragment extends Fragment {
         TextView text = (TextView) alertLayout.findViewById(R.id.dialog_title);
         increaselimit = (EditText) alertLayout.findViewById(R.id.increaselimit);
         text.setText(msg);
-        AppCompatButton btn_cancel = (AppCompatButton) alertLayout.findViewById(R.id.btn_cancel);
-        AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
+        btn_cancel = (AppCompatButton) alertLayout.findViewById(R.id.btn_cancel);
+        btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
         ListView list_view_with_checkbox = (ListView) alertLayout.findViewById(R.id.list_view_with_checkbox);
         final TextView input_text = (TextView) alertLayout.findViewById(R.id.input_text);
         increaselimit.addTextChangedListener(new TextWatcher() {
@@ -577,11 +596,11 @@ public class BaseFragment extends Fragment {
 
             @Override
             public void afterTextChanged(Editable s) {
-                if (s.length()!=0 && s.length()<10) {
+                if (s.length() != 0 && s.length() < 10) {
                     input_text.setText("");
-                    input_text.setText(EnglishNumberToWords.convert(Integer.parseInt(s.toString()))+" rupee");
+                    input_text.setText(EnglishNumberToWords.convert(Integer.parseInt(s.toString())) + " rupee");
                     input_text.setVisibility(View.VISIBLE);
-                }else
+                } else
                     input_text.setVisibility(View.GONE);
             }
         });
@@ -615,32 +634,26 @@ public class BaseFragment extends Fragment {
         btn_ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    arrayList = new ArrayList<>();
-                    if (medium != null && medium.size() != 0) {
-                        int size = medium.size();
-                        for (int i = 0; i < size; i++) {
-                            PermissionPozo dto = medium.get(i);
-                            arrayList.add(dto.getServiceId());
-                        }
+                btn_ok.setClickable(false);
+                arrayList = new ArrayList<>();
+                if (medium != null && medium.size() != 0) {
+                    int size = medium.size();
+                    for (int i = 0; i < size; i++) {
+                        PermissionPozo dto = medium.get(i);
+                        arrayList.add(dto.getServiceId());
                     }
-                    if (arrayList.size() != 0)
-                        anInterface.okClicked(type, ob);
-                    dialognew.dismiss();
                 }
-                handlercontrol();
+                if (arrayList.size() != 0)
+                    anInterface.okClicked(type, ob);
+                dialognew.dismiss();
             }
         });
         btn_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    anInterface.cancelClicked(type, ob);
-                    dialognew.dismiss();
-                }
-                handlercontrol();
+                btn_cancel.setClickable(false);
+                anInterface.cancelClicked(type, ob);
+                dialognew.dismiss();
             }
         });
         dialognew.show();
@@ -758,7 +771,7 @@ public class BaseFragment extends Fragment {
                 viewText.setText(list_spinner.get(position));
                 viewText.setError(null);
                 if (con_ifsc != null) {
-                   // String condition = "where " + RapipayDB.COLOMN__BANK_NAME + "='" + viewText.getText().toString() + "'";
+                    // String condition = "where " + RapipayDB.COLOMN__BANK_NAME + "='" + viewText.getText().toString() + "'";
                     String condition = viewText.getText().toString();
                     String ifsccode = BaseCompactActivity.dbRealm.geBankIFSC(condition).get(0);
                     if (ifsccode.equalsIgnoreCase("NA") & typeCheck.equalsIgnoreCase("BC")) {
@@ -824,6 +837,54 @@ public class BaseFragment extends Fragment {
         builder.show();
     }
 
+
+    protected void customDialog_Common_device(String msg) {
+        try {
+            final Dialog dialog = new Dialog(getActivity());
+            LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View alertLayout = inflater.inflate(R.layout.custom_layout_common, null);
+            TextView text = (TextView) alertLayout.findViewById(R.id.dialog_title);
+            text.setText(getResources().getString(R.string.Alert));
+            TextView dialog_msg = (TextView) alertLayout.findViewById(R.id.dialog_msg);
+            dialog_msg.setText(msg);
+            dialog_msg.setVisibility(View.VISIBLE);
+            alertLayout.findViewById(R.id.btn_cancel).setVisibility(View.GONE);
+            AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
+            dialog.setCancelable(false);
+            btn_ok.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    try {
+                        dialog.dismiss();
+                        Intent dashboard = new Intent(getActivity(), MainActivity.class);
+                        startActivity(dashboard);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            dialog.setContentView(alertLayout);
+            dialog.show();
+            Window window = dialog.getWindow();
+            window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    protected void setBack_click(Context context) {
+        Intent intent = new Intent(getActivity(), MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        context.startActivity(intent);
+    }
+
+    protected void setBack_click1(Context context) {
+        Intent intent = new Intent(getActivity(), PinVerification.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        context.startActivity(intent);
+    }
+
+
     protected Bitmap addWaterMark(Bitmap src) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
         String currentDateandTime = sdf.format(new Date());
@@ -838,7 +899,6 @@ public class BaseFragment extends Fragment {
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_OVER)); // Text Overlapping Pattern
         Bitmap waterMark = BitmapFactory.decodeResource(getResources(), R.drawable.rapipay);
         canvas.drawText(currentDateandTime, w / 4, h - 10, paint);
-
         return result;
     }
 
@@ -968,7 +1028,7 @@ public class BaseFragment extends Fragment {
             btn_account.setText(accountNo);
         btn_sendname.setText(input);
         if (ifsc_code != null) {
-           // String condition = "where " + RapipayDB.COLOMN_IFSC + "='" + ifsc_code + "'";
+            // String condition = "where " + RapipayDB.COLOMN_IFSC + "='" + ifsc_code + "'";
             String condition = ifsc_code;
             btn_bank.setText(BaseCompactActivity.dbRealm.geBank(condition).get(0));
         }
@@ -1017,11 +1077,11 @@ public class BaseFragment extends Fragment {
 
             @Override
             public void afterTextChanged(Editable s) {
-                if (s.length()!=0 && s.length()<10) {
+                if (s.length() != 0 && s.length() < 10) {
                     input_text.setText("");
-                    input_text.setText(EnglishNumberToWords.convert(Integer.parseInt(s.toString()))+" rupee");
+                    input_text.setText(EnglishNumberToWords.convert(Integer.parseInt(s.toString())) + " rupee");
                     input_text.setVisibility(View.VISIBLE);
-                }else
+                } else
                     input_text.setVisibility(View.GONE);
             }
         });
@@ -1101,8 +1161,8 @@ public class BaseFragment extends Fragment {
         View alertLayout = inflater.inflate(R.layout.receipt_layout_new, null);
         alertLayout.setKeepScreenOn(true);
         ImageView receipt_logo = (ImageView) alertLayout.findViewById(R.id.receipt_logo);
-       // String condition = "where " + RapipayDB.IMAGE_NAME + "='invoiceLogo.jpg'";
-        String condition = "invoiceLogo.jpg";
+        // String condition = "where " + RapipayDB.IMAGE_NAME + "='invoiceLogo.jpg'";
+        String condition = "loginLogo.jpg";
         ArrayList<ImagePozo> imagePozoArrayList = BaseCompactActivity.dbRealm.getImageDetails(condition);
         if (imagePozoArrayList.size() != 0) {
             byteConvert(receipt_logo, imagePozoArrayList.get(0).getImagePath());
@@ -1121,8 +1181,8 @@ public class BaseFragment extends Fragment {
         LinearLayout listLeft = (LinearLayout) main_layout.findViewById(R.id.listLeft);
         LinearLayout listRight = (LinearLayout) main_layout.findViewById(R.id.listRight);
         LinearLayout listbottom = (LinearLayout) main_layout.findViewById(R.id.listbottom);
-        AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
-        ImageView share = (ImageView) alertLayout.findViewById(R.id.share);
+        btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
+        share = (ImageView) alertLayout.findViewById(R.id.share);
         share.setColorFilter(getResources().getColor(R.color.colorPrimaryDark));
         if (left.size() != 0) {
             for (int k = 0; k < left.size(); k++) {
@@ -1174,47 +1234,41 @@ public class BaseFragment extends Fragment {
         btn_ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    anInterface.okClicked(type, object);
-                    dialog.dismiss();
-                }
-                handlercontrol();
+                btn_ok.setClickable(false);
+                anInterface.okClicked(type, object);
+                dialog.dismiss();
             }
         });
         share.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    Bitmap b = Bitmap.createBitmap(main_layout.getDrawingCache());
-                    main_layout.setDrawingCacheEnabled(false);
-                    ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-                    b.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+                share.setClickable(false);
+                Bitmap b = Bitmap.createBitmap(main_layout.getDrawingCache());
+                main_layout.setDrawingCacheEnabled(false);
+                ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                b.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
 
-                    File f = new File(Environment.getExternalStorageDirectory() + File.separator + "v2i.jpg");
-                    try {
-                        f.createNewFile();
-                        FileOutputStream fo = new FileOutputStream(f);
-                        fo.write(bytes.toByteArray());
-                        fo.flush();
-                        fo.close();
-                        f.setReadable(true, false);
-                        final Intent intent = new Intent(Intent.ACTION_SEND);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                File f = new File(Environment.getExternalStorageDirectory() + File.separator + "v2i.jpg");
+                try {
+                    f.createNewFile();
+                    FileOutputStream fo = new FileOutputStream(f);
+                    fo.write(bytes.toByteArray());
+                    fo.flush();
+                    fo.close();
+                    f.setReadable(true, false);
+                    final Intent intent = new Intent(Intent.ACTION_SEND);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-                        Uri apkURI = FileProvider.getUriForFile(
-                                getActivity(),
-                                getActivity().getApplicationContext()
-                                        .getPackageName() + ".provider", f);
-                        intent.putExtra(Intent.EXTRA_STREAM, apkURI);
-                        intent.setType("image/png");
-                        startActivity(Intent.createChooser(intent, "Share image via"));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                    Uri apkURI = FileProvider.getUriForFile(
+                            getActivity(),
+                            getActivity().getApplicationContext()
+                                    .getPackageName() + ".provider", f);
+                    intent.putExtra(Intent.EXTRA_STREAM, apkURI);
+                    intent.setType("image/png");
+                    startActivity(Intent.createChooser(intent, "Share image via"));
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-                handlercontrol();
             }
         });
         dialog.show();
@@ -1277,14 +1331,13 @@ public class BaseFragment extends Fragment {
         View alertLayout = inflater.inflate(R.layout.pmt_receipt_layout, null);
         alertLayout.setKeepScreenOn(true);
         ImageView receipt_logo = (ImageView) alertLayout.findViewById(R.id.receipt_logo);
-      //  String condition = "where " + RapipayDB.IMAGE_NAME + "='invoiceLogo.jpg'";
-        String condition = "invoiceLogo.jpg";
+        //  String condition = "where " + RapipayDB.IMAGE_NAME + "='invoiceLogo.jpg'";
+        String condition = "loginLogo.jpg";
         ArrayList<ImagePozo> imagePozoArrayList = BaseCompactActivity.dbRealm.getImageDetails(condition);
         if (imagePozoArrayList.size() != 0) {
             byteConvert(receipt_logo, imagePozoArrayList.get(0).getImagePath());
         }
         main_layout = (LinearLayout) alertLayout.findViewById(R.id.main_layout);
-
         main_layout.setDrawingCacheEnabled(true);
         main_layout.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
                 View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
@@ -1299,7 +1352,7 @@ public class BaseFragment extends Fragment {
         LinearLayout listRight = (LinearLayout) main_layout.findViewById(R.id.listRight);
         LinearLayout listbottom = (LinearLayout) main_layout.findViewById(R.id.listbottom);
         AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
-        ImageView share = (ImageView) alertLayout.findViewById(R.id.share);
+        share = (ImageView) alertLayout.findViewById(R.id.share);
         share.setColorFilter(getResources().getColor(R.color.colorPrimaryDark));
         medium_value = "";
         if (left.size() != 0) {
@@ -1363,42 +1416,40 @@ public class BaseFragment extends Fragment {
         share.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (btnstatus == false) {
-                    btnstatus = true;
-                    Bitmap b = Bitmap.createBitmap(main_layout.getDrawingCache());
-                    main_layout.setDrawingCacheEnabled(false);
-                    ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-                    b.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+                share.setClickable(false);
+                Bitmap b = Bitmap.createBitmap(main_layout.getDrawingCache());
+                main_layout.setDrawingCacheEnabled(false);
+                ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                b.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
 
-                    File f = new File(Environment.getExternalStorageDirectory() + File.separator + "v2i.jpg");
-                    try {
-                        f.createNewFile();
-                        FileOutputStream fo = new FileOutputStream(f);
-                        fo.write(bytes.toByteArray());
-                        fo.flush();
-                        fo.close();
-                        f.setReadable(true, false);
-                        final Intent intent = new Intent(Intent.ACTION_SEND);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                File f = new File(Environment.getExternalStorageDirectory() + File.separator + "v2i.jpg");
+                try {
+                    f.createNewFile();
+                    FileOutputStream fo = new FileOutputStream(f);
+                    fo.write(bytes.toByteArray());
+                    fo.flush();
+                    fo.close();
+                    f.setReadable(true, false);
+                    final Intent intent = new Intent(Intent.ACTION_SEND);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-                        Uri apkURI = FileProvider.getUriForFile(
-                                getActivity(),
-                                getActivity().getApplicationContext()
-                                        .getPackageName() + ".provider", f);
-                        intent.putExtra(Intent.EXTRA_STREAM, apkURI);
-                        intent.setType("image/png");
-                        startActivityForResult(Intent.createChooser(intent, "Share image via"), 2);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                    Uri apkURI = FileProvider.getUriForFile(
+                            getActivity(),
+                            getActivity().getApplicationContext()
+                                    .getPackageName() + ".provider", f);
+                    intent.putExtra(Intent.EXTRA_STREAM, apkURI);
+                    intent.setType("image/png");
+                    startActivityForResult(Intent.createChooser(intent, "Share image via"), 2);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-                handlercontrol();
             }
         });
         dialog.show();
         Window window = dialog.getWindow();
         window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
     }
+
     protected void responseMSg(JSONObject object) {
         try {
             if (object.has("responseMessage"))
