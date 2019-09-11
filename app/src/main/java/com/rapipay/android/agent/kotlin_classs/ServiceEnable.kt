@@ -94,7 +94,7 @@ class ServiceEnable : BaseFragment(), View.OnClickListener, RequestHandler {
                     customDialog_Ben("Alert", `object`.getString("responseMessage"))
                 }
             } else if (`object`.getString("responseCode").equals("60147", ignoreCase = true)) run {
-                Toast.makeText(context, `object`.getString("responseCode"), Toast.LENGTH_LONG).show()
+                Toast.makeText(context, `object`.getString("responseMessage"), Toast.LENGTH_LONG).show()
                 setBack_click1(context)
             } else
                 responseMSg(`object`)

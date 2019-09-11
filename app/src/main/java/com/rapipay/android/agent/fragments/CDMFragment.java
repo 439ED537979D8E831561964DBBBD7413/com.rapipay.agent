@@ -132,7 +132,7 @@ public class CDMFragment extends BaseFragment implements RequestHandler {
 
                 }
             } else if (object.getString("responseCode").equalsIgnoreCase("60147")) {
-                Toast.makeText(getActivity(), object.getString("responseCode"), Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), object.getString("responseMessage"), Toast.LENGTH_LONG).show();
                 setBack_click1(getActivity());
             } else
                 responseMSg(object);

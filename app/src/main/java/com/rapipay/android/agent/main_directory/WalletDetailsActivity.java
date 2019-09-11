@@ -546,11 +546,11 @@ public class WalletDetailsActivity extends BaseCompactActivity implements View.O
                 } else if (object.getString("responseCode").equalsIgnoreCase("75062")) {
                     customDialog_Common("KYCLAYOUT", object, null, "Agent Re-registration", null, object.getString("responseMessage"), "REREGISTRATIONWALLET");
                 } else if (object.getString("responseCode").equalsIgnoreCase("60147")) {
-                    Toast.makeText(this,object.getString("responseCode"),Toast.LENGTH_LONG).show();
+                    Toast.makeText(this,object.getString("responseMessage"),Toast.LENGTH_LONG).show();
                     setBack_click1(this);
                 }
             } else if (object.getString("responseCode").equalsIgnoreCase("60147")) {
-                Toast.makeText(this,object.getString("responseCode"),Toast.LENGTH_LONG).show();
+                Toast.makeText(this,object.getString("responseMessage"),Toast.LENGTH_LONG).show();
                 setBack_click(this);
             } else {
                 responseMSg(object);

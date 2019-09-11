@@ -20,7 +20,6 @@ import io.realm.Realm;
 
 public class MasterClass {
 
-
     public boolean getMasterData(JSONObject object, RapipayRealmDB db, Realm realm) {
         try {
             if (object.has("bankDetailList")) {

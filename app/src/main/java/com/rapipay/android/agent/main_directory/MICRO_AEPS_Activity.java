@@ -2,6 +2,7 @@ package com.rapipay.android.agent.main_directory;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.Dialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.DialogInterface;
@@ -69,6 +70,7 @@ import com.rapipay.android.agent.interfaces.CustomInterface;
 import com.rapipay.android.agent.interfaces.RequestHandler;
 import com.rapipay.android.agent.utils.AsyncPostMethod;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
+import com.rapipay.android.agent.utils.CustomProgessDialog;
 import com.rapipay.android.agent.utils.GenerateChecksum;
 import com.rapipay.android.agent.utils.ImageUtils;
 import com.rapipay.android.agent.utils.RecyclerTouchListener;
@@ -188,6 +190,8 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
 
     private void getBankDetails() {
         //  String url = "https://fingpayap.tapits.in/fingpay/getBankDetailsMasterData";
+        final Dialog dialogs = new Dialog(this);
+        final CustomProgessDialog dialog= new CustomProgessDialog(this);
         String url = "https://fingpayap.tapits.in/fpaepsservice/api/bankdata/bank/details";
         RequestQueue queue = Volley.newRequestQueue(this);
         final Microdata1 microdatas1 = new Microdata1();
@@ -198,6 +202,8 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
                     public void onResponse(final String response) {
                         try {
                             final Microresponse1 microresponse = new Microresponse1();
+                            dialogs.dismiss();
+                            dialog.hide_progress();
                             realm.executeTransaction(new Realm.Transaction() {
                                 @Override
                                 public void execute(Realm realm) {
@@ -283,7 +289,6 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
         });
         cashid = findViewById(R.id.cashid);
         balanceid = findViewById(R.id.balanceid);
-        heading = findViewById(R.id.toolbar_title);
         btn_contact = findViewById(R.id.btn_contact);
         reset = findViewById(R.id.reset);
         reset.setVisibility(View.GONE);
@@ -292,6 +297,7 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
         reset.setColorFilter(getResources().getColor(R.color.colorPrimaryDark));
         reset.setVisibility(View.VISIBLE);*/
         input_deviceid = findViewById(R.id.input_deviceid);
+        heading = findViewById(R.id.toolbar_title);
         if (balance != null) {
             heading.setText("AEPS2" + " (Balance : Rs." + balance + ")");
         } else {
@@ -864,19 +870,25 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
                     customReceiptNew("Transaction Status Receipt", object, MICRO_AEPS_Activity.this);
                 }
             } else if (object.getString("responseCode").equalsIgnoreCase("60217")) {
+                flag = 0;
                 customDialog_Common_device(object.getString("responseMessage"));
             } else if (object.getString("responseCode").equalsIgnoreCase("86039")) {
+                flag = 0;
                 customDialog_Common_device(object.getString("responseMessage"));
             } else if (object.getString("responseCode").equalsIgnoreCase("60147")) {
-                customDialog_Common_device(object.getString("responseCode"));
+                Toast.makeText(this, object.getString("responseMessage"), Toast.LENGTH_LONG).show();
+                setBack_click1(this);
             } else if (reqFor.equalsIgnoreCase("MATM")) {
                 responseMSg(object);
+                flag = 0;
             } else if (object.getString("responseCode").equalsIgnoreCase("904")) {
                 customDialog_Common_device(object.getString("responseMessage"));
+                flag = 0;
             } else if (object.getString("responseCode").equalsIgnoreCase("60067")) {
                 Toast.makeText(this,object.getString("responseCode"),Toast.LENGTH_LONG).show();
                 setBack_click1(this);
             } else {
+                flag = 0;
                 customDialog_List_info(object.getString("responseMessage"));
             }
             try { //balanceAmount
@@ -1039,6 +1051,7 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
                 } else {
                     if (reqFor.equalsIgnoreCase("AEPS") && !input_deviceid.getText().toString().isEmpty() && aeps_type.equals("aeps2")) {
                         Log.e("Device pid=", pidData);
+                        btn_submit_aeps.setClickable(true);
                         // Log.e("Device pid=", display);
                         //   new AsyncPostMethod(WebConfig.CASHOUT_URL, getCashOutDetail1(deviceName, input_mobile.getText().toString(), input_amount.getText().toString(), serviceType, requestChannel, reqFor, requestType, input_deviceid.getText().toString()).toString(), headerData, MICRO_AEPS_Activity.this, getString(R.string.responseTimeOut), typeput).execute();
                         new AsyncPostMethod(WebConfig.AEPS2_INIT, getCashOutDetail1(deviceName, input_mobile.getText().toString(), input_amount.getText().toString(), input_deviceid.getText().toString(), input_userid.getText().toString(), serviceType, requestChannel, reqFor, requestType, input_deviceid.getText().toString(), innno, bankName).toString(), headerData, MICRO_AEPS_Activity.this, getString(R.string.responseTimeOut), typeput).execute();

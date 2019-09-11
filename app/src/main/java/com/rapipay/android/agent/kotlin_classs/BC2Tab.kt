@@ -1,5 +1,6 @@
 package com.rapipay.android.agent.kotlin_classs
 
+import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.design.widget.TabLayout
 import android.support.v4.app.Fragment
@@ -7,22 +8,20 @@ import android.support.v4.app.FragmentTransaction
 import android.view.View
 import android.widget.TextView
 import com.rapipay.android.agent.R
-import com.rapipay.android.agent.fragments.BCTransferFragment
-import com.rapipay.android.agent.fragments.CreditTransFragment
+import com.rapipay.android.agent.fragments.BC2TransferFragment
 import com.rapipay.android.agent.utils.BaseCompactActivity
 
-class BCTab : BaseCompactActivity(), View.OnClickListener{
+class BC2Tab : BaseCompactActivity(), View.OnClickListener{
 
     var tabLayout: TabLayout?=null
-    var fragment_credit: BCTransferFragment?=null
+    var fragment_credit: BC2TransferFragment?=null
     var transFragment: TransferHistory?=null
     var toolbar_title: TextView?=null
     var bundle:Bundle?=null
     var datedata:String?=null
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.credit_tablayout)
+        setContentView(R.layout.activity_bc2_tab)
         bundle = Bundle()
         datedata = intent.extras!!.getString("reqFor")
         bundle!!.putString("reqFor", datedata)
@@ -38,7 +37,7 @@ class BCTab : BaseCompactActivity(), View.OnClickListener{
     }
 
     private fun setupTabLayout() {
-        fragment_credit = BCTransferFragment()
+        fragment_credit = BC2TransferFragment()
         transFragment = TransferHistory()
         transFragment!!.setArguments(bundle!!)
 

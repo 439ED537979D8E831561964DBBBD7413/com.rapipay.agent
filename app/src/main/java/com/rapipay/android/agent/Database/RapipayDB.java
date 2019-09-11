@@ -149,6 +149,7 @@ public class RapipayDB extends SQLiteOpenHelper {
 
         }
     }
+
     public ArrayList<RapiPayPozo> getDetails() {
         ArrayList<RapiPayPozo> list = new ArrayList<RapiPayPozo>();
         String selectQuery = "SELECT  * FROM " + TABLE_NAME;

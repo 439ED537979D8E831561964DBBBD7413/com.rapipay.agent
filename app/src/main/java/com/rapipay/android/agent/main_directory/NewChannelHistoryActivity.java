@@ -184,7 +184,7 @@ public class NewChannelHistoryActivity extends BaseCompactActivity implements Vi
                         }
                 }
             } else if (object.getString("responseCode").equalsIgnoreCase("60147")) {
-                Toast.makeText(this,object.getString("responseCode"),Toast.LENGTH_LONG).show();
+                Toast.makeText(this,object.getString("responseMessage"),Toast.LENGTH_LONG).show();
                 setBack_click1(this);
             } else {
                 responseMSg(object);

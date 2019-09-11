@@ -40,6 +40,7 @@ public class NewKycPersion extends RealmObject implements Serializable {
     public String SCANIMAGENAME;
     public String SCANIMAGEPATH;
     public String SCANTYPE;
+    public byte[] OTHERDOCUMENTPHOTO;
 
     public String getId() {
         return id;
@@ -55,6 +56,15 @@ public class NewKycPersion extends RealmObject implements Serializable {
 
     public void setSCANTYPE(String SCANTYPE) {
         this.SCANTYPE = SCANTYPE;
+    }
+
+
+    public byte[] getOTHERDOCUMENTPHOTO() {
+        return OTHERDOCUMENTPHOTO;
+    }
+
+    public void setOTHERDOCUMENTPHOTO(byte[] OTHERDOCUMENTPHOTO) {
+        this.OTHERDOCUMENTPHOTO = OTHERDOCUMENTPHOTO;
     }
 
     public String getSCANIMAGENAME() {

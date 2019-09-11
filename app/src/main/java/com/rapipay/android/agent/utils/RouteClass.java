@@ -4,37 +4,45 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.google.gson.Gson;
 import com.rapipay.android.agent.Database.RapipayDB;
 import com.rapipay.android.agent.Model.BankDetailsPozo;
 import com.rapipay.android.agent.Model.CreaditPaymentModePozo;
+import com.rapipay.android.agent.Model.HandsetRegistration;
 import com.rapipay.android.agent.Model.HeaderePozo;
 import com.rapipay.android.agent.Model.NewKYCPozo;
 import com.rapipay.android.agent.Model.PaymentModePozo;
 import com.rapipay.android.agent.Model.RapiPayPozo;
 import com.rapipay.android.agent.Model.StatePozo;
 import com.rapipay.android.agent.Model.TbOperatorPozo;
+import com.rapipay.android.agent.Model.TbRechargePozo;
+import com.rapipay.android.agent.Model.microaeps.Microresponse1;
 import com.rapipay.android.agent.main_directory.LoginScreenActivity;
+import com.rapipay.android.agent.main_directory.MainActivity;
 import com.rapipay.android.agent.main_directory.PinActivity;
 import com.rapipay.android.agent.main_directory.PinVerification;
 
+import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
 
-public class RouteClass {
+public class RouteClass extends BaseCompactActivity {
     Intent intent = null;
+
     public RouteClass(Context context, JSONObject object, String mobileNo, LocalStorage localStorage, String type) {
-        define_Route(context, object, mobileNo, localStorage,type);
+        define_Route(context, object, mobileNo, localStorage, type);
     }
 
-    private void define_Route(final Context context, JSONObject object, String mobileNo, LocalStorage localStorage, String type) {
+    private void define_Route(final Context context, final JSONObject object, String mobileNo, final LocalStorage localStorage, String type) {
         try {
-            ArrayList<RapiPayPozo> list = BaseCompactActivity.dbRealm.getDetails();
+            list = BaseCompactActivity.dbRealm.getDetails();
             if (list.size() == 0) {
-                if (type!=null && type.equalsIgnoreCase("PINENTERED")) {
+                list = BaseCompactActivity.db.getDetails();
+            }
+            if (list.size() == 0) {
+                if (type != null && type.equalsIgnoreCase("PINENTERED")) {
                     intent = new Intent(context, PinActivity.class);
                     intent.putExtra("agentId", mobileNo);
                     intent.putExtra("regTxnRefId", object.getString("txnRefId"));
@@ -42,21 +50,32 @@ public class RouteClass {
                     intent.putExtra("otpRefId", object.getString("otpRefId"));
                     intent.putExtra("sessionRefNo", object.getString("sessionRefNo"));
                     intent.putExtra("sessionKey", object.getString("sessionKey"));
-//                }else if (type!=null && type.equalsIgnoreCase("KYCENTERED")) {
-//                    intent = new Intent(context, WebViewClientActivity.class);
-//                    intent.putExtra("mobileNo", mobileNo);
-//                    intent.putExtra("parentId", object.getString("parentID"));
-//                    intent.putExtra("sessionKey", object.getString("sessionKey"));
-//                    intent.putExtra("sessionRefNo", object.getString("sessionRefNo"));
-//                    intent.putExtra("nodeAgent", "");
-//                    intent.putExtra("type", "");
-                }else if (localStorage.getActivityState(LocalStorage.ROUTESTATE).equalsIgnoreCase("0")) {
+
+
+                    final HandsetRegistration handsetRegistration = new HandsetRegistration();
+                    BaseCompactActivity.realm.executeTransaction(new Realm.Transaction() {
+                        @Override
+                        public void execute(Realm realm) {
+                            try {
+
+                                HandsetRegistration handsetRegistration = new HandsetRegistration();
+                                handsetRegistration.setSessionKey(object.getString("sessionKey"));
+                                handsetRegistration.setSessionRefNo(object.getString("sessionRefNo"));
+                                realm.copyToRealm(handsetRegistration);
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+
+                } else if (localStorage.getActivityState(LocalStorage.ROUTESTATE).equalsIgnoreCase("0")) {
                     intent = new Intent(context, LoginScreenActivity.class);
                 }
             } else if (list.size() != 0) {
                 if ((!list.get(0).getSession().isEmpty() && localStorage.getActivityState(LocalStorage.ROUTESTATE).equalsIgnoreCase("0")) || localStorage.getActivityState(LocalStorage.ROUTESTATE).equalsIgnoreCase("PINVERIFIED")) {
                     intent = new Intent(context, PinVerification.class);
-                }else if (list.get(0).getAftersessionRefNo().isEmpty() && localStorage.getActivityState(LocalStorage.ROUTESTATE).equalsIgnoreCase("0")) {
+                } else if (list.get(0).getAftersessionRefNo().isEmpty() && localStorage.getActivityState(LocalStorage.ROUTESTATE).equalsIgnoreCase("0")) {
                     deleteTables("forgot");
                     deleteTablesOld("forgot");
                     intent = new Intent(context, LoginScreenActivity.class);
@@ -66,13 +85,11 @@ public class RouteClass {
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 context.startActivity(intent);
             }
-        } catch (
-                Exception e)
-
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
     protected void deleteTables(final String type) {
         final RealmResults<RapiPayPozo> realmResults = BaseCompactActivity.realm.where(RapiPayPozo.class).findAll();
         final RealmResults<PaymentModePozo> realmResults1 = BaseCompactActivity.realm.where(PaymentModePozo.class).findAll();

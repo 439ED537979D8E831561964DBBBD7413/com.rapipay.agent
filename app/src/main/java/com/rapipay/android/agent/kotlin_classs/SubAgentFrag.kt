@@ -204,7 +204,7 @@ class SubAgentFrag : BaseFragment(), RequestHandler, CustomInterface, View.OnCli
                     customDialog_Common("KYCLAYOUTSS", null, null, "Alert", null, `object`.getString("responseMessage"), this@SubAgentFrag)
                 }
             } else if (`object`.getString("responseCode").equals("60147", ignoreCase = true)) run {
-                Toast.makeText(context, `object`.getString("responseCode"), Toast.LENGTH_LONG).show()
+                Toast.makeText(context, `object`.getString("responseMessage"), Toast.LENGTH_LONG).show()
                 setBack_click1(context)
             } else
                 responseMSg(`object`)

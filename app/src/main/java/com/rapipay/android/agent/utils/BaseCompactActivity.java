@@ -239,6 +239,7 @@ public class BaseCompactActivity extends AppCompatActivity {
         TextView otpView = (TextView) alertLayout.findViewById(R.id.dialog_msg);
         otpView.setText(output);
         otpView.setVisibility(View.VISIBLE);
+        dialog.cancel();
         dialog.setContentView(alertLayout);
     }
 
@@ -839,7 +840,8 @@ public class BaseCompactActivity extends AppCompatActivity {
             btn_account.setText("NA");
         btn_sendname.setText(input);
         if (msg.equalsIgnoreCase("Confirm Money Transfer?")) {
-            String condition = "where " + RapipayDB.COLOMN_IFSC + "='" + pozo.getIfsc() + "'";
+         //   String condition = "where " + RapipayDB.COLOMN_IFSC + "='" + pozo.getIfsc() + "'";
+            String condition = pozo.getIfsc();
             if (dbRealm.geBank(condition).size() != 0)
                 btn_bank.setText(dbRealm.geBank(condition).get(0));
             else
@@ -877,7 +879,8 @@ public class BaseCompactActivity extends AppCompatActivity {
             btn_account.setText(accountNo);
         btn_sendname.setText(input);
         if (ifsc_code != null) {
-            String condition = "where " + RapipayDB.COLOMN_IFSC + "='" + ifsc_code + "'";
+           // String condition = "where " + RapipayDB.COLOMN_IFSC + "='" + ifsc_code + "'";
+            String condition = ifsc_code ;
             btn_bank.setText(dbRealm.geBank(condition).get(0));
         }
         if (name != null)
@@ -2748,8 +2751,8 @@ public class BaseCompactActivity extends AppCompatActivity {
                 public void onClick(View v) {
                     try {
                         dialog.dismiss();
-                        Intent dashboard = new Intent(getApplicationContext(), MainActivity.class);
-                        startActivity(dashboard);
+                        /*Intent dashboard = new Intent(getApplicationContext(), MainActivity.class);
+                        startActivity(dashboard);*/
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

@@ -50,20 +50,20 @@ public class CustomSpinnerAdapter extends ArrayAdapter<String> {
     public void filter(String charText) {
         charText = charText.toLowerCase(Locale.getDefault());
         mValues.clear();
-        if (charText.length() == 0) {
-            mValues.addAll(arraylist);
-        }
-        else
-        {
-            for (String wp : arraylist)
-            {
-                if (wp.toLowerCase(Locale.getDefault()).contains(charText))
-                {
-                    mValues.add(wp);
+        try {
+            if (charText.length() == 0) {
+                mValues.addAll(arraylist);
+            } else {
+                for (String wp : arraylist) {
+                    if (wp.toLowerCase(Locale.getDefault()).contains(charText)) {
+                        mValues.add(wp);
+                    }
                 }
             }
+            notifyDataSetChanged();
+        }catch (Exception e){
+            e.printStackTrace();
         }
-        notifyDataSetChanged();
     }
 }
 

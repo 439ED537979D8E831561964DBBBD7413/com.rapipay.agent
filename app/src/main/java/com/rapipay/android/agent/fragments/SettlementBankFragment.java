@@ -213,7 +213,7 @@ public class SettlementBankFragment extends BaseFragment implements WalletReques
                     customDialog_Common("KYCLAYOUTS", null, null, "Account Deactivation", "", object.getString("responseMessage"), SettlementBankFragment.this);
                 }
             } else if (object.getString("responseCode").equalsIgnoreCase("60147")) {
-                Toast.makeText(getActivity(),object.getString("responseCode"),Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(),object.getString("responseMessage"),Toast.LENGTH_LONG).show();
                 setBack_click1(getActivity());
             } else
                 responseMSg(object);

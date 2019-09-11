@@ -442,7 +442,7 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
             } else if (object.getString("responseCode").equalsIgnoreCase("101")) {
                 customDialog_Common("Money Transfer", null, null, "KYCLAYOUT", object.getString("responseMessage"));
             } else if (object.getString("responseCode").equalsIgnoreCase("60147")) {
-                Toast.makeText(this,object.getString("responseCode"),Toast.LENGTH_LONG).show();
+                Toast.makeText(this,object.getString("responseMessage"),Toast.LENGTH_LONG).show();
                 setBack_click1(this);
             }
         } catch (Exception e) {

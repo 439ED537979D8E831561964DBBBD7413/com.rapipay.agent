@@ -616,7 +616,7 @@ public class CashOutClass extends BaseCompactActivity implements View.OnClickLis
                 }
                 clear();
             } else if (object.getString("responseCode").equalsIgnoreCase("60147")) {
-                Toast.makeText(this,object.getString("responseCode"),Toast.LENGTH_LONG).show();
+                Toast.makeText(this,object.getString("responseMessage"),Toast.LENGTH_LONG).show();
                 setBack_click1(this);
             } else {
                 responseMSg(object);

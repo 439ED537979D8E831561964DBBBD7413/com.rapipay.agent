@@ -28,10 +28,12 @@ import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.adapter.HeaderAdapter;
 import com.rapipay.android.agent.adapter.SimpleStringRecyclerViewAdapter;
 import com.rapipay.android.agent.interfaces.ClickListener;
+import com.rapipay.android.agent.kotlin_classs.BC2Tab;
 import com.rapipay.android.agent.kotlin_classs.BCTab;
 import com.rapipay.android.agent.main_directory.AEPS_BBPS_RegistrationActivity;
 import com.rapipay.android.agent.main_directory.Aeps1Activity;
 import com.rapipay.android.agent.main_directory.BC2TransferActivity;
+import com.rapipay.android.agent.main_directory.BC6TransferActivity;
 import com.rapipay.android.agent.main_directory.CashOutClass;
 import com.rapipay.android.agent.main_directory.ChannelHistoryActivity;
 import com.rapipay.android.agent.main_directory.CreditTabPage;
@@ -182,7 +184,6 @@ public class DashBoardFragments extends BaseFragment {
                 recycler_view4.smoothScrollToPosition(layoutManager4.findLastVisibleItemPosition() + 1);
             }
         });
-        recycler_view4.addItemDecoration(new DividerItemDecoration(getActivity(), 0));
         recycler_view4.setOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -222,7 +223,6 @@ public class DashBoardFragments extends BaseFragment {
                 recycler_view.smoothScrollToPosition(layoutManager.findLastVisibleItemPosition() + 1);
             }
         });
-        recycler_view.addItemDecoration(new DividerItemDecoration(getActivity(), 0));
         recycler_view.setOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -267,7 +267,6 @@ public class DashBoardFragments extends BaseFragment {
             }
         });
 
-        recycler_view5.addItemDecoration(new DividerItemDecoration(getActivity(), 0));
         recycler_view5.setOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -420,7 +419,13 @@ public class DashBoardFragments extends BaseFragment {
                     intent.putExtra("reqFor", "BCS");
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
-                } else if (position == 3) {
+                }  else if (position == 3) {
+//                    customDialog_Ben("BC FUND TRANSFER", "FundTransfer");
+                    Intent intent = new Intent(getActivity(), BC6TransferActivity.class);
+                    intent.putExtra("reqFor", "BCS");
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                } else if (position == 4) {
                     Intent intent = new Intent(getActivity(), PendingRefundActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
@@ -431,12 +436,12 @@ public class DashBoardFragments extends BaseFragment {
                     intent.putExtra("type", "");
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
-                } else if (position == 4) {
+                } else if (position == 5) {
                     Intent intent = new Intent(getActivity(), ChannelHistoryActivity.class);
                     intent.putExtra("TYPE", "");
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
-                } else if (position == 5) {
+                } else if (position == 6) {
 //                    customDialog_Ben("INDO-NEPAL Remittance", "PMTTransfer");
                     Intent intent = new Intent(getActivity(), PMTRemittanceActivity.class);
 //                    intent.putExtra("MOBILENO", input_number.getText().toString());

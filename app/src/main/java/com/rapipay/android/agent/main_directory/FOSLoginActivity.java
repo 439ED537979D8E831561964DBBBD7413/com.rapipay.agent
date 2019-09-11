@@ -202,7 +202,7 @@ public class FOSLoginActivity extends BaseCompactActivity implements View.OnClic
             } else if (object.getString("responseCode").equalsIgnoreCase("75077")) {
                 customDialog_Common("KYCLAYOUTS", null, null, "RapiPay Login Failed", null, object.getString("responseMessage"), FOSLoginActivity.this);
             } else if (object.getString("responseCode").equalsIgnoreCase("60147")) {
-                Toast.makeText(this,object.getString("responseCode"),Toast.LENGTH_LONG).show();
+                Toast.makeText(this,object.getString("responseMessage"),Toast.LENGTH_LONG).show();
                 setBack_click1(this);
             } else {
                 responseMSg(object);

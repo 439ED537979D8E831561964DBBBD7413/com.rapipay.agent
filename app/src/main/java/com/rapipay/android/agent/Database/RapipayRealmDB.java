@@ -1,9 +1,9 @@
 package com.rapipay.android.agent.Database;
 
 import android.util.Base64;
-
 import com.rapipay.android.agent.Model.BankDetailsPozo;
 import com.rapipay.android.agent.Model.CreaditPaymentModePozo;
+import com.rapipay.android.agent.Model.HandsetRegistration;
 import com.rapipay.android.agent.Model.HeaderePozo;
 import com.rapipay.android.agent.Model.ImagePozo;
 import com.rapipay.android.agent.Model.MasterPozo;
@@ -19,6 +19,8 @@ import com.rapipay.android.agent.Model.TbNepalPaymentModePozo;
 import com.rapipay.android.agent.Model.TbOperatorPozo;
 import com.rapipay.android.agent.Model.TbRechargePozo;
 import com.rapipay.android.agent.Model.TbTransitionPojo;
+import com.rapipay.android.agent.Model.bc2addresspojo.PostOffice;
+import com.rapipay.android.agent.Model.microaeps.Microdata1;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
 
 import java.util.ArrayList;
@@ -28,13 +30,68 @@ import io.realm.RealmResults;
 import io.realm.Sort;
 
 public class RapipayRealmDB {
-
-  //  Realm realm = null;
     MasterPozo masterPozo;
-   // RapipayRealmDB db = new RapipayRealmDB();
     RapiPayPozo rapiPayPozo;
+    Microdata1 microdatas1;
 
-    // While creating account we it will provide details of the user
+    // based on the bank name get ifsc code to the existing bank account.
+    public ArrayList<String> getBankIINNo(String condition) {
+        ArrayList<String> stlist = new ArrayList<String>();
+        ArrayList<Microdata1> microdata1 = new ArrayList<Microdata1>();
+
+        RealmResults<Microdata1> realmResults = BaseCompactActivity.realm.where(Microdata1.class).equalTo("bankName", condition).findAll();
+        for (int i = 0; i < realmResults.size(); i++) {
+            microdatas1 = new Microdata1();
+            microdatas1.setId(realmResults.get(i).getId());
+            microdatas1.setBankName(realmResults.get(i).getBankName());
+            microdatas1.setIINNo(realmResults.get(i).getIINNo());
+            /*microdatas.setDetails(realmResults.get(i).getDetails());
+            microdatas.setRemarks(realmResults.get(i).getRemarks());
+            microdatas.setTimestamp(realmResults.get(i).getTimestamp());*/
+            microdata1.add(microdatas1);
+            stlist.add(realmResults.get(i).getIINNo());
+        }
+        return stlist;
+    }
+
+    // based on the bank name get ifsc code to the existing bank account.
+    public ArrayList<String> getBankNames(String condition) {
+        ArrayList<String> stlist = new ArrayList<String>();
+        ArrayList<Microdata1> microdata1 = new ArrayList<Microdata1>();
+
+        RealmResults<Microdata1> realmResults = BaseCompactActivity.realm.where(Microdata1.class).equalTo("bankName", condition).findAll();
+        for (int i = 0; i < realmResults.size(); i++) {
+            microdatas1 = new Microdata1();
+            microdatas1.setId(realmResults.get(i).getId());
+            microdatas1.setBankName(realmResults.get(i).getBankName());
+            microdatas1.setIINNo(realmResults.get(i).getIINNo());
+            /*microdatas.setDetails(realmResults.get(i).getDetails());
+            microdatas.setRemarks(realmResults.get(i).getRemarks());
+            microdatas.setTimestamp(realmResults.get(i).getTimestamp());*/
+            microdata1.add(microdatas1);
+            stlist.add(realmResults.get(i).getBankName());
+        }
+        return stlist;
+    }
+
+    // based on the ifsc code get bank name of the account
+    public ArrayList<Microdata1> geBankList(String condition) {
+        ArrayList<Microdata1> microdata1 = new ArrayList<Microdata1>();
+        ArrayList<String> stlist = new ArrayList<String>();
+        RealmResults<Microdata1> realmResults = BaseCompactActivity.realm.where(Microdata1.class).findAll();
+        for (int i = 0; i < realmResults.size(); i++) {
+            microdatas1 = new Microdata1();
+            microdatas1.setId(realmResults.get(i).getId());
+            microdatas1.setBankName(realmResults.get(i).getBankName());
+            microdatas1.setIINNo(realmResults.get(i).getIINNo());
+            microdata1.add(microdatas1);
+            stlist.add(realmResults.get(i).getIINNo());
+        }
+        return microdata1;
+    }
+
+
+ // While creating account we it will provide details of the user
     public ArrayList<RapiPayPozo> getDetails() {
         ArrayList<RapiPayPozo> list = new ArrayList<RapiPayPozo>();
         try {
@@ -71,12 +128,42 @@ public class RapipayRealmDB {
         return flag;
     }
 
+    HandsetRegistration handsetRegistration;
+    // While creating account we it will provide details of the user
+    public ArrayList<HandsetRegistration> getDetailsHandset() {
+        ArrayList<HandsetRegistration> list = new ArrayList<HandsetRegistration>();
+        try {
+            RealmResults<HandsetRegistration> realmResults = BaseCompactActivity.realm.where(HandsetRegistration.class).findAll();
+            for (int i = 0; i < realmResults.size(); i++) {
+                handsetRegistration = new HandsetRegistration();
+                handsetRegistration.setSessionRefNo(realmResults.get(i).getSessionRefNo());
+                handsetRegistration.setSessionKey(realmResults.get(i).getSessionKey());
+                handsetRegistration.setImei(realmResults.get(i).getImei());
+                list.add(handsetRegistration);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    // check that the login use exist or not
+    public boolean getDetails_Rapi_Handset() {
+      //  realm = RealmController.getInstance().getRealm();
+
+        HandsetRegistration handsetRegistration1 = BaseCompactActivity.realm.where(HandsetRegistration.class).findFirst();
+        if (handsetRegistration1 != null) {
+            flag = true;
+        } else {
+            flag = false;
+        }
+        return flag;
+    }
     boolean flag = false;
 
     // get image of the pinverification activity
     public boolean getDetailsFooter() {
       //  realm = Realm.getDefaultInstance();
-
         HeaderePozo headerePozo = BaseCompactActivity.realm.where(HeaderePozo.class).findFirst();
         if (headerePozo != null) {
             flag = true;
@@ -86,11 +173,9 @@ public class RapipayRealmDB {
         return flag;
     }
 
-
     // check bank details exist or not
     public boolean getDetails_Bank() {
       //  realm = Realm.getDefaultInstance();
-
         BankDetailsPozo bankDetailsPozo = BaseCompactActivity.realm.where(BankDetailsPozo.class).findFirst();
         if (bankDetailsPozo != null) {
             flag = true;
@@ -101,7 +186,6 @@ public class RapipayRealmDB {
     }
 
     BankDetailsPozo bankDetailsPozo;
-
     // return bank of the details of the existing user
     public ArrayList<BankDetailsPozo> geBanktDetails(String condition) {
         ArrayList<BankDetailsPozo> list = new ArrayList<BankDetailsPozo>();
@@ -147,6 +231,7 @@ public class RapipayRealmDB {
                 newKycPersion.setEMAILID(realmResults.get(i).getEMAILID());
                 newKycPersion.setCOMPANY_NAME(realmResults.get(i).getCOMPANY_NAME());
                 newKycPersion.setPASSPORT_PHOTO(realmResults.get(i).getPASSPORT_PHOTO());
+                newKycPersion.setOTHERDOCUMENTPHOTO(realmResults.get(i).getOTHERDOCUMENTPHOTO());
                 newKycPersion.setSCANIMAGENAME(realmResults.get(i).getSCANIMAGENAME());
                 newKycPersion.setSCANIMAGEPATH(realmResults.get(i).getSCANIMAGEPATH());
                 newKycPersion.setPERSONAL_CLICKED(realmResults.get(i).getPERSONAL_CLICKED());
@@ -166,7 +251,6 @@ public class RapipayRealmDB {
     public ArrayList<ImagePozo> getImageDetails(String condition) {
         ArrayList<ImagePozo> list = new ArrayList<ImagePozo>();
         try {
-
             RealmResults<ImagePozo> realmResults = BaseCompactActivity.realm.where(ImagePozo.class).equalTo("imageName", condition).findAll();
             for (int i = 0; i < realmResults.size(); i++) {
                 imagePozo = new ImagePozo();
@@ -365,6 +449,34 @@ public class RapipayRealmDB {
         return stlist;
     }
 
+    // based on the ifsc code get bank name of the account
+    public String getBc2State(String condition) {
+        String state =null;
+        RealmResults<PostOffice> realmResults = BaseCompactActivity.realm.where(PostOffice.class).equalTo("Pincode", condition).findAll();
+        for (int i = 0; i < realmResults.size(); i++) {
+            state = realmResults.get(i).getState();
+        }
+        return state;
+    }
+    // based on the dist
+    public String getBc2Dist(String condition) {
+        String dist = null;
+        RealmResults<PostOffice> realmResults = BaseCompactActivity.realm.where(PostOffice.class).equalTo("Pincode", condition).findAll();
+        for (int i = 0; i < realmResults.size(); i++) {
+            dist = realmResults.get(i).getDistrict();
+        }
+        return dist;
+    }
+    // based on the city
+    public String getBc2City(String condition) {
+        String city =null;
+        RealmResults<PostOffice> realmResults = BaseCompactActivity.realm.where(PostOffice.class).equalTo("Pincode", condition).findAll();
+        for (int i = 0; i < realmResults.size(); i++) {
+            city = realmResults.get(i).getBlock();
+        }
+        return city;
+    }
+
     // get payment details to the user
     public ArrayList<CreaditPaymentModePozo> getPaymenttDetails() {
         ArrayList<CreaditPaymentModePozo> list = new ArrayList<CreaditPaymentModePozo>();
@@ -406,7 +518,6 @@ public class RapipayRealmDB {
 
     // get operator details based on the sorted operator value
     public ArrayList<TbRechargePozo> getOperatorDetail(String condition) {
-
         ArrayList<TbRechargePozo> list = new ArrayList<TbRechargePozo>();
         list.add(new TbRechargePozo("Select Operator"));
         RealmResults<TbRechargePozo> realmResults = BaseCompactActivity.realm.where(TbRechargePozo.class).equalTo("operatorsValue", condition).findAll();
