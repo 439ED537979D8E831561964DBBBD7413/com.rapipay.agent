@@ -108,11 +108,8 @@ public class RechargeHistory extends BaseCompactActivity implements View.OnClick
         trans_details.addOnItemTouchListener(new RecyclerTouchListener(this, trans_details, new ClickListener() {
             @Override
             public void onClick(View view, int position) {
-                if (setClickable(view, isClickable) == false) {
-                    isClickable = true;
-                } else {
-                    isClickable = false;
-                    setClickable(view, isClickable);
+                if(clicks) {
+                    clicks = false;
                     RechargePozo pozo = transactionPozoArrayList.get(position);
                     new AsyncPostMethod(WebConfig.WALLETRECEIPTURL, receipt_request(pozo).toString(), headerData, RechargeHistory.this, getString(R.string.responseTimeOut)).execute();
                 }
@@ -123,21 +120,6 @@ public class RechargeHistory extends BaseCompactActivity implements View.OnClick
 
             }
         }));
-    }
-
-    public boolean isClickable = false;
-
-    public static boolean setClickable(View view, boolean clickable) {
-        if (view != null) {
-            if (view instanceof ViewGroup) {
-                ViewGroup viewGroup = (ViewGroup) view;
-                for (int i = 0; i < viewGroup.getChildCount(); i++) {
-                    setClickable(viewGroup.getChildAt(i), clickable);
-                }
-            }
-            view.setClickable(clickable);
-        }
-        return clickable;
     }
 
     int position;
@@ -253,14 +235,16 @@ public class RechargeHistory extends BaseCompactActivity implements View.OnClick
                         }
                 }
             } else if (object.getString("responseCode").equalsIgnoreCase("60147")) {
-                Toast.makeText(this,object.getString("responseMessage"),Toast.LENGTH_LONG).show();
+                Toast.makeText(this, object.getString("responseMessage"), Toast.LENGTH_LONG).show();
                 setBack_click1(this);
             } else {
                 responseMSg(object);
                 trans_details.setVisibility(View.GONE);
+                clicks = true;
             }
             findViewById(R.id.btn_fund).setClickable(true);
         } catch (Exception e) {
+            clicks = true;
             e.printStackTrace();
         }
     }
