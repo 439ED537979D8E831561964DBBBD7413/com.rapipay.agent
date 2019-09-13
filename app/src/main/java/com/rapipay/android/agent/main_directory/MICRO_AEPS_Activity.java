@@ -73,6 +73,7 @@ import com.rapipay.android.agent.utils.BaseCompactActivity;
 import com.rapipay.android.agent.utils.CustomProgessDialog;
 import com.rapipay.android.agent.utils.GenerateChecksum;
 import com.rapipay.android.agent.utils.ImageUtils;
+import com.rapipay.android.agent.utils.LocalStorage;
 import com.rapipay.android.agent.utils.RecyclerTouchListener;
 import com.rapipay.android.agent.utils.WebConfig;
 import com.rapipay.android.agent.view.EnglishNumberToWords;
@@ -117,7 +118,7 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
     List<Microdata1> microdata1;
     private long mLastClickTime = System.currentTimeMillis();
     private static final long CLICK_TIME_INTERVAL = 1000;
-    ArrayList<String> dpdevicetype;
+    //  ArrayList<String> dpdevicetype;
     int flagdevicetype;
     RadioGroup radioGroup;
     RadioButton cashid, balanceid;
@@ -128,12 +129,13 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.aeps_bbps_layout);
+        localStorage = LocalStorage.getInstance(this);
         deletebankTables();
-        dpdevicetype = new ArrayList<>();
+       /* dpdevicetype = new ArrayList<>();
         dpdevicetype.add("Select Device Type");
         dpdevicetype.add("Morpho");
         dpdevicetype.add("Mantra");
-        dpdevicetype.add("StarTek");
+        dpdevicetype.add("StarTek");*/
         //  select_deviceid = findViewById(R.id.select_deviceid);
         //  select_device = findViewById(R.id.select_device);
         pending = findViewById(R.id.pending);
@@ -191,7 +193,7 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
     private void getBankDetails() {
         //  String url = "https://fingpayap.tapits.in/fingpay/getBankDetailsMasterData";
         final Dialog dialogs = new Dialog(this);
-        final CustomProgessDialog dialog= new CustomProgessDialog(this);
+        final CustomProgessDialog dialog = new CustomProgessDialog(this);
         String url = "https://fingpayap.tapits.in/fpaepsservice/api/bankdata/bank/details";
         RequestQueue queue = Volley.newRequestQueue(this);
         final Microdata1 microdatas1 = new Microdata1();
@@ -313,6 +315,8 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
             btn_submit_aeps.setVisibility(View.VISIBLE);
             //   select_device.setVisibility(View.GONE);
         }
+        flagdevicetype = localStorage.getActivityIntState("devicetype");
+        Log.e("device flag==", flagdevicetype + "");
         btn_capture = findViewById(R.id.btn_capture);
         img_morpho_check = findViewById(R.id.img_morpho_check);
         img_mantra_check = findViewById(R.id.img_mantra_check);
@@ -326,6 +330,7 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
             @Override
             public void onClick(View v) {
                 flagdevicetype = 1;
+                localStorage.setActivityState("devicetype", flagdevicetype);
                 img_morpho_check.setVisibility(View.VISIBLE);
                 img_mantra_check.setVisibility(View.GONE);
                 img_startek_check.setVisibility(View.GONE);
@@ -337,6 +342,7 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
             @Override
             public void onClick(View v) {
                 flagdevicetype = 2;
+                localStorage.setActivityState("devicetype", flagdevicetype);
                 img_morpho_check.setVisibility(View.GONE);
                 img_mantra_check.setVisibility(View.VISIBLE);
                 img_startek_check.setVisibility(View.GONE);
@@ -348,11 +354,26 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
             @Override
             public void onClick(View v) {
                 flagdevicetype = 3;
+                localStorage.setActivityState("devicetype", flagdevicetype);
                 img_morpho_check.setVisibility(View.GONE);
                 img_mantra_check.setVisibility(View.GONE);
                 img_startek_check.setVisibility(View.VISIBLE);
             }
         });
+
+        if (flagdevicetype == 1) {
+            img_morpho_check.setVisibility(View.VISIBLE);
+            img_mantra_check.setVisibility(View.GONE);
+            img_startek_check.setVisibility(View.GONE);
+        } else if (flagdevicetype == 2) {
+            img_morpho_check.setVisibility(View.GONE);
+            img_mantra_check.setVisibility(View.VISIBLE);
+            img_startek_check.setVisibility(View.GONE);
+        } else if (flagdevicetype == 3) {
+            img_morpho_check.setVisibility(View.GONE);
+            img_mantra_check.setVisibility(View.GONE);
+            img_startek_check.setVisibility(View.VISIBLE);
+        }
         pendingtrans_details = findViewById(R.id.pendingtrans_details);
         input_text = findViewById(R.id.input_texts);
         if (typeput.equalsIgnoreCase("Balance Enquiry")) {
@@ -833,11 +854,7 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
         requestKey = "";
         headerDatas = "";
         clientRefID = "";
-        flagdevicetype = 0;
-        flag = 0;
     }
-
-    int flag = 0;
 
 
     @Override
@@ -855,11 +872,9 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
                     requestKey = object.getString("requestKey");
                     headerDatas = object.getString("headerData"); //authdata
                     clientRefID = object.getString("clientRefID");
-                    if (requestData != "" && headerDatas != "" && pidData != "" && aeps_type.equals("aeps2") && serviceType.equalsIgnoreCase("AEPS_CASHOUT") && devicetype.equalsIgnoreCase("other") && flag == 0) {
-                        flag = 1;
+                    if (requestData != "" && pidData != "" && aeps_type.equals("aeps2") && serviceType.equalsIgnoreCase("AEPS_CASHOUT") && devicetype.equalsIgnoreCase("other")) {
                         new AsyncPostMethod(WebConfig.CASHOUT_URL1, getCashOutDetails2(clientRefID, input_mobile.getText().toString(), requestData, headerDatas, input_amount.getText().toString(), serviceType, requestChannel, reqFor, requestType, input_deviceid.getText().toString(), innno, bankName).toString(), headerData, MICRO_AEPS_Activity.this, getString(R.string.responseTimeOut), typeput).execute();
-                    } else if (requestData != "" && headerDatas != "" && pidData != "" && aeps_type.equals("aeps2") && serviceType.equalsIgnoreCase("AEPS_BALANCE_ENQ") && devicetype.equalsIgnoreCase("others") && flag == 0) {
-                        flag = 1;
+                    } else if (requestData != "" && pidData != "" && aeps_type.equals("aeps2") && serviceType.equalsIgnoreCase("AEPS_BALANCE_ENQ") && devicetype.equalsIgnoreCase("others")) {
                         new AsyncPostMethod(WebConfig.CASHOUT_URL1, getGetBalance(clientRefID, input_mobile.getText().toString(), requestData, headerDatas, input_deviceid.getText().toString(), serviceType, requestChannel, reqFor, requestType, input_deviceid.getText().toString(), innno, bankName).toString(), headerData, MICRO_AEPS_Activity.this, getString(R.string.responseTimeOut), typeput).execute();
                     }
                 } else if (object.getString("serviceType").equalsIgnoreCase("CASHOUT_PENDING_TXN_LIST")) {
@@ -870,33 +885,30 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
                     customReceiptNew("Transaction Status Receipt", object, MICRO_AEPS_Activity.this);
                 }
             } else if (object.getString("responseCode").equalsIgnoreCase("60217")) {
-                flag = 0;
                 customDialog_Common_device(object.getString("responseMessage"));
             } else if (object.getString("responseCode").equalsIgnoreCase("86039")) {
-                flag = 0;
                 customDialog_Common_device(object.getString("responseMessage"));
             } else if (object.getString("responseCode").equalsIgnoreCase("60147")) {
                 Toast.makeText(this, object.getString("responseMessage"), Toast.LENGTH_LONG).show();
                 setBack_click1(this);
             } else if (reqFor.equalsIgnoreCase("MATM")) {
                 responseMSg(object);
-                flag = 0;
             } else if (object.getString("responseCode").equalsIgnoreCase("904")) {
                 customDialog_Common_device(object.getString("responseMessage"));
-                flag = 0;
             } else if (object.getString("responseCode").equalsIgnoreCase("60067")) {
-                Toast.makeText(this,object.getString("responseCode"),Toast.LENGTH_LONG).show();
-                setBack_click1(this);
+                /*Toast.makeText(this, object.getString("responseMessage"), Toast.LENGTH_LONG).show();
+                setBack_click1(this);*/
+                customDialog_List_info(object.getString("respnseMessage"));
             } else {
-                flag = 0;
-                customDialog_List_info(object.getString("responseMessage"));
+                if (object.has("respnseMessage"))
+                    customDialog_List_info(object.getString("respnseMessage"));
+                else
+                    customDialog_List_info(object.getString("responseMessage"));
             }
             try { //balanceAmount
                 if (object.getBoolean("status") && aeps_type.equalsIgnoreCase("aeps2")) {
-                    condition = true;
                     generateReceipt1(String.valueOf(object), convertString(input_deviceid.getText().toString()));
                 } else {
-                    condition = true;
                     customDialog_Common_device(object.getString("respnseMessage"));// respnseMessage
                 }
             } catch (Exception e) {
@@ -905,10 +917,9 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
             try { //balanceAmount
                 if (object.getString("status").equalsIgnoreCase("1000") && aeps_type.equalsIgnoreCase("aeps2")) {
                     generateReceipt1(String.valueOf(object), convertString(input_deviceid.getText().toString()));
-                } else {
-                    if (!condition)
+                } /*else {
                         customDialog_Common_device(object.getString("respnseMessage"));
-                }
+                }*/
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -923,8 +934,6 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
 
     }
 
-
-    boolean condition = false;
 
     // aeps2 balance enquery
     /* "\"requestTransactionTime\":\"30\/08\/2019 11:03:16\", */
@@ -988,7 +997,7 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
                 if (!radioflag) {
                     btn_submit_aeps.setClickable(true);
                     Toast.makeText(MICRO_AEPS_Activity.this, "Please select transaction mode", Toast.LENGTH_SHORT).show();
-                } else if (flagdevicetype == 0) {
+                } else if (flagdevicetype < 1) {
                     btn_submit_aeps.setClickable(true);
                     Toast.makeText(this, "Please select device type", Toast.LENGTH_LONG).show();
                 } else if (!ImageUtils.commonAmount(input_mobile.getText().toString())) {

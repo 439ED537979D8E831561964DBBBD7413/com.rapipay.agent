@@ -299,25 +299,11 @@ public class BC2TransferActivity extends BaseCompactActivity implements View.OnC
                 if (s.length() == 6) {
                     String condition = senderpincode.getText().toString();
                     initAddressApi(condition);
-                    select_state.setClickable(false);
+                    // select_state.setClickable(false);
                     district.setClickable(false);
                 } else {
-                    city.setText("");
-                    district.setText("");
-                    state_update.setText("");
-                    flagstate = 0;
-                    state_update_top.setVisibility(View.GONE);
-                    select_state.setVisibility(View.VISIBLE);
-                   /* select_state.setClickable(true);
-                    district.setClickable(true);*/
+                    notselectpinApi();
                 }
-                // new WalletAsyncMethod(WebConfig.BC2RemittanceApp, getSender_Validate().toString(), headerData, BC2TransferActivity.this, getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
-                /*else {
-                    reset();
-                    fab.setVisibility(View.GONE);
-                    findViewById(R.id.btn_submit).setVisibility(View.GONE);
-                    sender_layout1.setVisibility(View.GONE);
-                }*/
             }
         });
 
@@ -391,6 +377,16 @@ public class BC2TransferActivity extends BaseCompactActivity implements View.OnC
         });
     }
 
+    public void notselectpinApi() {
+        city.setText("");
+        district.setText("");
+        state_update.setText("");
+        flagstate = 0;
+        select_state.setClickable(true);
+        state_update_top.setVisibility(View.GONE);
+        select_state.setVisibility(View.VISIBLE);
+    }
+
     int flagstate = 0;
 
     ArrayList<String> list_city, list_dist, list_state;
@@ -447,7 +443,7 @@ public class BC2TransferActivity extends BaseCompactActivity implements View.OnC
                             dialogs.dismiss();
                             dialog.hide_progress();
                             postOfficeArrayList = new ArrayList<>();
-                            final Gson gson = new Gson();
+                            final Gson gson = new Gson(); //[{"Message":"No records found","Status":"Error","PostOffice":null}]
                             JSONArray rootresponse = new JSONArray(response);
                             final JSONObject jsonObject = rootresponse.getJSONObject(0);
                             realm.executeTransaction(new Realm.Transaction() {
@@ -479,6 +475,7 @@ public class BC2TransferActivity extends BaseCompactActivity implements View.OnC
                                         }
                                         Log.e("response= postoffice=", postOffice.toString());
                                     } catch (Exception e) {
+                                        flagstate = 0;
                                         e.printStackTrace();
                                     }
                                 }
@@ -486,6 +483,7 @@ public class BC2TransferActivity extends BaseCompactActivity implements View.OnC
                         } catch (Exception e) {
                             dialog.hide_progress();
                             e.printStackTrace();
+                            notselectpinApi();
                         }
                     }
                 }, new Response.ErrorListener() {
@@ -757,53 +755,45 @@ public class BC2TransferActivity extends BaseCompactActivity implements View.OnC
                 if (input_name1.getText().toString().isEmpty()) {
                     input_name1.setError("Please enter valid name");
                     input_name1.requestFocus();
-                    findViewById(R.id.btn_submit).setClickable(true);
                 } else if (senderpincode.getText().toString().isEmpty()) {
                     senderpincode.setError("Please enter valid pincode");
                     senderpincode.requestFocus();
-                    findViewById(R.id.btn_submit).setClickable(true);
                 } else if (address_name.getText().toString().isEmpty()) {
                     address_name.setError("Please enter valid address");
                     address_name.requestFocus();
-                    findViewById(R.id.btn_submit).setClickable(true);
-                } else if (docType.equalsIgnoreCase("Select Document Type")) {
-                    Toast.makeText(BC2TransferActivity.this, "Please Select document type", Toast.LENGTH_SHORT).show();
-                    findViewById(R.id.btn_submit).setClickable(true);
                 } else if (selectGender.equalsIgnoreCase("Select Gender")) {
-                    Toast.makeText(BC2TransferActivity.this, "Please Select Gender", Toast.LENGTH_SHORT).show();
-                    findViewById(R.id.btn_submit).setClickable(true);
-                } else if (documentid.getText().toString().isEmpty()) {
-                    documentid.setError("Please enter valid document id");
-                    documentid.requestFocus();
-                    findViewById(R.id.btn_submit).setClickable(true);
-                } else if (flagstate == 0) {
-                    if (select_state.getText().toString().isEmpty() || select_state.getText().toString().equalsIgnoreCase("Select State*")) {
-                        select_state.setError("Please enter valid state");
-                        select_state.requestFocus();
-                        findViewById(R.id.btn_submit).setClickable(true);
-                    }
-                } else if (city.getText().toString().isEmpty()) {
-                    city.setError("Please enter city");
-                    city.requestFocus();
-                    findViewById(R.id.btn_submit).setClickable(true);
+                    Toast.makeText(this, "Please Select Gender", Toast.LENGTH_SHORT).show();
                 } else if (district.getText().toString().isEmpty()) {
                     district.setError("Please enter district");
                     district.requestFocus();
-                    findViewById(R.id.btn_submit).setClickable(true);
+                } else if (city.getText().toString().isEmpty()) {
+                    city.setError("Please enter city");
+                    city.requestFocus();
+                } else if (docType.equalsIgnoreCase("Select Document Type")) {
+                    Toast.makeText(this, "Please Select document type", Toast.LENGTH_SHORT).show();
                 } else if (date1_text.getText().toString().isEmpty()) {
                     date1_text.setError("Please enter valid date");
                     date1_text.requestFocus();
-                    findViewById(R.id.btn_submit).setClickable(true);
-                } else {
-                    findViewById(R.id.btn_submit).setClickable(true);
-                    new WalletAsyncMethod(WebConfig.BC2RemittanceApp, addSenderDetails().toString(), headerData, BC2TransferActivity.this, getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
-                    //   new AsyncPostMethod(WebConfig.FUNDTRANSFER_URL, getJson_Validate().toString(), headerData, FundTransferActivity.this, getString(R.string.responseTimeOutTrans)).execute();
-                }
+                } else if (documentid.getText().toString().isEmpty()) {
+                    documentid.setError("Please enter valid document id");
+                    documentid.requestFocus();
+                } else //if (flagstate == 0) {
+                    if ((select_state.getText().toString().isEmpty() || select_state.getText().toString().equalsIgnoreCase("Select State")) && flagstate == 0) {
+                        select_state.setError("Please enter valid state");
+                        select_state.requestFocus();
+                        //  }
+                    } else {
+                        if (flagstate == 0)
+                            new WalletAsyncMethod(WebConfig.BC2RemittanceApp, addSenderDetails(select_state.getText().toString()).toString(), headerData, BC2TransferActivity.this, getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+                            //   new AsyncPostMethod(WebConfig.FUNDTRANSFER_URL, getJson_Validate().toString(), headerData, FundTransferActivity.this, getString(R.string.responseTimeOutTrans)).execute();
+                        else
+                            new WalletAsyncMethod(WebConfig.BC2RemittanceApp, addSenderDetails(state_update.getText().toString()).toString(), headerData, BC2TransferActivity.this, getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+                    }
                 break;
         }
     }
 
-    private JSONObject addSenderDetails() {
+    private JSONObject addSenderDetails(String state) {
         JSONObject jsonObject = new JSONObject();
         if (!input_mobile.getText().toString().isEmpty() && input_mobile.getText().toString().length() == 10) {
             try {
@@ -824,7 +814,8 @@ public class BC2TransferActivity extends BaseCompactActivity implements View.OnC
                 jsonObject.put("senderCity", city.getText().toString());
                 jsonObject.put("senderPostalPin", senderpincode.getText().toString());
                 jsonObject.put("senderDistrict", district.getText().toString());
-                jsonObject.put("senderState", select_state.getText().toString());
+                jsonObject.put("senderState", state);
+                //  jsonObject.put("senderState", select_state.getText().toString());
                 jsonObject.put("txnIP", shieldsquare_IP2Hex(ImageUtils.ipAddress(this)));
                 jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
             } catch (Exception e) {
@@ -1048,6 +1039,8 @@ public class BC2TransferActivity extends BaseCompactActivity implements View.OnC
     }
 
     private void insertBenfDetails(JSONArray array) {
+        final Dialog dialogs = new Dialog(this);
+        final CustomProgessDialog dialog = new CustomProgessDialog(this);
         beneficiaryDetailsPozoslist = new ArrayList<>();
         try {
             for (int i = 0; i < array.length(); i++) {
@@ -1058,8 +1051,12 @@ public class BC2TransferActivity extends BaseCompactActivity implements View.OnC
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (beneficiaryDetailsPozoslist.size() != 0)
+        if (beneficiaryDetailsPozoslist.size() != 0) {
             initializeBenAdapter(beneficiaryDetailsPozoslist);
+        } else {
+            dialogs.dismiss();
+            dialog.hide_progress();
+        }
     }
 
     private void insertLastTransDetails(JSONArray array) {
@@ -1164,7 +1161,6 @@ public class BC2TransferActivity extends BaseCompactActivity implements View.OnC
                         otp_layout.setVisibility(View.VISIBLE);
                         fab.setVisibility(View.VISIBLE);
                         detail_expend.setVisibility(View.VISIBLE);
-                        findViewById(R.id.btn_submit).setClickable(false);
                         findViewById(R.id.sender_layout1).setVisibility(View.GONE);
                         clear();
                         otpRefId = object.getString("otpRefId");
@@ -1174,7 +1170,7 @@ public class BC2TransferActivity extends BaseCompactActivity implements View.OnC
                     } else if (object.getString("serviceType").equalsIgnoreCase("ADD_SENDER_DETAILS")) {
                         new WalletAsyncMethod(WebConfig.BC2RemittanceApp, getSender_Validate().toString(), headerData, BC2TransferActivity.this, this, getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
                     } else if (object.getString("serviceType").equalsIgnoreCase("DELETE_BENEFICIARY")) {
-                        customDialog_Common("KYCLAYOUTLAY", object, null, "Payee Detail", object.getString("responseMsg"));
+                        customDialog_Common("KYCLAYOUTLAY", object, null, "Payee Detail", object.getString("responseMessage"));
                     } else if (object.getString("serviceType").equalsIgnoreCase("GET_SERVICE_FEE")) {
                         customDialog_Common("Fund Transfer Confirmation", object, pozo, "Sure you want to Transfer?", input_mobile.getText().toString());
                     } else if (object.getString("serviceType").equalsIgnoreCase("Verify_Account")) {
@@ -1266,7 +1262,11 @@ public class BC2TransferActivity extends BaseCompactActivity implements View.OnC
                             }
                         }
                     } else if (object.getString("serviceType").equalsIgnoreCase("ADD_BENEFICIARY_DETAILS")) {
-                        customDialog_Common("KYCLAYOUTS", null, null, null, null, object.getString("responseMsg"), BC2TransferActivity.this);
+                        if (object.has("responseMsg")) {
+                            customDialog_Common("KYCLAYOUTS", null, null, null, null, object.getString("responseMsg"), BC2TransferActivity.this);
+                        } else {
+                            customDialog_Common("KYCLAYOUTS", null, null, null, null, object.getString("responseMessage"), BC2TransferActivity.this);
+                        }
                     }
                 } else if (object.getString("responseCode").equalsIgnoreCase("75235")) {
                     customDialog_Common(object.getString("responseMessage"));
@@ -1302,7 +1302,7 @@ public class BC2TransferActivity extends BaseCompactActivity implements View.OnC
                 } else if (object.getString("responseCode").equalsIgnoreCase("101")) {
                     dialog.dismiss();
                     customReceiptNew("Transaction Receipt", object, BC2TransferActivity.this);
-                   // customDialog_Common("Money Transfer", null, null, "Rapipay", object.getString("responseMessage"));
+                    // customDialog_Common("Money Transfer", null, null, "Rapipay", object.getString("responseMessage"));
                 } else if (object.getString("responseCode").equalsIgnoreCase("102")) {
                     dialog.dismiss();
                     customDialog_Common(object.getString("responseMessage"));
@@ -1335,6 +1335,8 @@ public class BC2TransferActivity extends BaseCompactActivity implements View.OnC
     }
 
     private void enterSenderDetails(JSONObject object) {
+        final Dialog dialogs = new Dialog(this);
+        final CustomProgessDialog dialog = new CustomProgessDialog(this);
         try {
             input_name1.setText(object.getString("sender_Name"));
             gender.setText(object.getString("sd_Gender"));
@@ -1367,8 +1369,12 @@ public class BC2TransferActivity extends BaseCompactActivity implements View.OnC
             gender_layout.setVisibility(View.VISIBLE);
             gender_spinner.setVisibility(View.GONE);
             document_layout.setVisibility(View.VISIBLE);
+            dialogs.dismiss();
+            dialog.hide_progress();
         } catch (Exception e) {
             e.printStackTrace();
+            dialogs.dismiss();
+            dialog.hide_progress();
         }
     }
 

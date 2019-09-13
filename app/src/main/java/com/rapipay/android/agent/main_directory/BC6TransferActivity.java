@@ -780,9 +780,9 @@ public class BC6TransferActivity extends BaseCompactActivity implements View.OnC
                         //  }
                     } else {
                         if (flagstate == 0)
-                            new WalletAsyncMethod(WebConfig.BC2RemittanceApp, addSenderDetails(select_state.getText().toString()).toString(), headerData, BC6TransferActivity.this, getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+                            new WalletAsyncMethod(WebConfig.BC6RemittanceApp, addSenderDetails(select_state.getText().toString()).toString(), headerData, BC6TransferActivity.this, getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
                         else
-                            new WalletAsyncMethod(WebConfig.BC2RemittanceApp, addSenderDetails(state_update.getText().toString()).toString(), headerData, BC6TransferActivity.this, getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+                            new WalletAsyncMethod(WebConfig.BC6RemittanceApp, addSenderDetails(state_update.getText().toString()).toString(), headerData, BC6TransferActivity.this, getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
                     }
                 break;
         }
