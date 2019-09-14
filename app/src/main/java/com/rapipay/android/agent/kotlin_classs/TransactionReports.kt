@@ -58,8 +58,14 @@ class TransactionReports : BaseFragment(), RequestHandler, View.OnClickListener,
         selectedYear = calendar.get(Calendar.YEAR)
         date2_text = v.findViewById<View>(R.id.date2) as AutofitTextView
         date1_text = v.findViewById<View>(R.id.date1) as AutofitTextView
-        date2_text!!.setText("$selectedYear-$selectedMonth-$selectedDate")
-        date1_text!!.setText("$selectedYear-$selectedMonth-$selectedDate")
+        if (selectedMonth < 11)
+            date2_text!!.setText("$selectedYear-" + "0$selectedMonth" + "-$selectedDate")
+        else
+            date2_text!!.setText("$selectedYear-$selectedMonth-$selectedDate")
+        if (selectedMonth < 11)
+            date1_text!!.setText("$selectedYear-" + "0$selectedMonth" + "-$selectedDate")
+        else
+            date1_text!!.setText("$selectedYear-$selectedMonth-$selectedDate")
         v.findViewById<View>(R.id.todate).setOnClickListener(toDateClicked)
         v.findViewById<View>(R.id.btn_fund).setOnClickListener(this)
         v.findViewById<View>(R.id.date1).setOnClickListener(toDateClicked)
@@ -189,6 +195,8 @@ class TransactionReports : BaseFragment(), RequestHandler, View.OnClickListener,
                 months = "0" + (month + 1).toString()
             else
                 months = (month + 1).toString()
+
+
             if (dayOfMonth.toString().length == 1)
                 dayss = "0$dayOfMonth"
             else

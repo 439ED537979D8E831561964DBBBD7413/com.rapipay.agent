@@ -181,11 +181,11 @@ public class AEPS_BBPS_RegistrationActivity extends BaseCompactActivity implemen
                     try {
                         JSONObject object = new JSONObject(response);
                         if (object.has("responseCode"))
-                           if (object.getString("responseCode").equalsIgnoreCase("200")) {
-                               customDialog_Common("KYCLAYOUTS", null, null, getResources().getString(R.string.Alert), null, object.getString("responseMessage"), AEPS_BBPS_RegistrationActivity.this);
-                            }else if (object.getString("responseCode").equalsIgnoreCase("75161")) {
-                               customDialog_Common("KYCLAYOUT", null, null, getResources().getString(R.string.Alert), null, object.getString("responseMessage"), AEPS_BBPS_RegistrationActivity.this);
-                           }else
+                            if (object.getString("responseCode").equalsIgnoreCase("200")) {
+                                customDialog_Common("KYCLAYOUTS", null, null, getResources().getString(R.string.Alert), null, object.getString("responseMessage"), AEPS_BBPS_RegistrationActivity.this);
+                            } else if (object.getString("responseCode").equalsIgnoreCase("75161")) {
+                                customDialog_Common("KYCLAYOUT", null, null, getResources().getString(R.string.Alert), null, object.getString("responseMessage"), AEPS_BBPS_RegistrationActivity.this);
+                            } else
                                 customDialog_Common("KYCLAYOUTS", null, null, getResources().getString(R.string.Alert), null, object.getString("responseMessage"), AEPS_BBPS_RegistrationActivity.this);
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -273,6 +273,7 @@ public class AEPS_BBPS_RegistrationActivity extends BaseCompactActivity implemen
         }
         return null;
     }
+
     public class PQChromeClient extends WebChromeClient {
         public boolean onShowFileChooser(WebView view, ValueCallback<Uri[]> filePath, FileChooserParams fileChooserParams) {
             if (mUploadMessage != null) {
@@ -344,7 +345,7 @@ public class AEPS_BBPS_RegistrationActivity extends BaseCompactActivity implemen
         if (type.equalsIgnoreCase("KYCLAYOUTS")) {
             setBack_click(this);
             finish();
-        }else  if (type.equalsIgnoreCase("KYCLAYOUT")) {
+        } else if (type.equalsIgnoreCase("KYCLAYOUT")) {
             String formData = getsession_ValidateKyc("A");
             Intent intent = new Intent(AEPS_BBPS_RegistrationActivity.this, WebViewVerify.class);
             intent.putExtra("persons", "pending");
