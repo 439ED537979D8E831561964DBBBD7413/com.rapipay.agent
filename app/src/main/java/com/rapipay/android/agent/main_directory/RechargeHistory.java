@@ -69,8 +69,14 @@ public class RechargeHistory extends BaseCompactActivity implements View.OnClick
         heading.setText("Recharge History");
         date2_text = (AutofitTextView) findViewById(R.id.date2);
         date1_text = (AutofitTextView) findViewById(R.id.date1);
-        date2_text.setText(selectedYear + "-" + selectedMonth + "-" + selectedDate);
-        date1_text.setText(selectedYear + "-" + selectedMonth + "-" + selectedDate);
+        if (selectedMonth < 11)
+            date2_text.setText(selectedYear + "-" + "0"+selectedMonth + "-" + selectedDate);
+        else
+            date2_text.setText(selectedYear + "-" + selectedMonth + "-" + selectedDate);
+        if (selectedMonth < 11)
+            date1_text.setText(selectedYear + "-" + "0"+selectedMonth + "-" + selectedDate);
+        else
+            date1_text.setText(selectedYear + "-" + selectedMonth + "-" + selectedDate);
         trans_details = (RecyclerView) findViewById(R.id.trans_details);
         findViewById(R.id.todate).setOnClickListener(toDateClicked);
         findViewById(R.id.date1).setOnClickListener(toDateClicked);

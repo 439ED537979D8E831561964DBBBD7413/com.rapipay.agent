@@ -29,6 +29,7 @@ import com.rapipay.android.agent.adapter.HeaderAdapter;
 import com.rapipay.android.agent.adapter.SimpleStringRecyclerViewAdapter;
 import com.rapipay.android.agent.interfaces.ClickListener;
 import com.rapipay.android.agent.kotlin_classs.BC2Tab;
+import com.rapipay.android.agent.kotlin_classs.BC6Tab;
 import com.rapipay.android.agent.kotlin_classs.BCTab;
 import com.rapipay.android.agent.main_directory.AEPS_BBPS_RegistrationActivity;
 import com.rapipay.android.agent.main_directory.Aeps1Activity;
@@ -395,7 +396,6 @@ public class DashBoardFragments extends BaseFragment {
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                 }
-
             }
 
             @Override
@@ -415,13 +415,15 @@ public class DashBoardFragments extends BaseFragment {
                     startActivity(intent);
                 } else if (position == 2) {
 //                    customDialog_Ben("BC FUND TRANSFER", "FundTransfer");
-                    Intent intent = new Intent(getActivity(), BC2TransferActivity.class);
+             //       Intent intent = new Intent(getActivity(), BC2TransferActivity.class);
+                    Intent intent = new Intent(getActivity(), BC2Tab.class);
                     intent.putExtra("reqFor", "BCS");
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                 }  else if (position == 3) {
 //                    customDialog_Ben("BC FUND TRANSFER", "FundTransfer");
-                    Intent intent = new Intent(getActivity(), BC6TransferActivity.class);
+                 //   Intent intent = new Intent(getActivity(), BC6TransferActivity.class);
+                    Intent intent = new Intent(getActivity(), BC6Tab.class);
                     intent.putExtra("reqFor", "BCS");
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
@@ -502,7 +504,6 @@ public class DashBoardFragments extends BaseFragment {
                     startActivity(intent);
                 }
             }
-
             @Override
             public void onLongClick(View view, int position) {
 

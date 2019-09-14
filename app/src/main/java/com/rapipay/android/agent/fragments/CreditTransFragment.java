@@ -80,8 +80,14 @@ public class CreditTransFragment extends BaseFragment implements RequestHandler,
         date1_text = (AutofitTextView) view.findViewById(R.id.date1);
         date1_text.setOnClickListener(this);
         date2_text.setOnClickListener(this);
-        date2_text.setText(selectedYear + "-" + selectedMonth + "-" + selectedDate);
-        date1_text.setText(selectedYear + "-" + selectedMonth + "-" + selectedDate);
+        if (selectedMonth < 11)
+            date2_text.setText(selectedYear + "-" + "0"+selectedMonth + "-" + selectedDate);
+        else
+            date2_text.setText(selectedYear + "-" + selectedMonth + "-" + selectedDate);
+        if (selectedMonth < 11)
+            date1_text.setText(selectedYear + "-" + "0"+selectedMonth + "-" + selectedDate);
+        else
+            date1_text.setText(selectedYear + "-" + selectedMonth + "-" + selectedDate);
         btn_fund = (ImageView) view.findViewById(R.id.btn_fund);
         btn_fund.setOnClickListener(this);
         trans_details = (RecyclerView) view.findViewById(R.id.trans_details);
@@ -370,7 +376,7 @@ public class CreditTransFragment extends BaseFragment implements RequestHandler,
                     listApiCall();
                 }
             } else if (object.getString("responseCode").equalsIgnoreCase("60147")) {
-                Toast.makeText(getActivity(),object.getString("responseMessage"),Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), object.getString("responseMessage"), Toast.LENGTH_LONG).show();
                 setBack_click1(getActivity());
             } else
                 responseMSg(object);

@@ -1,9 +1,9 @@
 package com.rapipay.android.agent.fragments;
 
+
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
@@ -51,6 +51,7 @@ import com.rapipay.android.agent.adapter.PaymentAdapter;
 import com.rapipay.android.agent.interfaces.ClickListener;
 import com.rapipay.android.agent.interfaces.CustomInterface;
 import com.rapipay.android.agent.interfaces.WalletRequestHandler;
+import com.rapipay.android.agent.main_directory.BC6TransferActivity;
 import com.rapipay.android.agent.main_directory.MainActivity;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
 import com.rapipay.android.agent.utils.BaseFragment;
@@ -76,7 +77,10 @@ import static android.app.Activity.RESULT_OK;
 import static com.rapipay.android.agent.utils.BaseCompactActivity.dbRealm;
 
 
-public class BC2TransferFragment extends BaseFragment implements View.OnClickListener, WalletRequestHandler, CustomInterface {
+/**
+ * A simple {@link Fragment} subclass.
+ */
+public class BC6TransferFragment extends BaseFragment implements View.OnClickListener, WalletRequestHandler, CustomInterface {
     EditText input_amount, input_account, input_name, senderpincode, input_name1, input_mobile, input_otp, searchfield;
     EditText incomesource, gender, documentid, documentype, city, district, address_name, sendercomname, state_update;
     AppCompatButton btn_otpsubmit, btn_fund, btn_verify;
@@ -115,13 +119,13 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        rv = inflater.inflate(R.layout.fragment_bc2_transfer3, container, false);
+        rv = inflater.inflate(R.layout.fragment_bc6_transfer, container, false);
         localStorage = LocalStorage.getInstance(getActivity());
         heading = (TextView) getActivity().findViewById(R.id.toolbar_title);
         if (balance != null)
-            heading.setText("BC2 Fund Transfer (Balance : Rs." + balance + ")");
+            heading.setText("BC6 Fund Transfer (Balance : Rs." + balance + ")");
         else
-            heading.setText("BC2 Fund Transfer");
+            heading.setText("BC6 Fund Transfer");
         headerData = (WebConfig.BASIC_USERID + ":" + WebConfig.BASIC_PASSWORD);
         if (dbRealm != null && dbRealm.getDetails_Rapi())
             list = dbRealm.getDetails();
@@ -257,7 +261,7 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
                 if (transactionPozoArrayList.size() != 0 && !receipt_clicked) {
                     receipt_clicked = true;
                     LastTransactionPozo pozo = transactionPozoArrayList.get(position);
-                    new WalletAsyncMethod(WebConfig.WALLETRECEIPTURL, receipt_request(pozo).toString(), headerData, BC2TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+                    new WalletAsyncMethod(WebConfig.WALLETRECEIPTURL, receipt_request(pozo).toString(), headerData, BC6TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
                 }
             }
 
@@ -281,7 +285,7 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
             public void afterTextChanged(Editable s) {
                 //  if (flagdevicetype > 0) {
                 if (s.length() == 10)
-                    new WalletAsyncMethod(WebConfig.BC2RemittanceApp, getSender_Validate().toString(), headerData, BC2TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+                    new WalletAsyncMethod(WebConfig.BC6RemittanceApp, getSender_Validate().toString(), headerData, BC6TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
 
                 else {
                     reset();
@@ -410,7 +414,7 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("beneficiaryId", pozo.getBeneficiaryId());
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
-            jsonObject.put("reqFor", "BC2");
+            jsonObject.put("reqFor", "BC6");
             jsonObject.put("txnIP", shieldsquare_IP2Hex(ImageUtils.ipAddress(getActivity())));
             jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
         } catch (Exception e) {
@@ -491,7 +495,7 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
                 jsonObject.put("nodeAgentId", list.get(0).getMobilno());
                 jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
                 jsonObject.put("mobileNumber", input_mobile.getText().toString());
-                jsonObject.put("reqFor", "BC2");
+                jsonObject.put("reqFor", "BC6");
                 jsonObject.put("txnIP", shieldsquare_IP2Hex(ImageUtils.ipAddress(getActivity())));
                 jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
 
@@ -521,7 +525,7 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
             jsonObject.put("accountName", bankAccountName);
             jsonObject.put("transferType", transfer_type);
             jsonObject.put("CDFlag", CDFlag);
-            jsonObject.put("reqFor", "BC2");
+            jsonObject.put("reqFor", "BC6");
             jsonObject.put("txnIP", shieldsquare_IP2Hex(ImageUtils.ipAddress(getActivity())));
             jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
 
@@ -543,7 +547,7 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
                 jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
                 jsonObject.put("mobileNumber", input_mobile.getText().toString());
                 jsonObject.put("senderName", input_name.getText().toString().trim());
-                jsonObject.put("reqFor", "BC2");
+                jsonObject.put("reqFor", "BC6");
                 jsonObject.put("txnIP", shieldsquare_IP2Hex(ImageUtils.ipAddress(getActivity())));
                 jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
 
@@ -557,7 +561,7 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
     }
 
     /*  {"serviceType":"Verify_Mobile","prevServiceType":"ADD_SENDER_DETAILS","otp":"213195","otprefID":"602900020298","fundTransferId":"19090706435415068",
-              "transactionID":"19090706440849973","senderMobile":"9222222222","nodeAgentId":"1000000014","requestType":"BC_CHANNEL","typeMobileWeb":"WEB","reqFor":"BC2","txnIP":"172.16.50.73","sessionRefNo":"NZ794ZM3HG"}
+              "transactionID":"19090706440849973","senderMobile":"9222222222","nodeAgentId":"1000000014","requestType":"BC_CHANNEL","typeMobileWeb":"WEB","reqFor":"BC6","txnIP":"172.16.50.73","sessionRefNo":"NZ794ZM3HG"}
   */
 
     public JSONObject add_OtpDetails(String otpRefId, String fund_transferId) {
@@ -576,7 +580,7 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
                     jsonObject.put("fundTransferId", fund_transferId);
                     jsonObject.put("otp", input_otp.getText().toString());
                     jsonObject.put("otprefID", otpRefId);
-                    jsonObject.put("reqFor", "BC2");
+                    jsonObject.put("reqFor", "BC6");
                     jsonObject.put("txnIP", shieldsquare_IP2Hex(ImageUtils.ipAddress(getActivity())));
                     jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
 
@@ -723,7 +727,7 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
             case R.id.btn_sender:
                 hideKeyboard(getActivity());
                 if (!input_name.getText().toString().isEmpty())
-                    new WalletAsyncMethod(WebConfig.BC2RemittanceApp, addSender().toString(), headerData, BC2TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+                    new WalletAsyncMethod(WebConfig.BC6RemittanceApp, addSender().toString(), headerData, BC6TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
                 else
                     Toast.makeText(getActivity(), "Please enter correct text", Toast.LENGTH_SHORT).show();
                 break;
@@ -731,7 +735,7 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
                 v.findViewById(R.id.btn_otpsubmit).setClickable(false);
                 if (!otpRefId.isEmpty() && !fund_transferId.isEmpty() && !input_otp.getText().toString().isEmpty()) {
                     hideKeyboard(getActivity());
-                    new WalletAsyncMethod(WebConfig.BC2RemittanceApp, add_OtpDetails(otpRefId, fund_transferId).toString(), headerData, BC2TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+                    new WalletAsyncMethod(WebConfig.BC6RemittanceApp, add_OtpDetails(otpRefId, fund_transferId).toString(), headerData, BC6TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
                 } else
                     Toast.makeText(getActivity(), "Please enter OTP", Toast.LENGTH_SHORT).show();
                 break;
@@ -788,10 +792,10 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
                         //  }
                     } else {
                         if (flagstate == 0)
-                            new WalletAsyncMethod(WebConfig.BC2RemittanceApp, addSenderDetails(select_state.getText().toString()).toString(), headerData, BC2TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+                            new WalletAsyncMethod(WebConfig.BC6RemittanceApp, addSenderDetails(select_state.getText().toString()).toString(), headerData, BC6TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
                             //   new AsyncPostMethod(WebConfig.FUNDTRANSFER_URL, getJson_Validate().toString(), headerData, FundTransferActivity.this, getString(R.string.responseTimeOutTrans)).execute();
                         else
-                            new WalletAsyncMethod(WebConfig.BC2RemittanceApp, addSenderDetails(state_update.getText().toString()).toString(), headerData, BC2TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+                            new WalletAsyncMethod(WebConfig.BC6RemittanceApp, addSenderDetails(state_update.getText().toString()).toString(), headerData, BC6TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
                     }
                 break;
         }
@@ -806,9 +810,8 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
                 jsonObject.put("typeMobileWeb", "mobile");
                 jsonObject.put("transactionID", ImageUtils.miliSeconds());
                 jsonObject.put("nodeAgentId", list.get(0).getMobilno());
-                jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
                 jsonObject.put("mobileNumber", input_mobile.getText().toString());
-                jsonObject.put("reqFor", "BC2");
+                jsonObject.put("reqFor", "BC6");
                 jsonObject.put("senderName", input_name1.getText().toString());
                 jsonObject.put("senderGender", selectGender);
                 jsonObject.put("senderDoB", date_text.getText().toString());
@@ -820,6 +823,7 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
                 jsonObject.put("senderDistrict", district.getText().toString());
                 jsonObject.put("senderState", state);
                 jsonObject.put("txnIP", shieldsquare_IP2Hex(ImageUtils.ipAddress(getActivity())));
+                jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
                 jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
             } catch (Exception e) {
                 e.printStackTrace();
@@ -921,12 +925,12 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
                 } else {
                     dialognew.dismiss();
                     if (isNEFT && con_ifsc.getText().toString().matches("^[a-zA-Z0-9]{1,50}$"))
-                        new WalletAsyncMethod(WebConfig.BC2RemittanceApp, addBeneAccount(bene_number.getText().toString(), con_ifsc.getText().toString(), bene_name.getText().toString(), "D", "NEFT").toString(), headerData, BC2TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+                        new WalletAsyncMethod(WebConfig.BCRemittanceApp, addBeneAccount(bene_number.getText().toString(), con_ifsc.getText().toString(), bene_name.getText().toString(), "D", "NEFT").toString(), headerData, BC6TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
                     else if (!isNEFT) {
                         // String condition = "where " + RapipayDB.COLOMN__BANK_NAME + "='" + bank_select_bene.getText().toString() + "'";
                         String condition = bank_select_bene.getText().toString();
                         ifsc_code = dbRealm.geBankIFSC(condition).get(0);
-                        new WalletAsyncMethod(WebConfig.BC2RemittanceApp, addBeneAccount(bene_number.getText().toString(), con_ifsc.getText().toString(), bene_name.getText().toString(), "D", "IMPS").toString(), headerData, BC2TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+                        new WalletAsyncMethod(WebConfig.BCRemittanceApp, addBeneAccount(bene_number.getText().toString(), con_ifsc.getText().toString(), bene_name.getText().toString(), "D", "IMPS").toString(), headerData, BC6TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
                     }
                 }
             }
@@ -951,13 +955,13 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
                 } else {
                     dialognew.dismiss();
                     if (isNEFT && con_ifsc.getText().toString().matches("^[a-zA-Z0-9]{1,50}$"))
-                        new WalletAsyncMethod(WebConfig.BCRemittanceApp, verify_Account(con_ifsc.getText().toString(), bene_number.getText().toString()).toString(), headerData, BC2TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+                        new WalletAsyncMethod(WebConfig.BCRemittanceApp, verify_Account(con_ifsc.getText().toString(), bene_number.getText().toString()).toString(), headerData, BC6TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
                     else if (!isNEFT) {
                         //  String condition = "where " + RapipayDB.COLOMN__BANK_NAME + "='" + bank_select_bene.getText().toString() + "'";
                         String condition = bank_select_bene.getText().toString();
                         ifsc_code = dbRealm.geBankIFSC(condition).get(0);
 //                    if (newtin.getText().toString().isEmpty())
-                        new WalletAsyncMethod(WebConfig.BCRemittanceApp, verify_Account(ifsc_code, bene_number.getText().toString()).toString(), headerData, BC2TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+                        new WalletAsyncMethod(WebConfig.BCRemittanceApp, verify_Account(ifsc_code, bene_number.getText().toString()).toString(), headerData, BC6TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
                     }
                 }
             }
@@ -1011,13 +1015,15 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
             jsonObject.put("mobileNumber", input_mobile.getText().toString());
             jsonObject.put("txnAmmount", "1");
-            jsonObject.put("reqFor", "BC2");
+            jsonObject.put("reqFor", "BC6");
             jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
 
         } catch (Exception e) {
             e.printStackTrace();
         }
         return jsonObject;
+        //{"serviceType":"Verify_Account","requestType":"BC_CHANNEL","typeMobileWeb":"mobile","transactionID":"170250160913846","nodeAgentId":"1000000014","senderName":"dggdg","IFSC":"PUNB0061800","accountNo":"4747001700100025","txnIP":"AC1032F6",
+        // "sessionRefNo":"A2MWSFPTCR","mobileNumber":"8668855858","txnAmmount":"1","reqFor":"BC6","checkSum":"E6AB618D47FD9C139730112D511471844AC0BF5E1C892BD0D4C4FD1B83954EF260A5DA4879246F7FA39BBC41B1EE248A783541FE045F7C8444F779C94CF59590"}
     }
 
     public JSONObject service_fee(String txnAmmount, String subType) {
@@ -1031,7 +1037,7 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
             jsonObject.put("agentID", list.get(0).getMobilno());
             jsonObject.put("subType", subType);
             jsonObject.put("txnAmmount", txnAmmount);
-            jsonObject.put("reqFor", "BC2");
+            jsonObject.put("reqFor", "BC6");
             jsonObject.put("txnIP", shieldsquare_IP2Hex(ImageUtils.ipAddress(getActivity())));
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
             jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
@@ -1039,22 +1045,7 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
             e.printStackTrace();
         }
         return jsonObject;
-
-       /* {"serviceType":"GET_SERVICE_FEE","requestType":"BC_CHANNEL","typeMobileWeb":"mobile","transactionID":"144607200907660","nodeAgentId":"1000000014","agentID":"1000000014",
-                "subType":"DMT_BC_AC_TRANSFER","txnAmmount":"11","reqFor":"BC2","sessionRefNo":"S97H3PKHGN","checkSum":"4B30208C1B417B503208811609A4D9D39CBB8B99DFD89A85A7F0BF87332F2C0244580C6E87125837539497358F54CE0992C95E4FCE628B47E7D25CC4EFE05E04"}
-    */
     }
-/*
-    {
-        "isVerified": "NOT-VERIFIED",
-            "isIMPS": "Y",
-            "isNEFT": "N",
-            "bc_BENE_ID": "7H3KM6FNBW",
-            "bank_Name": "ICICI BANK LIMITED",
-            "account_NUMBER": "1111122222",
-            "account_IFSC": "ICIC0000488",
-            "bank_ACCOUNT_NAME": "TEST NODE API"
-    }*/
 
     private void insertBenfDetails(JSONArray array) {
         final Dialog dialogs = new Dialog(getActivity());
@@ -1106,9 +1097,9 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
 
 
     /*   {"serviceType":"DMT_BC_AC_TRANSFER","transactionID":"1567589635646","mobileNumber":"8743999103","senderName":"chetanya","txnAmmount":"10","beneficiaryId":"7FN9EDTFKH","nodeAgentId":"1000000014",
-               "requestType":"BC_CHANNEL","typeMobileWeb":"WEB","reqFor":"BC2","tPin":"03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4","transferType":"IMPS","txnIP":"172.16.50.95","sessionRefNo":"JA3KXBAAMR"}
+               "requestType":"BC_CHANNEL","typeMobileWeb":"WEB","reqFor":"BC6","tPin":"03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4","transferType":"IMPS","txnIP":"172.16.50.95","sessionRefNo":"JA3KXBAAMR"}
    */
-    // change for bc2
+    // change for BC6
     public JSONObject getMoney_Validate(String amount, JSONObject object, String beneficiaryId) {
         JSONObject jsonObject = new JSONObject();
         try {
@@ -1122,7 +1113,7 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
             jsonObject.put("nodeAgentId", list.get(0).getMobilno());
             jsonObject.put("requestType", "BC_Channel");
             jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("reqFor", "BC2");
+            jsonObject.put("reqFor", "BC6");
             jsonObject.put("transferType", transfer_type);
             jsonObject.put("txnIP", shieldsquare_IP2Hex(ImageUtils.ipAddress(getActivity())));
             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
@@ -1157,6 +1148,8 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
         }
         return hex;
     }
+    //{"responseCode":"60283","responseMessage":"Sender Limit exceeded","serviceType":"Verify_Account","senderName":null,"ifscCode":null,"accountNo":null,"txnAmount":null,"serviceFee":null,"bankAccountName":null,"runningBalance":null,
+    // "bankRRNNumber":null, "bcBeneId":null,"subResponseMsg":null,"remainingLimit":null,"bankName":null,"objSplitTxn":null,"getTxnReceiptDataList":null,"apiCommonResposne":{"runningBalance":"59927314.80245"}}
 
     @Override
     public void chechStat(String s, String hitfrom) {
@@ -1190,7 +1183,7 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
                             reqFor = object.getString("reqFor");
                         fund_transferId = object.getString("transactionId");
                     } else if (object.getString("serviceType").equalsIgnoreCase("ADD_SENDER_DETAILS")) {
-                        new WalletAsyncMethod(WebConfig.BC2RemittanceApp, getSender_Validate().toString(), headerData, BC2TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+                        new WalletAsyncMethod(WebConfig.BC6RemittanceApp, getSender_Validate().toString(), headerData, BC6TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
                     } else if (object.getString("serviceType").equalsIgnoreCase("DELETE_BENEFICIARY")) {
                         if (object.has("responseMsg"))
                             customDialog_Common("KYCLAYOUTLAY", object, null, "Payee Detail", object.getString("responseMsg"));
@@ -1203,7 +1196,7 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
                     } else if (object.getString("serviceType").equalsIgnoreCase("DMT_BC_AC_TRANSFER")) {
                         dialog.dismiss();
                         customDialog_Common("Fund Transfer Details", object, pozo, "VerifyLayout", input_name.getText().toString().trim());
-                    } else if (object.getString("serviceType").equalsIgnoreCase("SENDER_COMPLETE_DETAILS")) { // sender already registered
+                    } else if (object.getString("serviceType").equalsIgnoreCase("SENDER_COMPLETE_DETAILS")) {
                         sender_layout.setVisibility(View.GONE);
                         getActivity().findViewById(R.id.reset).setVisibility(View.VISIBLE);
                         try {
@@ -1244,7 +1237,7 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
                         if (object.has("getTxnReceiptDataList")) {
                             try {
                                 JSONArray array = object.getJSONArray("getTxnReceiptDataList");
-                                customReceiptNew("Money Transfer", object, BC2TransferFragment.this);
+                                customReceiptNew("Money Transfer", object, BC6TransferFragment.this);
                             } catch (Exception e) {
                                 e.printStackTrace();
                                 customDialog_Common("Cannot generate receipt now please try later!", object, pozo, "VerifyLayout", input_name.getText().toString().trim());
@@ -1280,14 +1273,14 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
                         if (object.has("getTxnReceiptDataList")) {
                             try {
                                 JSONArray array = object.getJSONArray("getTxnReceiptDataList");
-                                customReceiptNew("Transaction Receipt", object, BC2TransferFragment.this);
+                                customReceiptNew("Transaction Receipt", object, BC6TransferFragment.this);
                             } catch (Exception e) {
                                 e.printStackTrace();
                                 customDialog_Common("Cannot generate receipt now please try later!", object, pozo, "VerifyLayout", input_name.getText().toString().trim());
                             }
                         }
                     } else if (object.getString("serviceType").equalsIgnoreCase("ADD_BENEFICIARY_DETAILS")) {
-                        customDialog_Common("KYCLAYOUTS", null, null, null, null, object.getString("responseMessage"), BC2TransferFragment.this);
+                        customDialog_Common("KYCLAYOUTS", null, null, null, null, object.getString("responseMessage"), BC6TransferFragment.this);
                     }
                 } else if (object.getString("responseCode").equalsIgnoreCase("75235")) {
                     customDialog_Common(object.getString("responseMessage"));
@@ -1330,10 +1323,14 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
                         }
                     }
                 } else if (object.getString("responseCode").equalsIgnoreCase("101")) {
-                    if (object.has("responseMsg"))
-                        customDialog_Common("Money Transfer", null, null, "KYCLAYOUT", object.getString("responseMsg"));
+                    if (object.has("responseMessage")) {
+                        dialog.dismiss();
+                        customReceiptNew("Transaction Receipt", object, BC6TransferFragment.this);
+                    }
+                    // customDialog_Common("Money Transfer", null, null, "KYCLAYOUT", object.getString("responseMessage"));
                     else
-                        customDialog_Common("Money Transfer", null, null, "KYCLAYOUT", object.getString("responseMessage"));
+                        customReceiptNew("Transaction Receipt", object, BC6TransferFragment.this);
+                    //  customDialog_Common("Money Transfer", null, null, "KYCLAYOUT", object.getString("responseMsg"));
                 } else if (object.getString("responseCode").equalsIgnoreCase("102")) {
                     dialog.dismiss();
                     customDialog_Common(object.getString("responseMessage"));
@@ -1343,6 +1340,8 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
                 } else if (object.getString("responseCode").equalsIgnoreCase("60147")) {
                     Toast.makeText(getActivity(), object.getString("responseMessage"), Toast.LENGTH_LONG).show();
                     setBack_click1(getActivity());
+                } else if (object.getString("responseCode").equalsIgnoreCase("60146")) {
+                    customDialog_Common(object.getString("responseMessage"));
                 } else if (object.getString("responseCode").equalsIgnoreCase("60003")) {
                     customDialog_Common(object.getString("responseMessage"));
                     btn_otpsubmit.setClickable(true);
@@ -1353,9 +1352,6 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
                     if (object.has("responseMessage")) {
                         // dialog.dismiss();
                         customDialog_Common(object.getString("responseMessage"));
-                    } else if (object.has("respnseMessage")) {
-                        // dialog.dismiss();
-                        customDialog_Common(object.getString("respnseMessage"));
                     } else if (object.has("responseMsg"))
                         customDialog_Common(object.getString("responseMsg"));
                 }
@@ -1574,7 +1570,7 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
                         btn_ifsc.requestFocus();
                     } else {
 //                        transfer_type=input;
-                        new WalletAsyncMethod(WebConfig.BC2RemittanceApp, addBeneAccount(accountNo, btn_ifsc.getText().toString(), beneName, "D", "NEFT").toString(), headerData, BC2TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+                        new WalletAsyncMethod(WebConfig.BC6RemittanceApp, addBeneAccount(accountNo, btn_ifsc.getText().toString(), beneName, "D", "NEFT").toString(), headerData, BC6TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
                         dialog.dismiss();
                     }
                 }
@@ -1631,7 +1627,7 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
                         btn_ok.setClickable(true);
                     } else {
                         transfer_type = input;
-                        new WalletAsyncMethod(WebConfig.BC2RemittanceApp, service_fee(ben_amount.getText().toString(), "DMT_BC_AC_TRANSFER").toString(), headerData, BC2TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+                        new WalletAsyncMethod(WebConfig.BC6RemittanceApp, service_fee(ben_amount.getText().toString(), "DMT_BC_AC_TRANSFER").toString(), headerData, BC6TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
                         dialog.dismiss();
                     }
                 }
@@ -1703,7 +1699,7 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
                 customView(alertLayout, msg, dialog);
             } else if (msg.equalsIgnoreCase("VerifyLayout")) {
                 if (type.equalsIgnoreCase("Fund Transfer Details"))
-                    customReceiptNew(type, object, BC2TransferFragment.this);
+                    customReceiptNew(type, object, BC6TransferFragment.this);
                 else {
                     btn_ok.setText("Add Beneficiary");
                     alertLayout.findViewById(R.id.verifytransferlayout).setVisibility(View.VISIBLE);
@@ -1735,17 +1731,17 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
                         if (!object.getString("subType").equalsIgnoreCase("Money_Transfer")) {
                             if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && newtpin.getText().toString().length() == 4) {
                                 //need to change for bc2
-                                new WalletAsyncMethod(WebConfig.BC2DMTBC2Service, getMoney_Validate(ben_amount.getText().toString(), object, pozo.getBeneficiaryId()).toString(), headerData, BC2TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+                                new WalletAsyncMethod(WebConfig.BC6DMTBC6Service, getMoney_Validate(ben_amount.getText().toString(), object, pozo.getBeneficiaryId()).toString(), headerData, BC6TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
 
                             } else if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && (newtpin.getText().toString().isEmpty() || newtpin.getText().toString().length() != 4)) {
                                 newtpin.setError("Please enter TPIN");
                                 newtpin.requestFocus();
                             } else if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("N")) {
                                 //need to change for bc2
-                                new WalletAsyncMethod(WebConfig.BC2DMTBC2Service, getMoney_Validate(ben_amount.getText().toString(), object, pozo.getBeneficiaryId()).toString(), headerData, BC2TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+                                new WalletAsyncMethod(WebConfig.BC6DMTBC6Service, getMoney_Validate(ben_amount.getText().toString(), object, pozo.getBeneficiaryId()).toString(), headerData, BC6TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
                             }
                         } else {
-                            new WalletAsyncMethod(WebConfig.FUNDTRANSFER_URL, getJson_Validate().toString(), headerData, BC2TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+                            new WalletAsyncMethod(WebConfig.FUNDTRANSFER_URL, getJson_Validate().toString(), headerData, BC6TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
                             dialog.dismiss();
                         }
                     } catch (Exception e) {
@@ -1762,14 +1758,14 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
                         ben_amount.setError("Maximum transfer amount would be " + limit + ".");
                         ben_amount.requestFocus();
                     } else {
-                        new WalletAsyncMethod(WebConfig.BC2RemittanceApp, service_fee(ben_amount.getText().toString(), "Money_Transfer_Bene").toString(), headerData, BC2TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+                        new WalletAsyncMethod(WebConfig.BC6RemittanceApp, service_fee(ben_amount.getText().toString(), "Money_Transfer_Bene").toString(), headerData, BC6TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
                         dialog.dismiss();
                     }
                 } else if (type.equalsIgnoreCase("KYCLAYOUTLAY")) {
-                    new WalletAsyncMethod(WebConfig.BC2RemittanceApp, getSender_Validate().toString(), headerData, BC2TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+                    new WalletAsyncMethod(WebConfig.BC6RemittanceApp, getSender_Validate().toString(), headerData, BC6TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
                     dialog.dismiss();
                 } else if (type.equalsIgnoreCase("Beneficiary Details")) {
-                    new WalletAsyncMethod(WebConfig.BC2RemittanceApp, delete_Benef((BeneficiaryDetailsPozo) pozo).toString(), headerData, BC2TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+                    new WalletAsyncMethod(WebConfig.BC6RemittanceApp, delete_Benef((BeneficiaryDetailsPozo) pozo).toString(), headerData, BC6TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
                     dialog.dismiss();
                 } else if (type.equalsIgnoreCase("Money Transfer") || type.equalsIgnoreCase("Account Verify Details") || type.equalsIgnoreCase("Cannot generate receipt now please try later!")) {
                     input_account.setText("");
@@ -1778,7 +1774,7 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
                     dialog.dismiss();
                     if (type.equalsIgnoreCase("Account Verify Details")) {
                         try {
-                            new WalletAsyncMethod(WebConfig.BC2RemittanceApp, addBeneAccount(object.getString("accountNo"), object.getString("ifscCode"), object.getString("bankAccountName"), "C", "IMPS").toString(), headerData, BC2TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+                            new WalletAsyncMethod(WebConfig.BC6RemittanceApp, addBeneAccount(object.getString("accountNo"), object.getString("ifscCode"), object.getString("bankAccountName"), "C", "IMPS").toString(), headerData, BC6TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
 //                            alertDialog.dismiss();
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -1819,10 +1815,10 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
             clear();
             receipt_clicked = false;
         } else if (type.equalsIgnoreCase("KYCLAYOUTS"))
-            new WalletAsyncMethod(WebConfig.BC2RemittanceApp, getSender_Validate().toString(), headerData, BC2TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+            new WalletAsyncMethod(WebConfig.BC6RemittanceApp, getSender_Validate().toString(), headerData, BC6TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
         else if (type.equalsIgnoreCase("Fund Transfer Details")) {
 //            localStorage.setActivityState(LocalStorage.ROUTESTATE, "UPDATE");
-            new WalletAsyncMethod(WebConfig.BC2RemittanceApp, getSender_Validate().toString(), headerData, BC2TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+            new WalletAsyncMethod(WebConfig.BC6RemittanceApp, getSender_Validate().toString(), headerData, BC6TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
         }
     }
 

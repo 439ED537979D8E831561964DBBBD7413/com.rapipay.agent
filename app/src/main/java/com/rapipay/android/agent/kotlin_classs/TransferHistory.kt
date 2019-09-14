@@ -54,8 +54,15 @@ class TransferHistory : BaseFragment(), RequestHandler, View.OnClickListener {
         selectedDate = calendar.get(Calendar.DAY_OF_MONTH)
         selectedMonth = calendar.get(Calendar.MONTH) + 1
         selectedYear = calendar.get(Calendar.YEAR)
-        date2_text!!.setText("$selectedYear-$selectedMonth-$selectedDate")
-        date1_text!!.setText("$selectedYear-$selectedMonth-$selectedDate")
+        if (selectedMonth < 11)
+            date2_text!!.setText("$selectedYear-"+"0$selectedMonth-"+"$selectedDate")
+        else
+            date2_text!!.setText("$selectedYear-$selectedMonth-$selectedDate")
+        if (selectedMonth < 11)
+            date1_text!!.setText("$selectedYear-"+"0$selectedMonth-"+"$selectedDate")
+        else
+            date1_text!!.setText("$selectedYear-$selectedMonth-$selectedDate")
+
         loadUrl()
         toimage!!.setOnClickListener(toDateClicked)
         fromimage = v.findViewById<View>(R.id.fromimage) as ImageView

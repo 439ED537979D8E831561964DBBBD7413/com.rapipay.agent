@@ -71,6 +71,7 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
     View rv;
     private long mLastClickTime = System.currentTimeMillis();
     private static final long CLICK_TIME_INTERVAL = 1000;
+    boolean listitem_clickable = true;
    /* RadioGroup radioGroup;
     RadioButton bc1id, bc2id;
     boolean radioflag = false;
@@ -193,39 +194,50 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
         beneficiary_details.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), beneficiary_details, new ClickListener() {
             @Override
             public void onClick(View view, int position) {
-                beneficiary_details.setClickable(false);
-                if (beneficiaryDetailsPozoslist.size() != 0) {
-                    pozo = beneficiaryDetailsPozoslist.get(position);
-                    if (pozo.getIsNEFT().equalsIgnoreCase("N") && pozo.getIsIMPS().equalsIgnoreCase("Y"))
-                        customFundTransfer("Fund Transfer", null, pozo, "Sure you want to Transfer?", "IMPS");
-                    else if (pozo.getIsNEFT().equalsIgnoreCase("Y") && pozo.getIsIMPS().equalsIgnoreCase("N"))
-                        customFundTransfer("Fund Transfer", null, pozo, "Sure you want to Transfer?", "NEFT");
-                    else
-                        customDialog_Common("BENLAYOUT", null, pozo, "Fund Transfer Type", null);
+                if (listitem_clickable) {
+                    if (beneficiaryDetailsPozoslist.size() != 0) {
+                        pozo = beneficiaryDetailsPozoslist.get(position);
+                        if (pozo.getIsNEFT().equalsIgnoreCase("N") && pozo.getIsIMPS().equalsIgnoreCase("Y")) {
+                            listitem_clickable = false;
+                            customFundTransfer("Fund Transfer", null, pozo, "Sure you want to Transfer?", "IMPS");
+                        } else if (pozo.getIsNEFT().equalsIgnoreCase("Y") && pozo.getIsIMPS().equalsIgnoreCase("N")) {
+                            listitem_clickable = false;
+                            customFundTransfer("Fund Transfer", null, pozo, "Sure you want to Transfer?", "NEFT");
+                        } else {
+                            listitem_clickable = false;
+                            customDialog_Common("BENLAYOUT", null, pozo, "Fund Transfer Type", null);
+                        }
+                    }
                 }
             }
 
             @Override
             public void onLongClick(View view, int position) {
-                beneficiary_details.setClickable(false);
-                if (beneficiaryDetailsPozoslist.size() != 0) {
-                    pozo = beneficiaryDetailsPozoslist.get(position);
-                    customDialog_Common("Beneficiary Details", null, pozo, "Sure you want to Delete Beneficiary?", "");
+                if (listitem_clickable) {
+                    listitem_clickable = false;
+                    if (beneficiaryDetailsPozoslist.size() != 0) {
+                        pozo = beneficiaryDetailsPozoslist.get(position);
+                        customDialog_Common("Beneficiary Details", null, pozo, "Sure you want to Delete Beneficiary?", "");
+                    }
                 }
             }
         }));
+
         trans_details.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), trans_details, new ClickListener() {
             @Override
             public void onClick(View view, int position) {
-                long now = System.currentTimeMillis();
-                if (now - mLastClickTime < CLICK_TIME_INTERVAL) {
-                    return;
-                }
-                mLastClickTime = now;
-                if (transactionPozoArrayList.size() != 0 && !receipt_clicked) {
-                    receipt_clicked = true;
-                    LastTransactionPozo pozo = transactionPozoArrayList.get(position);
-                    new WalletAsyncMethod(WebConfig.WALLETRECEIPTURL, receipt_request(pozo).toString(), headerData, BCTransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+                if (listitem_clickable) {
+                    listitem_clickable = false;
+                    long now = System.currentTimeMillis();
+                    if (now - mLastClickTime < CLICK_TIME_INTERVAL) {
+                        return;
+                    }
+                    mLastClickTime = now;
+                    if (transactionPozoArrayList.size() != 0 && !receipt_clicked) {
+                        receipt_clicked = true;
+                        LastTransactionPozo pozo = transactionPozoArrayList.get(position);
+                        new WalletAsyncMethod(WebConfig.WALLETRECEIPTURL, receipt_request(pozo).toString(), headerData, BCTransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+                    }
                 }
             }
 
@@ -253,10 +265,6 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
                     new WalletAsyncMethod(WebConfig.BCRemittanceApp, getSender_Validate().toString(), headerData, BCTransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
                 else
                     reset();
-               /* } else {
-                    input_mobile.setEnabled(false);
-                    Toast.makeText(getActivity(), "Please select BC fund transfer type", Toast.LENGTH_LONG).show();
-                }*/
             }
         });
         searchfield.addTextChangedListener(new TextWatcher() {
@@ -1001,6 +1009,7 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
             @Override
             public void onClick(View v) {
                 btn_ok.setClickable(false);
+                listitem_clickable = true;
                 hideKeyboard(getActivity());
                 if (type.equalsIgnoreCase("Fund Transfer")) {
                     if (!ImageUtils.commonAmount(ben_amount.getText().toString())) {
@@ -1026,6 +1035,7 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
         btn_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                listitem_clickable = true;
                 btn_cancel.setClickable(false);
                 bank_select.setText("Select Bank");
                 input_account.setText("");
@@ -1110,6 +1120,7 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
             @Override
             public void onClick(View v) {
                 hideKeyboard(getActivity());
+                listitem_clickable = true;
                 if (type.equalsIgnoreCase("BENLAYOUT")) {
                     customFundTransfer("Fund Transfer", null, pozo, "Sure you want to Transfer?", btn_ok.getText().toString());
                     dialog.dismiss();
@@ -1173,6 +1184,7 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
             @Override
             public void onClick(View v) {
                 btn_cancel.setClickable(false);
+                listitem_clickable = true;
                 if (type.equalsIgnoreCase("BENLAYOUT")) {
                     customFundTransfer("Fund Transfer", null, pozo, "Sure you want to Transfer?", btn_cancel.getText().toString());
                 }
@@ -1185,6 +1197,7 @@ public class BCTransferFragment extends BaseFragment implements View.OnClickList
         dialog_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                listitem_clickable = true;
                 dialog.dismiss();
             }
         });
