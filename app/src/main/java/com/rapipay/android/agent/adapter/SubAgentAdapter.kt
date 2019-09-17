@@ -28,6 +28,7 @@ class SubAgentAdapter(private val context: Context,private val mValue: ArrayList
             limit = mView.findViewById<View>(R.id.limit)as TextView
         }
     }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SubAgentAdapter.ViewHolder {
         var view = LayoutInflater.from(parent.context).inflate(R.layout.subagent_adap_lay, parent, false) as View
         return ViewHolder(view)
@@ -43,6 +44,7 @@ class SubAgentAdapter(private val context: Context,private val mValue: ArrayList
         holder.status.text=mValue.get(position).status
         holder.limit.text=formatss(mValue.get(position).currentLimit)
     }
+
     private fun formatss(amount: String): String? {
         try {
             val formatter = NumberFormat.getInstance(Locale("en", "IN"))
@@ -50,8 +52,6 @@ class SubAgentAdapter(private val context: Context,private val mValue: ArrayList
         } catch (e: Exception) {
             e.printStackTrace()
         }
-
         return null
     }
-
 }
