@@ -28,7 +28,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.rapipay.android.agent.BuildConfig;
-import com.rapipay.android.agent.Database.RapipayDB;
 import com.rapipay.android.agent.Model.BankDetailsPozo;
 import com.rapipay.android.agent.Model.DeviceDetailsPozo;
 import com.rapipay.android.agent.Model.HeaderePozo;
@@ -158,10 +157,10 @@ public class MainActivity extends BaseCompactActivity
         switch (v.getId()) {
             case R.id.reset:
                 loadBalance();
+                tv.setText("");
+                tv.setVisibility(View.GONE);
                 DashBoardFragments.movablefloating.setVisibility(View.GONE);
-                //  tv.setText("");
                 DashBoardFragments.bankdetails.setVisibility(View.VISIBLE);
-                tv.setVisibility(View.VISIBLE);
                 break;
             case R.id.bankde:
                 Intent intent = new Intent(MainActivity.this, BankDetails.class);
@@ -222,6 +221,7 @@ public class MainActivity extends BaseCompactActivity
         back_click = (ImageView) findViewById(R.id.back_click);
         tv = (TextView) this.findViewById(R.id.mywidget);
         tv.setSelected(true);
+        tv.setSingleLine(true);
         reset.setColorFilter(getResources().getColor(R.color.colorPrimaryDark));
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         if (Build.VERSION.SDK_INT >= 9) {
@@ -257,6 +257,7 @@ public class MainActivity extends BaseCompactActivity
             loadImageFromStorage("image.jpg", ivHeaderPhoto, localStorage.getActivityState(LocalStorage.IMAGEPATH));
         TextView name_agent = (TextView) headerLayout.findViewById(R.id.name_agent);
         name_agent.setText(list.get(0).getAgentName());
+        Log.e("agent name=",list.get(0).getAgentName());
         ivHeaderPhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -382,7 +383,6 @@ public class MainActivity extends BaseCompactActivity
         expandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-
                 if (childList.get(headerList.get(groupPosition)) != null) {
                     MenuModel model = childList.get(headerList.get(groupPosition)).get(childPosition);
                     int index = parent.getFlatListPosition(ExpandableListView.getPackedPositionForChild(groupPosition, childPosition));
@@ -696,6 +696,7 @@ public class MainActivity extends BaseCompactActivity
                 else if (object.getString("headerValue").equalsIgnoreCase("Notice")) {
                     tv.setText(object.getString("headerData"));
                     tv.setVisibility(View.VISIBLE);
+                    //  Log.e("notification",object.getString("headerData"));
                 } else if (object.getString("headerValue").equalsIgnoreCase("BANK_LIVE_ST")) {
                     bankdetails = object.getString("headerData").replace(",", "\n");
 //                    customDialog_Common("KYCLAYOUTS", null, null, "Banl Update", "", object.getString("headerData").replace(",","\n"), MainActivity.this);
