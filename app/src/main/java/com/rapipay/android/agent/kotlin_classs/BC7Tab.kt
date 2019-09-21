@@ -41,7 +41,6 @@ class BC7Tab : BaseCompactActivity(), View.OnClickListener{
         fragment_credit = BC7TransferFragment()
         transFragment = TransferHistory()
         transFragment!!.setArguments(bundle!!)
-
         tabLayout!!.addTab(tabLayout!!.newTab().setText("BC Transfer"), true)
         tabLayout!!.addTab(tabLayout!!.newTab().setText("Transaction History"))
     }

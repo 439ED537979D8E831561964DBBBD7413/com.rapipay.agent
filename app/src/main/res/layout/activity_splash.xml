@@ -53,9 +53,29 @@
         android:textSize="16dp"
         android:textStyle="italic" />
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_below="@+id/textview2"
+        android:layout_above="@+id/ln_bottom"
+        >
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="50dp"
+            android:id="@+id/gifimageview"
+            android:layout_gravity="center"
+            android:layout_marginLeft="15dp"
+            android:padding="10dp"
+            android:layout_centerInParent="true"
+            android:scaleType="centerCrop"
+            android:src="@drawable/overlay_loader" />
+    </RelativeLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:id="@+id/ln_bottom"
         android:layout_alignParentBottom="true"
         android:orientation="horizontal">
 

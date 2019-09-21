@@ -38,7 +38,7 @@
                 android:visibility="gone" />
 
             <!--  Email Label -->
-            <android.support.design.widget.TextInputLayout
+            <!--<android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
@@ -54,7 +54,45 @@
                     android:maxLength="10"
                     android:textStyle="bold"
                     android:textSize="16dp" />
-            </android.support.design.widget.TextInputLayout>
+            </android.support.design.widget.TextInputLayout>-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="800">
+                <!--  Email Label -->
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_weight="700">
+
+                    <EditText
+                        android:id="@+id/input_mobile"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/p_cususerid"
+                        android:inputType="number"
+                        android:maxLength="10"
+                        android:textSize="16dp" />
+                </android.support.design.widget.TextInputLayout>
+
+                <ImageView
+                    android:id="@+id/btn_search"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_margin="5dp"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_weight="100"
+                    android:onClick="onClick"
+                    android:clickable="true"
+                    android:src="@drawable/contact_asps"
+                    android:text="@string/btnsearch"
+                    android:textColor="@color/white"
+                    android:textSize="10dp" />
+            </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/sender_layout"
@@ -170,8 +208,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="5dp"
-                    android:background="@drawable/border_view"
-                    android:padding="10dp"
                     android:spinnerMode="dropdown"
                     android:text="Select Bank" />
 
@@ -238,6 +274,7 @@
                         android:layout_height="wrap_content"
                         android:layout_margin="10dp"
                         android:layout_weight="400"
+                        android:padding="@dimen/margin_10dp"
                         android:background="@drawable/border_button"
                         android:clickable="true"
                         android:onClick="onClick"
@@ -297,6 +334,7 @@
                     android:id="@+id/beneficiary_details"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:clickable="false"
                     android:layout_gravity="center_horizontal"
                     android:layout_marginTop="5dp"
                     android:gravity="center_horizontal" />

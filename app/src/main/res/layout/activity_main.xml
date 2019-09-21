@@ -30,6 +30,7 @@
             android:layout_marginTop="@dimen/nav_header_height"
             android:background="@android:color/white"
             android:dividerHeight="0dp"
+            android:layout_gravity="center_horizontal"
             android:choiceMode = "singleChoice"
             android:listSelector = "@drawable/selector_list_item"
             android:layout_marginBottom="50dp"
@@ -43,6 +44,7 @@
             android:layout_gravity="bottom"
             android:gravity="center"
             android:textSize="12dp"
+            android:textStyle="italic"
             android:text="Contact Us @ 011-47822261"
             android:textColor="@color/black"
             android:visibility="visible"/>
@@ -53,6 +55,7 @@
             android:layout_gravity="bottom"
             android:gravity="center"
             android:textSize="12dp"
+            android:textStyle="italic"
             android:text="Version"
             android:textColor="@color/black"/>
     </android.support.design.widget.NavigationView>

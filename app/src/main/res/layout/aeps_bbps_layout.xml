@@ -12,156 +12,440 @@
         <include layout="@layout/toolbar" />
     </android.support.design.widget.AppBarLayout>
 
-    <!--<android.support.v4.widget.NestedScrollView-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent"-->
-    <!--android:background="@color/white"-->
-    <!--app:layout_behavior="@string/appbar_scrolling_view_behavior">-->
-
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:theme="@style/AppTheme"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        android:layout_marginTop="55dp">
 
-        <TextView
-            android:id="@+id/heading"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/colorPrimaryDark"
-            android:gravity="center"
-            android:padding="5dp"
-            android:text="@string/pchist"
-            android:textColor="@color/white"
-            android:visibility="gone" />
-        <!--  Email Label -->
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="5dp"
-            android:weightSum="800">
+            android:orientation="vertical"
+            android:theme="@style/AppTheme"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-            <android.support.design.widget.TextInputLayout
-                android:id="@+id/mobile_top"
-                android:layout_width="0dp"
+            <LinearLayout
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="650">
+                android:layout_gravity="center_horizontal"
+                android:gravity="center_horizontal"
+                android:orientation="horizontal"
+                android:theme="@style/AppTheme">
 
-                <EditText
-                    android:id="@+id/input_mobile"
+                <RadioGroup
+                    android:id="@+id/myRadioGroup"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/p_mobile"
-                    android:inputType="number"
-                    android:maxLength="10"
-                    android:textSize="16dp" />
-            </android.support.design.widget.TextInputLayout>
+                    android:layout_margin="10dp"
+                    android:checkedButton="@+id/sound"
+                    android:orientation="horizontal"
+                    android:weightSum="800">
 
-            <ImageView
-                android:id="@+id/btn_contact"
-                android:layout_width="0dp"
-                android:layout_height="50dp"
-                android:layout_weight="150"
-                android:clickable="true"
-                android:onClick="onClick"
-                android:src="@drawable/contactsicon"
-                android:textColor="@color/white" />
-        </LinearLayout>
+                    <RadioButton
+                        android:id="@+id/cashid"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="400"
+                        android:text="@string/aeps1cashwithdraw"
+                        android:textSize="14dp"
+                        android:textStyle="bold|italic" />
 
-        <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_marginTop="8dp">
+                    <RadioButton
+                        android:id="@+id/balanceid"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="@dimen/margin_20dp_activity_login"
+                        android:layout_weight="400"
+                        android:text="@string/aeps1balenq"
+                        android:textSize="14dp"
+                        android:textStyle="bold|italic" />
 
-            <EditText
-                android:id="@+id/input_amount"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/p_amount"
-                android:inputType="number"
-                android:maxLength="10"
-                android:textSize="16dp" />
-        </android.support.design.widget.TextInputLayout>
-        <TextView
-            android:padding="10dp"
-            android:id="@+id/input_texts"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="13dp"
-            android:textColor="@color/red"
-            android:visibility="gone"/>
-        <Spinner
-            android:id="@+id/select_deviceid"
-            style="@style/Widget.AppCompat.Spinner.Underlined"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
-            android:layout_marginTop="5dp"
-            android:spinnerMode="dropdown"
-            android:visibility="gone" />
-        <AutoCompleteTextView
-            android:id="@+id/input_deviceid"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Enter DeviceID"
-            android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-            android:maxLength="15"
-            android:textSize="16dp"
-            android:visibility="visible">
-            <requestFocus />
-        </AutoCompleteTextView>
+                </RadioGroup>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:weightSum="800">
-
-            <android.support.v7.widget.AppCompatButton
-                android:id="@+id/btn_submit_aeps"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:layout_weight="400"
-                android:background="@drawable/border_button"
-                android:onClick="onClick"
-                android:text="@string/btnsubmit"
-                android:textColor="@color/white"
-                android:textSize="10dp" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/pending_tran_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:orientation="vertical"
-            android:visibility="gone">
+            </LinearLayout>
 
             <TextView
+                android:id="@+id/heading"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:background="@color/colorPrimaryDark"
                 android:gravity="center"
                 android:padding="5dp"
-                android:text="Pending Transaction Details"
+                android:text="@string/pchist"
                 android:textColor="@color/white"
-                android:textSize="14dp" />
+                android:visibility="gone" />
 
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/pendingtrans_details"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
+                android:orientation="horizontal"
+                android:padding="5dp"
+                android:weightSum="900">
+
+                <LinearLayout
+                    android:id="@+id/ln_morpho"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="300"
+                    android:clickable="true"
+                    android:onClick="onClick"
+                    android:orientation="vertical"
+                    android:padding="5dp">
+
+                    <LinearLayout
+                        android:layout_width="120dp"
+                        android:layout_height="50dp"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_weight="100"
+                        android:gravity="bottom"
+                        android:orientation="horizontal"
+                        android:padding="5dp">
+
+                        <ImageView
+                            android:id="@+id/img_morpho"
+                            android:layout_width="80dp"
+                            android:layout_height="50dp"
+                            android:layout_weight="150"
+                            android:src="@drawable/morpho_device"
+                            android:textColor="@color/white" />
+
+                        <ImageView
+                            android:id="@+id/img_morpho_check"
+                            android:layout_width="20dp"
+                            android:layout_height="50dp"
+                            android:layout_weight="10"
+                            android:src="@drawable/check"
+                            android:textColor="@color/white"
+                            android:visibility="gone" />
+
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="@dimen/margin_10dp"
+                        android:gravity="center"
+                        android:text="Morpho"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/ln_mantra"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="300"
+                    android:clickable="true"
+                    android:onClick="onClick"
+                    android:orientation="vertical"
+                    android:padding="5dp">
+
+                    <LinearLayout
+                        android:layout_width="120dp"
+                        android:layout_height="50dp"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_weight="100"
+                        android:gravity="bottom"
+                        android:orientation="horizontal"
+                        android:padding="5dp">
+
+                        <ImageView
+                            android:id="@+id/img_mantra"
+                            android:layout_width="wrap_content"
+                            android:layout_height="40dp"
+                            android:src="@drawable/mantra_device"
+                            android:textColor="@color/white" />
+
+                        <ImageView
+                            android:id="@+id/img_mantra_check"
+                            android:layout_width="20dp"
+                            android:layout_height="50dp"
+                            android:layout_weight="10"
+                            android:src="@drawable/check"
+                            android:textColor="@color/white"
+                            android:visibility="gone" />
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginRight="@dimen/margin_10dp"
+                        android:gravity="center"
+                        android:text="Mantra"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/ln_startek"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="300"
+                    android:clickable="true"
+                    android:onClick="onClick"
+                    android:orientation="vertical"
+                    android:padding="5dp">
+
+                    <LinearLayout
+                        android:layout_width="120dp"
+                        android:layout_height="50dp"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_weight="100"
+                        android:gravity="bottom"
+                        android:orientation="horizontal"
+                        android:padding="5dp">
+
+                        <ImageView
+                            android:id="@+id/img_startek"
+                            android:layout_width="100dp"
+                            android:layout_height="50dp"
+                            android:layout_weight="150"
+                            android:src="@drawable/startek_device"
+                            android:textColor="@color/white" />
+
+                        <ImageView
+                            android:id="@+id/img_startek_check"
+                            android:layout_width="20dp"
+                            android:layout_height="50dp"
+                            android:layout_weight="10"
+                            android:src="@drawable/check"
+                            android:textColor="@color/white"
+                            android:visibility="gone" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginRight="@dimen/margin_20dp_activity_login"
+                        android:gravity="center"
+                        android:text="Startek"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+            <!-- <Spinner
+                 android:id="@+id/select_device"
+                 style="@style/Widget.AppCompat.Spinner.Underlined"
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content"
+                 android:layout_marginTop="@dimen/margin_10dp"
+                 android:layout_marginBottom="5dp"
+                 android:spinnerMode="dropdown" />-->
+            <!--  Email Label -->
+            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="5dp"
+                android:weightSum="800">
+
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/mobile_top"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="650">
+
+                    <EditText
+                        android:id="@+id/input_mobile"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/p_mobile"
+                        android:inputType="number"
+                        android:maxLength="10"
+                        android:textSize="16dp" />
+                </android.support.design.widget.TextInputLayout>
+
+                <ImageView
+                    android:id="@+id/btn_contact"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="150"
+                    android:clickable="true"
+                    android:onClick="onClick"
+                    android:src="@drawable/contact_asps"
+                    android:textColor="@color/white" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ln_amount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="5dp">
+
+                    <EditText
+                        android:id="@+id/input_amount"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/p_amount"
+                        android:inputType="number"
+                        android:maxLength="10"
+                        android:textSize="16dp" />
+                </android.support.design.widget.TextInputLayout>
+
+                <TextView
+                    android:id="@+id/input_texts"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/red"
+                    android:textSize="13dp"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+            <Spinner
+                android:id="@+id/select_deviceid"
+                style="@style/Widget.AppCompat.Spinner.Underlined"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                android:gravity="center_horizontal" />
+                android:layout_marginBottom="5dp"
+                android:spinnerMode="dropdown"
+                android:visibility="gone" />
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:id="@+id/bank_select"
+                    style="@style/Widget.AppCompat.Spinner.Underlined"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:spinnerMode="dropdown"
+                    android:text="Select Bank"
+                    android:textSize="14dp" />
+
+            </android.support.design.widget.TextInputLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal">
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="200">
+
+                    <AutoCompleteTextView
+                        android:id="@+id/input_deviceid"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+                        android:hint="Enter Aadhar Number"
+                        android:inputType="number"
+                        android:maxLength="15"
+                        android:textSize="16dp"
+                        android:visibility="visible">
+
+                    </AutoCompleteTextView>
+                </android.support.design.widget.TextInputLayout>
+
+                <TextView
+                    android:id="@+id/adhar_select"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="@dimen/margin_5dp"
+                    android:layout_marginRight="@dimen/margin_5dp"
+                    android:background="@color/violet"
+                    android:text="Change Aadhar"
+                    android:textColor="@color/white"
+                    android:textSize="14dp"
+                    android:visibility="gone" />
+
+            </LinearLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="5dp">
+
+                <EditText
+                    android:id="@+id/input_userid"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Enter name"
+                    android:textSize="16dp">
+
+                </EditText>
+            </android.support.design.widget.TextInputLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="horizontal"
+                android:weightSum="800">
+
+                <android.support.v7.widget.AppCompatButton
+                    android:id="@+id/btn_capture"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:layout_weight="300"
+                    android:background="@drawable/border_button"
+                    android:onClick="onClick"
+                    android:text="Capture"
+                    android:textColor="@color/white"
+                    android:textSize="12dp"
+                    android:visibility="gone" />
+
+                <android.support.v7.widget.AppCompatButton
+                    android:id="@+id/btn_submit_aeps"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:layout_weight="300"
+                    android:background="@drawable/border_button"
+                    android:onClick="onClick"
+                    android:text="@string/btnsubmit"
+                    android:textColor="@color/white"
+                    android:textSize="12dp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/pending_tran_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/pending"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/colorPrimaryDark"
+                    android:gravity="center"
+                    android:padding="5dp"
+                    android:text="Pending Transaction Details"
+                    android:textColor="@color/white"
+                    android:textSize="14dp" />
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/pendingtrans_details"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="5dp"
+                    android:gravity="center_horizontal" />
+            </LinearLayout>
+
         </LinearLayout>
-
-    </LinearLayout>
-
+    </ScrollView>
     <!--</android.support.v4.widget.NestedScrollView>-->
 </android.support.design.widget.CoordinatorLayout>

@@ -90,7 +90,7 @@ public class BC7TransferFragment extends BaseFragment implements View.OnClickLis
     ArrayList<BeneficiaryDetailsPozo> beneficiaryDetailsPozoslist;
     ArrayList<LastTransactionPozo> transactionPozoArrayList;
     BeneficiaryDetailsPozo pozo;
-    String amount = "", mobileNo;
+    String amount = "";
     TextView bene_number, bene_name, newtin;
     float limit;
     RelativeLayout addbc2details;
@@ -104,7 +104,7 @@ public class BC7TransferFragment extends BaseFragment implements View.OnClickLis
     boolean isFabClick = false;
     private TextInputLayout state_update_top, gender_layout, document_layout;
     boolean isFabClick1 = false;
-    Spinner bank_district, bank_city, account_type, gender_spinner, spinner_docType;
+    Spinner gender_spinner, spinner_docType;
     ArrayList<PaymentModePozo> list_gender = null;
     ArrayAdapter<String> adapter_doc;
     String headerData;
@@ -112,6 +112,7 @@ public class BC7TransferFragment extends BaseFragment implements View.OnClickLis
     AutofitTextView date_text;
     String[] items = new String[]{"Select Document Type", "Aadhaar Card", "Voter ID", "Driving License", "Passport", "Rasan Card", "Pan Card", "Indian Citizenship"};
     View rv;
+    int years = 0, beforeyear = 0;
 
 
     @Override
@@ -145,6 +146,7 @@ public class BC7TransferFragment extends BaseFragment implements View.OnClickLis
         selectedDate = calendar.get(Calendar.DAY_OF_MONTH);
         selectedMonth = calendar.get(Calendar.MONTH) + 1;
         selectedYear = calendar.get(Calendar.YEAR);
+        beforeyear = selectedYear;
         fab = (MovableFloatingActionButton) rv.findViewById(R.id.fab);
         fab.setOnClickListener(this);
         rv.findViewById(R.id.btn_submit).setOnClickListener(this);
@@ -195,6 +197,7 @@ public class BC7TransferFragment extends BaseFragment implements View.OnClickLis
         btn_sender = (ImageView) rv.findViewById(R.id.btn_sender);
         btn_sender.setOnClickListener(this);
         getActivity().findViewById(R.id.reset).setOnClickListener(this);
+        getActivity().findViewById(R.id.reset).setVisibility(View.GONE);
         btn_sender.setColorFilter(getResources().getColor(R.color.colorPrimaryDark));
         sender_layout = (LinearLayout) rv.findViewById(R.id.sender_layout);
         sender_layout1 = (LinearLayout) rv.findViewById(R.id.sender_layout1);
@@ -284,10 +287,10 @@ public class BC7TransferFragment extends BaseFragment implements View.OnClickLis
             @Override
             public void afterTextChanged(Editable s) {
                 //  if (flagdevicetype > 0) {
-                if (s.length() == 10)
-                    new WalletAsyncMethod(WebConfig.BC7RemittanceApp, getSender_Validate().toString(), headerData, BC7TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
-
-                else {
+                if (s.length() == 10) {
+                    clear();
+                    new WalletAsyncMethod(WebConfig.BC2RemittanceApp, getSender_Validate().toString(), headerData, BC7TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+                } else {
                     reset();
                     fab.setVisibility(View.GONE);
                     getActivity().findViewById(R.id.btn_submit).setVisibility(View.GONE);
@@ -421,16 +424,6 @@ public class BC7TransferFragment extends BaseFragment implements View.OnClickLis
             e.printStackTrace();
         }
         return jsonObject;
-    }
-
-    public void notselectpinApi() {
-        city.setText("");
-        district.setText("");
-        state_update.setText("");
-        flagstate = 0;
-        select_state.setClickable(true);
-        state_update_top.setVisibility(View.GONE);
-        select_state.setVisibility(View.VISIBLE);
     }
 
     public JSONObject receipt_request(LastTransactionPozo pozo) {
@@ -594,25 +587,125 @@ public class BC7TransferFragment extends BaseFragment implements View.OnClickLis
         return jsonObject;
     }
 
-    protected void customDialog(String msg) {
+    private JSONObject addSenderDetails(String state) {
+        JSONObject jsonObject = new JSONObject();
+        if (!input_mobile.getText().toString().isEmpty() && input_mobile.getText().toString().length() == 10) {
+            try {
+                jsonObject.put("serviceType", "ADD_SENDER_DETAILS");
+                jsonObject.put("requestType", "BC_CHANNEL");
+                jsonObject.put("typeMobileWeb", "mobile");
+                jsonObject.put("transactionID", ImageUtils.miliSeconds());
+                jsonObject.put("nodeAgentId", list.get(0).getMobilno());
+                jsonObject.put("mobileNumber", input_mobile.getText().toString());
+                jsonObject.put("reqFor", "BC7");
+                jsonObject.put("senderName", input_name1.getText().toString());
+                jsonObject.put("senderGender", selectGender);
+                jsonObject.put("senderDoB", date_text.getText().toString());
+                jsonObject.put("senderAddress", address_name.getText().toString());
+                jsonObject.put("docType", docType);
+                jsonObject.put("docID", documentid.getText().toString());
+                jsonObject.put("senderCity", city.getText().toString());
+                jsonObject.put("senderPostalPin", senderpincode.getText().toString());
+                jsonObject.put("senderDistrict", district.getText().toString());
+                jsonObject.put("senderState", state);
+                jsonObject.put("txnIP", shieldsquare_IP2Hex(ImageUtils.ipAddress(getActivity())));
+                jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
+                jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            Toast.makeText(getActivity(), "Enter Mobile Number", Toast.LENGTH_SHORT).show();
+        }
+        return jsonObject;
+    }
+
+    public JSONObject verify_Account(String ifsc, String accountno) {
+        JSONObject jsonObject = new JSONObject();
         try {
-            dialogs = new Dialog(getActivity());
-            LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            View alertLayout = inflater.inflate(R.layout.custom_layout_common, null);
-            alertLayout.setKeepScreenOn(true);
-            TextView text = (TextView) alertLayout.findViewById(R.id.dialog_title);
-            text.setVisibility(View.GONE);
-            TextView dialog_msg = (TextView) alertLayout.findViewById(R.id.dialog_msg);
-            dialog_msg.setText(msg);
-            dialog_msg.setVisibility(View.VISIBLE);
-            alertLayout.findViewById(R.id.btn_cancel).setVisibility(View.GONE);
-            AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
-            btn_ok.setVisibility(View.GONE);
-            dialogs.setContentView(alertLayout);
-            dialogs.show();
+            jsonObject.put("serviceType", "Verify_Account");
+            jsonObject.put("requestType", "BC_CHANNEL");
+            jsonObject.put("typeMobileWeb", "mobile");
+            jsonObject.put("transactionID", ImageUtils.miliSeconds());
+            jsonObject.put("nodeAgentId", list.get(0).getMobilno());
+            jsonObject.put("senderName", input_name.getText().toString().trim());
+            jsonObject.put("IFSC", ifsc);
+            jsonObject.put("accountNo", accountno);
+            jsonObject.put("txnIP", shieldsquare_IP2Hex(ImageUtils.ipAddress(getActivity())));
+            jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
+            jsonObject.put("mobileNumber", input_mobile.getText().toString());
+            jsonObject.put("txnAmmount", "1");
+            jsonObject.put("reqFor", "BC7");
+            jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
+
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return jsonObject;
+        //{"serviceType":"Verify_Account","requestType":"BC_CHANNEL","typeMobileWeb":"mobile","transactionID":"170250160913846","nodeAgentId":"1000000014","senderName":"dggdg","IFSC":"PUNB0061800","accountNo":"4747001700100025","txnIP":"AC1032F6",
+        // "sessionRefNo":"A2MWSFPTCR","mobileNumber":"8668855858","txnAmmount":"1","reqFor":"BC7","checkSum":"E6AB618D47FD9C139730112D511471844AC0BF5E1C892BD0D4C4FD1B83954EF260A5DA4879246F7FA39BBC41B1EE248A783541FE045F7C8444F779C94CF59590"}
+    }
+
+    public JSONObject service_fee(String txnAmmount, String subType) {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("serviceType", "GET_SERVICE_FEE");
+            jsonObject.put("requestType", "BC_CHANNEL");
+            jsonObject.put("typeMobileWeb", "mobile");
+            jsonObject.put("transactionID", ImageUtils.miliSeconds());
+            jsonObject.put("nodeAgentId", list.get(0).getMobilno());
+            jsonObject.put("agentID", list.get(0).getMobilno());
+            jsonObject.put("subType", subType);
+            jsonObject.put("txnAmmount", txnAmmount);
+            jsonObject.put("reqFor", "BC7");
+            jsonObject.put("txnIP", shieldsquare_IP2Hex(ImageUtils.ipAddress(getActivity())));
+            jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
+            jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return jsonObject;
+    }
+
+    // change for BC7
+    public JSONObject getMoney_Validate(String amount, JSONObject object, String beneficiaryId) {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("serviceType", "DMT_BC_AC_TRANSFER");
+            // jsonObject.put("transactionID", ImageUtils.miliSeconds());
+            jsonObject.put("transactionID", object.getString("bcTransactionID"));
+            jsonObject.put("mobileNumber", input_mobile.getText().toString());
+            jsonObject.put("senderName", input_name1.getText().toString().trim());
+            jsonObject.put("txnAmmount", amount);
+            jsonObject.put("beneficiaryId", beneficiaryId);
+            jsonObject.put("nodeAgentId", list.get(0).getMobilno());
+            jsonObject.put("requestType", "BC_Channel");
+            jsonObject.put("typeMobileWeb", "mobile");
+            jsonObject.put("reqFor", "BC7");
+            jsonObject.put("transferType", transfer_type);
+            jsonObject.put("txnIP", shieldsquare_IP2Hex(ImageUtils.ipAddress(getActivity())));
+            jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
+            //  jsonObject.put("IFSC", pozo.getIfsc());
+            if (newtpin.getText().toString().isEmpty())
+                jsonObject.put("tPin", "");
+            else
+                jsonObject.put("tPin", ImageUtils.encodeSHA256(newtpin.getText().toString()));
+            jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return jsonObject;
+    }
+
+    public void notselectpinApi() {
+        city.setText("");
+        district.setText("");
+        state_update.setText("");
+        flagstate = 0;
+        select_state.setClickable(true);
+        state_update_top.setVisibility(View.GONE);
+        select_state.setVisibility(View.VISIBLE);
     }
 
     PostOffice postOffice;
@@ -749,34 +842,28 @@ public class BC7TransferFragment extends BaseFragment implements View.OnClickLis
                 v.findViewById(R.id.delete_all).setClickable(false);
                 addBeneDetails("FUNDTRANSFER", "Add Beneficiary Detail");
                 break;
-            /*case R.id.select_state:
-             *//*ArrayList<String> list_state1 = new ArrayList<>();
-                ArrayList<StatePozo> list_state = dbRealm.getState_Details();
-                for (int i = 0; i < list_state.size(); i++) {
-                    list_state1.add(list_state.get(i).getHeaderData());
-                }
-                customSpinner(select_state, "Select State", list_state1);*//*
-
-                break;*/
 
             case R.id.btn_submit:
                 if (input_name1.getText().toString().isEmpty()) {
                     input_name1.setError("Please enter valid name");
                     input_name1.requestFocus();
+                } else if (selectGender.equalsIgnoreCase("Select Gender")) {
+                    Toast.makeText(getActivity(), "Please Select Gender", Toast.LENGTH_SHORT).show();
+                } else if (Math.abs(years - beforeyear) < 18) {
+                    // Log.e("years "+years,"beforeyear " +beforeyear+" ageyear difference"+Math.abs(years-beforeyear));
+                    Toast.makeText(getActivity(), "Age must be greater than 17 years", Toast.LENGTH_SHORT).show();
                 } else if (senderpincode.getText().toString().isEmpty()) {
                     senderpincode.setError("Please enter valid pincode");
                     senderpincode.requestFocus();
-                } else if (address_name.getText().toString().isEmpty()) {
-                    address_name.setError("Please enter valid address");
-                    address_name.requestFocus();
-                } else if (selectGender.equalsIgnoreCase("Select Gender")) {
-                    Toast.makeText(getActivity(), "Please Select Gender", Toast.LENGTH_SHORT).show();
                 } else if (district.getText().toString().isEmpty()) {
                     district.setError("Please enter district");
                     district.requestFocus();
                 } else if (city.getText().toString().isEmpty()) {
                     city.setError("Please enter city");
                     city.requestFocus();
+                } else if (address_name.getText().toString().isEmpty()) {
+                    address_name.setError("Please enter valid address");
+                    address_name.requestFocus();
                 } else if (docType.equalsIgnoreCase("Select Document Type")) {
                     Toast.makeText(getActivity(), "Please Select document type", Toast.LENGTH_SHORT).show();
                 } else if (date_text.getText().toString().isEmpty()) {
@@ -792,46 +879,13 @@ public class BC7TransferFragment extends BaseFragment implements View.OnClickLis
                         //  }
                     } else {
                         if (flagstate == 0)
-                            new WalletAsyncMethod(WebConfig.BC7RemittanceApp, addSenderDetails(select_state.getText().toString()).toString(), headerData, BC7TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+                            new WalletAsyncMethod(WebConfig.BC2RemittanceApp, addSenderDetails(select_state.getText().toString()).toString(), headerData, BC7TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
                             //   new AsyncPostMethod(WebConfig.FUNDTRANSFER_URL, getJson_Validate().toString(), headerData, FundTransferActivity.this, getString(R.string.responseTimeOutTrans)).execute();
                         else
-                            new WalletAsyncMethod(WebConfig.BC7RemittanceApp, addSenderDetails(state_update.getText().toString()).toString(), headerData, BC7TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+                            new WalletAsyncMethod(WebConfig.BC2RemittanceApp, addSenderDetails(state_update.getText().toString()).toString(), headerData, BC7TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
                     }
                 break;
         }
-    }
-
-    private JSONObject addSenderDetails(String state) {
-        JSONObject jsonObject = new JSONObject();
-        if (!input_mobile.getText().toString().isEmpty() && input_mobile.getText().toString().length() == 10) {
-            try {
-                jsonObject.put("serviceType", "ADD_SENDER_DETAILS");
-                jsonObject.put("requestType", "BC_CHANNEL");
-                jsonObject.put("typeMobileWeb", "mobile");
-                jsonObject.put("transactionID", ImageUtils.miliSeconds());
-                jsonObject.put("nodeAgentId", list.get(0).getMobilno());
-                jsonObject.put("mobileNumber", input_mobile.getText().toString());
-                jsonObject.put("reqFor", "BC7");
-                jsonObject.put("senderName", input_name1.getText().toString());
-                jsonObject.put("senderGender", selectGender);
-                jsonObject.put("senderDoB", date_text.getText().toString());
-                jsonObject.put("senderAddress", address_name.getText().toString());
-                jsonObject.put("docType", docType);
-                jsonObject.put("docID", documentid.getText().toString());
-                jsonObject.put("senderCity", city.getText().toString());
-                jsonObject.put("senderPostalPin", senderpincode.getText().toString());
-                jsonObject.put("senderDistrict", district.getText().toString());
-                jsonObject.put("senderState", state);
-                jsonObject.put("txnIP", shieldsquare_IP2Hex(ImageUtils.ipAddress(getActivity())));
-                jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
-                jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } else {
-            Toast.makeText(getActivity(), "Enter Mobile Number", Toast.LENGTH_SHORT).show();
-        }
-        return jsonObject;
     }
 
     public void clickable() {
@@ -839,7 +893,6 @@ public class BC7TransferFragment extends BaseFragment implements View.OnClickLis
             beneficiary_details.setClickable(true);
             getActivity().findViewById(R.id.trans_details).setClickable(true);
             getActivity().findViewById(R.id.btn_search).setClickable(true);
-            // getActivity().findViewById(R.id.delete_all).setClickable(true);
             getActivity().findViewById(R.id.reset).setClickable(true);
             getActivity().findViewById(R.id.btn_otpsubmit).setClickable(true);
             getActivity().findViewById(R.id.btn_sender).setClickable(true);
@@ -927,7 +980,6 @@ public class BC7TransferFragment extends BaseFragment implements View.OnClickLis
                     if (isNEFT && con_ifsc.getText().toString().matches("^[a-zA-Z0-9]{1,50}$"))
                         new WalletAsyncMethod(WebConfig.BCRemittanceApp, addBeneAccount(bene_number.getText().toString(), con_ifsc.getText().toString(), bene_name.getText().toString(), "D", "NEFT").toString(), headerData, BC7TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
                     else if (!isNEFT) {
-                        // String condition = "where " + RapipayDB.COLOMN__BANK_NAME + "='" + bank_select_bene.getText().toString() + "'";
                         String condition = bank_select_bene.getText().toString();
                         ifsc_code = dbRealm.geBankIFSC(condition).get(0);
                         new WalletAsyncMethod(WebConfig.BCRemittanceApp, addBeneAccount(bene_number.getText().toString(), con_ifsc.getText().toString(), bene_name.getText().toString(), "D", "IMPS").toString(), headerData, BC7TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
@@ -957,10 +1009,8 @@ public class BC7TransferFragment extends BaseFragment implements View.OnClickLis
                     if (isNEFT && con_ifsc.getText().toString().matches("^[a-zA-Z0-9]{1,50}$"))
                         new WalletAsyncMethod(WebConfig.BCRemittanceApp, verify_Account(con_ifsc.getText().toString(), bene_number.getText().toString()).toString(), headerData, BC7TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
                     else if (!isNEFT) {
-                        //  String condition = "where " + RapipayDB.COLOMN__BANK_NAME + "='" + bank_select_bene.getText().toString() + "'";
                         String condition = bank_select_bene.getText().toString();
                         ifsc_code = dbRealm.geBankIFSC(condition).get(0);
-//                    if (newtin.getText().toString().isEmpty())
                         new WalletAsyncMethod(WebConfig.BCRemittanceApp, verify_Account(ifsc_code, bene_number.getText().toString()).toString(), headerData, BC7TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
                     }
                 }
@@ -1000,53 +1050,6 @@ public class BC7TransferFragment extends BaseFragment implements View.OnClickLis
         }
     }
 
-    public JSONObject verify_Account(String ifsc, String accountno) {
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("serviceType", "Verify_Account");
-            jsonObject.put("requestType", "BC_CHANNEL");
-            jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("transactionID", ImageUtils.miliSeconds());
-            jsonObject.put("nodeAgentId", list.get(0).getMobilno());
-            jsonObject.put("senderName", input_name.getText().toString().trim());
-            jsonObject.put("IFSC", ifsc);
-            jsonObject.put("accountNo", accountno);
-            jsonObject.put("txnIP", shieldsquare_IP2Hex(ImageUtils.ipAddress(getActivity())));
-            jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
-            jsonObject.put("mobileNumber", input_mobile.getText().toString());
-            jsonObject.put("txnAmmount", "1");
-            jsonObject.put("reqFor", "BC7");
-            jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return jsonObject;
-        //{"serviceType":"Verify_Account","requestType":"BC_CHANNEL","typeMobileWeb":"mobile","transactionID":"170250160913846","nodeAgentId":"1000000014","senderName":"dggdg","IFSC":"PUNB0061800","accountNo":"4747001700100025","txnIP":"AC1032F6",
-        // "sessionRefNo":"A2MWSFPTCR","mobileNumber":"8668855858","txnAmmount":"1","reqFor":"BC7","checkSum":"E6AB618D47FD9C139730112D511471844AC0BF5E1C892BD0D4C4FD1B83954EF260A5DA4879246F7FA39BBC41B1EE248A783541FE045F7C8444F779C94CF59590"}
-    }
-
-    public JSONObject service_fee(String txnAmmount, String subType) {
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("serviceType", "GET_SERVICE_FEE");
-            jsonObject.put("requestType", "BC_CHANNEL");
-            jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("transactionID", ImageUtils.miliSeconds());
-            jsonObject.put("nodeAgentId", list.get(0).getMobilno());
-            jsonObject.put("agentID", list.get(0).getMobilno());
-            jsonObject.put("subType", subType);
-            jsonObject.put("txnAmmount", txnAmmount);
-            jsonObject.put("reqFor", "BC7");
-            jsonObject.put("txnIP", shieldsquare_IP2Hex(ImageUtils.ipAddress(getActivity())));
-            jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
-            jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return jsonObject;
-    }
-
     private void insertBenfDetails(JSONArray array) {
         final Dialog dialogs = new Dialog(getActivity());
         final CustomProgessDialog dialog = new CustomProgessDialog(getActivity());
@@ -1068,66 +1071,11 @@ public class BC7TransferFragment extends BaseFragment implements View.OnClickLis
             initializeBenAdapter(beneficiaryDetailsPozoslist);
     }
 
-    private void insertLastTransDetails(JSONArray array) {
-        transactionPozoArrayList = new ArrayList<>();
-        try {
-            for (int i = 0; i < array.length(); i++) {
-                JSONObject object = array.getJSONObject(i);
-                transactionPozoArrayList.add(new LastTransactionPozo(object.getString("accountNo"), object.getString("txnAmount"), object.getString("refundTxnId"), object.getString("bankName"), object.getString("serviceProviderTXNID"), object.getString("transferType"), object.getString("txnRequestDate")));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if (transactionPozoArrayList.size() != 0)
-            initializeTransAdapter(transactionPozoArrayList);
-    }
-
     private void initializeBenAdapter(ArrayList<BeneficiaryDetailsPozo> list) {
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         beneficiary_details.setLayoutManager(layoutManager);
         adapter = new BCBeneficiaryAdapter(getActivity(), list);
         beneficiary_details.setAdapter(adapter);
-    }
-
-    private void initializeTransAdapter(ArrayList<LastTransactionPozo> list) {
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
-        trans_details.setLayoutManager(layoutManager);
-        trans_details.setAdapter(new LastTransAdapter(getActivity(), trans_details, list));
-    }
-
-
-    /*   {"serviceType":"DMT_BC_AC_TRANSFER","transactionID":"1567589635646","mobileNumber":"8743999103","senderName":"chetanya","txnAmmount":"10","beneficiaryId":"7FN9EDTFKH","nodeAgentId":"1000000014",
-               "requestType":"BC_CHANNEL","typeMobileWeb":"WEB","reqFor":"BC7","tPin":"03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4","transferType":"IMPS","txnIP":"172.16.50.95","sessionRefNo":"JA3KXBAAMR"}
-   */
-    // change for BC7
-    public JSONObject getMoney_Validate(String amount, JSONObject object, String beneficiaryId) {
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("serviceType", "DMT_BC_AC_TRANSFER");
-            // jsonObject.put("transactionID", ImageUtils.miliSeconds());
-            jsonObject.put("transactionID", object.getString("bcTransactionID"));
-            jsonObject.put("mobileNumber", input_mobile.getText().toString());
-            jsonObject.put("senderName", input_name1.getText().toString().trim());
-            jsonObject.put("txnAmmount", amount);
-            jsonObject.put("beneficiaryId", beneficiaryId);
-            jsonObject.put("nodeAgentId", list.get(0).getMobilno());
-            jsonObject.put("requestType", "BC_Channel");
-            jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("reqFor", "BC7");
-            jsonObject.put("transferType", transfer_type);
-            jsonObject.put("txnIP", shieldsquare_IP2Hex(ImageUtils.ipAddress(getActivity())));
-            jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
-            //  jsonObject.put("IFSC", pozo.getIfsc());
-            if (newtpin.getText().toString().isEmpty())
-                jsonObject.put("tPin", "");
-            else
-                jsonObject.put("tPin", ImageUtils.encodeSHA256(newtpin.getText().toString()));
-            jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return jsonObject;
     }
 
     public String shieldsquare_IP2Hex(String reqIpAddr) {
@@ -1177,13 +1125,21 @@ public class BC7TransferFragment extends BaseFragment implements View.OnClickLis
                         getActivity().findViewById(R.id.sender_layout1).setVisibility(View.GONE);
                         clear();
                         otpRefId = object.getString("otpRefId");
+                        // when existing no. and after successfully add then otp must not show
+                        if (otpRefId.isEmpty() || otpRefId == "null") {
+                            otp_layout.setVisibility(View.GONE);
+                            new WalletAsyncMethod(WebConfig.BC2RemittanceApp, getSender_Validate().toString(), headerData, BC7TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+                        }
                         if (object.has("reqFor"))
                             reqFor = object.getString("reqFor");
                         fund_transferId = object.getString("transactionId");
                     } else if (object.getString("serviceType").equalsIgnoreCase("ADD_SENDER_DETAILS")) {
-                        new WalletAsyncMethod(WebConfig.BC7RemittanceApp, getSender_Validate().toString(), headerData, BC7TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+                        new WalletAsyncMethod(WebConfig.BC2RemittanceApp, getSender_Validate().toString(), headerData, BC7TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
                     } else if (object.getString("serviceType").equalsIgnoreCase("DELETE_BENEFICIARY")) {
-                        customDialog_Common("KYCLAYOUTLAY", object, null, "Payee Detail", object.getString("responseMessage"));
+                        if (object.has("responseMsg"))
+                            customDialog_Common("KYCLAYOUTLAY", object, null, "Payee Detail", object.getString("responseMsg"));
+                        else
+                            customDialog_Common("KYCLAYOUTLAY", object, null, "Payee Detail", object.getString("responseMessage"));
                     } else if (object.getString("serviceType").equalsIgnoreCase("GET_SERVICE_FEE")) {
                         customDialog_Common("Fund Transfer Confirmation", object, pozo, "Sure you want to Transfer?", input_mobile.getText().toString());
                     } else if (object.getString("serviceType").equalsIgnoreCase("Verify_Account")) {
@@ -1191,7 +1147,7 @@ public class BC7TransferFragment extends BaseFragment implements View.OnClickLis
                     } else if (object.getString("serviceType").equalsIgnoreCase("DMT_BC_AC_TRANSFER")) {
                         dialog.dismiss();
                         customDialog_Common("Fund Transfer Details", object, pozo, "VerifyLayout", input_name.getText().toString().trim());
-                    } else if (object.getString("serviceType").equalsIgnoreCase("SENDER_COMPLETE_DETAILS")) {
+                    } else if (object.getString("serviceType").equalsIgnoreCase("SENDER_COMPLETE_DETAILS")) { // sender already registered
                         sender_layout.setVisibility(View.GONE);
                         getActivity().findViewById(R.id.reset).setVisibility(View.VISIBLE);
                         try {
@@ -1277,6 +1233,8 @@ public class BC7TransferFragment extends BaseFragment implements View.OnClickLis
                     } else if (object.getString("serviceType").equalsIgnoreCase("ADD_BENEFICIARY_DETAILS")) {
                         customDialog_Common("KYCLAYOUTS", null, null, null, null, object.getString("responseMessage"), BC7TransferFragment.this);
                     }
+                } else if (object.getString("responseCode").equalsIgnoreCase("102")) {
+                    customDialog_Common(object.getString("responseMessage"));
                 } else if (object.getString("responseCode").equalsIgnoreCase("75235")) {
                     customDialog_Common(object.getString("responseMessage"));
                 } else if (object.getString("serviceType").equalsIgnoreCase("SENDER_COMPLETE_DETAILS")) {
@@ -1289,6 +1247,7 @@ public class BC7TransferFragment extends BaseFragment implements View.OnClickLis
                                 // JSONArray array = object.getJSONArray("senderDetails");
                                 //JSONObject jsonObject = object.getJSONObject("senderDetails");
                                 //  enterSenderDetails(object.getJSONObject("senderDetails"));
+                                select_state.setVisibility(View.GONE);
                                 enterNewSenderDetails(object.getJSONObject("senderDetails"));
                                 getActivity().findViewById(R.id.btn_submit).setVisibility(View.VISIBLE);
                                 // delete_all.setVisibility(View.VISIBLE);
@@ -1311,28 +1270,26 @@ public class BC7TransferFragment extends BaseFragment implements View.OnClickLis
                             input_name1.setText("");
                             getActivity().findViewById(R.id.btn_submit).setVisibility(View.VISIBLE);
                         } else if (object.getString("responseCode").equalsIgnoreCase("60217")) {
-                            customDialog_Common(object.getString("responseMessage"));
+                            if (object.has("responseMsg"))
+                                customDialog_Common(object.getString("responseMsg"));
+                            else
+                                customDialog_Common(object.getString("responseMessage"));
                         }
                     }
-                } else if (object.getString("responseCode").equalsIgnoreCase("101")) {
-                    if (object.has("responseMessage")) {
-                        dialog.dismiss();
-                        customReceiptNew("Transaction Receipt", object, BC7TransferFragment.this);
-                    }
-                    // customDialog_Common("Money Transfer", null, null, "KYCLAYOUT", object.getString("responseMessage"));
-                    else
-                        customReceiptNew("Transaction Receipt", object, BC7TransferFragment.this);
                 } else if (object.getString("responseCode").equalsIgnoreCase("102")) {
                     dialog.dismiss();
                     customDialog_Common(object.getString("responseMessage"));
+                } else if (object.getString("responseCode").equalsIgnoreCase("101")) {
+                    if (object.has("responseMsg"))
+                        customDialog_Common("Money Transfer", null, null, "KYCLAYOUT", object.getString("responseMsg"));
+                    else
+                        customDialog_Common("Money Transfer", null, null, "KYCLAYOUT", object.getString("responseMessage"));
                 } else if (object.getString("responseCode").equalsIgnoreCase("60067")) {
                     dialog.dismiss();
                     customDialog_Common(object.getString("responseMessage"));
                 } else if (object.getString("responseCode").equalsIgnoreCase("60147")) {
                     Toast.makeText(getActivity(), object.getString("responseMessage"), Toast.LENGTH_LONG).show();
                     setBack_click1(getActivity());
-                } else if (object.getString("responseCode").equalsIgnoreCase("60146")) {
-                    customDialog_Common(object.getString("responseMessage"));
                 } else if (object.getString("responseCode").equalsIgnoreCase("60003")) {
                     customDialog_Common(object.getString("responseMessage"));
                     btn_otpsubmit.setClickable(true);
@@ -1340,7 +1297,12 @@ public class BC7TransferFragment extends BaseFragment implements View.OnClickLis
                     dialog.dismiss();
                     customDialog_Common(object.getString("responseMessage"));
                 } else {
+                    if (object.has("responseMessage")) {
                         customDialog_Common(object.getString("responseMessage"));
+                    } else if (object.has("respnseMessage")) {
+                        customDialog_Common(object.getString("respnseMessage"));
+                    } else if (object.has("responseMsg"))
+                        customDialog_Common(object.getString("responseMsg"));
                 }
             } else {
                 if (MainActivity.FN_TIME_OUT != null)
@@ -1373,6 +1335,7 @@ public class BC7TransferFragment extends BaseFragment implements View.OnClickLis
 
                 @Override
                 public void onDateChanged(DatePicker datePicker, int year, int month, int dayOfMonth) {
+                    years = year;
                     Log.e("Date", "Year=" + year + " Month=" + (month + 1) + " day=" + dayOfMonth);
                     if (String.valueOf(month + 1).length() == 1)
                         months = "0" + String.valueOf(month + 1);
@@ -1410,7 +1373,7 @@ public class BC7TransferFragment extends BaseFragment implements View.OnClickLis
         try {
             input_name1.setText(object.getString("sender_Name"));
             gender.setText(object.getString("sd_Gender"));
-            senderpincode.setText(object.getString("sd_Nationality"));
+            senderpincode.setText(object.getString("sender_Postal_Pin"));
             address_name.setText(object.getString("sd_Address"));
             date_text.setText(object.getString("sd_Dob"));
             district.setText(object.getString("sd_District"));
@@ -1428,14 +1391,14 @@ public class BC7TransferFragment extends BaseFragment implements View.OnClickLis
             documentype.setEnabled(false);
             documentid.setEnabled(false);
             state_update.setEnabled(false);
+            select_state.setVisibility(View.GONE);
             state_update_top.setVisibility(View.VISIBLE);
-            //   select_state.setVisibility(View.GONE);
-            // image.setVisibility(View.GONE);
             getActivity().findViewById(R.id.btn_submit).setVisibility(View.GONE);
             amount = "";
             fab.setVisibility(View.VISIBLE);
             hideKeyboard(getActivity());
-            input_mobile.setEnabled(false);
+            input_mobile.setEnabled(true);
+            input_name.setEnabled(false);
             gender_layout.setVisibility(View.VISIBLE);
             gender_spinner.setVisibility(View.GONE);
             document_layout.setVisibility(View.VISIBLE);
@@ -1447,9 +1410,9 @@ public class BC7TransferFragment extends BaseFragment implements View.OnClickLis
     private void enterNewSenderDetails(JSONObject object) {
         try {
             if (object.getString("sender_Name").equalsIgnoreCase(null))
-                input_name1.setText("");
+                input_name.setText("");
             else
-                input_name1.setText(object.getString("sender_Name"));
+                input_name.setText(object.getString("sender_Name"));
             if (object.getString("sd_Gender").equalsIgnoreCase("null")) {
                 gender.setText("");
                 gender.setVisibility(View.GONE);
@@ -1499,7 +1462,6 @@ public class BC7TransferFragment extends BaseFragment implements View.OnClickLis
         }
     }
 
-
     protected void customDialog_Common(final String msg) {
         try {
             final Dialog dialog = new Dialog(getActivity());
@@ -1530,51 +1492,6 @@ public class BC7TransferFragment extends BaseFragment implements View.OnClickLis
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    protected void customAddneft(final String type, String ifsc, final String accountNo, String msg, final String beneName, String beneBank) {
-        final Dialog dialog = new Dialog(getActivity());
-        LayoutInflater inflater = getLayoutInflater();
-        View alertLayout = inflater.inflate(R.layout.custom_layout_common, null);
-        alertLayout.setKeepScreenOn(true);
-        TextView text = (TextView) alertLayout.findViewById(R.id.dialog_title);
-        text.setText(msg);
-        TextView dialog_cancel = (TextView) alertLayout.findViewById(R.id.dialog_cancel);
-        AppCompatButton btn_cancel = (AppCompatButton) alertLayout.findViewById(R.id.btn_cancel);
-        AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
-        if (type.equalsIgnoreCase("Fund Transfer")) {
-            alertLayout.findViewById(R.id.addneftben_layout).setVisibility(View.VISIBLE);
-            customAddBeneneft(alertLayout, ifsc, accountNo, beneName, beneBank, dialog, "NEFT");
-        }
-        dialog.setCancelable(false);
-        btn_ok.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                hideKeyboard(getActivity());
-                if (type.equalsIgnoreCase("Fund Transfer")) {
-                    if (btn_ifsc.getText().toString().isEmpty()) {
-                        btn_ifsc.setError("Please enter valid IFSC Code.");
-                        btn_ifsc.requestFocus();
-                    } else {
-//                        transfer_type=input;
-                        new WalletAsyncMethod(WebConfig.BC7RemittanceApp, addBeneAccount(accountNo, btn_ifsc.getText().toString(), beneName, "D", "NEFT").toString(), headerData, BC7TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
-                        dialog.dismiss();
-                    }
-                }
-            }
-        });
-        btn_cancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                bank_select.setText("Select Bank");
-                input_account.setText("");
-                input_amount.setText("");
-                dialog.dismiss();
-            }
-        });
-        dialog.show();
-        Window window = dialog.getWindow();
-        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
     }
 
     String transfer_type;
@@ -1718,14 +1635,14 @@ public class BC7TransferFragment extends BaseFragment implements View.OnClickLis
                         if (!object.getString("subType").equalsIgnoreCase("Money_Transfer")) {
                             if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && newtpin.getText().toString().length() == 4) {
                                 //need to change for bc2
-                                new WalletAsyncMethod(WebConfig.BC7DMTBC7Service, getMoney_Validate(ben_amount.getText().toString(), object, pozo.getBeneficiaryId()).toString(), headerData, BC7TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+                                new WalletAsyncMethod(WebConfig.BC2DMTBC2Service, getMoney_Validate(ben_amount.getText().toString(), object, pozo.getBeneficiaryId()).toString(), headerData, BC7TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
 
                             } else if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && (newtpin.getText().toString().isEmpty() || newtpin.getText().toString().length() != 4)) {
                                 newtpin.setError("Please enter TPIN");
                                 newtpin.requestFocus();
                             } else if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("N")) {
                                 //need to change for bc2
-                                new WalletAsyncMethod(WebConfig.BC7DMTBC7Service, getMoney_Validate(ben_amount.getText().toString(), object, pozo.getBeneficiaryId()).toString(), headerData, BC7TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+                                new WalletAsyncMethod(WebConfig.BC2DMTBC2Service, getMoney_Validate(ben_amount.getText().toString(), object, pozo.getBeneficiaryId()).toString(), headerData, BC7TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
                             }
                         } else {
                             new WalletAsyncMethod(WebConfig.FUNDTRANSFER_URL, getJson_Validate().toString(), headerData, BC7TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
@@ -1745,14 +1662,14 @@ public class BC7TransferFragment extends BaseFragment implements View.OnClickLis
                         ben_amount.setError("Maximum transfer amount would be " + limit + ".");
                         ben_amount.requestFocus();
                     } else {
-                        new WalletAsyncMethod(WebConfig.BC7RemittanceApp, service_fee(ben_amount.getText().toString(), "Money_Transfer_Bene").toString(), headerData, BC7TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+                        new WalletAsyncMethod(WebConfig.BC2RemittanceApp, service_fee(ben_amount.getText().toString(), "Money_Transfer_Bene").toString(), headerData, BC7TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
                         dialog.dismiss();
                     }
                 } else if (type.equalsIgnoreCase("KYCLAYOUTLAY")) {
-                    new WalletAsyncMethod(WebConfig.BC7RemittanceApp, getSender_Validate().toString(), headerData, BC7TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+                    new WalletAsyncMethod(WebConfig.BC2RemittanceApp, getSender_Validate().toString(), headerData, BC7TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
                     dialog.dismiss();
                 } else if (type.equalsIgnoreCase("Beneficiary Details")) {
-                    new WalletAsyncMethod(WebConfig.BC7RemittanceApp, delete_Benef((BeneficiaryDetailsPozo) pozo).toString(), headerData, BC7TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+                    new WalletAsyncMethod(WebConfig.BC2RemittanceApp, delete_Benef((BeneficiaryDetailsPozo) pozo).toString(), headerData, BC7TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
                     dialog.dismiss();
                 } else if (type.equalsIgnoreCase("Money Transfer") || type.equalsIgnoreCase("Account Verify Details") || type.equalsIgnoreCase("Cannot generate receipt now please try later!")) {
                     input_account.setText("");
@@ -1761,7 +1678,7 @@ public class BC7TransferFragment extends BaseFragment implements View.OnClickLis
                     dialog.dismiss();
                     if (type.equalsIgnoreCase("Account Verify Details")) {
                         try {
-                            new WalletAsyncMethod(WebConfig.BC7RemittanceApp, addBeneAccount(object.getString("accountNo"), object.getString("ifscCode"), object.getString("bankAccountName"), "C", "IMPS").toString(), headerData, BC7TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+                            new WalletAsyncMethod(WebConfig.BC2RemittanceApp, addBeneAccount(object.getString("accountNo"), object.getString("ifscCode"), object.getString("bankAccountName"), "C", "IMPS").toString(), headerData, BC7TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
 //                            alertDialog.dismiss();
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -1804,7 +1721,6 @@ public class BC7TransferFragment extends BaseFragment implements View.OnClickLis
         } else if (type.equalsIgnoreCase("KYCLAYOUTS"))
             new WalletAsyncMethod(WebConfig.BC7RemittanceApp, getSender_Validate().toString(), headerData, BC7TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
         else if (type.equalsIgnoreCase("Fund Transfer Details")) {
-//            localStorage.setActivityState(LocalStorage.ROUTESTATE, "UPDATE");
             new WalletAsyncMethod(WebConfig.BC7RemittanceApp, getSender_Validate().toString(), headerData, BC7TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
         }
     }

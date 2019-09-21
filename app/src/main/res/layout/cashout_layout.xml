@@ -24,6 +24,51 @@
             android:orientation="vertical"
             android:theme="@style/AppTheme">
 
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center_horizontal"
+            android:theme="@style/AppTheme">
+            <RadioGroup
+                android:layout_margin="10dp"
+                android:id="@+id/myRadioGroup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:checkedButton="@+id/sound"
+                android:weightSum="800">
+
+                <RadioButton
+                    android:id="@+id/cashid"
+                    android:textSize="14dp"
+                    android:textStyle="bold|italic"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Cash@Pos" />
+
+                <RadioButton
+                    android:id="@+id/saleid"
+                    android:textSize="14dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold|italic"
+                    android:layout_marginLeft="@dimen/margin_20dp_activity_login"
+                    android:text="Sale" />
+
+                <RadioButton
+                    android:id="@+id/emiid"
+                    android:textSize="14dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold|italic"
+                    android:layout_marginLeft="@dimen/margin_20dp_activity_login"
+                    android:text="EMI" />
+
+            </RadioGroup>
+        </LinearLayout>
             <TextView
                 android:id="@+id/heading"
                 android:layout_width="match_parent"
@@ -54,6 +99,7 @@
                         android:inputType="number"
                         android:maxLength="10"
                         android:textSize="16dp" />
+
                 </android.support.design.widget.TextInputLayout>
 
                 <!--<ImageView-->
@@ -182,6 +228,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center_horizontal"
                 android:weightSum="800">
 
                 <android.support.v7.widget.AppCompatButton
@@ -189,25 +237,26 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
-                    android:layout_weight="400"
+                    android:layout_weight="300"
                     android:background="@drawable/border_button"
                     android:onClick="onClick"
                     android:text="@string/btnsubmit"
                     android:textColor="@color/white"
-                    android:textSize="10dp" />
+                    android:textSize="12dp" />
 
                 <android.support.v7.widget.AppCompatButton
                     android:id="@+id/reciept_details"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
-                    android:layout_weight="400"
+                    android:layout_weight="300"
                     android:background="@drawable/border_button"
                     android:onClick="onClick"
                     android:text="@string/reciept_details"
                     android:textColor="@color/white"
-                    android:textSize="10dp"
-                    android:visibility="gone" />
+                    android:textSize="12dp"
+                    android:visibility="gone"
+                    />
             </LinearLayout>
         </LinearLayout>
 

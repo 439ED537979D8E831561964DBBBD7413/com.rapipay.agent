@@ -25,14 +25,14 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="2dp"
             android:orientation="vertical"
             android:theme="@style/AppTheme">
 
             <RelativeLayout
                 android:id="@+id/top"
                 android:layout_width="match_parent"
-                android:layout_height="250dp">
+                android:layout_height="270dp">
 
                 <android.support.v4.view.ViewPager
                     android:id="@+id/pager"
@@ -59,70 +59,125 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/top"
+                android:layout_marginTop="@dimen/margin_40"
                 android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_above="@+id/confirmpinView"
-                    android:layout_marginTop="10dp"
-                    android:gravity="center"
-                    android:text="Enter Login Pin"
-                    android:textColor="@color/black"
-                    android:textSize="16sp" />
 
                 <EditText
                     android:id="@+id/confirmpinView"
-                    android:layout_width="100dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:layout_marginLeft="55dp"
-                    android:layout_marginRight="60dp"
+                    android:layout_marginLeft="30dp"
+                    android:layout_marginRight="30dp"
+                    android:background="@drawable/border_magenta"
                     android:gravity="center"
+                    android:letterSpacing=".5"
+                    android:hint="Enter MPIN"
                     android:inputType="numberPassword"
                     android:maxLength="6"
+                    android:padding="10dp"
                     android:textColor="@color/black"
                     android:textScaleX="1.4"
-                    android:textSize="18dp" />
+                    android:textSize="18sp" />
 
-                <TextView
-                    android:id="@+id/forget_pin"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:id="@+id/between1"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_above="@+id/confirmpinView"
-                    android:layout_gravity="center"
-                    android:layout_marginRight="10dp"
-                    android:gravity="right"
-                    android:onClick="onClick"
-                    android:padding="5dp"
-                    android:text="Forgot Pin"
-                    android:textColor="@color/black"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
-                <TextView
-                    android:id="@+id/switchuser"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_above="@+id/confirmpinView"
-                    android:layout_gravity="center"
-                    android:layout_marginRight="10dp"
-                    android:layout_marginTop="10dp"
-                    android:gravity="right"
-                    android:onClick="onClick"
-                    android:padding="5dp"
-                    android:text="Switch User"
-                    android:textColor="@color/black"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
+                    android:layout_below="@+id/top"
+                    android:padding="@dimen/margin_20dp_activity_login"
+                    android:layout_marginTop="@dimen/margin_20dp_activity_login"
+                    android:layout_weight="200"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="start"
+                        android:layout_marginLeft="30dp"
+                        android:orientation="vertical"
+                        android:layout_weight="100">
+
+                        <TextView
+                            android:id="@+id/forget_pin"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_above="@+id/confirmpinView"
+                            android:layout_gravity="start"
+                            android:onClick="onClick"
+                            android:padding="5dp"
+                            android:text="Forgot Pin?"
+                            android:textStyle="bold|italic"
+                            android:textColor="@color/violet"
+                            android:textSize="16sp" />
+
+                        <View
+                            android:layout_width="80dp"
+                            android:layout_height="1dp"
+                            android:background="@color/violet" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/top"
+                        android:layout_gravity="end"
+                        android:layout_weight="100"
+                        android:gravity="end"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/switchuser"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_above="@+id/confirmpinView"
+                            android:layout_marginLeft="@dimen/margin_20dp_activity_login"
+                            android:gravity="right"
+                            android:onClick="onClick"
+                            android:padding="5dp"
+                            android:layout_marginRight="@dimen/margin_50dp_activity_login"
+                            android:textStyle="bold|italic"
+                            android:text="Switch User"
+                            android:textColor="@color/violet"
+                            android:textSize="16sp" />
+
+                        <View
+                            android:layout_width="85dp"
+                            android:layout_height="1dp"
+                            android:background="@color/violet"
+                            android:layout_marginRight="@dimen/margin_50dp_activity_login"/>
+                    </LinearLayout>
+                </LinearLayout>
+
             </LinearLayout>
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_alignParentBottom="true"
                 android:layout_below="@+id/between"
+                android:layout_alignParentBottom="true"
                 android:layout_marginTop="80dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_marginLeft="@dimen/margin_5dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/btn_sing_in"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_gravity="bottom"
+                    android:gravity="center"
+                    android:text="Version"
+                    android:textColor="@color/black"
+                    android:textSize="12dp"
+                    android:textStyle="bold|italic" />
+            </LinearLayout>
         </RelativeLayout>
     </ScrollView>
 </LinearLayout>

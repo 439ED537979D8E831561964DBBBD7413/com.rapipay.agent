@@ -37,8 +37,6 @@
                     android:id="@+id/bank_select"
                     style="@style/Widget.AppCompat.Spinner.Underlined"
                     android:layout_width="match_parent"
-                    android:background="@drawable/border_view"
-                    android:padding="10dp"
                     android:layout_height="wrap_content"
                     android:layout_margin="5dp"
                     android:spinnerMode="dropdown"
@@ -75,14 +73,29 @@
                         android:textSize="16dp" />
                 </android.support.design.widget.TextInputLayout>
 
-                <Spinner
-                    android:id="@+id/select_mode"
-                    style="@style/Widget.AppCompat.Spinner.Underlined"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="5dp"
-                    android:layout_marginTop="5dp"
-                    android:spinnerMode="dropdown" />
+                    android:orientation="horizontal"
+                    android:layout_marginTop="5dp">
+
+                    <Spinner
+                        android:id="@+id/select_mode"
+                        style="@style/Widget.AppCompat.Spinner.Underlined"
+                        android:layout_width="250dp"
+                        android:layout_height="wrap_content"
+                        android:spinnerMode="dropdown"
+                        android:layout_marginRight="@dimen/margin_10dp"/>
+
+                    <TextView
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:id="@+id/img_pay_mod"
+                        android:layout_marginLeft="50dp"
+                        android:onClick="onClick"
+                        android:background="@drawable/reset"/>
+
+                </LinearLayout>
 
                 <android.support.design.widget.TextInputLayout
                     android:layout_width="match_parent"
@@ -165,20 +178,25 @@
                         android:layout_height="wrap_content"
                         android:hint="@string/p_remark"
                         android:inputType="text"
+                        android:digits="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890_ "
                         android:textSize="16dp" />
                 </android.support.design.widget.TextInputLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="@dimen/margin_10dp"
                     android:orientation="horizontal">
 
                     <android.support.v7.widget.AppCompatButton
                         android:id="@+id/btn_fund"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:layout_marginLeft="60dp"
+                        android:padding="@dimen/margin_10dp"
                         android:layout_marginRight="60dp"
                         android:background="@drawable/border_button"
                         android:clickable="true"
@@ -186,7 +204,7 @@
                         android:onClick="onClick"
                         android:text="@string/btnupdate"
                         android:textColor="@color/white"
-                        android:textSize="14dp" />
+                        android:textSize="12dp" />
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>

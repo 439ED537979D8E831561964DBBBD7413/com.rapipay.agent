@@ -141,6 +141,7 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
         selectedDate = calendar.get(Calendar.DAY_OF_MONTH);
         selectedMonth = calendar.get(Calendar.MONTH) + 1;
         selectedYear = calendar.get(Calendar.YEAR);
+        beforeyear = selectedYear;
         fab = (MovableFloatingActionButton) rv.findViewById(R.id.fab);
         fab.setOnClickListener(this);
         rv.findViewById(R.id.btn_submit).setOnClickListener(this);
@@ -191,6 +192,7 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
         btn_sender = (ImageView) rv.findViewById(R.id.btn_sender);
         btn_sender.setOnClickListener(this);
         getActivity().findViewById(R.id.reset).setOnClickListener(this);
+        getActivity().findViewById(R.id.reset).setVisibility(View.GONE);
         btn_sender.setColorFilter(getResources().getColor(R.color.colorPrimaryDark));
         sender_layout = (LinearLayout) rv.findViewById(R.id.sender_layout);
         sender_layout1 = (LinearLayout) rv.findViewById(R.id.sender_layout1);
@@ -280,10 +282,10 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
             @Override
             public void afterTextChanged(Editable s) {
                 //  if (flagdevicetype > 0) {
-                if (s.length() == 10)
+                if (s.length() == 10) {
+                    clear();
                     new WalletAsyncMethod(WebConfig.BC2RemittanceApp, getSender_Validate().toString(), headerData, BC2TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
-
-                else {
+                } else {
                     reset();
                     fab.setVisibility(View.GONE);
                     getActivity().findViewById(R.id.btn_submit).setVisibility(View.GONE);
@@ -579,7 +581,6 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
                     jsonObject.put("reqFor", "BC2");
                     jsonObject.put("txnIP", shieldsquare_IP2Hex(ImageUtils.ipAddress(getActivity())));
                     jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
-
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -728,7 +729,6 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
                     Toast.makeText(getActivity(), "Please enter correct text", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.btn_otpsubmit:
-                v.findViewById(R.id.btn_otpsubmit).setClickable(false);
                 if (!otpRefId.isEmpty() && !fund_transferId.isEmpty() && !input_otp.getText().toString().isEmpty()) {
                     hideKeyboard(getActivity());
                     new WalletAsyncMethod(WebConfig.BC2RemittanceApp, add_OtpDetails(otpRefId, fund_transferId).toString(), headerData, BC2TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
@@ -759,20 +759,23 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
                 if (input_name1.getText().toString().isEmpty()) {
                     input_name1.setError("Please enter valid name");
                     input_name1.requestFocus();
+                } else if (selectGender.equalsIgnoreCase("Select Gender")) {
+                    Toast.makeText(getActivity(), "Please Select Gender", Toast.LENGTH_SHORT).show();
+                } else if (Math.abs(years - beforeyear) < 18) {
+                    // Log.e("years "+years,"beforeyear " +beforeyear+" ageyear difference"+Math.abs(years-beforeyear));
+                    Toast.makeText(getActivity(), "Age must be greater than 17 years", Toast.LENGTH_SHORT).show();
                 } else if (senderpincode.getText().toString().isEmpty()) {
                     senderpincode.setError("Please enter valid pincode");
                     senderpincode.requestFocus();
-                } else if (address_name.getText().toString().isEmpty()) {
-                    address_name.setError("Please enter valid address");
-                    address_name.requestFocus();
-                } else if (selectGender.equalsIgnoreCase("Select Gender")) {
-                    Toast.makeText(getActivity(), "Please Select Gender", Toast.LENGTH_SHORT).show();
                 } else if (district.getText().toString().isEmpty()) {
                     district.setError("Please enter district");
                     district.requestFocus();
                 } else if (city.getText().toString().isEmpty()) {
                     city.setError("Please enter city");
                     city.requestFocus();
+                } else if (address_name.getText().toString().isEmpty()) {
+                    address_name.setError("Please enter valid address");
+                    address_name.requestFocus();
                 } else if (docType.equalsIgnoreCase("Select Document Type")) {
                     Toast.makeText(getActivity(), "Please Select document type", Toast.LENGTH_SHORT).show();
                 } else if (date_text.getText().toString().isEmpty()) {
@@ -923,7 +926,6 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
                     if (isNEFT && con_ifsc.getText().toString().matches("^[a-zA-Z0-9]{1,50}$"))
                         new WalletAsyncMethod(WebConfig.BC2RemittanceApp, addBeneAccount(bene_number.getText().toString(), con_ifsc.getText().toString(), bene_name.getText().toString(), "D", "NEFT").toString(), headerData, BC2TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
                     else if (!isNEFT) {
-                        // String condition = "where " + RapipayDB.COLOMN__BANK_NAME + "='" + bank_select_bene.getText().toString() + "'";
                         String condition = bank_select_bene.getText().toString();
                         ifsc_code = dbRealm.geBankIFSC(condition).get(0);
                         new WalletAsyncMethod(WebConfig.BC2RemittanceApp, addBeneAccount(bene_number.getText().toString(), con_ifsc.getText().toString(), bene_name.getText().toString(), "D", "IMPS").toString(), headerData, BC2TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
@@ -983,6 +985,20 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
         last_tran_layout.setVisibility(View.GONE);
         bank_select.setText("Select Bank");
         input_name.setEnabled(true);
+        gender_layout.setEnabled(true);
+        gender_spinner.setEnabled(true);
+        senderpincode.setEnabled(true);
+        select_state.setEnabled(true);
+        state_update_top.setEnabled(true);
+        state_update.setEnabled(true);
+        address_name.setEnabled(true);
+        district.setEnabled(true);
+        city.setEnabled(true);
+        documentype.setEnabled(true);
+        spinner_docType.setEnabled(true);
+        documentid.setEnabled(true);
+        getActivity().findViewById(R.id.btn_submit).setEnabled(true);
+
     }
 
     @Override
@@ -1040,21 +1056,7 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
         }
         return jsonObject;
 
-       /* {"serviceType":"GET_SERVICE_FEE","requestType":"BC_CHANNEL","typeMobileWeb":"mobile","transactionID":"144607200907660","nodeAgentId":"1000000014","agentID":"1000000014",
-                "subType":"DMT_BC_AC_TRANSFER","txnAmmount":"11","reqFor":"BC2","sessionRefNo":"S97H3PKHGN","checkSum":"4B30208C1B417B503208811609A4D9D39CBB8B99DFD89A85A7F0BF87332F2C0244580C6E87125837539497358F54CE0992C95E4FCE628B47E7D25CC4EFE05E04"}
-    */
     }
-/*
-    {
-        "isVerified": "NOT-VERIFIED",
-            "isIMPS": "Y",
-            "isNEFT": "N",
-            "bc_BENE_ID": "7H3KM6FNBW",
-            "bank_Name": "ICICI BANK LIMITED",
-            "account_NUMBER": "1111122222",
-            "account_IFSC": "ICIC0000488",
-            "bank_ACCOUNT_NAME": "TEST NODE API"
-    }*/
 
     private void insertBenfDetails(JSONArray array) {
         final Dialog dialogs = new Dialog(getActivity());
@@ -1104,10 +1106,6 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
         trans_details.setAdapter(new LastTransAdapter(getActivity(), trans_details, list));
     }
 
-
-    /*   {"serviceType":"DMT_BC_AC_TRANSFER","transactionID":"1567589635646","mobileNumber":"8743999103","senderName":"chetanya","txnAmmount":"10","beneficiaryId":"7FN9EDTFKH","nodeAgentId":"1000000014",
-               "requestType":"BC_CHANNEL","typeMobileWeb":"WEB","reqFor":"BC2","tPin":"03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4","transferType":"IMPS","txnIP":"172.16.50.95","sessionRefNo":"JA3KXBAAMR"}
-   */
     // change for bc2
     public JSONObject getMoney_Validate(String amount, JSONObject object, String beneficiaryId) {
         JSONObject jsonObject = new JSONObject();
@@ -1186,6 +1184,11 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
                         getActivity().findViewById(R.id.sender_layout1).setVisibility(View.GONE);
                         clear();
                         otpRefId = object.getString("otpRefId");
+                        // when existing no. and after successfully add then otp must not show
+                        if (otpRefId.isEmpty() || otpRefId == "null") {
+                            otp_layout.setVisibility(View.GONE);
+                            new WalletAsyncMethod(WebConfig.BC2RemittanceApp, getSender_Validate().toString(), headerData, BC2TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
+                        }
                         if (object.has("reqFor"))
                             reqFor = object.getString("reqFor");
                         fund_transferId = object.getString("transactionId");
@@ -1289,6 +1292,8 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
                     } else if (object.getString("serviceType").equalsIgnoreCase("ADD_BENEFICIARY_DETAILS")) {
                         customDialog_Common("KYCLAYOUTS", null, null, null, null, object.getString("responseMessage"), BC2TransferFragment.this);
                     }
+                } else if (object.getString("responseCode").equalsIgnoreCase("102")) {
+                    customDialog_Common(object.getString("responseMessage"));
                 } else if (object.getString("responseCode").equalsIgnoreCase("75235")) {
                     customDialog_Common(object.getString("responseMessage"));
                 } else if (object.getString("serviceType").equalsIgnoreCase("SENDER_COMPLETE_DETAILS")) {
@@ -1301,6 +1306,7 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
                                 // JSONArray array = object.getJSONArray("senderDetails");
                                 //JSONObject jsonObject = object.getJSONObject("senderDetails");
                                 //  enterSenderDetails(object.getJSONObject("senderDetails"));
+                                select_state.setVisibility(View.GONE);
                                 enterNewSenderDetails(object.getJSONObject("senderDetails"));
                                 getActivity().findViewById(R.id.btn_submit).setVisibility(View.VISIBLE);
                                 // delete_all.setVisibility(View.VISIBLE);
@@ -1329,14 +1335,14 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
                                 customDialog_Common(object.getString("responseMessage"));
                         }
                     }
+                } else if (object.getString("responseCode").equalsIgnoreCase("102")) {
+                    dialog.dismiss();
+                    customDialog_Common(object.getString("responseMessage"));
                 } else if (object.getString("responseCode").equalsIgnoreCase("101")) {
                     if (object.has("responseMsg"))
                         customDialog_Common("Money Transfer", null, null, "KYCLAYOUT", object.getString("responseMsg"));
                     else
                         customDialog_Common("Money Transfer", null, null, "KYCLAYOUT", object.getString("responseMessage"));
-                } else if (object.getString("responseCode").equalsIgnoreCase("102")) {
-                    dialog.dismiss();
-                    customDialog_Common(object.getString("responseMessage"));
                 } else if (object.getString("responseCode").equalsIgnoreCase("60067")) {
                     dialog.dismiss();
                     customDialog_Common(object.getString("responseMessage"));
@@ -1351,10 +1357,8 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
                     customDialog_Common(object.getString("responseMessage"));
                 } else {
                     if (object.has("responseMessage")) {
-                        // dialog.dismiss();
                         customDialog_Common(object.getString("responseMessage"));
                     } else if (object.has("respnseMessage")) {
-                        // dialog.dismiss();
                         customDialog_Common(object.getString("respnseMessage"));
                     } else if (object.has("responseMsg"))
                         customDialog_Common(object.getString("responseMsg"));
@@ -1373,7 +1377,7 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
 
     private int selectedDate, selectedMonth, selectedYear;
     String months = null, dayss = null;
-
+    int years = 0, beforeyear = 0;
     View.OnClickListener toDateClicked = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -1390,6 +1394,7 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
 
                 @Override
                 public void onDateChanged(DatePicker datePicker, int year, int month, int dayOfMonth) {
+                    years = year;
                     Log.e("Date", "Year=" + year + " Month=" + (month + 1) + " day=" + dayOfMonth);
                     if (String.valueOf(month + 1).length() == 1)
                         months = "0" + String.valueOf(month + 1);
@@ -1427,7 +1432,7 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
         try {
             input_name1.setText(object.getString("sender_Name"));
             gender.setText(object.getString("sd_Gender"));
-            senderpincode.setText(object.getString("sd_Nationality"));
+            senderpincode.setText(object.getString("sender_Postal_Pin"));
             address_name.setText(object.getString("sd_Address"));
             date_text.setText(object.getString("sd_Dob"));
             district.setText(object.getString("sd_District"));
@@ -1445,6 +1450,7 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
             documentype.setEnabled(false);
             documentid.setEnabled(false);
             state_update.setEnabled(false);
+            select_state.setVisibility(View.GONE);
             state_update_top.setVisibility(View.VISIBLE);
             //   select_state.setVisibility(View.GONE);
             // image.setVisibility(View.GONE);
@@ -1452,7 +1458,8 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
             amount = "";
             fab.setVisibility(View.VISIBLE);
             hideKeyboard(getActivity());
-            input_mobile.setEnabled(false);
+            input_mobile.setEnabled(true);
+            input_name.setEnabled(false);
             gender_layout.setVisibility(View.VISIBLE);
             gender_spinner.setVisibility(View.GONE);
             document_layout.setVisibility(View.VISIBLE);
@@ -1464,9 +1471,9 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
     private void enterNewSenderDetails(JSONObject object) {
         try {
             if (object.getString("sender_Name").equalsIgnoreCase(null))
-                input_name1.setText("");
+                input_name.setText("");
             else
-                input_name1.setText(object.getString("sender_Name"));
+                input_name.setText(object.getString("sender_Name"));
             if (object.getString("sd_Gender").equalsIgnoreCase("null")) {
                 gender.setText("");
                 gender.setVisibility(View.GONE);
@@ -1547,51 +1554,6 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    protected void customAddneft(final String type, String ifsc, final String accountNo, String msg, final String beneName, String beneBank) {
-        final Dialog dialog = new Dialog(getActivity());
-        LayoutInflater inflater = getLayoutInflater();
-        View alertLayout = inflater.inflate(R.layout.custom_layout_common, null);
-        alertLayout.setKeepScreenOn(true);
-        TextView text = (TextView) alertLayout.findViewById(R.id.dialog_title);
-        text.setText(msg);
-        TextView dialog_cancel = (TextView) alertLayout.findViewById(R.id.dialog_cancel);
-        AppCompatButton btn_cancel = (AppCompatButton) alertLayout.findViewById(R.id.btn_cancel);
-        AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
-        if (type.equalsIgnoreCase("Fund Transfer")) {
-            alertLayout.findViewById(R.id.addneftben_layout).setVisibility(View.VISIBLE);
-            customAddBeneneft(alertLayout, ifsc, accountNo, beneName, beneBank, dialog, "NEFT");
-        }
-        dialog.setCancelable(false);
-        btn_ok.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                hideKeyboard(getActivity());
-                if (type.equalsIgnoreCase("Fund Transfer")) {
-                    if (btn_ifsc.getText().toString().isEmpty()) {
-                        btn_ifsc.setError("Please enter valid IFSC Code.");
-                        btn_ifsc.requestFocus();
-                    } else {
-//                        transfer_type=input;
-                        new WalletAsyncMethod(WebConfig.BC2RemittanceApp, addBeneAccount(accountNo, btn_ifsc.getText().toString(), beneName, "D", "NEFT").toString(), headerData, BC2TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
-                        dialog.dismiss();
-                    }
-                }
-            }
-        });
-        btn_cancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                bank_select.setText("Select Bank");
-                input_account.setText("");
-                input_amount.setText("");
-                dialog.dismiss();
-            }
-        });
-        dialog.show();
-        Window window = dialog.getWindow();
-        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
     }
 
     String transfer_type;

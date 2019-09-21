@@ -1,32 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="80dp"
-    android:layout_height="80dp"
     xmlns:autofit="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
-    android:layout_marginLeft="3dp"
-    android:id="@+id/layout_item">
+    android:id="@+id/layout_item"
+    android:layout_width="85dp"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
 
-    <ImageView
-        android:id="@+id/recycler_image"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_gravity="center"/>
-
-    <me.grantland.widget.AutofitTextView
-        android:id="@+id/recycler_text"
-        android:layout_marginTop="5dp"
-        android:layout_width="wrap_content"
+    <LinearLayout xmlns:autofit="http://schemas.android.com/apk/res-auto"
+        android:layout_width="80dp"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:gravity="center"
-        android:textSize="9dp"
-        android:inputType="textMultiLine"
-        android:singleLine="false"
-        android:maxLines="2"
-        autofit:minTextSize="8sp"
-        android:textColor="@color/black"
-        android:layout_below="@+id/recycler_image"
-        android:text="Recycler"/>
+        android:orientation="vertical">
 
+        <ImageView
+            android:id="@+id/recycler_image"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center" />
+
+        <me.grantland.widget.AutofitTextView
+            android:id="@+id/recycler_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/recycler_image"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:maxLines="2"
+            android:singleLine="false"
+            android:inputType="textNoSuggestions|textMultiLine"
+            android:padding="2dp"
+            android:text="Recycler"
+            android:textColor="@color/black"
+            android:textSize="9dp"
+            android:textStyle="bold"
+            autofit:minTextSize="7sp" />
+    </LinearLayout>
+
+   <!-- <View
+        android:layout_width=".5dp"
+        android:layout_height="80dp"
+        android:layout_marginLeft="1.5dp"
+        android:background="@color/colorbackground" />
+-->
 </LinearLayout>

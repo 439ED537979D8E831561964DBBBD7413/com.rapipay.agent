@@ -67,7 +67,6 @@
             android:id="@+id/bank_select"
             style="@style/Widget.AppCompat.Spinner.Underlined"
             android:layout_width="match_parent"
-            android:background="@drawable/border_view"
             android:padding="10dp"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"

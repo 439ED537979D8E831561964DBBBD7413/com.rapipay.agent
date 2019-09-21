@@ -38,6 +38,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="5dp"
+            android:scrollbars="none"
             android:gravity="center_horizontal" />
 
         <TextView
@@ -56,6 +57,7 @@
             android:layout_height="match_parent"
             android:inputType="textMultiLine"
             android:padding="2dp"
+            android:layout_marginBottom="@dimen/margin_15dp_activity_login"
             android:textColor="@color/red"
             android:textSize="12dp" />
     </LinearLayout>

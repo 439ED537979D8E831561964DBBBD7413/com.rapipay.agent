@@ -570,6 +570,24 @@
                         android:visibility="gone" />
                 </LinearLayout>
 
+            <LinearLayout
+                android:id="@+id/custom_fun"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="5dp"
+                android:visibility="gone">
+
+                <EditText
+                    android:id="@+id/newtpinss1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Enter Remarks"
+                    android:digits="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890_ "
+                    android:textSize="16dp" />
+
+            </LinearLayout>
+
                 <LinearLayout
                     android:id="@+id/custom_service"
                     android:layout_width="match_parent"

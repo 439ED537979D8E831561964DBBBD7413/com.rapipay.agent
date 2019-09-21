@@ -5,62 +5,167 @@
 <!--<include layout="@layout/toolbar" />--><!--</android.support.design.widget.AppBarLayout>-->
 
 <!--<android.support.v4.widget.NestedScrollView--><!--android:layout_width="match_parent"--><!--android:layout_height="match_parent"--><!--android:background="@color/white"--><!--app:layout_behavior="@string/appbar_scrolling_view_behavior">-->
-
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:theme="@style/AppTheme"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior">
+    android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/heading"
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/colorPrimaryDark"
-        android:gravity="center"
-        android:padding="5dp"
-        android:text="@string/pchist"
-        android:textColor="@color/white"
-        android:visibility="gone" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
         android:theme="@style/AppTheme"
-        android:visibility="visible"
-        android:weightSum="800">
-        <!--  Email Label -->
-        <android.support.design.widget.TextInputLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            android:layout_weight="350">
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-            <EditText
-                android:id="@+id/input_mobile"
-                android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/heading"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimaryDark"
+            android:gravity="center"
+            android:padding="5dp"
+            android:text="@string/pchist"
+            android:textColor="@color/white"
+            android:visibility="gone" />
+
+
+        <!--<RadioGroup
+            android:id="@+id/myRadioGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:checkedButton="@+id/sound"
+            android:orientation="horizontal"
+            android:weightSum="800">
+
+            <RadioButton
+                android:id="@+id/bc1id"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:hint="Sender Number"
-                android:inputType="number"
-                android:maxLength="10"
-                android:textStyle="bold"
-                android:textSize="16dp" />
-        </android.support.design.widget.TextInputLayout>
+                android:layout_weight="400"
+                android:textSize="14dp"
+                android:textStyle="bold|italic"
+                android:text="@string/bc1id"/>
 
-        <LinearLayout
-            android:id="@+id/sender_layout"
-            android:layout_width="0dp"
+            <RadioButton
+                android:id="@+id/bc2id"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="400"
+                android:text="@string/bc2id"
+                android:textSize="14dp"
+                android:textStyle="bold|italic" />
+
+        </RadioGroup>-->
+
+       <!-- <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="350"
+            android:orientation="horizontal"
+            android:padding="5dp"
+            android:weightSum="600">
+
+            <LinearLayout
+                android:id="@+id/ln_bc1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="300"
+                android:clickable="true"
+                android:onClick="onClick"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="120dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_weight="100"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:id="@+id/img_bc1"
+                        android:layout_width="90dp"
+                        android:layout_height="40dp"
+                        android:layout_weight="150"
+                        android:src="@drawable/bc"
+                        android:textColor="@color/white" />
+
+                    <ImageView
+                        android:id="@+id/img_bc1_check"
+                        android:layout_width="20dp"
+                        android:layout_height="50dp"
+                        android:layout_weight="10"
+                        android:src="@drawable/check"
+                        android:textColor="@color/white"
+                        android:visibility="gone" />
+
+
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="BC1"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ln_bc2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="300"
+                android:clickable="true"
+                android:onClick="onClick"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="120dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_weight="100"
+                    android:gravity="bottom"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:id="@+id/img_bc2"
+                        android:layout_width="90dp"
+                        android:layout_height="40dp"
+                        android:layout_weight="150"
+                        android:src="@drawable/bc"
+                        android:textColor="@color/white" />
+
+                    <ImageView
+                        android:id="@+id/img_bc2_check"
+                        android:layout_width="20dp"
+                        android:layout_height="50dp"
+                        android:layout_weight="10"
+                        android:src="@drawable/check"
+                        android:textColor="@color/white"
+                        android:visibility="gone" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="BC2"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:theme="@style/AppTheme"
-            android:visibility="gone"
-            android:weightSum="450">
-
+            android:visibility="visible"
+            android:weightSum="800">
+            <!--  Email Label -->
             <android.support.design.widget.TextInputLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -69,261 +174,289 @@
                 android:layout_weight="350">
 
                 <EditText
-                    android:id="@+id/input_name"
+                    android:id="@+id/input_mobile"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Sender Name"
-                    android:inputType="text"
-                    android:textStyle="bold"
+                    android:hint="Sender Number"
+                    android:inputType="number"
+                    android:maxLength="10"
+                    android:textSize="16dp"
+                    android:textStyle="bold" />
+            </android.support.design.widget.TextInputLayout>
+
+            <LinearLayout
+                android:id="@+id/sender_layout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="350"
+                android:orientation="horizontal"
+                android:theme="@style/AppTheme"
+                android:visibility="gone"
+                android:weightSum="450">
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:layout_weight="350">
+
+                    <EditText
+                        android:id="@+id/input_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Sender Name"
+                        android:inputType="text"
+                        android:textSize="16dp"
+                        android:textStyle="bold" />
+                </android.support.design.widget.TextInputLayout>
+
+                <ImageView
+                    android:id="@+id/btn_sender"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:layout_weight="100"
+                    android:onClick="onClick"
+                    android:src="@drawable/sender"
+                    android:text="@string/btnsender"
+                    android:textColor="@color/white"
+                    android:textSize="10dp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/warning"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="left"
+            android:padding="5dp"
+            android:text="Mobile No.not exist please add name and click button"
+            android:textColor="@color/red"
+            android:textSize="15dp"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:id="@+id/otp_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            android:weightSum="800">
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:layout_weight="700">
+
+                <EditText
+                    android:id="@+id/input_otp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/p_otp"
+                    android:inputType="numberPassword"
+                    android:maxLength="6"
                     android:textSize="16dp" />
             </android.support.design.widget.TextInputLayout>
 
-            <ImageView
-                android:id="@+id/btn_sender"
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/btn_otpsubmit"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:layout_margin="10dp"
+                android:layout_weight="100"
+                android:background="@drawable/otpborder"
+                android:onClick="onClick"
+                android:text="@string/btotp"
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="14dp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/fundlayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="3dp"
+            android:background="@drawable/bg_border"
+            android:orientation="horizontal"
+            android:weightSum="800"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/limit"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"
-                android:layout_weight="100"
+                android:layout_weight="650"
+                android:gravity="center"
+                android:padding="5dp"
+                android:text="@string/pchist"
+                android:textColor="@color/black"
+                android:textSize="15dp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/btn_fund"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="5dp"
+                android:padding="@dimen/margin_10dp"
+                android:background="@drawable/border_button"
                 android:onClick="onClick"
-                android:src="@drawable/sender"
-                android:text="@string/btnsender"
+                android:text="Add \n Beneficiary"
                 android:textColor="@color/white"
                 android:textSize="10dp" />
         </LinearLayout>
-    </LinearLayout>
-
-    <TextView
-        android:id="@+id/warning"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="left"
-        android:padding="5dp"
-        android:text="Mobile No.not exist please add name and click button"
-        android:textColor="@color/red"
-        android:textSize="15dp"
-        android:visibility="gone" />
-
-    <LinearLayout
-        android:id="@+id/otp_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:visibility="gone"
-        android:weightSum="800">
-
-        <android.support.design.widget.TextInputLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            android:layout_weight="700">
-
-            <EditText
-                android:id="@+id/input_otp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/p_otp"
-                android:inputType="numberPassword"
-                android:maxLength="6"
-                android:textSize="16dp" />
-        </android.support.design.widget.TextInputLayout>
-
-        <android.support.v7.widget.AppCompatButton
-            android:id="@+id/btn_otpsubmit"
-            android:layout_width="0dp"
-            android:layout_height="40dp"
-            android:layout_gravity="center"
-            android:layout_margin="10dp"
-            android:layout_weight="100"
-            android:background="@drawable/otpborder"
-            android:onClick="onClick"
-            android:text="@string/btotp"
-            android:textColor="@color/colorPrimaryDark"
-            android:textSize="14dp"
-            android:textStyle="bold" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/fundlayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="3dp"
-        android:background="@drawable/bg_border"
-        android:orientation="horizontal"
-        android:visibility="gone"
-        android:weightSum="800">
-
-        <TextView
-            android:id="@+id/limit"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="650"
-            android:gravity="center"
-            android:padding="5dp"
-            android:text="@string/pchist"
-            android:textColor="@color/black"
-            android:textSize="15dp"
-            android:textStyle="bold"
-            android:visibility="gone" />
-
-        <android.support.v7.widget.AppCompatButton
-            android:id="@+id/btn_fund"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="5dp"
-            android:layout_weight="150"
-            android:background="@drawable/border_button"
-            android:onClick="onClick"
-            android:text="@string/btnben"
-            android:textColor="@color/white"
-            android:textSize="10dp" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/border_view"
-        android:orientation="vertical"
-        android:visibility="gone">
-
-        <!--<TextView-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:background="@color/colorPrimaryDark"-->
-        <!--android:gravity="center"-->
-        <!--android:padding="5dp"-->
-        <!--android:text="New Transaction"-->
-        <!--android:textColor="@color/white"-->
-        <!--android:textSize="14dp" />-->
-
-        <TextView
-            android:id="@+id/bank_select"
-            style="@style/Widget.AppCompat.Spinner.Underlined"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:background="@drawable/border_view"
-            android:padding="10dp"
-            android:spinnerMode="dropdown"
-            android:text="Select Bank" />
-
-        <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp">
-
-            <EditText
-                android:id="@+id/input_account"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/p_recaccount"
-                android:inputType="number"
-                android:textSize="16dp" />
-        </android.support.design.widget.TextInputLayout>
-
-        <EditText
-            android:id="@+id/newtpin"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Enter TPIN"
-            android:inputType="number"
-            android:maxLength="4"
-            android:textSize="16dp"
-            android:visibility="gone" />
-        <!--  Password Label -->
-        <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
-            android:visibility="gone">
-
-            <EditText
-                android:id="@+id/input_amount"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/p_amount"
-                android:inputType="numberDecimal"
-                android:maxLength="10"
-                android:textSize="16dp" />
-        </android.support.design.widget.TextInputLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:weightSum="800">
+            android:background="@drawable/border_view"
+            android:orientation="vertical"
+            android:visibility="gone">
 
-            <android.support.v7.widget.AppCompatButton
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:layout_weight="400"
-                android:background="@drawable/border_button"
-                android:onClick="onClick"
-                android:text="@string/btnben"
-                android:textColor="@color/white"
-                android:textSize="10dp" />
+            <!--<TextView-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:background="@color/colorPrimaryDark"-->
+            <!--android:gravity="center"-->
+            <!--android:padding="5dp"-->
+            <!--android:text="New Transaction"-->
+            <!--android:textColor="@color/white"-->
+            <!--android:textSize="14dp" />-->
 
-            <android.support.v7.widget.AppCompatButton
-                android:id="@+id/btn_verify"
-                android:layout_width="0dp"
+            <TextView
+                android:id="@+id/bank_select"
+                style="@style/Widget.AppCompat.Spinner.Underlined"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:layout_weight="400"
-                android:background="@drawable/border_button"
-                android:onClick="onClick"
-                android:text="@string/btnverify"
-                android:textColor="@color/white"
-                android:textSize="10dp" />
+                android:layout_margin="5dp"
+                android:background="@drawable/border_view"
+                android:padding="10dp"
+                android:spinnerMode="dropdown"
+                android:text="Select Bank" />
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp">
+
+                <EditText
+                    android:id="@+id/input_account"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/p_recaccount"
+                    android:inputType="number"
+                    android:textSize="16dp" />
+            </android.support.design.widget.TextInputLayout>
+
+            <EditText
+                android:id="@+id/newtpin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Enter TPIN"
+                android:inputType="number"
+                android:maxLength="4"
+                android:textSize="16dp"
+                android:visibility="gone" />
+            <!--  Password Label -->
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:visibility="gone">
+
+                <EditText
+                    android:id="@+id/input_amount"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/p_amount"
+                    android:inputType="numberDecimal"
+                    android:maxLength="10"
+                    android:textSize="16dp" />
+            </android.support.design.widget.TextInputLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="800">
+
+                <android.support.v7.widget.AppCompatButton
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:layout_weight="400"
+                    android:background="@drawable/border_button"
+                    android:onClick="onClick"
+                    android:text="@string/btnben"
+                    android:textColor="@color/white"
+                    android:textSize="10dp" />
+
+                <android.support.v7.widget.AppCompatButton
+                    android:id="@+id/btn_verify"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:layout_weight="400"
+                    android:background="@drawable/border_button"
+                    android:onClick="onClick"
+                    android:text="@string/btnverify"
+                    android:textColor="@color/white"
+                    android:textSize="10dp" />
+            </LinearLayout>
         </LinearLayout>
-    </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/beneficiary_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:orientation="vertical"
-        android:visibility="gone">
-
-        <TextView
-            android:id="@+id/text_ben"
+        <LinearLayout
+            android:id="@+id/beneficiary_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/colorPrimaryDark"
-            android:gravity="left"
-            android:padding="5dp"
-            android:text="@string/p_bentrans"
-            android:textColor="@color/white"
-            android:textSize="14dp" />
+            android:layout_marginTop="5dp"
+            android:orientation="vertical"
+            android:visibility="gone">
 
-        <EditText
-            android:id="@+id/searchfield"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="2dp"
-            android:background="@drawable/bg_border"
-            android:gravity="left"
-            android:hint="Search Beneficiary"
-            android:padding="5dp"
-            android:textColor="@color/black"
-            android:textSize="14dp" />
+            <TextView
+                android:id="@+id/text_ben"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorPrimaryDark"
+                android:gravity="left"
+                android:padding="5dp"
+                android:text="@string/p_bentrans"
+                android:textColor="@color/white"
+                android:textSize="14dp" />
 
-        <!--<LinearLayout-->
+            <EditText
+                android:id="@+id/searchfield"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="2dp"
+                android:background="@drawable/bg_border"
+                android:gravity="left"
+                android:hint="Search Beneficiary"
+                android:padding="5dp"
+                android:textColor="@color/black"
+                android:textSize="14dp" />
+
+            <!--<LinearLayout-->
             <!--android:layout_width="match_parent"-->
             <!--android:layout_height="wrap_content"-->
             <!--android:layout_marginTop="5dp"-->
             <!--android:orientation="horizontal">-->
 
             <!--<include-->
-                <!--layout="@layout/bene_layout_new"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_marginTop="5dp" />-->
+            <!--layout="@layout/bene_layout_new"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_marginTop="5dp" />-->
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/beneficiary_details"
@@ -333,34 +466,35 @@
                 android:layout_marginTop="5dp"
                 android:gravity="center_horizontal"
                 android:scrollbars="vertical" />
-        <!--</LinearLayout>-->
-    </LinearLayout>
+            <!--</LinearLayout>-->
+        </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/last_tran_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:orientation="vertical"
-        android:visibility="gone">
-
-        <TextView
+        <LinearLayout
+            android:id="@+id/last_tran_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/colorPrimaryDark"
-            android:gravity="center"
-            android:padding="5dp"
-            android:text="Last Transaction Details (Tap to see transaction status)"
-            android:textColor="@color/white"
-            android:textSize="14dp" />
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/trans_details"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
             android:layout_marginTop="5dp"
-            android:gravity="center_horizontal" />
-    </LinearLayout>
+            android:orientation="vertical"
+            android:visibility="gone">
 
-</LinearLayout><!--</android.support.v4.widget.NestedScrollView>--><!--</android.support.design.widget.CoordinatorLayout>-->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorPrimaryDark"
+                android:gravity="center"
+                android:padding="5dp"
+                android:text="Last Transaction Details (Tap to see transaction status)"
+                android:textColor="@color/white"
+                android:textSize="14dp" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/trans_details"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="5dp"
+                android:gravity="center_horizontal" />
+        </LinearLayout>
+
+    </LinearLayout><!--</android.support.v4.widget.NestedScrollView>--><!--</android.support.design.widget.CoordinatorLayout>-->
+</ScrollView>

@@ -28,32 +28,33 @@
             android:orientation="vertical">
 
             <RadioGroup
-                android:layout_margin="10dp"
                 android:id="@+id/myRadioGroup"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
+                android:layout_margin="10dp"
                 android:checkedButton="@+id/sound"
-                android:weightSum="800"
-                android:visibility="gone">
+                android:orientation="horizontal"
+                android:visibility="gone"
+                android:weightSum="800">
 
                 <RadioButton
                     android:id="@+id/prepaid"
-                    android:layout_weight="400"
-                    android:textSize="12dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/prepaid" />
+                    android:layout_weight="400"
+                    android:text="@string/prepaid"
+                    android:textSize="12dp" />
 
                 <RadioButton
-                    android:layout_weight="400"
                     android:id="@+id/postpaid"
-                    android:textSize="12dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/postpaid" />
+                    android:layout_weight="400"
+                    android:text="@string/postpaid"
+                    android:textSize="12dp" />
 
             </RadioGroup>
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -79,11 +80,11 @@
                 <ImageView
                     android:id="@+id/btn_contact"
                     android:layout_width="0dp"
-                    android:layout_height="50dp"
+                    android:layout_height="40dp"
                     android:layout_weight="150"
                     android:clickable="true"
                     android:onClick="onClick"
-                    android:src="@drawable/contactsicon"
+                    android:src="@drawable/contact_asps"
                     android:textColor="@color/white" />
             </LinearLayout>
 
@@ -101,24 +102,25 @@
                     android:maxLength="13"
                     android:textSize="16dp" />
             </android.support.design.widget.TextInputLayout>
+
             <TextView
-                android:padding="10dp"
                 android:id="@+id/input_texts"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="13dp"
+                android:padding="10dp"
                 android:textColor="@color/red"
-                android:visibility="gone"/>
+                android:textSize="13dp"
+                android:visibility="gone" />
+
             <TextView
                 android:id="@+id/select_operator"
                 style="@style/Widget.AppCompat.Spinner.Underlined"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="5dp"
-                android:background="@drawable/border_view"
-                android:padding="10dp"
                 android:spinnerMode="dropdown"
                 android:text="Select Operator" />
+
             <EditText
                 android:id="@+id/newtpin"
                 android:layout_width="match_parent"
@@ -127,16 +129,17 @@
                 android:inputType="number"
                 android:maxLength="4"
                 android:textSize="16dp"
-                android:visibility="gone"/>
+                android:visibility="gone" />
+
             <android.support.v7.widget.AppCompatButton
                 android:id="@+id/btn_submit"
-                android:layout_width="match_parent"
+                android:layout_width="130dp"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="60dp"
-                android:layout_marginRight="60dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="@dimen/margin_20dp_activity_login"
                 android:background="@drawable/border_button"
-                android:onClick="onClick"
                 android:clickable="true"
+                android:onClick="onClick"
                 android:text="@string/btnsubmit"
                 android:textColor="@color/white"
                 android:textSize="14dp" />

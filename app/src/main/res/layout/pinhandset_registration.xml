@@ -42,7 +42,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginTop="30dp"
+                android:layout_marginTop="20dp"
                 android:text=""
                 android:textColor="@color/black"
                 android:textSize="24dp" />
@@ -50,100 +50,81 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
+                android:layout_marginTop="@dimen/margin_10dp"
+                android:orientation="vertical"
                 android:padding="10dp"
                 android:weightSum="800">
 
-                <TextView
-                    android:layout_width="0dp"
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_weight="200"
-                    android:text="Enter OTP"
-                    android:textColor="@color/black"
-                    android:textSize="16dp" />
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:background="#fafbfc">
 
-                <com.rapipay.android.agent.view.PinEntryEditText
-                    android:id="@+id/otppinView"
-                    android:layout_width="0dp"
+                    <com.rapipay.android.agent.view.PinEntryEditText
+                        android:id="@+id/otppinView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:cursorVisible="false"
+                        android:digits="1234567890"
+                        android:hint="Enter OTP"
+                        android:inputType="number"
+                        android:maxLength="6"
+                        android:padding="5dp"
+                        android:textColor="@color/black"
+                        android:textIsSelectable="false"
+                        android:textSize="20sp" />
+
+                </android.support.design.widget.TextInputLayout>
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_weight="600"
-                    android:cursorVisible="false"
-                    android:digits="1234567890"
-                    android:hint="Enter OTP"
-                    android:inputType="number"
-                    android:maxLength="6"
-                    android:padding="5dp"
-                    android:textColor="@color/black"
-                    android:textIsSelectable="false"
-                    android:textSize="20sp" />
-            </LinearLayout>
+                    android:layout_marginTop="18dp"
+                    android:layout_marginBottom="8dp"
+                    android:background="#f5f7f9">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="10dp"
-                android:weightSum="800">
+                    <com.rapipay.android.agent.view.PinEntryEditText
+                        android:id="@+id/pinView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:cursorVisible="false"
+                        android:digits="1234567890"
+                        android:hint="Set Login Pin"
+                        android:inputType="number"
+                        android:maxLength="6"
+                        android:padding="5dp"
+                        android:textColor="@color/black"
+                        android:textIsSelectable="false"
+                        android:textSize="20sp" />
+                </android.support.design.widget.TextInputLayout>
 
-                <TextView
-                    android:layout_width="0dp"
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_weight="200"
-                    android:text="Set Login Pin"
-                    android:textColor="@color/black"
-                    android:textSize="16dp" />
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:background="#f5f7f9">
 
-                <com.rapipay.android.agent.view.PinEntryEditText
-                    android:id="@+id/pinView"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_weight="600"
-                    android:cursorVisible="false"
-                    android:digits="1234567890"
-                    android:hint="Enter OTP"
-                    android:inputType="number"
-                    android:maxLength="6"
-                    android:padding="5dp"
-                    android:textColor="@color/black"
-                    android:textIsSelectable="false"
-                    android:textSize="20sp" />
-            </LinearLayout>
+                    <com.rapipay.android.agent.view.PinEntryEditText
+                        android:id="@+id/confirmpinView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:cursorVisible="false"
+                        android:digits="1234567890"
+                        android:hint="Confirm Login Pin"
+                        android:inputType="number"
+                        android:maxLength="6"
+                        android:padding="5dp"
+                        android:textColor="@color/black"
+                        android:textIsSelectable="false"
+                        android:textSize="20sp" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="10dp"
-                android:weightSum="800">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_weight="200"
-                    android:text="Confirm Login Pin"
-                    android:textColor="@color/black"
-                    android:textSize="16dp" />
-
-                <com.rapipay.android.agent.view.PinEntryEditText
-                    android:id="@+id/confirmpinView"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_weight="600"
-                    android:cursorVisible="false"
-                    android:digits="1234567890"
-                    android:hint="Enter OTP"
-                    android:inputType="number"
-                    android:maxLength="6"
-                    android:padding="5dp"
-                    android:textColor="@color/black"
-                    android:textIsSelectable="false"
-                    android:textSize="20sp" />
+                </android.support.design.widget.TextInputLayout>
             </LinearLayout>
 
             <android.support.v7.widget.AppCompatButton

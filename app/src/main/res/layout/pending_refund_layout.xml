@@ -71,7 +71,7 @@
                         android:layout_weight="100"
                         android:onClick="onClick"
                         android:clickable="true"
-                        android:src="@drawable/contactsicon"
+                        android:src="@drawable/contact_asps"
                         android:text="@string/btnsearch"
                         android:textColor="@color/white"
                         android:textSize="10dp" />

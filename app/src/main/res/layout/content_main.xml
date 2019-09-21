@@ -1,31 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/content_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:showIn="@layout/app_bar_main"
-    tools:context="com.rapipay.android.agent.main_directory.MainActivity">
+    tools:context="com.rapipay.android.agent.main_directory.MainActivity"
+    tools:showIn="@layout/app_bar_main">
 
     <FrameLayout
         android:id="@+id/frame_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+
     <TextView
-        android:layout_alignParentBottom="true"
         android:id="@+id/mywidget"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:singleLine="true"
+        android:layout_alignParentBottom="true"
+        android:background="@color/newcolor"
         android:ellipsize="marquee"
-        android:fadingEdge="horizontal"
         android:marqueeRepeatLimit="marquee_forever"
         android:scrollHorizontally="true"
-        android:textColor="#ff4500"
+        android:singleLine="true"
+        android:textSize="14dp"
+        android:textColor="@color/white"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         android:visibility="gone"/>
+
 </RelativeLayout>

@@ -13,7 +13,6 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="center|left"
-        android:layout_marginLeft="10dp"
         android:clickable="true"
         android:onClick="onClick"
         android:scaleType="center" />
@@ -53,9 +52,9 @@
 
         <ImageView
             android:id="@+id/reset"
-            android:layout_width="50dp"
-            android:layout_height="45dp"
-            android:layout_marginTop="8dp"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginTop="13dp"
             android:layout_alignParentRight="true"
             android:layout_gravity="right|center"
             android:layout_marginRight="5dp"
@@ -63,8 +62,7 @@
             android:onClick="onClick"
             android:gravity="center"
             android:scaleType="fitStart"
-            android:src="@drawable/reset"
-            android:visibility="gone"/>
+            android:src="@drawable/reset"/>
 
         <TextView
             android:id="@+id/bankde"
