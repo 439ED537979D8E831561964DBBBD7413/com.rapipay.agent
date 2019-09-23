@@ -77,7 +77,7 @@ public class WalletAsyncMethod extends AsyncTask<String, String, String> {
             e.printStackTrace();
         }
         return null;
-    } //{"serviceType":"DMT_BC_AC_TRANSFER","apiCommonResposne":null,"responseCode":"60067","responseMessage":"60067:Connection timeout. Server error. Retry again"}
+    }
 
     @Override
     protected void onPostExecute(String s) {

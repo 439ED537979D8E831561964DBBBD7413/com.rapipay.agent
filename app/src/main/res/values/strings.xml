@@ -6,6 +6,13 @@
     <string name="notification_error_ssl_cert_invalid">Please click on Continue to proceed!</string>
 
 
+    <!--  android:fontFamily="sans-serif"           // roboto regular
+    android:fontFamily="sans-serif-light"     // roboto light
+    android:fontFamily="sans-serif-condensed" // roboto condensed
+    android:fontFamily="sans-serif-black"     // roboto black
+    android:fontFamily="sans-serif-thin"      // roboto thin (android 4.2)
+    android:fontFamily="sans-serif-medium"    // roboto medium (android 5.0)
+-->
     <string name="dialog_button_ok">OK</string>
     <string name="baseurl"></string>
     <string name="dialog_button_cancel">Cancel</string>
@@ -69,7 +76,7 @@
     <string name="p_feesetup">Fee Setup</string>
     <string name="p_fundTransfer">Fund Transfer</string>
     <string name="p_passbook">Pass Book</string>
-    <string name="p_moneytransfer">Money Transfer</string>
+    <string name="p_moneytransfer">Money Transfers</string>
     <string name="p_walletdetail">Wallet Details</string>
     <string name="p_addPayee">Add Payee</string>
     <string name="p_deletepayee">Delete Payee</string>
@@ -80,9 +87,10 @@
     <string name="p_DTH">DTH</string>
     <string name="p_electricty">Electricity</string>
     <string name="p_telephone">Telephone</string>
-    <string name="p_recharge">Recharge and Bill Payment</string>
+    <string name="p_recharge">Recharge and Bill Payments</string>
+    <string name="p_bc">BC Fund Transfers</string>
     <string name="p_travel">Travel and Insurance</string>
-    <string name="p_mpos">MPOS</string>
+    <string name="p_mpos">MPOS / MATM / AEPS</string>
     <string name="p_name">Enter Sender Name*</string>
     <string name="p_namecust">Enter Customer Name*</string>
     <string name="p_benname">Enter Beneficiary Name</string>
@@ -116,10 +124,10 @@
     <string name="p_sendnames">Sender No.</string>
     <string name="p_date1">To Date</string>
     <string name="p_date2">From Date</string>
-    <string name="p_date1for">To(yyyy-MM-dd)</string>
+    <string name="p_date1for">To(yyyy/MM/dd)</string>
     <string name="p_datefor">To(dd/MM/yyyy)</string>
     <string name="p_dater">Deposit Date(dd/MM/yyyy)</string>
-    <string name="p_date2for">From(yyyy-MM-dd)</string>
+    <string name="p_date2for">From(yyyy/MM/dd)</string>
 
     <string name="p_comnames">Company Name</string>
     <string name="p_requestid">Request ID</string>
@@ -173,7 +181,14 @@
     <string name="dialogue_message">Hello, %1$s! You have new messages.</string>
     <string name="prompt_getadteerror">Error in geting data,try again...</string>
     <string name="prepaid">PrePaid</string>
+    <string name="aeps1cashwithdraw">Cash Withdrawal</string>
+    <string name="aeps2cashwithdraw">Cash Withdrawal</string>
+    <string name="aeps1balenq">Balance Enquiry</string>
+    <string name="aeps2balenq">Balance Enquiry</string>
     <string name="postpaid">PostPaid</string>
+
+    <string name="bc1id">BC1</string>
+    <string name="bc2id">BC2</string>
 
     <string name="msg_double_click_to_exit">Press again to close</string>
 
@@ -206,4 +221,8 @@
     <string name="default_notification_channel_name" translatable="true">Weather</string>
     <string name="msg_subscribe_failed">Failed to subscribe to weather topic</string>
     <string name="fcm_message">FCM Message</string>
+    <string name="title_activity_matm">MatmActivity</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

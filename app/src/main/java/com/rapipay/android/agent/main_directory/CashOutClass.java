@@ -66,21 +66,9 @@ import com.rapipay.android.agent.view.EnglishNumberToWords;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-
-import java.io.IOException;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-import static com.example.rfplmantra.MantraActivity.display;
 import static com.pnsol.sdk.interfaces.PaymentTransactionConstants.CHIP_TRANSACTION_APPROVED;
 import static com.pnsol.sdk.interfaces.PaymentTransactionConstants.CHIP_TRANSACTION_DECLINED;
 import static com.pnsol.sdk.interfaces.PaymentTransactionConstants.DISPLAY_STATUS;

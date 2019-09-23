@@ -2,24 +2,17 @@ package com.rapipay.android.agent.main_directory;
 
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.rapipay.android.agent.BuildConfig;
-import com.rapipay.android.agent.Database.RapipayDB;
 import com.rapipay.android.agent.Model.ImagePozo;
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.interfaces.CustomInterface;
 import com.rapipay.android.agent.utils.BaseCompactActivity;
 import com.rapipay.android.agent.utils.LocalStorage;
 import com.rapipay.android.agent.utils.RouteClass;
-
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-
 public class SpashScreenActivity extends BaseCompactActivity implements CustomInterface {
 
     ImageView imageView,gifimageview;

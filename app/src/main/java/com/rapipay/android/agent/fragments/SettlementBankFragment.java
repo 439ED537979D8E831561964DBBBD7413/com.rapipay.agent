@@ -19,8 +19,6 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.rapipay.android.agent.Database.RapipayDB;
 import com.rapipay.android.agent.Model.BankDetailsPozo;
 import com.rapipay.android.agent.Model.PMTBenefPozo;
 import com.rapipay.android.agent.Model.SettlementPozo;
@@ -113,7 +111,8 @@ public class SettlementBankFragment extends BaseFragment implements WalletReques
         JSONObject jsonObject = new JSONObject();
         try {
             transactionID = ImageUtils.miliSeconds();
-            String condition = "where " + RapipayDB.COLOMN__BANK_NAME + "='" + bank_select.getText().toString() + "'";
+         //   String condition = "where " + RapipayDB.COLOMN__BANK_NAME + "='" + bank_select.getText().toString() + "'";
+            String condition = bank_select.getText().toString();
             ifsc_code = BaseCompactActivity.dbRealm.geBankIFSC(condition).get(0);
             jsonObject.put("serviceType", "Verify_Account");
             jsonObject.put("requestType", "BC_CHANNEL");

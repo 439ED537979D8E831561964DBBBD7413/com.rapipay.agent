@@ -32,7 +32,7 @@ public class ImageUtils {
         list.add(new ImagePozo("MP", "MPOS Registration", R.drawable.mposreg));
         list.add(new ImagePozo("AE", "AEPS Registration", R.drawable.aeps_reg));
         list.add(new ImagePozo("BB", "BBPS Registration", R.drawable.bbps_reg));
-        list.add(new ImagePozo("MA", "MATM Registration", R.drawable.matm_reg));
+        list.add(new ImagePozo("MA", "MATM Registration", R.drawable.matmreg));
         return list;
     }
 
@@ -40,23 +40,21 @@ public class ImageUtils {
         ArrayList<ImagePozo> list = new ArrayList<>();
         list.clear();
         list.add(new ImagePozo(1, "RapiPay Wallet Fund Transfer", R.drawable.wallet));
-        list.add(new ImagePozo(2, "BC1 Fund Transfer", R.drawable.bc));
-        list.add(new ImagePozo(3, "BC2 Fund Transfer", R.drawable.bc));
-        list.add(new ImagePozo(3, "BC6 Fund Transfer", R.drawable.bc));
-        list.add(new ImagePozo(4, "Pending & Refund", R.drawable.refund));
-        list.add(new ImagePozo(5, "Transaction History", R.drawable.transhistory));
-        list.add(new ImagePozo(6, "INDO NEPAL", R.drawable.indonepal));
+        list.add(new ImagePozo(2, "INDO NEPAL", R.drawable.indonepal));
+        /*
+        list.add(new ImagePozo(4, "BC6 Fund Transfer", R.drawable.bc));*/
+        list.add(new ImagePozo(3, "Pending & Refund", R.drawable.refund));
+        list.add(new ImagePozo(4, "Transaction History", R.drawable.transhistory));
+       // list.add(new ImagePozo(7, "INDO NEPAL", R.drawable.indonepal));
         return list;
     }
 
     public static ArrayList<ImagePozo> getSixthImageUrl() {
         ArrayList<ImagePozo> list = new ArrayList<>();
         list.clear();
-        list.add(new ImagePozo(2, "MPOS", R.drawable.mposcash));
-        list.add(new ImagePozo(3, "MATM", R.drawable.matm));
-        /*list.add(new ImagePozo(2, "Cash@Pos", R.drawable.mposcash));
-        list.add(new ImagePozo(3, "Sale", R.drawable.mposale));
-        list.add(new ImagePozo(4, "EMI", R.drawable.mposemi));*/
+        list.add(new ImagePozo(1, "MPOS", R.drawable.mposcash));
+        list.add(new ImagePozo(2, "MATM", R.drawable.matm));
+        list.add(new ImagePozo(3, "AEPS", R.drawable.aeps));
         return list;
     }
 
@@ -74,9 +72,9 @@ public class ImageUtils {
         list.clear();
         /*list.add(new ImagePozo(2, "AEPS1 ", R.drawable.aeps));
         list.add(new ImagePozo(3, "AEPS2 ", R.drawable.aeps));*/
-        list.add(new ImagePozo(2, "AEPS1", R.drawable.aeps));
+      //  list.add(new ImagePozo(2, "AEPS1", R.drawable.aeps));
         //list.add(new ImagePozo(3, "AEPS1 Balance Enquiry", R.drawable.aeps));
-        list.add(new ImagePozo(3, "AEPS2", R.drawable.aeps));
+        list.add(new ImagePozo(1, "AEPS2", R.drawable.aeps));
       //  list.add(new ImagePozo(5, "AEPS2 Balance Enquiry", R.drawable.aeps));
         return list;
     }
@@ -87,6 +85,16 @@ public class ImageUtils {
         list.add(new ImagePozo(1, "Mobile Recharge", R.drawable.mobile));
         list.add(new ImagePozo(2, "DTH Recharge", R.drawable.dthnew));
         list.add(new ImagePozo(3, "Recharge History", R.drawable.history));
+        return list;
+    }
+
+    public static ArrayList<ImagePozo> getBcImageUrl() {
+        ArrayList<ImagePozo> list = new ArrayList<>();
+        list.clear();
+        list.add(new ImagePozo(1, "BC1 Fund Transfer", R.drawable.bc));
+        list.add(new ImagePozo(2, "BC2 Fund Transfer", R.drawable.bc));
+        list.add(new ImagePozo(3, "BC6 Fund Transfer", R.drawable.bc));
+        //list.add(new ImagePozo(4, "BC7 Fund Transfer", R.drawable.bc));
         return list;
     }
 

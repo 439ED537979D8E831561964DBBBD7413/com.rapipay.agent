@@ -69,14 +69,13 @@ class ActivationHistory : BaseFragment(), RequestHandler, View.OnClickListener {
 //        toimage!!.setColorFilter(resources.getColor(R.color.colorPrimaryDark))
         fromimage = v.findViewById<View>(R.id.fromimage) as ImageView
         fromimage!!.setOnClickListener(fromDateClicked)
-        if (selectedMonth < 11)
+        if (selectedMonth < 11) {
             date2_text!!.setText("$selectedYear-0$selectedMonth-$selectedDate")
-        else
-            date2_text!!.setText("$selectedYear-$selectedMonth-$selectedDate")
-        if (selectedMonth < 11)
             date1_text!!.setText("$selectedYear-0$selectedMonth-$selectedDate")
-        else
+        }else {
+            date2_text!!.setText("$selectedYear-$selectedMonth-$selectedDate")
             date1_text!!.setText("$selectedYear-$selectedMonth-$selectedDate")
+        }
         enterpin = v.findViewById<View>(R.id.input_user) as EditText
         confirmpin = v.findViewById<View>(R.id.input_password) as EditText
         btn_login = v.findViewById<View>(R.id.btn_login) as AppCompatButton

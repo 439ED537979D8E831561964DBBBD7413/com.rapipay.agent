@@ -29,9 +29,20 @@ public class LocalStorage {
         editor.putString(Key,value);
         editor.commit();
     }
+    public void setActivityState(String Key, int value){
+        SharedPreferences preferences = context.getSharedPreferences("MyPreferences",0);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putInt(Key,value);
+        editor.commit();
+    }
 
     public String getActivityState(String Key){
         SharedPreferences preferences = context.getSharedPreferences("MyPreferences",0);
         return preferences.getString(Key,"0");
+    }
+
+    public Integer getActivityIntState(String Key){
+        SharedPreferences preferences = context.getSharedPreferences("MyPreferences",0);
+        return preferences.getInt(Key,0);
     }
 }

@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -25,15 +24,12 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,10 +39,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.finopaytech.finosdk.activity.MainTransactionActivity;
-import com.finopaytech.finosdk.encryption.AES_BC;
-import com.finopaytech.finosdk.helpers.Utils;
-import com.finopaytech.finosdk.models.ErrorSingletone;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
@@ -64,7 +56,6 @@ import com.rapipay.android.agent.Model.microaeps.Microdata1;
 import com.rapipay.android.agent.Model.microaeps.Microresponse1;
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.adapter.MATMAEPSAdapter;
-import com.rapipay.android.agent.adapter.MicroAepsAdapter;
 import com.rapipay.android.agent.interfaces.ClickListener;
 import com.rapipay.android.agent.interfaces.CustomInterface;
 import com.rapipay.android.agent.interfaces.RequestHandler;
@@ -184,10 +175,6 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
         });*/
         initialize();
         setUpGClient();
-        /*if (!typeput.equalsIgnoreCase("Balance Enquiry")) {
-            loadUrl();
-        } else
-            reset.setVisibility(View.GONE);*/
     }
 
     private void getBankDetails() {
@@ -240,10 +227,6 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
         });
         // Add the request to the RequestQueue.
         queue.add(stringRequest);
-    }
-
-    private void loadUrl() {
-        new AsyncPostMethod(WebConfig.CASHOUT_URL, getPendingTransaction().toString(), headerData, MICRO_AEPS_Activity.this, getString(R.string.responseTimeOut), typeput).execute();
     }
 
     public void assignBundleValue(int position) {
@@ -301,9 +284,9 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
         input_deviceid = findViewById(R.id.input_deviceid);
         heading = findViewById(R.id.toolbar_title);
         if (balance != null) {
-            heading.setText("AEPS2" + " (Balance : Rs." + balance + ")");
+            heading.setText("AEPS" + " (Balance : Rs." + balance + ")");
         } else {
-            heading.setText("AEPS2");
+            heading.setText("AEPS");
         }
         input_mobile = findViewById(R.id.input_mobile);
         btn_submit_aeps = findViewById(R.id.btn_submit_aeps);
@@ -454,23 +437,6 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
             view.setClickable(clickable);
         }
         return clickable;
-    }
-
-    public JSONObject getPendingTransaction() {
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("serviceType", "CASHOUT_PENDING_TXN_LIST");
-            jsonObject.put("requestChannel", requestChannel);
-            jsonObject.put("typeMobileWeb", "mobile");
-            jsonObject.put("transactionID", ImageUtils.miliSeconds());
-            jsonObject.put("agentMobile", list.get(0).getMobilno());
-            jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
-            jsonObject.put("reqFor", reqFor);
-            jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return jsonObject;
     }
 
     public JSONObject getTransactionStatus(String orgTxnRefID) {
@@ -856,7 +822,6 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
         clientRefID = "";
     }
 
-
     @Override
     public void chechStatus(JSONObject object) {
         try {
@@ -873,9 +838,9 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
                     headerDatas = object.getString("headerData"); //authdata
                     clientRefID = object.getString("clientRefID");
                     if (requestData != "" && pidData != "" && aeps_type.equals("aeps2") && serviceType.equalsIgnoreCase("AEPS_CASHOUT") && devicetype.equalsIgnoreCase("other")) {
-                        new AsyncPostMethod(WebConfig.CASHOUT_URL1, getCashOutDetails2(clientRefID, input_mobile.getText().toString(), requestData, headerDatas, input_amount.getText().toString(), serviceType, requestChannel, reqFor, requestType, input_deviceid.getText().toString(), innno, bankName).toString(), headerData, MICRO_AEPS_Activity.this, getString(R.string.responseTimeOut), typeput).execute();
+                        new AsyncPostMethod(WebConfig.CASHOUT_URL_NEW, getCashOutDetails2(clientRefID, input_mobile.getText().toString(), requestData, headerDatas, input_amount.getText().toString(), serviceType, requestChannel, reqFor, requestType, input_deviceid.getText().toString(), innno, bankName).toString(), headerData, MICRO_AEPS_Activity.this, getString(R.string.responseTimeOut), typeput).execute();
                     } else if (requestData != "" && pidData != "" && aeps_type.equals("aeps2") && serviceType.equalsIgnoreCase("AEPS_BALANCE_ENQ") && devicetype.equalsIgnoreCase("others")) {
-                        new AsyncPostMethod(WebConfig.CASHOUT_URL1, getGetBalance(clientRefID, input_mobile.getText().toString(), requestData, headerDatas, input_deviceid.getText().toString(), serviceType, requestChannel, reqFor, requestType, input_deviceid.getText().toString(), innno, bankName).toString(), headerData, MICRO_AEPS_Activity.this, getString(R.string.responseTimeOut), typeput).execute();
+                        new AsyncPostMethod(WebConfig.CASHOUT_URL_NEW, getGetBalance(clientRefID, input_mobile.getText().toString(), requestData, headerDatas, input_deviceid.getText().toString(), serviceType, requestChannel, reqFor, requestType, input_deviceid.getText().toString(), innno, bankName).toString(), headerData, MICRO_AEPS_Activity.this, getString(R.string.responseTimeOut), typeput).execute();
                     }
                 } else if (object.getString("serviceType").equalsIgnoreCase("CASHOUT_PENDING_TXN_LIST")) {
                     if (object.has("cashoutPendingList")) {
@@ -884,6 +849,8 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
                 } else if (object.getString("serviceType").equalsIgnoreCase("AEPS_TRANSACTION_STATUS") || object.getString("serviceType").equalsIgnoreCase("MATM_TRANSACTION_STATUS")) {
                     customReceiptNew("Transaction Status Receipt", object, MICRO_AEPS_Activity.this);
                 }
+            } else if (object.getString("responseCode").equalsIgnoreCase("85001")) {
+                customDialog_Common_device(object.getString("responseMessage"));
             } else if (object.getString("responseCode").equalsIgnoreCase("60217")) {
                 customDialog_Common_device(object.getString("responseMessage"));
             } else if (object.getString("responseCode").equalsIgnoreCase("86039")) {
@@ -917,9 +884,7 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
             try { //balanceAmount
                 if (object.getString("status").equalsIgnoreCase("1000") && aeps_type.equalsIgnoreCase("aeps2")) {
                     generateReceipt1(String.valueOf(object), convertString(input_deviceid.getText().toString()));
-                } /*else {
-                        customDialog_Common_device(object.getString("respnseMessage"));
-                }*/
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -1076,11 +1041,6 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
                 setBack_click(this);
                 finish();
                 break;
-           /* case R.id.reset:
-                reset.setClickable(false);
-                if (!typeput.equalsIgnoreCase("Balance Enquiry"))
-                    loadUrl();
-                break;*/
         }
     }
 

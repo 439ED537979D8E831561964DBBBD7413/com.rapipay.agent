@@ -743,7 +743,7 @@ public class PMTRemittanceActivity extends BaseCompactActivity implements View.O
                 ArrayList<String> list_state1 = new ArrayList<>();
                 ArrayList<StatePozo> list_state = dbRealm.getState_Details();
                 for (int i = 0; i < list_state.size(); i++) {
-                    list_state1.add(list_state.get(i).getHeaderValue());
+                    list_state1.add(list_state.get(i).getHeaderData());
                 }
                 customSpinner((TextView) findViewById(R.id.select_state), "Select State*", list_state1);
                 break;

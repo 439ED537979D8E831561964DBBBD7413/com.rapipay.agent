@@ -18,8 +18,6 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.rapipay.android.agent.Database.RapipayDB;
 import com.rapipay.android.agent.Model.NewKYCPozo;
 import com.rapipay.android.agent.Model.NewKycAddress;
 import com.rapipay.android.agent.Model.NewKycBusiness;

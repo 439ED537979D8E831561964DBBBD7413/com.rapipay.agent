@@ -12,7 +12,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.rapipay.android.agent.BuildConfig;
-import com.rapipay.android.agent.Database.RapipayDB;
 import com.rapipay.android.agent.Model.ImagePozo;
 import com.rapipay.android.agent.Model.RapiPayPozo;
 import com.rapipay.android.agent.R;

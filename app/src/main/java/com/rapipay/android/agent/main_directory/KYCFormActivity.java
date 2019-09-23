@@ -46,7 +46,6 @@ import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
-import com.rapipay.android.agent.Database.RapipayDB;
 import com.rapipay.android.agent.Model.NewKYCPozo;
 import com.rapipay.android.agent.Model.NewKycAddress;
 import com.rapipay.android.agent.Model.NewKycBusiness;
@@ -152,7 +151,7 @@ public class KYCFormActivity extends BaseCompactActivity implements RequestHandl
                 ArrayList<String> list_state1 = new ArrayList<>();
                 ArrayList<StatePozo> list_state = dbRealm.getState_Details();
                 for (int i = 0; i < list_state.size(); i++) {
-                    list_state1.add(list_state.get(i).getHeaderValue());
+                    list_state1.add(list_state.get(i).getHeaderData());
                 }
                 customSpinner(select_state, "Select State", list_state1);
             }

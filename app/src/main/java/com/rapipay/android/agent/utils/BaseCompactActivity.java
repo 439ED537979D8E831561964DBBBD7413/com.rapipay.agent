@@ -61,7 +61,6 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.firebase.analytics.FirebaseAnalytics;
-import com.rapipay.android.agent.Database.RapipayDB;
 import com.rapipay.android.agent.Database.RapipayRealmDB;
 import com.rapipay.android.agent.Model.BankDetailsPozo;
 import com.rapipay.android.agent.Model.BeneficiaryDetailsPozo;
@@ -140,7 +139,7 @@ public class BaseCompactActivity extends AppCompatActivity {
     protected static String balance = null;
     protected static final int CONTACT_PICKER_RESULT = 1;
     protected TextView heading;
-    public static RapipayDB db;
+   // public static RapipayDB db;
     protected BluetoothAdapter btAdapter;
     protected static int REQUEST_BLUETOOTH = 101;
     protected ArrayList<RapiPayPozo> list, listOld;
@@ -175,7 +174,7 @@ public class BaseCompactActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         dbRealm = new RapipayRealmDB();
-        db = new RapipayDB(this);
+       // db = new RapipayDB(this);
         Realm.init(this);
         getRealmUpdate();
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
@@ -1004,7 +1003,7 @@ public class BaseCompactActivity extends AppCompatActivity {
                 ArrayList<String> list_state1 = new ArrayList<>();
                 ArrayList<StatePozo> list_state = dbRealm.getState_Details();
                 for (int i = 0; i < list_state.size(); i++) {
-                    list_state1.add(list_state.get(i).getHeaderValue());
+                    list_state1.add(list_state.get(i).getHeaderData());
                 }
                 customSpinner(bank_select, "Select State*", list_state1);
             }
@@ -1631,7 +1630,7 @@ public class BaseCompactActivity extends AppCompatActivity {
         Window window = dialog.getWindow();
         window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
     }
-
+    protected boolean clicks = true;
     protected void customReceiptNew(final String type, final JSONObject object, final CustomInterface anInterface) {
         this.anInterface = anInterface;
         left = new ArrayList<>();
@@ -1750,6 +1749,7 @@ public class BaseCompactActivity extends AppCompatActivity {
             public void onClick(View v) {
                 anInterface.okClicked(type, object);
                 dialog.dismiss();
+                clicks = true;
             }
         });
         share.setOnClickListener(new View.OnClickListener() {
@@ -1787,6 +1787,7 @@ public class BaseCompactActivity extends AppCompatActivity {
         Window window = dialog.getWindow();
         window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
     }
+
 
     public void clickable() {
         try {
@@ -2832,7 +2833,7 @@ public class BaseCompactActivity extends AppCompatActivity {
     }
 
     protected void deleteTables() {
-        SQLiteDatabase dba = BaseCompactActivity.db.getWritableDatabase();
+       /* SQLiteDatabase dba = BaseCompactActivity.db.getWritableDatabase();
         dba.execSQL("delete from " + RapipayDB.TABLE_NAME);
         dba.execSQL("delete from " + RapipayDB.TABLE_BANK);
         dba.execSQL("delete from " + RapipayDB.TABLE_STATE);
@@ -2846,6 +2847,6 @@ public class BaseCompactActivity extends AppCompatActivity {
         dba.execSQL("delete from " + RapipayDB.TABLE_KYC_ADDRESS);
         dba.execSQL("delete from " + RapipayDB.TABLE_KYC_BUISNESS);
         dba.execSQL("delete from " + RapipayDB.TABLE_KYC_VERIFICATION);
-        dba.execSQL("delete from " + RapipayDB.TABLE_IMAGES);
+        dba.execSQL("delete from " + RapipayDB.TABLE_IMAGES);*/
     }
 }

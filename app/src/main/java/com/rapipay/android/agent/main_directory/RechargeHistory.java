@@ -13,8 +13,6 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.rapipay.android.agent.Database.RapipayDB;
 import com.rapipay.android.agent.Model.RechargePozo;
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.adapter.RechargeHistoryAdapter;
@@ -69,14 +67,13 @@ public class RechargeHistory extends BaseCompactActivity implements View.OnClick
         heading.setText("Recharge History");
         date2_text = (AutofitTextView) findViewById(R.id.date2);
         date1_text = (AutofitTextView) findViewById(R.id.date1);
-        if (selectedMonth < 11)
-            date2_text.setText(selectedYear + "-" + "0"+selectedMonth + "-" + selectedDate);
-        else
+        if (selectedMonth < 11) {
+            date2_text.setText(selectedYear + "-" + "0" + selectedMonth + "-" + selectedDate);
+            date1_text.setText(selectedYear + "-" + "0" + selectedMonth + "-" + selectedDate);
+        } else {
             date2_text.setText(selectedYear + "-" + selectedMonth + "-" + selectedDate);
-        if (selectedMonth < 11)
-            date1_text.setText(selectedYear + "-" + "0"+selectedMonth + "-" + selectedDate);
-        else
             date1_text.setText(selectedYear + "-" + selectedMonth + "-" + selectedDate);
+        }
         trans_details = (RecyclerView) findViewById(R.id.trans_details);
         findViewById(R.id.todate).setOnClickListener(toDateClicked);
         findViewById(R.id.date1).setOnClickListener(toDateClicked);
@@ -114,7 +111,7 @@ public class RechargeHistory extends BaseCompactActivity implements View.OnClick
         trans_details.addOnItemTouchListener(new RecyclerTouchListener(this, trans_details, new ClickListener() {
             @Override
             public void onClick(View view, int position) {
-                if(clicks) {
+                if (clicks) {
                     clicks = false;
                     RechargePozo pozo = transactionPozoArrayList.get(position);
                     new AsyncPostMethod(WebConfig.WALLETRECEIPTURL, receipt_request(pozo).toString(), headerData, RechargeHistory.this, getString(R.string.responseTimeOut)).execute();

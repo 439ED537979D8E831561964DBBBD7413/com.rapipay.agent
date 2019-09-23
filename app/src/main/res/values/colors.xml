@@ -3,23 +3,25 @@
     <color name="colorPrimary">#282247</color>
     <!--<color name="colorPrimaryDark">#282247</color>-->
     <color name="colorPrimaryDark">#684196</color>
-    <color name="newcolor">#684196</color>
+    <color name="newcolor">#59178a</color>
     <color name="colorAccent">#000000</color>
     <color name="white">#FFFFFF</color>
     <color name="tab_color">#99292d</color>
     <color name="reversefrom">#90cfee</color>
     <color name="receivedfrom">#b5dea0</color>
-    <color name="reverseby">#bf98e7</color>
+    <color name="reverseby">#d296ff</color>
     <color name="givento">#f788cc</color>
-
+    <color name="violet">#4c1a84</color>
+    <color name="magenta">#d60b8c</color>
     <color name="rapipaybuttoncolor">#2B2348</color>
-    <color name="transparent_black">#66000000</color>
+    <color name="transparent_black">#00F</color>
     <color name="list_item_title">#fff</color>
     <color name="list_background">#303030</color>
     <color name="list_background_pressed">#992416</color>
     <color name="list_divider">#272727</color>
     <color name="counter_text_bg">#626262</color>
     <color name="counter_text_color">#EDE9E9</color>
+    <color name="dashboard_color">#EDE9E9</color>
     <color name="coo1">#7df1e7</color>
     <color name="base">#FF4081</color>
     <color name="hint">#303F9F</color>
@@ -29,7 +31,6 @@
     <color name="colorbackground">#D8D8D8</color>
     <color name="black">#000000</color>
     <color name="green1">#62BB45</color>
-
 
     <color name="red">#F00</color>
     <color name="green">#0F0</color>

@@ -19,7 +19,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.rapipay.android.agent.Database.RapipayDB;
+import com.rapipay.android.agent.Model.BankDetailsPozo;
 import com.rapipay.android.agent.Model.BeneficiaryDetailsPozo;
 import com.rapipay.android.agent.Model.LastTransactionPozo;
 import com.rapipay.android.agent.R;
@@ -114,8 +114,14 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
         bank_select.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ArrayList<String> list_bank = db.geBankDetails("");
-                customSpinner(bank_select, "Select Bank", list_bank);
+                /*ArrayList<String> list_bank = dbRealm.geBankDetails("");
+                customSpinner(bank_select, "Select Bank", list_bank);*/
+                ArrayList<String> list_bank = new ArrayList<>();
+                ArrayList<BankDetailsPozo> list_bank1 = BaseCompactActivity.dbRealm.geBankDetails("");
+                for (int i = 0; i < list_bank1.size(); i++) {
+                    list_bank.add(list_bank1.get(i).getBankName());
+                }
+                customSpinner(bank_select, "Select Bank", list_bank, null);
             }
         });
         beneficiary_details.addOnItemTouchListener(new RecyclerTouchListener(this, beneficiary_details, new ClickListener() {
@@ -233,8 +239,9 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
         JSONObject jsonObject = new JSONObject();
         if (!input_name.getText().toString().isEmpty() && !bank_select.getText().toString().isEmpty() && !bank_select.getText().toString().equalsIgnoreCase("Select Bank")) {
             try {
-                String condition = "where " + RapipayDB.COLOMN__BANK_NAME + "='" + bank_select.getText().toString() + "'";
-                ifsc_code = db.geBankIFSC(condition).get(0);
+               // String condition = "where " + RapipayDB.COLOMN__BANK_NAME + "='" + bank_select.getText().toString() + "'";
+                String condition = bank_select.getText().toString();
+                ifsc_code = dbRealm.geBankIFSC(condition).get(0);
                 jsonObject.put("serviceType", "Money_Transfer");
                 jsonObject.put("requestType", "BC_CHANNEL");
                 jsonObject.put("typeMobileWeb", "mobile");
@@ -531,8 +538,12 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
                 bank_select_bene.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        ArrayList<String> list_bank = db.geBankDetails("");
-                        customSpinner(bank_select_bene, "Select Bank", list_bank);
+                        ArrayList<String> list_bank = new ArrayList<>();
+                        ArrayList<BankDetailsPozo> list_bank1 = BaseCompactActivity.dbRealm.geBankDetails("");
+                        for (int i = 0; i < list_bank1.size(); i++) {
+                            list_bank.add(list_bank1.get(i).getBankName());
+                        }
+                        customSpinner(bank_select, "Select Bank", list_bank, null);
                     }
                 });
                 newtin = (EditText) alertLayout.findViewById(R.id.newpin);
@@ -564,8 +575,8 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
                     con_bene_number.requestFocus();
                 } else {
                     dialognew.dismiss();
-                    String condition = "where " + RapipayDB.COLOMN__BANK_NAME + "='" + bank_select_bene.getText().toString() + "'";
-                    ifsc_code = db.geBankIFSC(condition).get(0);
+                    String condition = bank_select_bene.getText().toString() ;
+                    ifsc_code = dbRealm.geBankIFSC(condition).get(0);
                     new AsyncPostMethod(WebConfig.BCRemittanceApp, addBeneAccount(bene_number.getText().toString(), ifsc_code, bene_name.getText().toString(), "D").toString(), headerData, FundTransferActivity.this, getString(R.string.responseTimeOutTrans)).execute();
                 }
             }
@@ -590,8 +601,8 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
 //                    newtin.requestFocus();
                 } else {
                     dialognew.dismiss();
-                    String condition = "where " + RapipayDB.COLOMN__BANK_NAME + "='" + bank_select_bene.getText().toString() + "'";
-                    ifsc_code = db.geBankIFSC(condition).get(0);
+                    String condition = bank_select_bene.getText().toString();
+                    ifsc_code = dbRealm.geBankIFSC(condition).get(0);
 //                    if (newtin.getText().toString().isEmpty())
                     new AsyncPostMethod(WebConfig.BCRemittanceApp, verify_Account(ifsc_code, bene_number.getText().toString()).toString(), headerData, FundTransferActivity.this, getString(R.string.responseTimeOutTrans)).execute();
 //                    else
@@ -775,8 +786,8 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
                 if (!object.getString("subType").equalsIgnoreCase("Money_Transfer"))
                     serviceFee(alertLayout, object, (BeneficiaryDetailsPozo) ob, msg, input, "BC");
                 else {
-                    String condition = "where " + RapipayDB.COLOMN__BANK_NAME + "='" + bank_select.getText().toString() + "'";
-                    ifsc_code = db.geBankIFSC(condition).get(0);
+                    String condition = bank_select.getText().toString();
+                    ifsc_code = dbRealm.geBankIFSC(condition).get(0);
                     moneyTransgerFee(alertLayout, object, input_account.getText().toString(), ifsc_code, input_name.getText().toString(), msg, input);
                 }
             } else if (type.equalsIgnoreCase("Fund Transfer")) {

@@ -1154,7 +1154,7 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
             }
         }
         return hex;
-    }
+    }//{"userAccessId":"10883423","responseMessage":"Insufficient balance in user account.","responseCode":"900"}
 
     @Override
     public void chechStat(String s, String hitfrom) {
@@ -1296,8 +1296,8 @@ public class BC2TransferFragment extends BaseFragment implements View.OnClickLis
                     customDialog_Common(object.getString("responseMessage"));
                 } else if (object.getString("responseCode").equalsIgnoreCase("75235")) {
                     customDialog_Common(object.getString("responseMessage"));
-                } else if (object.getString("serviceType").equalsIgnoreCase("SENDER_COMPLETE_DETAILS")) {
-                    if (object.has("serviceType")) {
+                } else if (object.has("serviceType")) {
+                    if (object.getString("serviceType").equalsIgnoreCase("SENDER_COMPLETE_DETAILS")) {
                         if (object.getString("responseCode").equalsIgnoreCase("86036")) {
                             sender_layout.setVisibility(View.GONE);
                             detail_expend.setVisibility(View.VISIBLE);

@@ -32,6 +32,7 @@ import android.support.v7.widget.AppCompatButton;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -344,7 +345,7 @@ public class BaseFragment extends Fragment {
         clickable();
         super.onPause();
     }
-
+    protected boolean clicks = true;
     protected void customDialog_Common(final String type, JSONObject object, final Object ob, String msg, final String input, String output, final CustomInterface anInterface) {
         this.anInterface = anInterface;
         dialog = new Dialog(getActivity());
@@ -412,7 +413,7 @@ public class BaseFragment extends Fragment {
                         ArrayList<String> list_state1 = new ArrayList<>();
                         ArrayList<StatePozo> list_state = BaseCompactActivity.dbRealm.getState_Details();
                         for (int i = 0; i < list_state.size(); i++) {
-                            list_state1.add(list_state.get(i).getHeaderValue());
+                            list_state1.add(list_state.get(i).getHeaderData());
                         }
                         customSpinner(bank_select, "Select State*", list_state1, "");
                     }
@@ -427,6 +428,7 @@ public class BaseFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 btn_ok.setClickable(false);
+                clicks = true;
                 if (type.equalsIgnoreCase("PENDINGREFUND")) {
                     anInterface.okClicked(input, ob);
                     dialog.dismiss();
@@ -474,6 +476,7 @@ public class BaseFragment extends Fragment {
         btn_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                clicks = true;
                 btn_cancel.setClickable(false);
                 anInterface.cancelClicked(type, ob);
                 dialog.dismiss();
@@ -482,12 +485,14 @@ public class BaseFragment extends Fragment {
         btn_regenerate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                clicks = true;
                 dialog.dismiss();
             }
         });
         dialog_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                clicks = true;
                 dialog.dismiss();
             }
         });
@@ -730,6 +735,61 @@ public class BaseFragment extends Fragment {
         dialog.setContentView(alertLayout);
     }
 
+    protected void customSpinner(final TextView viewText, final String type, final ArrayList<String> list_spinner) {
+        spinner_list = list_spinner;
+        dialognew = new Dialog(getActivity());
+        LayoutInflater inflater = getLayoutInflater();
+        View alertLayout = inflater.inflate(R.layout.custom_spinner_layout, null);
+        alertLayout.setKeepScreenOn(true);
+        TextView text = (TextView) alertLayout.findViewById(R.id.spinner_title);
+        final EditText search = (EditText) alertLayout.findViewById(R.id.input_search);
+        text.setText(type);
+        search.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String text = search.getText().toString().toLowerCase(Locale.getDefault());
+                adapter.filter(text);
+                Log.e("bank name===",text);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+        ListView listLeft = (ListView) alertLayout.findViewById(R.id.list_view);
+        AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
+        if (spinner_list.size() != 0) {
+            adapter = new CustomSpinnerAdapter(spinner_list, getActivity());
+            listLeft.setAdapter(adapter);
+        }
+        listLeft.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                viewText.setText(list_spinner.get(position));
+                viewText.setError(null);
+                dialognew.dismiss();
+            }
+        });
+        dialognew.setCancelable(false);
+        dialognew.setContentView(alertLayout);
+        btn_ok.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialognew.dismiss();
+            }
+        });
+        dialognew.show();
+        Window window = dialognew.getWindow();
+        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+    }
+
+
     protected CustomSpinnerAdapter adapter = null;
 
     protected void customSpinner(final TextView viewText, final String type, final ArrayList<String> list_spinner, final String typeCheck) {
@@ -753,8 +813,13 @@ public class BaseFragment extends Fragment {
 
             @Override
             public void afterTextChanged(Editable s) {
-                String text = search.getText().toString().toLowerCase(Locale.getDefault());
-                adapter.filter(text);
+                try {
+                    String text = search.getText().toString().toLowerCase(Locale.getDefault());
+                    adapter.filter(text);
+                    Log.e("bank name=",text);
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
             }
         });
         ListView listLeft = (ListView) alertLayout.findViewById(R.id.list_view);
@@ -835,41 +900,6 @@ public class BaseFragment extends Fragment {
             }
         });
         builder.show();
-    }
-
-
-    protected void customDialog_Common_device(String msg) {
-        try {
-            final Dialog dialog = new Dialog(getActivity());
-            LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            View alertLayout = inflater.inflate(R.layout.custom_layout_common, null);
-            TextView text = (TextView) alertLayout.findViewById(R.id.dialog_title);
-            text.setText(getResources().getString(R.string.Alert));
-            TextView dialog_msg = (TextView) alertLayout.findViewById(R.id.dialog_msg);
-            dialog_msg.setText(msg);
-            dialog_msg.setVisibility(View.VISIBLE);
-            alertLayout.findViewById(R.id.btn_cancel).setVisibility(View.GONE);
-            AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
-            dialog.setCancelable(false);
-            btn_ok.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    try {
-                        dialog.dismiss();
-                        Intent dashboard = new Intent(getActivity(), MainActivity.class);
-                        startActivity(dashboard);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-            dialog.setContentView(alertLayout);
-            dialog.show();
-            Window window = dialog.getWindow();
-            window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     protected void setBack_click(Context context) {

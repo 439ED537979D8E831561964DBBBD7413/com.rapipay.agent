@@ -2,10 +2,6 @@ package com.rapipay.android.agent.utils;
 
 import android.content.Context;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
-
-import com.google.gson.Gson;
-import com.rapipay.android.agent.Database.RapipayDB;
 import com.rapipay.android.agent.Model.BankDetailsPozo;
 import com.rapipay.android.agent.Model.CreaditPaymentModePozo;
 import com.rapipay.android.agent.Model.HandsetRegistration;
@@ -15,10 +11,7 @@ import com.rapipay.android.agent.Model.PaymentModePozo;
 import com.rapipay.android.agent.Model.RapiPayPozo;
 import com.rapipay.android.agent.Model.StatePozo;
 import com.rapipay.android.agent.Model.TbOperatorPozo;
-import com.rapipay.android.agent.Model.TbRechargePozo;
-import com.rapipay.android.agent.Model.microaeps.Microresponse1;
 import com.rapipay.android.agent.main_directory.LoginScreenActivity;
-import com.rapipay.android.agent.main_directory.MainActivity;
 import com.rapipay.android.agent.main_directory.PinActivity;
 import com.rapipay.android.agent.main_directory.PinVerification;
 
@@ -38,9 +31,9 @@ public class RouteClass extends BaseCompactActivity {
     private void define_Route(final Context context, final JSONObject object, String mobileNo, final LocalStorage localStorage, String type) {
         try {
             list = BaseCompactActivity.dbRealm.getDetails();
-            if (list.size() == 0) {
+            /*if (list.size() == 0) {
                 list = BaseCompactActivity.db.getDetails();
-            }
+            }*/
             if (list.size() == 0) {
                 if (type != null && type.equalsIgnoreCase("PINENTERED")) {
                     intent = new Intent(context, PinActivity.class);
@@ -118,7 +111,7 @@ public class RouteClass extends BaseCompactActivity {
     }
 
     protected void deleteTablesOld(String type) {
-        SQLiteDatabase dba = BaseCompactActivity.db.getWritableDatabase();
+        /*SQLiteDatabase dba = BaseCompactActivity.db.getWritableDatabase();
         dba.execSQL("delete from " + RapipayDB.TABLE_BANK);
         dba.execSQL("delete from " + RapipayDB.TABLE_PAYMENT);
         dba.execSQL("delete from " + RapipayDB.TABLE_STATE);
@@ -132,6 +125,6 @@ public class RouteClass extends BaseCompactActivity {
             dba.execSQL("delete from " + RapipayDB.TABLE_KYC_ADDRESS);
             dba.execSQL("delete from " + RapipayDB.TABLE_KYC_BUISNESS);
             dba.execSQL("delete from " + RapipayDB.TABLE_KYC_VERIFICATION);
-        }
+        }*/
     }
 }

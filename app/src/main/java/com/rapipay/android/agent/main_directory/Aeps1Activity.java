@@ -4,7 +4,6 @@ import android.Manifest;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -14,7 +13,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.LinearLayoutManager;
@@ -25,7 +23,6 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
@@ -37,12 +34,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.finopaytech.finosdk.activity.MainTransactionActivity;
 import com.finopaytech.finosdk.encryption.AES_BC;
 import com.finopaytech.finosdk.helpers.Utils;
@@ -60,11 +51,8 @@ import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.gson.Gson;
 import com.rapipay.android.agent.Model.AEPSPendingPozo;
-import com.rapipay.android.agent.Model.microaeps.Microdata1;
-import com.rapipay.android.agent.Model.microaeps.Microresponse1;
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.adapter.MATMAEPSAdapter;
-import com.rapipay.android.agent.adapter.MicroAepsAdapter;
 import com.rapipay.android.agent.interfaces.ClickListener;
 import com.rapipay.android.agent.interfaces.CustomInterface;
 import com.rapipay.android.agent.interfaces.RequestHandler;
@@ -79,25 +67,11 @@ import com.rapipay.android.agent.view.EnglishNumberToWords;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-
-import java.io.IOException;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-import io.realm.Realm;
-
-import static com.example.rfplmantra.MantraActivity.callmantraDeviceinfo;
-import static com.example.rfplmantra.MantraActivity.display;
-import static com.example.rfplmorphof.MorphoActivity.callmophoDeviceinfo;
-import static com.example.rfplstartek.StratekActivity.callStartekDeviceinfo;
 
 public class Aeps1Activity extends BaseCompactActivity implements View.OnClickListener, RequestHandler, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,

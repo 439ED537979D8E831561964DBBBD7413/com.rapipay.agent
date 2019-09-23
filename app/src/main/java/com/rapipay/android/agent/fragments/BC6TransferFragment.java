@@ -764,8 +764,8 @@ public class BC6TransferFragment extends BaseFragment implements View.OnClickLis
                     input_name1.requestFocus();
                 } else if (selectGender.equalsIgnoreCase("Select Gender")) {
                     Toast.makeText(getActivity(), "Please Select Gender", Toast.LENGTH_SHORT).show();
-                } else if (Math.abs(years-beforeyear)<18) {
-                   // Log.e("years "+years,"beforeyear " +beforeyear+" ageyear difference"+Math.abs(years-beforeyear));
+                } else if (Math.abs(years - beforeyear) < 18) {
+                    // Log.e("years "+years,"beforeyear " +beforeyear+" ageyear difference"+Math.abs(years-beforeyear));
                     Toast.makeText(getActivity(), "Age must be greater than 17 years", Toast.LENGTH_SHORT).show();
                 } else if (senderpincode.getText().toString().isEmpty()) {
                     senderpincode.setError("Please enter valid pincode");
@@ -1194,7 +1194,7 @@ public class BC6TransferFragment extends BaseFragment implements View.OnClickLis
                         clear();
                         otpRefId = object.getString("otpRefId");
                         // when existing no. and after successfully add then otp must not show
-                        if(otpRefId.isEmpty() || otpRefId=="null"){
+                        if (otpRefId.isEmpty() || otpRefId == "null") {
                             otp_layout.setVisibility(View.GONE);
                             new WalletAsyncMethod(WebConfig.BC6RemittanceApp, getSender_Validate().toString(), headerData, BC6TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
                         }
@@ -1299,11 +1299,11 @@ public class BC6TransferFragment extends BaseFragment implements View.OnClickLis
                         customDialog_Common("KYCLAYOUTS", null, null, null, null, object.getString("responseMessage"), BC6TransferFragment.this);
                     }
                 } else if (object.getString("responseCode").equalsIgnoreCase("102")) {
-                        customDialog_Common(object.getString("responseMessage"));
-                }  else if (object.getString("responseCode").equalsIgnoreCase("75235")) {
-                        customDialog_Common(object.getString("responseMessage"));
-                } else if (object.has("serviceType") || object.getString("serviceType").equalsIgnoreCase("SENDER_COMPLETE_DETAILS")) {
-                    if (object.has("serviceType")) {
+                    customDialog_Common(object.getString("responseMessage"));
+                } else if (object.getString("responseCode").equalsIgnoreCase("75235")) {
+                    customDialog_Common(object.getString("responseMessage"));
+                } else if (object.has("serviceType")) {
+                    if (object.getString("serviceType").equalsIgnoreCase("SENDER_COMPLETE_DETAILS")) {
                         if (object.getString("responseCode").equalsIgnoreCase("86036")) {
                             sender_layout.setVisibility(View.GONE);
                             detail_expend.setVisibility(View.VISIBLE);
@@ -1342,8 +1342,7 @@ public class BC6TransferFragment extends BaseFragment implements View.OnClickLis
                     if (object.has("responseMessage")) {
                         dialog.dismiss();
                         customReceiptNew("Transaction Receipt", object, BC6TransferFragment.this);
-                    }
-                    else
+                    } else
                         customReceiptNew("Transaction Receipt", object, BC6TransferFragment.this);
                 } else if (object.getString("responseCode").equalsIgnoreCase("102")) {
                     dialog.dismiss();
@@ -1377,7 +1376,7 @@ public class BC6TransferFragment extends BaseFragment implements View.OnClickLis
         }
     }
 
-    int years=0, beforeyear=0;
+    int years = 0, beforeyear = 0;
     private int selectedDate, selectedMonth, selectedYear;
     String months = null, dayss = null;
 
@@ -1558,51 +1557,6 @@ public class BC6TransferFragment extends BaseFragment implements View.OnClickLis
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    protected void customAddneft(final String type, String ifsc, final String accountNo, String msg, final String beneName, String beneBank) {
-        final Dialog dialog = new Dialog(getActivity());
-        LayoutInflater inflater = getLayoutInflater();
-        View alertLayout = inflater.inflate(R.layout.custom_layout_common, null);
-        alertLayout.setKeepScreenOn(true);
-        TextView text = (TextView) alertLayout.findViewById(R.id.dialog_title);
-        text.setText(msg);
-        TextView dialog_cancel = (TextView) alertLayout.findViewById(R.id.dialog_cancel);
-        AppCompatButton btn_cancel = (AppCompatButton) alertLayout.findViewById(R.id.btn_cancel);
-        AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
-        if (type.equalsIgnoreCase("Fund Transfer")) {
-            alertLayout.findViewById(R.id.addneftben_layout).setVisibility(View.VISIBLE);
-            customAddBeneneft(alertLayout, ifsc, accountNo, beneName, beneBank, dialog, "NEFT");
-        }
-        dialog.setCancelable(false);
-        btn_ok.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                hideKeyboard(getActivity());
-                if (type.equalsIgnoreCase("Fund Transfer")) {
-                    if (btn_ifsc.getText().toString().isEmpty()) {
-                        btn_ifsc.setError("Please enter valid IFSC Code.");
-                        btn_ifsc.requestFocus();
-                    } else {
-//                        transfer_type=input;
-                        new WalletAsyncMethod(WebConfig.BC6RemittanceApp, addBeneAccount(accountNo, btn_ifsc.getText().toString(), beneName, "D", "NEFT").toString(), headerData, BC6TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
-                        dialog.dismiss();
-                    }
-                }
-            }
-        });
-        btn_cancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                bank_select.setText("Select Bank");
-                input_account.setText("");
-                input_amount.setText("");
-                dialog.dismiss();
-            }
-        });
-        dialog.show();
-        Window window = dialog.getWindow();
-        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
     }
 
     String transfer_type;

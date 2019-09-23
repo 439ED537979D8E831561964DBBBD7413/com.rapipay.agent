@@ -14,7 +14,6 @@ import android.view.Window;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.rapipay.android.agent.Database.RapipayDB;
 import com.rapipay.android.agent.Model.RapiPayPozo;
 import com.rapipay.android.agent.R;
 import com.rapipay.android.agent.interfaces.RequestHandler;
@@ -176,7 +175,7 @@ public class ChangePassword extends BaseFragment implements RequestHandler, View
     }
 
     protected void deleteTables(String type) {
-        SQLiteDatabase dba = BaseCompactActivity.db.getWritableDatabase();
+        /*SQLiteDatabase dba = BaseCompactActivity.db.getWritableDatabase();
         dba.execSQL("delete from " + RapipayDB.TABLE_BANK);
         dba.execSQL("delete from " + RapipayDB.TABLE_PAYMENT);
         dba.execSQL("delete from " + RapipayDB.TABLE_STATE);
@@ -185,6 +184,6 @@ public class ChangePassword extends BaseFragment implements RequestHandler, View
         dba.execSQL("delete from " + RapipayDB.TABLE_TRANSFERLIST);
         dba.execSQL("delete from " + RapipayDB.TABLE_PAYERPAYEE);
         if (!type.equalsIgnoreCase(""))
-            dba.execSQL("delete from " + RapipayDB.TABLE_NAME);
+            dba.execSQL("delete from " + RapipayDB.TABLE_NAME);*/
     }
 }

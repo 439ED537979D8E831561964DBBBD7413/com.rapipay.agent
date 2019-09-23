@@ -41,6 +41,7 @@ class TransactionReports : BaseFragment(), RequestHandler, View.OnClickListener,
     internal var months: String? = null
     internal var dayss: String? = null
     private var isLoading: Boolean = false
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         var view = inflater.inflate(R.layout.txn_report_layout, container, false);
         reqFor = arguments!!.getString("reqFor")
@@ -58,14 +59,13 @@ class TransactionReports : BaseFragment(), RequestHandler, View.OnClickListener,
         selectedYear = calendar.get(Calendar.YEAR)
         date2_text = v.findViewById<View>(R.id.date2) as AutofitTextView
         date1_text = v.findViewById<View>(R.id.date1) as AutofitTextView
-        if (selectedMonth < 11)
+        if (selectedMonth < 11) {
             date2_text!!.setText("$selectedYear-" + "0$selectedMonth" + "-$selectedDate")
-        else
-            date2_text!!.setText("$selectedYear-$selectedMonth-$selectedDate")
-        if (selectedMonth < 11)
             date1_text!!.setText("$selectedYear-" + "0$selectedMonth" + "-$selectedDate")
-        else
+        }else {
+            date2_text!!.setText("$selectedYear-$selectedMonth-$selectedDate")
             date1_text!!.setText("$selectedYear-$selectedMonth-$selectedDate")
+        }
         v.findViewById<View>(R.id.todate).setOnClickListener(toDateClicked)
         v.findViewById<View>(R.id.btn_fund).setOnClickListener(this)
         v.findViewById<View>(R.id.date1).setOnClickListener(toDateClicked)

@@ -595,7 +595,8 @@ public class MatmActivity extends BaseCompactActivity implements View.OnClickLis
 
     int flag = 0;
 
-
+    //{"responseMessage":"85001:POS Device is not assigned to you","responseCode":"85001","serviceType":"MATM_BALANCE_ENQ","objMposData":null,
+// "apiCommonResposne":{"runningBalance":"192.31036"},"requestData":null,"requestKey":null,"headerData":null,"headerKey":null,"clientRefID":null,"postURL":null}
     @Override
     public void chechStatus(JSONObject object) {
         try {
@@ -620,6 +621,8 @@ public class MatmActivity extends BaseCompactActivity implements View.OnClickLis
                 } else if (object.getString("serviceType").equalsIgnoreCase("AEPS_TRANSACTION_STATUS") || object.getString("serviceType").equalsIgnoreCase("MATM_TRANSACTION_STATUS")) {
                     customReceiptNew("Transaction Status Receipt", object, MatmActivity.this);
                 }
+            }else if (object.getString("responseCode").equalsIgnoreCase("85001")) {
+                customDialog_Common_device(object.getString("responseMessage"));
             } else if (object.getString("responseCode").equalsIgnoreCase("60217")) {
                 customDialog_Matm_device(object.getString("responseMessage"));
             } else if (object.getString("responseCode").equalsIgnoreCase("86039")) {
@@ -633,9 +636,9 @@ public class MatmActivity extends BaseCompactActivity implements View.OnClickLis
             } else if (object.getString("responseCode").equalsIgnoreCase("60147")) {
                 Toast.makeText(this,object.getString("responseCode"),Toast.LENGTH_LONG).show();
                 setBack_click1(this);
-            } /*else {
+            } else {
                 customDialog_List_info(object.getString("responseMessage"));
-            }*/
+            }
             btn_submit_aeps.setClickable(true);
         } catch (Exception e) {
             e.printStackTrace();

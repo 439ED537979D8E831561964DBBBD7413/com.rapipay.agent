@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.rapipay.android.agent">
+
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />
@@ -13,8 +14,7 @@
         android:required="false" />
 
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="ANDROID.PERMISSION.READ_EXTERNAL_STORAGE"/>
-
+    <uses-permission android:name="ANDROID.PERMISSION.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
@@ -25,23 +25,43 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+
     <uses-feature
         android:name="android.hardware.location.gps"
         android:required="true" />
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/rapipay"
         android:label="@string/app_name"
         android:largeHeap="true"
-        android:supportsRtl="true"
         android:resizeableActivity="false"
+        android:supportsRtl="true"
         android:theme="@style/AppTheme.PopupOverlay"
         tools:replace="android:icon,android:allowBackup">
+        <activity android:name=".kotlin_classs.BC7Tab"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden" />
+        <activity android:name=".main_directory.Aeps1Activity"/>
+        <activity
+            android:name=".kotlin_classs.BC2Tab"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name=".kotlin_classs.BC6Tab"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name=".main_directory.MatmActivity"
+            android:label="@string/title_activity_matm"
+            android:theme="@style/AppTheme.PopupOverlay.NoActionBar" />
+
         <meta-data
             android:name="com.google.android.gms.vision.DEPENDENCIES"
             android:value="barcode" />
+
         <activity
             android:name=".main_directory.LoginScreenActivity"
             android:screenOrientation="portrait"
@@ -50,6 +70,7 @@
             android:name=".kotlin_classs.BCTab"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden" />
+
         <activity
             android:name=".main_directory.CashOutClass"
             android:screenOrientation="portrait"
@@ -175,11 +196,10 @@
         <activity
             android:name=".main_directory.MPOSRegistration"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="stateHidden" />
-        <!--<activity-->
-            <!--android:name=".main_directory.Fino_AEPS_BBPS_Activity"-->
-            <!--android:screenOrientation="portrait"-->
-            <!--android:windowSoftInputMode="stateHidden" />-->
+            android:windowSoftInputMode="stateHidden" /> <!-- <activity -->
+        <!-- android:name=".main_directory.Fino_AEPS_BBPS_Activity" -->
+        <!-- android:screenOrientation="portrait" -->
+        <!-- android:windowSoftInputMode="stateHidden" /> -->
         <activity
             android:name=".main_directory.MyCommission"
             android:screenOrientation="portrait"
@@ -206,20 +226,19 @@
             android:windowSoftInputMode="stateHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-
-        <!--<receiver android:name=".adapter.SmsReceiver">-->
-        <!--<intent-filter>-->
-        <!--<action android:name="android.provider.Telephony.SMS_RECEIVED" />-->
-        <!--</intent-filter>-->
-        <!--</receiver>-->
-        <!--<service android:name=".FCM.MyFirebaseMessagingService">-->
-        <!--<intent-filter>-->
-        <!--<action android:name="com.google.firebase.MESSAGING_EVENT" />-->
-        <!--</intent-filter>-->
-        <!--</service>-->
+        </activity> <!-- <receiver android:name=".adapter.SmsReceiver"> -->
+        <!-- <intent-filter> -->
+        <!-- <action android:name="android.provider.Telephony.SMS_RECEIVED" /> -->
+        <!-- </intent-filter> -->
+        <!-- </receiver> -->
+        <!-- <service android:name=".FCM.MyFirebaseMessagingService"> -->
+        <!-- <intent-filter> -->
+        <!-- <action android:name="com.google.firebase.MESSAGING_EVENT" /> -->
+        <!-- </intent-filter> -->
+        <!-- </service> -->
         <provider
             android:name="com.finopaytech.finosdk.helpers.FinoFileProvider"
             android:authorities="${applicationId}.provider"
@@ -227,18 +246,8 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths">
-            </meta-data>
+                android:resource="@xml/file_paths" />
         </provider>
-        <!--<provider-->
-        <!--android:name="android.support.v4.content.FileProvider"-->
-        <!--android:authorities="${applicationId}.provider"-->
-        <!--android:exported="false"-->
-        <!--android:grantUriPermissions="true">-->
-        <!--<meta-data-->
-        <!--android:name="android.support.FILE_PROVIDER_PATHS"-->
-        <!--android:resource="@xml/provider_paths"/>-->
-        <!--</provider>-->
     </application>
 
 </manifest>

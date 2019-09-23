@@ -66,25 +66,23 @@ public class PassbookActivity extends BaseCompactActivity implements View.OnClic
         fromimage.setOnClickListener(fromDateClicked);
         fromimage.setColorFilter(getResources().getColor(R.color.colorPrimaryDark));
         if (TYPE.equalsIgnoreCase("NODE")) {
-            if (selectedMonth < 11)
-                date2_text.setText(selectedYear + "-" + "0"+selectedMonth + "-" + "01");
-            else
-                date2_text.setText(selectedYear + "-" + selectedMonth + "-" + "01");
-            if (selectedMonth < 11)
+            if (selectedMonth < 11) {
+                date2_text.setText(selectedYear + "-" + "0" + selectedMonth + "-" + "01");
                 date1_text.setText(selectedYear + "-" + "0"+selectedMonth + "-" + selectedDate);
-            else
+            } else {
+                date2_text.setText(selectedYear + "-" + selectedMonth + "-" + "01");
                 date1_text.setText(selectedYear + "-" + selectedMonth + "-" + selectedDate);
+            }
             if (printDifference(mainDate(date2_text.getText().toString()), mainDate(date1_text.getText().toString())))
                 new AsyncPostMethod(WebConfig.CommonReport, channel_request(first, last).toString(), headerData, PassbookActivity.this, getString(R.string.responseTimeOut)).execute();
         } else {
-            if (selectedMonth < 11)
-                date2_text.setText(selectedYear + "-" + "0"+selectedMonth + "-" + selectedDate);
-            else
+            if (selectedMonth < 11) {
+                date2_text.setText(selectedYear + "-" + "0" + selectedMonth + "-" + selectedDate);
+                date1_text.setText(selectedYear + "-" + "0" + selectedMonth + "-" + selectedDate);
+            } else {
                 date2_text.setText(selectedYear + "-" + selectedMonth + "-" + selectedDate);
-            if (selectedMonth < 11)
-                date1_text.setText(selectedYear + "-" + "0"+selectedMonth + "-" + selectedDate);
-            else
                 date1_text.setText(selectedYear + "-" + selectedMonth + "-" + selectedDate);
+            }
         }
         trans_details.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override

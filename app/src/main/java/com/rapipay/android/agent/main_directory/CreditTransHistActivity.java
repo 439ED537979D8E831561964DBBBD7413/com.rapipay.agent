@@ -63,14 +63,13 @@ public class CreditTransHistActivity extends BaseCompactActivity implements Requ
         date1_text = (AutofitTextView) findViewById(R.id.date1);
         date1_text.setOnClickListener(this);
         date2_text.setOnClickListener(this);
-        if (selectedMonth < 11)
-            date2_text.setText(selectedYear + "-" + "0"+selectedMonth + "-" + selectedDate);
-        else
-            date2_text.setText(selectedYear + "-" + selectedMonth + "-" + selectedDate);
-        if (selectedMonth < 11)
+        if (selectedMonth < 11) {
+            date2_text.setText(selectedYear + "-" + "0" + selectedMonth + "-" + selectedDate);
             date1_text.setText(selectedYear + "-" + "0"+selectedMonth + "-" + selectedDate);
-        else
+        } else {
+            date2_text.setText(selectedYear + "-" + selectedMonth + "-" + selectedDate);
             date1_text.setText(selectedYear + "-" + selectedMonth + "-" + selectedDate);
+        }
         btn_fund = (ImageView) findViewById(R.id.btn_fund);
         btn_fund.setOnClickListener(this);
         trans_details = (RecyclerView) findViewById(R.id.trans_details);

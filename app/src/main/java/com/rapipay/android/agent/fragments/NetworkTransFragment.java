@@ -494,7 +494,7 @@ public class NetworkTransFragment extends BaseFragment implements RequestHandler
                         newtpinss.setError("Please enter valid data");
                         newtpinss.requestFocus();
                         btn_ok.setClickable(true);
-                    } else {
+                    } else if (BaseCompactActivity.ENABLE_TPIN != null && BaseCompactActivity.ENABLE_TPIN.equalsIgnoreCase("Y") && newtpin.getText().toString().length() == 4) {
                         dialog.dismiss();
                         customDialogConfirm(pozo, "Are you sure you want to Transfer?", "CONFIRMATION", textsss.getText().toString(), newtpinss.getText().toString(), "Credit Confirmation", remarks.getText().toString());
                         trans_details.setEnabled(true);

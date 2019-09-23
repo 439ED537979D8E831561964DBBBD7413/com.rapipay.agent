@@ -642,8 +642,6 @@ public class BC7TransferFragment extends BaseFragment implements View.OnClickLis
             e.printStackTrace();
         }
         return jsonObject;
-        //{"serviceType":"Verify_Account","requestType":"BC_CHANNEL","typeMobileWeb":"mobile","transactionID":"170250160913846","nodeAgentId":"1000000014","senderName":"dggdg","IFSC":"PUNB0061800","accountNo":"4747001700100025","txnIP":"AC1032F6",
-        // "sessionRefNo":"A2MWSFPTCR","mobileNumber":"8668855858","txnAmmount":"1","reqFor":"BC7","checkSum":"E6AB618D47FD9C139730112D511471844AC0BF5E1C892BD0D4C4FD1B83954EF260A5DA4879246F7FA39BBC41B1EE248A783541FE045F7C8444F779C94CF59590"}
     }
 
     public JSONObject service_fee(String txnAmmount, String subType) {
@@ -876,7 +874,6 @@ public class BC7TransferFragment extends BaseFragment implements View.OnClickLis
                     if ((select_state.getText().toString().isEmpty() || select_state.getText().toString().equalsIgnoreCase("Select State")) && flagstate == 0) {
                         select_state.setError("Please enter valid state");
                         select_state.requestFocus();
-                        //  }
                     } else {
                         if (flagstate == 0)
                             new WalletAsyncMethod(WebConfig.BC2RemittanceApp, addSenderDetails(select_state.getText().toString()).toString(), headerData, BC7TransferFragment.this, getActivity(), getString(R.string.responseTimeOutTrans), "BCTRANSFER").execute();
@@ -1237,8 +1234,8 @@ public class BC7TransferFragment extends BaseFragment implements View.OnClickLis
                     customDialog_Common(object.getString("responseMessage"));
                 } else if (object.getString("responseCode").equalsIgnoreCase("75235")) {
                     customDialog_Common(object.getString("responseMessage"));
-                } else if (object.getString("serviceType").equalsIgnoreCase("SENDER_COMPLETE_DETAILS")) {
-                    if (object.has("serviceType")) {
+                } else if (object.has("serviceType")) {
+                    if (object.getString("serviceType").equalsIgnoreCase("SENDER_COMPLETE_DETAILS")) {
                         if (object.getString("responseCode").equalsIgnoreCase("86036")) {
                             sender_layout.setVisibility(View.GONE);
                             detail_expend.setVisibility(View.VISIBLE);

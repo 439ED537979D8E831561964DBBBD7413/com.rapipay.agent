@@ -8,6 +8,8 @@ import android.support.v4.view.PagerAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 
 import com.rapipay.android.agent.Model.HeaderePozo;
@@ -17,11 +19,9 @@ import java.util.ArrayList;
 
 public class SlidingImage_Adapter extends PagerAdapter {
 
-
     private ArrayList<HeaderePozo> IMAGES;
     private LayoutInflater inflater;
     private Context context;
-
 
     public SlidingImage_Adapter(Context context, ArrayList<HeaderePozo> IMAGES) {
         this.context = context;
@@ -47,6 +47,13 @@ public class SlidingImage_Adapter extends PagerAdapter {
                 .findViewById(R.id.image);
         byteConvert(imageView,IMAGES.get(position).getImagePath());
         view.addView(imageLayout, 0);
+        final Animation zoomAnimation = AnimationUtils.loadAnimation(context, R.anim.zoom);
+        /*imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                imageView.startAnimation(zoomAnimation);
+            }
+        });*/
         return imageLayout;
     }
 

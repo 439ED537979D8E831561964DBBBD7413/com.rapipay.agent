@@ -76,14 +76,13 @@ public class NetworkHistoryFragment extends BaseFragment implements RequestHandl
         date2_text.setOnClickListener(this);
         date1_text = (AutofitTextView) view.findViewById(R.id.date1);
         date1_text.setOnClickListener(this);
-        if (selectedMonth < 11)
-            date2_text.setText(selectedYear + "-" + "0"+selectedMonth + "-" + selectedDate);
-        else
+        if (selectedMonth < 11) {
+            date2_text.setText(selectedYear + "-" + "0" + selectedMonth + "-" + selectedDate);
+            date1_text.setText(selectedYear + "-" + "0" + selectedMonth + "-" + selectedDate);
+        }else {
             date2_text.setText(selectedYear + "-" + selectedMonth + "-" + selectedDate);
-        if (selectedMonth < 11)
-            date1_text.setText(selectedYear + "-" + "0"+selectedMonth + "-" + selectedDate);
-        else
             date1_text.setText(selectedYear + "-" + selectedMonth + "-" + selectedDate);
+        }
         view.findViewById(R.id.btn_fund).setOnClickListener(this);
         trans_details = (ListView) view.findViewById(R.id.trans_details);
         select_state = (Spinner) view.findViewById(R.id.select_state);

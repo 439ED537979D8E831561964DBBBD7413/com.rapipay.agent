@@ -53,11 +53,8 @@ class SubAgentFrag : BaseFragment(), RequestHandler, CustomInterface, View.OnCli
         trans_details = v.findViewById<RecyclerView>(R.id.trans_details)
         trans_details!!.addOnItemTouchListener(RecyclerTouchListener(activity, trans_details, object : ClickListener {
             override fun onClick(view: View?, position: Int) {
-                if (setClickable(view, isClickable) == false) {
-                    isClickable = true
-                } else {
-                    isClickable = false
-                    setClickable(view, isClickable)
+                if (clicks) {
+                    clicks = false
                     pozo = listsubAgent[position]
                     customDialog_Common("SUBAGENTSERVICE", null, pozo, "Select Action", "", "", this@SubAgentFrag)
                 }
@@ -67,21 +64,6 @@ class SubAgentFrag : BaseFragment(), RequestHandler, CustomInterface, View.OnCli
             }
         }))
     }
-
-    var isClickable = true
-    fun setClickable(view: View?, clickable: Boolean): Boolean {
-        if (view != null) {
-            if (view is ViewGroup) {
-                val viewGroup = view as ViewGroup?
-                for (i in 0 until viewGroup!!.childCount) {
-                    setClickable(viewGroup.getChildAt(i), clickable)
-                }
-            }
-            view.isClickable = clickable
-        }
-        return clickable
-    }
-
 
     fun getSubAgent(): JSONObject {
         var jsonObject = JSONObject()
@@ -170,20 +152,12 @@ class SubAgentFrag : BaseFragment(), RequestHandler, CustomInterface, View.OnCli
         var id: Int = v!!.id
         when (id) {
             R.id.createagen -> {
-                createagent!!.setClickable(false)
-                customDialog_Common("CREATEAGENT", null, null, "Create Sub-Agent", null, null, this@SubAgentFrag)
-                createagent!!.setClickable(true)
+                if (clicks) {
+                    clicks = false
+                    customDialog_Common("CREATEAGENT", null, null, "Create Sub-Agent", null, null, this@SubAgentFrag)
+                }
             }
         }
-    }
-
-    public override fun clickable() {
-        createagent!!.setClickable(true)
-    }
-
-    override fun onPause() {
-        clickable()
-        super.onPause()
     }
 
     override fun chechStat(`object`: String?) {

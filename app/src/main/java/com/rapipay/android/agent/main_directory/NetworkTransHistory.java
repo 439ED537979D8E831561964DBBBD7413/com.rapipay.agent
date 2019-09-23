@@ -67,14 +67,13 @@ public class NetworkTransHistory extends BaseCompactActivity implements RequestH
         date1_text = (AutofitTextView) findViewById(R.id.date1);
         date1_text.setOnClickListener(this);
         date2_text.setOnClickListener(this);
-        if (selectedMonth < 11)
-            date2_text.setText(selectedYear + "-" + "0"+selectedMonth + "-" + "01");
-        else
-            date2_text.setText(selectedYear + "-" + selectedMonth + "-" + "01");
-        if (selectedMonth < 11)
+        if (selectedMonth < 11) {
+            date2_text.setText(selectedYear + "-" + "0" + selectedMonth + "-" + "01");
             date1_text.setText(selectedYear + "-" + "0"+selectedMonth + "-" + selectedDate);
-        else
+        }else {
+            date2_text.setText(selectedYear + "-" + selectedMonth + "-" + "01");
             date1_text.setText(selectedYear + "-" + selectedMonth + "-" + selectedDate);
+        }
         btn_fund = (ImageView) findViewById(R.id.btn_fund);
         btn_fund.setOnClickListener(this);
         trans_details = (ListView) findViewById(R.id.trans_details);

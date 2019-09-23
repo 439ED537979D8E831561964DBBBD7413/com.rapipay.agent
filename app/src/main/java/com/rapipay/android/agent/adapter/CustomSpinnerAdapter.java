@@ -18,18 +18,20 @@ public class CustomSpinnerAdapter extends ArrayAdapter<String> {
     private ArrayList<String> arraylist = null;
 
     Context mContext;
-    private  class ViewHolder {
+
+    private class ViewHolder {
         public TextView recycler_text;
     }
 
     public CustomSpinnerAdapter(ArrayList<String> data, Context context) {
         super(context, R.layout.receipt_list, data);
         this.mValues = data;
-        this.mContext=context;
+        this.mContext = context;
         this.arraylist = new ArrayList<String>();
         this.arraylist.addAll(mValues);
 
     }
+
     @Override
     public View getView(int position, View view, ViewGroup parent) {
         ViewHolder viewHolder; // view lookup cache stored in tag
@@ -61,7 +63,7 @@ public class CustomSpinnerAdapter extends ArrayAdapter<String> {
                 }
             }
             notifyDataSetChanged();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

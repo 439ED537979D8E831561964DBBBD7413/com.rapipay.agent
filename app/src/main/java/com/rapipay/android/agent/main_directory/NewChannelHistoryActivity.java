@@ -64,14 +64,13 @@ public class NewChannelHistoryActivity extends BaseCompactActivity implements Vi
         btn_fund.setOnClickListener(this);
         date2_text = (AutofitTextView) findViewById(R.id.date2);
         date1_text = (AutofitTextView) findViewById(R.id.date1);
-        if (selectedMonth < 11)
-            date2_text.setText(selectedYear + "-" + "0"+selectedMonth + "-" + selectedDate);
-        else
-            date2_text.setText(selectedYear + "-" + selectedMonth + "-" + selectedDate);
-        if (selectedMonth < 11)
+        if (selectedMonth < 11) {
+            date2_text.setText(selectedYear + "-" + "0" + selectedMonth + "-" + selectedDate);
             date1_text.setText(selectedYear + "-" + "0"+selectedMonth + "-" + selectedDate);
-        else
+        }else {
+            date2_text.setText(selectedYear + "-" + selectedMonth + "-" + selectedDate);
             date1_text.setText(selectedYear + "-" + selectedMonth + "-" + selectedDate);
+        }
         trans_details = (ListView) findViewById(R.id.trans_details);
         search_data = (EditText) findViewById(R.id.search_data);
         search_data.setVisibility(View.VISIBLE);
