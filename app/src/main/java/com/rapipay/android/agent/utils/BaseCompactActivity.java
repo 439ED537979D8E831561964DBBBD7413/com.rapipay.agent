@@ -2389,64 +2389,6 @@ public class BaseCompactActivity extends AppCompatActivity {
         return jsonObject;
     }
 
-  /*  {"serviceType":"INITIATE_AEPS_CASHOUT",
-            "aepsType":"AEPS2",
-            "reqFor":"AEPS",
-            "latitude":"",
-            "bankName":"",
-            "txnIP":"",
-            "deviceName":"",
-            "transactionID":"",
-            "senderName":"",
-            "initiatedFor":"AEPS_BALANCE_ENQ",
-            "deviceSrno":"",
-            "requestChannel":"AEPS_CHANNEL",
-            "langitude":"0",
-            "requestType":"AEPS-CASHOUT",
-            "sessionRefNo":"",
-            "aadharNo":"",
-            "bankIinNo":"",
-            "agentMobile":"",
-            "responseUrl":"",
-            "nodeAgentId":"",
-            "clientIp":"",
-            "checkSum":"",
-            "customerMobile":"",
-            "typeMobileWeb":"mobile",
-            "txnAmount":}
-*/
-
-    /* protected JSONObject getCashOutDetail1(String mobile, String txnAmmount, String serviceType, String requestChannel, String reqFor, String requestType, String blueToothAddress) {
-         JSONObject jsonObject = new JSONObject();
-         try { //https://uat.rapipay.com/MposService/AEPSCashout
-             transactionIDAEPS = ImageUtils.miliSeconds();
-             jsonObject.put("serviceType", serviceType);
-             jsonObject.put("requestChannel", requestChannel);
-             jsonObject.put("typeMobileWeb", "mobile");
-             jsonObject.put("transactionID", transactionIDAEPS);
-             jsonObject.put("agentMobile", list.get(0).getMobilno());
-             jsonObject.put("customerMobile", mobile);
-             jsonObject.put("senderName", "RapiPay");
-             jsonObject.put("txnAmount", txnAmmount);
-             jsonObject.put("aepsType", "aeps2");
-             jsonObject.put("deviceIMEI", localStorage.getActivityState(LocalStorage.EMI));
-             if (reqFor.equalsIgnoreCase("AEPS")) {
-                 jsonObject.put("bluetoothAddress", blueToothAddress);
-             } else
-                 jsonObject.put("bluetoothAddress", blueToothAddress.replaceAll(":", ""));
-             jsonObject.put("reqFor", reqFor);
-             jsonObject.put("latitude", String.valueOf(mylocation.getLatitude()));
-             jsonObject.put("langitude", String.valueOf(mylocation.getLongitude()));
-             jsonObject.put("sessionRefNo", list.get(0).getAftersessionRefNo());
-             jsonObject.put("requestType", requestType);
-             jsonObject.put("checkSum", GenerateChecksum.checkSum(list.get(0).getPinsession(), jsonObject.toString()));
-         } catch (Exception e) {
-             e.printStackTrace();
-         }
-
-         return jsonObject;
-     }
- */
     protected JSONObject getCashOutDetail1(String deviceName, String mobile, String txnAmmount, String adharno, String username, String serviceType, String requestChannel, String reqFor, String requestType, String blueToothAddress, String innno, String bankName) {
         JSONObject jsonObject = new JSONObject();
         String initiatedfor = "";
@@ -2830,23 +2772,5 @@ public class BaseCompactActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    protected void deleteTables() {
-       /* SQLiteDatabase dba = BaseCompactActivity.db.getWritableDatabase();
-        dba.execSQL("delete from " + RapipayDB.TABLE_NAME);
-        dba.execSQL("delete from " + RapipayDB.TABLE_BANK);
-        dba.execSQL("delete from " + RapipayDB.TABLE_STATE);
-        dba.execSQL("delete from " + RapipayDB.TABLE_PAYMENT);
-        dba.execSQL("delete from " + RapipayDB.TABLE_OPERATOR);
-        dba.execSQL("delete from " + RapipayDB.TABLE_TRANSFERLIST);
-        dba.execSQL("delete from " + RapipayDB.TABLE_PAYERPAYEE);
-        dba.execSQL("delete from " + RapipayDB.TABLE_NEPAL_PAYMENTMOODE);
-        dba.execSQL("delete from " + RapipayDB.TABLE_NEPAL_BANK);
-        dba.execSQL("delete from " + RapipayDB.TABLE_KYC_PERSONAL);
-        dba.execSQL("delete from " + RapipayDB.TABLE_KYC_ADDRESS);
-        dba.execSQL("delete from " + RapipayDB.TABLE_KYC_BUISNESS);
-        dba.execSQL("delete from " + RapipayDB.TABLE_KYC_VERIFICATION);
-        dba.execSQL("delete from " + RapipayDB.TABLE_IMAGES);*/
     }
 }

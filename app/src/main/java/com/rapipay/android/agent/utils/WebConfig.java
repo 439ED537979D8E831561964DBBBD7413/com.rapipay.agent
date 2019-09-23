@@ -49,7 +49,6 @@ public class WebConfig {
     public static String AEPSReg = WEBMain + "DMTBC2ALAPP/DMTBC2Service";
     public static String CREDITREQUESTHIST = WEBMain + "ReportApp/CommonReport";
     public static String CREDITREQUESTHISTRPT = KYCACT + "ReportApp/CommonReport";
-    //  public static String AEPS2_INIT = "http://172.16.50.73:8082/AEPS_GATEWAY_V2/AepsServiceApi"; //http://172.16.50.73:8080/MposService/MposTxnServlet
     public static String AEPS2_INIT = WEBMain + "AEPS_GATEWAY_V2/AepsServiceApi"; //http://172.16.50.73:8080/MposService/MposTxnServlet
 
     public WebConfig(String main) {
