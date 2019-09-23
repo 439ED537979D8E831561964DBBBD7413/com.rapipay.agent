@@ -32,8 +32,7 @@ class BankDetails : BaseFragment(), RequestHandler {
     var note1: TextView? = null
     var note2: TextView? = null
 
-    val wlDetails: JSONObject
-        get() {
+    val wlDetails: JSONObject get() {
             val format = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
             val date = Date()
             val jsonObject = JSONObject()
@@ -87,7 +86,6 @@ class BankDetails : BaseFragment(), RequestHandler {
                     val data = Base64.decode(`object`.getString("smsVirtualCode"), Base64.DEFAULT)
                     val text = String(data, Charsets.UTF_8)
                     parseBankDetails(JSONObject(text))
-
                 }
             } else if (`object`.getString("responseCode").equals("60147", ignoreCase = true))
                 run {
