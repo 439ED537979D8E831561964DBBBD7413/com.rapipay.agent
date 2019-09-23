@@ -594,27 +594,6 @@ public class BC6TransferFragment extends BaseFragment implements View.OnClickLis
         return jsonObject;
     }
 
-    protected void customDialog(String msg) {
-        try {
-            dialogs = new Dialog(getActivity());
-            LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            View alertLayout = inflater.inflate(R.layout.custom_layout_common, null);
-            alertLayout.setKeepScreenOn(true);
-            TextView text = (TextView) alertLayout.findViewById(R.id.dialog_title);
-            text.setVisibility(View.GONE);
-            TextView dialog_msg = (TextView) alertLayout.findViewById(R.id.dialog_msg);
-            dialog_msg.setText(msg);
-            dialog_msg.setVisibility(View.VISIBLE);
-            alertLayout.findViewById(R.id.btn_cancel).setVisibility(View.GONE);
-            AppCompatButton btn_ok = (AppCompatButton) alertLayout.findViewById(R.id.btn_ok);
-            btn_ok.setVisibility(View.GONE);
-            dialogs.setContentView(alertLayout);
-            dialogs.show();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     PostOffice postOffice;
     AddressResponse addressResponse;
     ArrayList<PostOffice> postOfficeArrayList;
@@ -748,16 +727,6 @@ public class BC6TransferFragment extends BaseFragment implements View.OnClickLis
                 v.findViewById(R.id.delete_all).setClickable(false);
                 addBeneDetails("FUNDTRANSFER", "Add Beneficiary Detail");
                 break;
-            /*case R.id.select_state:
-             *//*ArrayList<String> list_state1 = new ArrayList<>();
-                ArrayList<StatePozo> list_state = dbRealm.getState_Details();
-                for (int i = 0; i < list_state.size(); i++) {
-                    list_state1.add(list_state.get(i).getHeaderData());
-                }
-                customSpinner(select_state, "Select State", list_state1);*//*
-
-                break;*/
-
             case R.id.btn_submit:
                 if (input_name1.getText().toString().isEmpty()) {
                     input_name1.setError("Please enter valid name");
@@ -1037,8 +1006,6 @@ public class BC6TransferFragment extends BaseFragment implements View.OnClickLis
             e.printStackTrace();
         }
         return jsonObject;
-        //{"serviceType":"Verify_Account","requestType":"BC_CHANNEL","typeMobileWeb":"mobile","transactionID":"170250160913846","nodeAgentId":"1000000014","senderName":"dggdg","IFSC":"PUNB0061800","accountNo":"4747001700100025","txnIP":"AC1032F6",
-        // "sessionRefNo":"A2MWSFPTCR","mobileNumber":"8668855858","txnAmmount":"1","reqFor":"BC6","checkSum":"E6AB618D47FD9C139730112D511471844AC0BF5E1C892BD0D4C4FD1B83954EF260A5DA4879246F7FA39BBC41B1EE248A783541FE045F7C8444F779C94CF59590"}
     }
 
     public JSONObject service_fee(String txnAmmount, String subType) {
@@ -1110,10 +1077,6 @@ public class BC6TransferFragment extends BaseFragment implements View.OnClickLis
         trans_details.setAdapter(new LastTransAdapter(getActivity(), trans_details, list));
     }
 
-
-    /*   {"serviceType":"DMT_BC_AC_TRANSFER","transactionID":"1567589635646","mobileNumber":"8743999103","senderName":"chetanya","txnAmmount":"10","beneficiaryId":"7FN9EDTFKH","nodeAgentId":"1000000014",
-               "requestType":"BC_CHANNEL","typeMobileWeb":"WEB","reqFor":"BC6","tPin":"03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4","transferType":"IMPS","txnIP":"172.16.50.95","sessionRefNo":"JA3KXBAAMR"}
-   */
     // change for BC6
     public JSONObject getMoney_Validate(String amount, JSONObject object, String beneficiaryId) {
         JSONObject jsonObject = new JSONObject();
@@ -1162,8 +1125,7 @@ public class BC6TransferFragment extends BaseFragment implements View.OnClickLis
             }
         }
         return hex;
-    } // {"userAccessId":"90524659","responseData":"","responseMessage":"60147:Session is expired. Please try again.","responseCode":"60147"}
-    //{"serviceType":"Verify_Account","apiCommonResposne":null,"responseCode":"102","responseMessage":"102:Transaction pending, Please check Transaction Ledger for Status."}
+    }
 
     @Override
     public void chechStat(String s, String hitfrom) {
