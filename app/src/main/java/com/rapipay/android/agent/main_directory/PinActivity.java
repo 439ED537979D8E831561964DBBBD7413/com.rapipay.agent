@@ -1,7 +1,5 @@
 package com.rapipay.android.agent.main_directory;
 
-import android.content.ContentValues;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -288,7 +286,6 @@ public class PinActivity extends BaseCompactActivity implements View.OnClickList
 
     @Override
     public void okClicked(String type, Object ob) {
-        deleteTables();
         if (type.equalsIgnoreCase("SESSIONEXPIRRED") || type.equalsIgnoreCase("SESSIONEXPIRE"))
             jumpPage();
         else if (type.equalsIgnoreCase("KYCLAYOUTS")) {

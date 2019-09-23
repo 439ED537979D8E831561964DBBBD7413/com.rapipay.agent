@@ -75,14 +75,8 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
         if (listHandsetRegistration == null) {
             jumpPage();
         }
-        /*if (db != null && db.getDetails_Rapi()) {
-            listOld = db.getDetails();
-            if (dbRealm != null && dbRealm.getDetails_Rapi())
-                list = dbRealm.getDetails();
-        }*/
         initialize();
         if (dbRealm != null && dbRealm.getDetails_Rapi()) {
-            deleteTables();
             loadApi();
 //            loadMaster();
         } else
@@ -181,12 +175,7 @@ public class PinVerification extends BaseCompactActivity implements RequestHandl
         });
 
     }
-   /*
-    2019-08-23 12:54:38.654 23099-23099/com.rapipay.android.agents E/json: {"serviceType":"PinVerify","requestType":"handset_CHannel","typeMobileWeb":"mobile","txnRefId":"133854120823625","agentId":"9168360492",
-    "nodeAgentId":"9168360492","pin":"111111","imeiNo":"356477080688252","deviceName":"motorola","sessionRefNo":"6JAJ8XRFPZ","osType":"ANDROID","domainName":"agent.rapipay.com","clientRequestIP":"172.16.50.246",
-    "checkSum":"319ABCC1DB3FCE5075C3258AD732F27E779F52F29EAAE6C3EA5AB8408E228FA8AA0553AAE8553188B4DC36D6C25100830A2CDEE6D461887BC2E167504FCFBDC8"}
 
-*/
     public JSONObject getJson_Validate(String pinResults) {
         JSONObject jsonObject = new JSONObject();
         WifiManager wm = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);

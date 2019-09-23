@@ -16,6 +16,7 @@ import java.util.ArrayList;
 public class SpashScreenActivity extends BaseCompactActivity implements CustomInterface {
 
     ImageView imageView,gifimageview;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,8 +35,6 @@ public class SpashScreenActivity extends BaseCompactActivity implements CustomIn
         imageView = (ImageView)findViewById(R.id.imageView);
         gifimageview = (ImageView)findViewById(R.id.gifimageview);
         Glide.with(this).load(R.drawable.overlay_loader).into(gifimageview);
-
-       // String condition = "where " + RapipayDB.IMAGE_NAME + "='loginLogo.jpg'";
         String condition = "loginLogo.jpg";
         if(dbRealm!=null) {
             ArrayList<ImagePozo> imagePozoArrayList = dbRealm.getImageDetails(condition);
@@ -48,7 +47,6 @@ public class SpashScreenActivity extends BaseCompactActivity implements CustomIn
             route_path(true);
         }
     }
-
 
     private void route() {
         new RouteClass(this, null, null, localStorage, null);

@@ -114,8 +114,6 @@ public class FundTransferActivity extends BaseCompactActivity implements View.On
         bank_select.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                /*ArrayList<String> list_bank = dbRealm.geBankDetails("");
-                customSpinner(bank_select, "Select Bank", list_bank);*/
                 ArrayList<String> list_bank = new ArrayList<>();
                 ArrayList<BankDetailsPozo> list_bank1 = BaseCompactActivity.dbRealm.geBankDetails("");
                 for (int i = 0; i < list_bank1.size(); i++) {
