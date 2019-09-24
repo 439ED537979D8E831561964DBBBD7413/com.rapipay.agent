@@ -30,7 +30,6 @@
         android:textSize="14dp"
         android:textColor="@color/white"
         android:focusable="true"
-        android:focusableInTouchMode="true"
-        android:visibility="gone"/>
+        android:focusableInTouchMode="true"/>
 
 </RelativeLayout>

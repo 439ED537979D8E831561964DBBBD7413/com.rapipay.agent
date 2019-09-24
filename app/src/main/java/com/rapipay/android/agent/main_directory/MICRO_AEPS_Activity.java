@@ -134,7 +134,6 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
         adhar_select = findViewById(R.id.adhar_select);
         adhar_select.setClickable(true);
         getBankDetails();
-
         bank_select.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -146,7 +145,6 @@ public class MICRO_AEPS_Activity extends BaseCompactActivity implements View.OnC
                 customSpinner(bank_select, "Select Bank", list_bank);
             }
         });
-
         adhar_select.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
